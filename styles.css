@@ -340,7 +340,7 @@ h1 {
 
 .clue-card {
   position: relative;
-  min-height: 8rem;
+  min-height: 7rem;
   overflow: hidden;
   padding: 1.05rem;
   border: 1px solid var(--border);
@@ -372,7 +372,7 @@ h1 {
 
 .clue-card.is-hidden {
   display: grid;
-  min-height: 5rem;
+  min-height: 4.25rem;
   place-items: center;
   border-style: dashed;
   background:
@@ -726,7 +726,7 @@ h1 {
 .order-choice {
   width: 100%;
   height: 100%;
-  min-height: 8.5rem;
+  min-height: 7.25rem;
   display: flex;
   flex-direction: row;
   align-items: flex-start;
@@ -780,7 +780,7 @@ h1 {
   background: linear-gradient(100deg, #fff, #bdefff 55%, #c7b9ff);
   background-clip: text;
   color: transparent;
-  font-size: clamp(2.7rem, 12vw, 5.5rem);
+  font-size: clamp(2.7rem, 12vw, 5rem);
   letter-spacing: 0.01em;
   line-height: 0.96;
   text-transform: uppercase;
@@ -836,7 +836,7 @@ h1 {
   color: var(--danger);
 }
 
-@media (min-width: 23rem) {
+@media (min-width: 22rem) {
   .site-header,
   .app-shell {
     width: min(100% - 2rem, 74rem);
@@ -847,14 +847,23 @@ h1 {
   }
 
   .card-button {
-    min-height: 8.5rem;
+    min-height: 6.75rem;
   }
 }
 
 @media (max-width: 35rem) {
   .site-header {
     grid-template-columns: 1fr;
-    gap: 0.75rem;
+    gap: 0.45rem;
+    padding-block: 0.7rem 0.65rem;
+  }
+
+  .app-shell {
+    padding-block: 0.5rem 2rem;
+  }
+
+  .panel {
+    padding: 0.85rem;
   }
 
   .header-meta {
@@ -864,14 +873,186 @@ h1 {
     justify-content: space-between;
   }
 
+  .streak-display {
+    gap: 0.3rem;
+    padding: 0.23rem 0.3rem 0.23rem 0.58rem;
+    font-size: 0.73rem;
+  }
+
+  .streak-display strong {
+    min-width: 1.5rem;
+    min-height: 1.5rem;
+    font-size: 0.7rem;
+  }
+
+  .brand-logo {
+    width: 3.55rem;
+    height: 3.55rem;
+  }
+
   .eyebrow {
     max-width: none;
-    font-size: 0.7rem;
-    letter-spacing: 0.1em;
+    font-size: 0.73rem;
+    letter-spacing: 0.095em;
+  }
+
+  h1 {
+    font-size: clamp(2.1rem, 9vw, 2.3rem);
+  }
+
+  .screen-heading {
+    margin-bottom: 1rem;
+  }
+
+  .screen-heading .kicker {
+    margin-bottom: 0.4rem;
+  }
+
+  .screen-heading h2 {
+    margin-bottom: 0.45rem;
+    font-size: clamp(1.8rem, 7.5vw, 2.15rem);
+    line-height: 1;
+  }
+
+  .screen-heading > p:last-child,
+  .helper-text {
+    font-size: 0.94rem;
+    line-height: 1.45;
+  }
+
+  .clue-list,
+  .order-choice-list,
+  .steps-order {
+    gap: 0.65rem;
+  }
+
+  .clue-card {
+    padding: 0.85rem;
+  }
+
+  .clue-number {
+    margin-bottom: 0.55rem;
+  }
+
+  .clue-text {
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .actions {
+    gap: 0.55rem;
+    margin-top: 0.85rem;
   }
 
   .actions .button {
     flex-basis: 100%;
+  }
+
+  .button {
+    min-height: 3rem;
+    padding: 0.7rem 0.8rem;
+    font-size: 0.94rem;
+    line-height: 1.15;
+  }
+
+  .card-grid {
+    gap: 0.65rem;
+  }
+
+  .card-button {
+    padding: 0.85rem 2.6rem 0.85rem 0.85rem;
+  }
+
+  .card-button::after {
+    right: 0.75rem;
+    width: 1.65rem;
+    height: 1.65rem;
+  }
+
+  .card-title {
+    margin-top: 0.35rem;
+    font-size: 1.25rem;
+  }
+
+  .result-banner {
+    padding: 0.9rem 1rem 1rem;
+  }
+
+  .result-banner h2 {
+    font-size: 2rem;
+  }
+
+  .result-banner p:last-child {
+    font-size: 0.96rem;
+    line-height: 1.4;
+  }
+
+  .bonus-panel {
+    margin-top: 1.1rem;
+    padding-top: 1.1rem;
+  }
+
+  .bonus-panel h3 {
+    margin-bottom: 0.45rem;
+    font-size: clamp(1.65rem, 6.6vw, 2rem);
+    line-height: 1;
+  }
+
+  .selection-progress {
+    margin: 0.75rem 0;
+    font-size: 0.84rem;
+  }
+
+  .order-choice {
+    gap: 0.7rem;
+    padding: 0.8rem;
+  }
+
+  .order-rank {
+    width: 2.65rem;
+    height: 2.65rem;
+    font-size: 1.15rem;
+  }
+
+  .order-text {
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+
+  .final-map-name {
+    margin-bottom: 1.1rem;
+    font-size: clamp(2.35rem, 10.5vw, 3.2rem);
+  }
+
+  .steps-order li {
+    gap: 0.6rem;
+    min-height: 4.5rem;
+    padding: 0.7rem;
+    font-size: 0.94rem;
+    line-height: 1.35;
+  }
+
+  .steps-order .order-rank {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .step-tick {
+    width: 1.8rem;
+    height: 1.8rem;
+    font-size: 1.1rem;
+  }
+
+  #replay-puzzle {
+    font-size: 0.88rem;
+    line-height: 1.15;
+  }
+}
+
+@media (min-width: 22rem) and (max-width: 35rem) {
+  .actions .button {
+    min-width: 0;
+    flex: 1 1 0;
   }
 }
 
@@ -890,12 +1071,16 @@ h1 {
   }
 
   .clue-card {
-    min-height: 10.5rem;
+    min-height: 9.25rem;
     padding: 1.2rem;
   }
 
   .clue-card.is-hidden {
-    min-height: 10.5rem;
+    min-height: 9.25rem;
+  }
+
+  .card-button {
+    min-height: 8rem;
   }
 
   .card-grid {
@@ -903,7 +1088,7 @@ h1 {
   }
 
   .order-choice {
-    min-height: 13.5rem;
+    min-height: 11.5rem;
     flex-direction: column;
     padding: 1.2rem;
   }
