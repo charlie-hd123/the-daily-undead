@@ -8,6 +8,8 @@ The bonus ordering round uses tap-to-rank cards: tapping steps assigns 1, 2, and
 
 A correct map and correct step order produce a gold **Perfect!** result banner with the map, clue count, and correct chronological order summarized on one screen.
 
+The player also has a browser-local streak. A correct map answer increases it immediately, whether or not the bonus order is correct. A wrong map answer resets it to zero. Development replays count as additional plays, and clearing the site's browser data resets the streak.
+
 This first version is a dependency-free static site designed to work on GitHub Pages. Its current answer content comes from `Easter Egg Steps - 22JUL2026.xlsm`: 259 ordered steps across 37 maps from World at War through Black Ops 7. Nine additional maps without full Easter eggs are selectable but excluded from the answer rotation.
 
 ## Run locally

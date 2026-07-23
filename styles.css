@@ -78,6 +78,33 @@ h1 {
   text-align: right;
 }
 
+.header-meta {
+  display: grid;
+  justify-items: end;
+  gap: 0.45rem;
+}
+
+.streak-display {
+  margin: 0;
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.streak-display strong {
+  display: inline-grid;
+  min-width: 1.75rem;
+  min-height: 1.75rem;
+  margin-left: 0.25rem;
+  place-items: center;
+  border: 1px solid var(--accent);
+  border-radius: 50%;
+  background: #342a14;
+  color: #ffd45e;
+}
+
 .app-shell {
   padding-block: 1rem 3rem;
 }
