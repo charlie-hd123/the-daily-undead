@@ -485,7 +485,7 @@ function renderResult() {
       : state.isCorrect
         ? `You identified ${answerTitle} in ${state.lockedClues} ${clueLabel}.`
         : `You chose ${selectedMap?.title ?? "an unknown map"}. Today’s answer was ${answerTitle}.`;
-  const resultClass = failedBonus ? "failed" : perfectResult ? "perfect" : state.isCorrect ? "correct" : "failed";
+  const resultClass = failedBonus ? "partial" : perfectResult ? "perfect" : state.isCorrect ? "correct" : "failed";
   const animateResult = resultClass !== lastResultClass;
   lastResultClass = resultClass;
   const showReplay = !state.isCorrect || state.bonusComplete || state.bonusFailed;
@@ -500,7 +500,7 @@ function renderResult() {
       ${
         showReplay
           ? `<div class="actions">
-              <button id="replay-puzzle" class="button" type="button">Replay with a different map · Development</button>
+              <button id="replay-puzzle" class="button" type="button">Replay with a different map - Only available whilst game in development</button>
             </div>`
           : ""
       }
