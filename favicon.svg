@@ -1,4 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="12" fill="#171717"/>
-  <path d="M12 17h40v8H12zm0 14h31v8H12zm0 14h22v8H12z" fill="#e6b84a"/>
+  <defs>
+    <linearGradient id="bg" x1="8" y1="5" x2="58" y2="61" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#17122c"/>
+      <stop offset="1" stop-color="#05070d"/>
+    </linearGradient>
+    <linearGradient id="aether" x1="13" y1="13" x2="52" y2="53" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#67e8ff"/>
+      <stop offset=".52" stop-color="#9e77ff"/>
+      <stop offset="1" stop-color="#ff5dac"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+  <path d="M32 9 51 20v24L32 55 13 44V20L32 9Z" fill="none" stroke="url(#aether)" stroke-width="3"/>
+  <path d="M24 20v24M32 17v30M40 20v24" stroke="#f7c85c" stroke-width="4" stroke-linecap="round"/>
+  <path d="m19 43 28-23" stroke="#ff5d78" stroke-width="4" stroke-linecap="round"/>
 </svg>
