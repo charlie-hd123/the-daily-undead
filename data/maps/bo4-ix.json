@@ -1,0 +1,43 @@
+{
+  "id": "bo4-ix",
+  "gameId": "bo4",
+  "gameTitle": "Black Ops 4",
+  "title": "IX",
+  "steps": [
+    {
+      "id": "defeat-the-four-champions-and-place-their-heads-on-the-temple-spikes",
+      "order": 1,
+      "clue": "Defeat the four champions and place their heads on the temple spikes."
+    },
+    {
+      "id": "prepare-the-bone-meal-charcoal-and-dung",
+      "order": 2,
+      "clue": "Prepare the bone meal, charcoal, and dung."
+    },
+    {
+      "id": "ferment-the-mixture-trigger-fire-bomb-above-it-and-complete-the-danu-trial",
+      "order": 3,
+      "clue": "Ferment the mixture, trigger Fire Bomb above it, and complete the Danu trial."
+    },
+    {
+      "id": "ignite-four-bull-symbols-and-complete-both-ra-obelisk-trials",
+      "order": 4,
+      "clue": "Ignite four bull symbols and complete both Ra obelisk trials."
+    },
+    {
+      "id": "raise-and-charge-the-four-lightning-rods-then-survive-the-arena-trial",
+      "order": 5,
+      "clue": "Raise and charge the four lightning rods, then survive the arena trial."
+    },
+    {
+      "id": "activate-the-nine-underground-symbols-and-complete-the-pit-trial",
+      "order": 6,
+      "clue": "Activate the nine underground symbols and complete the pit trial."
+    },
+    {
+      "id": "enter-the-red-portal-and-defeat-the-war-elephants",
+      "order": 7,
+      "clue": "Enter the red portal and defeat the war elephants."
+    }
+  ]
+}

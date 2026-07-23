@@ -1,0 +1,43 @@
+{
+  "id": "bo6-the-tomb",
+  "gameId": "bo6",
+  "gameTitle": "Black Ops 6",
+  "title": "The Tomb",
+  "steps": [
+    {
+      "id": "build-the-staff-of-ice-and-upgrade-it-to-ull-s-arrow",
+      "order": 1,
+      "clue": "Build the Staff of Ice and upgrade it to Ull's Arrow."
+    },
+    {
+      "id": "complete-the-vermin-statue-challenge-and-return-its-energy",
+      "order": 2,
+      "clue": "Complete the Vermin statue challenge and return its energy."
+    },
+    {
+      "id": "complete-the-parasite-statue-challenge-and-return-its-energy",
+      "order": 3,
+      "clue": "Complete the Parasite statue challenge and return its energy."
+    },
+    {
+      "id": "complete-the-doppelghast-statue-challenge-and-return-its-energy",
+      "order": 4,
+      "clue": "Complete the Doppelghast statue challenge and return its energy."
+    },
+    {
+      "id": "complete-the-amalgam-statue-challenge-and-return-its-energy",
+      "order": 5,
+      "clue": "Complete the Amalgam statue challenge and return its energy."
+    },
+    {
+      "id": "cross-the-opened-bridge-and-activate-the-sentinel-artifact",
+      "order": 6,
+      "clue": "Cross the opened bridge and activate the Sentinel Artifact."
+    },
+    {
+      "id": "complete-the-artifact-boss-fight",
+      "order": 7,
+      "clue": "Complete the artifact boss fight."
+    }
+  ]
+}

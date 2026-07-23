@@ -1,0 +1,48 @@
+{
+  "id": "bo2-buried",
+  "gameId": "bo2",
+  "gameTitle": "Black Ops 2",
+  "title": "Buried",
+  "steps": [
+    {
+      "id": "build-the-guillotine-beside-the-saloon",
+      "order": 1,
+      "clue": "Build the guillotine beside the saloon."
+    },
+    {
+      "id": "power-the-four-red-orbs-with-the-paralyzer",
+      "order": 2,
+      "clue": "Power the four red orbs with the Paralyzer."
+    },
+    {
+      "id": "knock-down-the-lantern-charge-it-with-mansion-ghosts-and-place-it-on-the-symbol",
+      "order": 3,
+      "clue": "Knock down the lantern, charge it with mansion ghosts, and place it on the symbol."
+    },
+    {
+      "id": "decode-the-message-and-strike-the-three-named-tunnel-signs",
+      "order": 4,
+      "clue": "Decode the message and strike the three named tunnel signs."
+    },
+    {
+      "id": "guide-the-wisp-to-the-guillotine-and-charge-it-with-zombie-souls",
+      "order": 5,
+      "clue": "Guide the wisp to the guillotine and charge it with zombie souls."
+    },
+    {
+      "id": "use-a-time-bomb-at-the-guillotine-and-retrieve-the-switch-from-the-future",
+      "order": 6,
+      "clue": "Use a Time Bomb at the guillotine and retrieve the switch from the future."
+    },
+    {
+      "id": "attach-the-switch-then-pull-the-four-maze-levers-in-the-correct-order",
+      "order": 7,
+      "clue": "Attach the switch, then pull the four maze levers in the correct order."
+    },
+    {
+      "id": "make-a-wish-and-complete-the-sharpshooter-targets",
+      "order": 8,
+      "clue": "Make a wish and complete the sharpshooter targets."
+    }
+  ]
+}

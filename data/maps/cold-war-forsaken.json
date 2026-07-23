@@ -1,0 +1,33 @@
+{
+  "id": "cold-war-forsaken",
+  "gameId": "cold-war",
+  "gameTitle": "Black Ops Cold War",
+  "title": "Forsaken",
+  "steps": [
+    {
+      "id": "lift-the-facility-lockdown-and-release-the-forsaken",
+      "order": 1,
+      "clue": "Lift the facility lockdown and release the Forsaken."
+    },
+    {
+      "id": "collect-the-neutralizer-housing-monitor-fuel-tank-and-three-catalyzed-shards",
+      "order": 2,
+      "clue": "Collect the Neutralizer housing, monitor, fuel tank, and three catalyzed shards."
+    },
+    {
+      "id": "build-and-activate-the-aetherium-neutralizer",
+      "order": 3,
+      "clue": "Build and activate the Aetherium Neutralizer."
+    },
+    {
+      "id": "escort-it-through-the-phase-and-open-the-containment-door",
+      "order": 4,
+      "clue": "Escort it through the Phase and open the containment door."
+    },
+    {
+      "id": "charge-the-turrets-destroy-the-weak-points-and-complete-the-capture",
+      "order": 5,
+      "clue": "Charge the turrets, destroy the weak points, and complete the capture."
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "id": "bo3-gorod-krovi",
+  "gameId": "bo3",
+  "gameTitle": "Black Ops 3",
+  "title": "Gorod Krovi",
+  "steps": [
+    {
+      "id": "power-the-hatchery-generator-with-a-valkyrie-drone",
+      "order": 1,
+      "clue": "Power the Hatchery generator with a Valkyrie Drone."
+    },
+    {
+      "id": "solve-the-six-valves-and-retrieve-the-master-code-cylinder",
+      "order": 2,
+      "clue": "Solve the six valves and retrieve the Master Code Cylinder."
+    },
+    {
+      "id": "insert-the-cylinder-and-enter-kronos-into-s-o-p-h-i-a",
+      "order": 3,
+      "clue": "Insert the cylinder and enter KRONOS into S.O.P.H.I.A."
+    },
+    {
+      "id": "place-the-six-silver-trophies-beneath-the-monitor",
+      "order": 4,
+      "clue": "Place the six silver trophies beneath the monitor."
+    },
+    {
+      "id": "complete-s-o-p-h-i-a-s-six-challenges",
+      "order": 5,
+      "clue": "Complete S.O.P.H.I.A.'s six challenges."
+    },
+    {
+      "id": "deliver-the-power-core-to-nikolai-s-mech",
+      "order": 6,
+      "clue": "Deliver the power core to Nikolai's mech."
+    },
+    {
+      "id": "release-s-o-p-h-i-a-and-use-the-hidden-grate-to-free-nikolai",
+      "order": 7,
+      "clue": "Release S.O.P.H.I.A. and use the hidden grate to free Nikolai."
+    },
+    {
+      "id": "defeat-the-dragon-and-nikolai",
+      "order": 8,
+      "clue": "Defeat the dragon and Nikolai."
+    }
+  ]
+}

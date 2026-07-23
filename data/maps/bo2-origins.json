@@ -1,0 +1,48 @@
+{
+  "id": "bo2-origins",
+  "gameId": "bo2",
+  "gameTitle": "Black Ops 2",
+  "title": "Origins",
+  "steps": [
+    {
+      "id": "build-and-upgrade-all-four-staffs",
+      "order": 1,
+      "clue": "Build and upgrade all four staffs."
+    },
+    {
+      "id": "place-the-staffs-in-their-four-matching-holders",
+      "order": 2,
+      "clue": "Place the staffs in their four matching holders."
+    },
+    {
+      "id": "press-the-robot-button-and-throw-a-g-strike-onto-the-stone-seal",
+      "order": 3,
+      "clue": "Press the robot button and throw a G-Strike onto the stone seal."
+    },
+    {
+      "id": "deploy-the-maxis-drone-into-the-opened-pit-and-defeat-the-panzers",
+      "order": 4,
+      "clue": "Deploy the Maxis Drone into the opened pit and defeat the Panzers."
+    },
+    {
+      "id": "shoot-down-the-glowing-plane-and-kill-its-pilot-while-in-zombie-blood",
+      "order": 5,
+      "clue": "Shoot down the glowing plane and kill its pilot while in Zombie Blood."
+    },
+    {
+      "id": "upgrade-every-player-s-one-inch-punch-inside-the-excavation-site",
+      "order": 6,
+      "clue": "Upgrade every player's One Inch Punch inside the excavation site."
+    },
+    {
+      "id": "return-the-staffs-to-the-crazy-place-and-collect-100-souls",
+      "order": 7,
+      "clue": "Return the staffs to the Crazy Place and collect 100 souls."
+    },
+    {
+      "id": "release-maxis-into-the-central-portal",
+      "order": 8,
+      "clue": "Release Maxis into the central portal."
+    }
+  ]
+}

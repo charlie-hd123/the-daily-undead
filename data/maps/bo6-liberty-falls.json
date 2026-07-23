@@ -1,0 +1,43 @@
+{
+  "id": "bo6-liberty-falls",
+  "gameId": "bo6",
+  "gameTitle": "Black Ops 6",
+  "title": "Liberty Falls",
+  "steps": [
+    {
+      "id": "contact-the-trapped-scientist-and-obtain-the-thrustodyne",
+      "order": 1,
+      "clue": "Contact the trapped scientist and obtain the Thrustodyne."
+    },
+    {
+      "id": "pull-in-the-three-ltg-parts-and-build-the-device",
+      "order": 2,
+      "clue": "Pull in the three LTG parts and build the device."
+    },
+    {
+      "id": "defend-the-ltg-weaken-the-hvt-and-charge-the-first-canister",
+      "order": 3,
+      "clue": "Defend the LTG, weaken the HVT, and charge the first canister."
+    },
+    {
+      "id": "calibrate-the-three-projectors-to-release-the-second-canister",
+      "order": 4,
+      "clue": "Calibrate the three projectors to release the second canister."
+    },
+    {
+      "id": "move-the-ltg-repeat-the-hvt-capture-and-return-the-second-canister",
+      "order": 5,
+      "clue": "Move the LTG, repeat the HVT capture, and return the second canister."
+    },
+    {
+      "id": "activate-the-dimensional-gateway",
+      "order": 6,
+      "clue": "Activate the dimensional gateway."
+    },
+    {
+      "id": "survive-the-church-lockdown-and-defeat-its-three-elite-waves",
+      "order": 7,
+      "clue": "Survive the church lockdown and defeat its three elite waves."
+    }
+  ]
+}

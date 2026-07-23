@@ -1,0 +1,43 @@
+{
+  "id": "cold-war-mauer-der-toten",
+  "gameId": "cold-war",
+  "gameTitle": "Black Ops Cold War",
+  "title": "Mauer der Toten",
+  "steps": [
+    {
+      "id": "use-klaus-and-the-crbr-s-blazer-to-open-the-hidden-lab",
+      "order": 1,
+      "clue": "Use Klaus and the CRBR-S Blazer to open the hidden lab."
+    },
+    {
+      "id": "charge-and-return-the-three-essence-canisters",
+      "order": 2,
+      "clue": "Charge and return the three essence canisters."
+    },
+    {
+      "id": "stop-the-train-with-klaus-and-retrieve-the-warhead-and-keycard",
+      "order": 3,
+      "clue": "Stop the train with Klaus and retrieve the warhead and keycard."
+    },
+    {
+      "id": "build-klaus-s-hacking-helm-and-unlock-the-dimensional-disruptor",
+      "order": 4,
+      "clue": "Build Klaus's hacking helm and unlock the Dimensional Disruptor."
+    },
+    {
+      "id": "craft-both-uranium-devices-collide-them-on-the-zipline-then-repeat-next-round",
+      "order": 5,
+      "clue": "Craft both uranium devices, collide them on the zipline, then repeat next round."
+    },
+    {
+      "id": "place-both-cleansed-rocks-in-the-lab-and-defeat-valentina",
+      "order": 6,
+      "clue": "Place both cleansed rocks in the lab and defeat Valentina."
+    },
+    {
+      "id": "protect-klaus-while-he-carries-the-warhead-through-the-portal",
+      "order": 7,
+      "clue": "Protect Klaus while he carries the warhead through the portal."
+    }
+  ]
+}

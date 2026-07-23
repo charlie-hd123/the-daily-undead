@@ -1,0 +1,53 @@
+{
+  "id": "bo4-ancient-evil",
+  "gameId": "bo4",
+  "gameTitle": "Black Ops 4",
+  "title": "Ancient Evil",
+  "steps": [
+    {
+      "id": "light-the-eternal-flame-and-ignite-the-three-oil-spills",
+      "order": 1,
+      "clue": "Light the Eternal Flame and ignite the three oil spills."
+    },
+    {
+      "id": "use-charon-to-destroy-four-glowing-eyed-statues",
+      "order": 2,
+      "clue": "Use Charon to destroy four glowing-eyed statues."
+    },
+    {
+      "id": "connect-the-four-gear-mechanisms-with-apollo-s-will",
+      "order": 3,
+      "clue": "Connect the four gear mechanisms with Apollo's Will."
+    },
+    {
+      "id": "use-gaia-to-reveal-and-complete-the-three-symbol-groups",
+      "order": 4,
+      "clue": "Use Gaia to reveal and complete the three symbol groups."
+    },
+    {
+      "id": "free-and-place-ra-s-scepter",
+      "order": 5,
+      "clue": "Free and place Ra's Scepter."
+    },
+    {
+      "id": "install-the-golden-pole-and-solve-the-three-ring-sundial",
+      "order": 6,
+      "clue": "Install the golden pole and solve the three-ring sundial."
+    },
+    {
+      "id": "complete-the-amphitheater-sharpshooter-trial",
+      "order": 7,
+      "clue": "Complete the amphitheater sharpshooter trial."
+    },
+    {
+      "id": "open-the-river-of-sorrow-door-and-fire-the-charged-ballista",
+      "order": 8,
+      "clue": "Open the River of Sorrow door and fire the charged ballista."
+    },
+    {
+      "id": "defeat-perseus",
+      "order": 9,
+      "clue": "Defeat Perseus."
+    }
+  ]
+}

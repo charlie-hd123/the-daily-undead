@@ -1,0 +1,33 @@
+{
+  "id": "bo3-zetsubou-no-shima",
+  "gameId": "bo3",
+  "gameTitle": "Black Ops 3",
+  "title": "Zetsubou No Shima",
+  "steps": [
+    {
+      "id": "obtain-the-skull-of-nan-sapwe",
+      "order": 1,
+      "clue": "Obtain the Skull of Nan Sapwe."
+    },
+    {
+      "id": "use-it-to-reveal-the-blueprint-and-elevator-machinery",
+      "order": 2,
+      "clue": "Use it to reveal the blueprint and elevator machinery."
+    },
+    {
+      "id": "collect-the-three-missing-cogs",
+      "order": 3,
+      "clue": "Collect the three missing cogs."
+    },
+    {
+      "id": "install-the-cogs-and-activate-the-elevator",
+      "order": 4,
+      "clue": "Install the cogs and activate the elevator."
+    },
+    {
+      "id": "descend-and-defeat-the-giant-thrasher",
+      "order": 5,
+      "clue": "Descend and defeat the giant Thrasher."
+    }
+  ]
+}

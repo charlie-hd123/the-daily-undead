@@ -1,0 +1,53 @@
+{
+  "id": "bo3-revelations",
+  "gameId": "bo3",
+  "gameTitle": "Black Ops 3",
+  "title": "Revelations",
+  "steps": [
+    {
+      "id": "shoot-the-four-tombstones-in-the-required-order",
+      "order": 1,
+      "clue": "Shoot the four tombstones in the required order."
+    },
+    {
+      "id": "obtain-and-play-the-three-audio-reels-in-sequence",
+      "order": 2,
+      "clue": "Obtain and play the three audio reels in sequence."
+    },
+    {
+      "id": "reconstruct-s-o-p-h-i-a-from-the-scattered-bones",
+      "order": 3,
+      "clue": "Reconstruct S.O.P.H.I.A. from the scattered bones."
+    },
+    {
+      "id": "teleport-to-the-bedroom-and-place-the-kronorium-on-the-stage",
+      "order": 4,
+      "clue": "Teleport to the bedroom and place the Kronorium on the stage."
+    },
+    {
+      "id": "charge-the-four-apothicon-eggs-into-gateworms",
+      "order": 5,
+      "clue": "Charge the four Apothicon Eggs into Gateworms."
+    },
+    {
+      "id": "use-the-gateworms-to-retrieve-the-four-runes-of-creation",
+      "order": 6,
+      "clue": "Use the Gateworms to retrieve the four Runes of Creation."
+    },
+    {
+      "id": "enter-the-kronorium-symbols-and-recover-the-summoning-key",
+      "order": 7,
+      "clue": "Enter the Kronorium symbols and recover the Summoning Key."
+    },
+    {
+      "id": "throw-the-summoning-key-at-the-seven-marked-objects",
+      "order": 8,
+      "clue": "Throw the Summoning Key at the seven marked objects."
+    },
+    {
+      "id": "charge-the-key-break-the-shadowman-s-shield-and-defeat-him",
+      "order": 9,
+      "clue": "Charge the key, break the Shadowman's shield, and defeat him."
+    }
+  ]
+}

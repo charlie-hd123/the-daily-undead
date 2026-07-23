@@ -1,0 +1,58 @@
+{
+  "id": "bo1-shangri-la",
+  "gameId": "bo1",
+  "gameTitle": "Black Ops",
+  "title": "Shangri-La",
+  "steps": [
+    {
+      "id": "press-the-spawn-buttons-together-to-activate-the-eclipse",
+      "order": 1,
+      "clue": "Press the spawn buttons together to activate the Eclipse."
+    },
+    {
+      "id": "match-all-12-pairs-of-floor-symbols",
+      "order": 2,
+      "clue": "Match all 12 pairs of floor symbols."
+    },
+    {
+      "id": "with-three-players-standing-on-the-grate-the-fourth-player-activates-the-slide-switch",
+      "order": 3,
+      "clue": "With three players standing on the grate, the fourth player activates the slide switch."
+    },
+    {
+      "id": "explode-the-crystal-above-the-slide-then-shrink-it",
+      "order": 4,
+      "clue": "Explode the crystal above the slide then shrink it."
+    },
+    {
+      "id": "lead-a-napalm-zombie-past-all-four-gas-leaks",
+      "order": 5,
+      "clue": "Lead a Napalm Zombie past all four gas leaks."
+    },
+    {
+      "id": "trigger-spikemores-facing-the-four-tunnel-holes-then-press-the-waterfall-brick",
+      "order": 6,
+      "clue": "Trigger Spikemores facing the four tunnel holes, then press the waterfall brick."
+    },
+    {
+      "id": "knife-all-12-wall-panels",
+      "order": 7,
+      "clue": "Knife all 12 wall panels."
+    },
+    {
+      "id": "destroy-the-wooden-snare-trap-near-the-minecart",
+      "order": 8,
+      "clue": "Destroy the wooden snare trap near the minecart."
+    },
+    {
+      "id": "knife-the-four-correct-gongs-until-the-crystals-glow-yellow",
+      "order": 9,
+      "clue": "Knife the four correct gongs until the crystals glow yellow."
+    },
+    {
+      "id": "catch-the-falling-dynamite",
+      "order": 10,
+      "clue": "Catch the falling dynamite."
+    }
+  ]
+}

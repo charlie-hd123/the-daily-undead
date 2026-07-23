@@ -1,0 +1,38 @@
+{
+  "id": "bo2-mob-of-the-dead",
+  "gameId": "bo2",
+  "gameTitle": "Black Ops 2",
+  "title": "Mob of the Dead",
+  "steps": [
+    {
+      "id": "build-the-plane-and-fly-to-the-bridge",
+      "order": 1,
+      "clue": "Build the plane and fly to the bridge."
+    },
+    {
+      "id": "refuel-it-and-complete-two-more-bridge-trips",
+      "order": 2,
+      "clue": "Refuel it and complete two more bridge trips."
+    },
+    {
+      "id": "enter-the-four-prison-numbers-on-the-spiral-staircase-keypad",
+      "order": 3,
+      "clue": "Enter the four prison numbers on the spiral-staircase keypad."
+    },
+    {
+      "id": "follow-and-collect-the-five-headphone-recordings",
+      "order": 4,
+      "clue": "Follow and collect the five headphone recordings."
+    },
+    {
+      "id": "enter-afterlife-and-board-the-plane-from-the-roof",
+      "order": 5,
+      "clue": "Enter Afterlife and board the plane from the roof."
+    },
+    {
+      "id": "break-the-cycle-by-killing-weasel-on-the-bridge",
+      "order": 6,
+      "clue": "Break the cycle by killing Weasel on the bridge."
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "bo2-tranzit",
+  "gameId": "bo2",
+  "gameTitle": "Black Ops 2",
+  "title": "TranZit",
+  "steps": [
+    {
+      "id": "build-a-turbine-and-use-it-to-access-the-power-station",
+      "order": 1,
+      "clue": "Build a Turbine and use it to access the power station."
+    },
+    {
+      "id": "turn-on-the-power-then-switch-it-back-off",
+      "order": 2,
+      "clue": "Turn on the power, then switch it back off."
+    },
+    {
+      "id": "place-two-turbines-beneath-the-pylon-and-lure-the-electric-enemy-underneath-it",
+      "order": 3,
+      "clue": "Place two Turbines beneath the pylon and lure the electric enemy underneath it."
+    },
+    {
+      "id": "throw-an-emp-grenade-at-the-enemy-while-it-is-beneath-the-pylon",
+      "order": 4,
+      "clue": "Throw an EMP Grenade at the enemy while it is beneath the pylon."
+    },
+    {
+      "id": "place-turbines-beneath-two-active-streetlights",
+      "order": 5,
+      "clue": "Place Turbines beneath two active streetlights."
+    }
+  ]
+}

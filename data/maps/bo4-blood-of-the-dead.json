@@ -1,0 +1,48 @@
+{
+  "id": "bo4-blood-of-the-dead",
+  "gameId": "bo4",
+  "gameTitle": "Black Ops 4",
+  "title": "Blood of the Dead",
+  "steps": [
+    {
+      "id": "spirit-blast-the-rooftop-voltmeter-to-reveal-pack-a-punch",
+      "order": 1,
+      "clue": "Spirit-blast the rooftop voltmeter to reveal Pack-a-Punch."
+    },
+    {
+      "id": "use-brutus-to-open-the-hidden-ritual-room-and-take-the-red-stone",
+      "order": 2,
+      "clue": "Use Brutus to open the hidden ritual room and take the red stone."
+    },
+    {
+      "id": "place-the-stone-track-the-spectral-bird-and-recover-the-kronorium",
+      "order": 3,
+      "clue": "Place the stone, track the spectral bird, and recover the Kronorium."
+    },
+    {
+      "id": "read-its-numbers-and-complete-all-five-portal-challenges",
+      "order": 4,
+      "clue": "Read its numbers and complete all five portal challenges."
+    },
+    {
+      "id": "add-the-five-red-orbs-to-the-laboratory-map",
+      "order": 5,
+      "clue": "Add the five red orbs to the laboratory map."
+    },
+    {
+      "id": "return-to-the-warden-escape-the-cells-and-collect-brutus-s-orb",
+      "order": 6,
+      "clue": "Return to the Warden, escape the cells, and collect Brutus's orb."
+    },
+    {
+      "id": "place-the-final-orb-and-enter-the-dark-mechanism",
+      "order": 7,
+      "clue": "Place the final orb and enter the Dark Mechanism."
+    },
+    {
+      "id": "defeat-brutus-and-complete-richtofen-s-sacrifice",
+      "order": 8,
+      "clue": "Defeat Brutus and complete Richtofen's sacrifice."
+    }
+  ]
+}

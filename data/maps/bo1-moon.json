@@ -1,0 +1,43 @@
+{
+  "id": "bo1-moon",
+  "gameId": "bo1",
+  "gameTitle": "Black Ops",
+  "title": "Moon",
+  "steps": [
+    {
+      "id": "complete-simon-says-on-the-four-computers-outside-the-receiving-bay",
+      "order": 1,
+      "clue": "Complete Simon Says on the four computers outside the Receiving Bay"
+    },
+    {
+      "id": "within-60-seconds-hack-the-four-glowing-green-terminals",
+      "order": 2,
+      "clue": "Within 60 seconds, hack the four glowing green terminals."
+    },
+    {
+      "id": "shoot-it-with-the-wave-gun-when-it-reaches-the-satellite-dish",
+      "order": 3,
+      "clue": "Shoot it with the Wave Gun when it reaches the satellite dish."
+    },
+    {
+      "id": "grenade-the-shelf-beside-the-teleporter-and-throw-a-gersh-device-at-the-fallen-plates",
+      "order": 4,
+      "clue": "Grenade the shelf beside the teleporter and throw a Gersh Device at the fallen plates."
+    },
+    {
+      "id": "throw-a-qed-at-the-plates-near-quick-revive",
+      "order": 5,
+      "clue": "Throw a QED at the plates near Quick Revive."
+    },
+    {
+      "id": "insert-the-charged-vril-device-into-the-pyramid",
+      "order": 6,
+      "clue": "Insert the charged Vril Device into the pyramid."
+    },
+    {
+      "id": "throw-a-qed-at-the-vril-sphere",
+      "order": 7,
+      "clue": "Throw a QED at the Vril Sphere."
+    }
+  ]
+}

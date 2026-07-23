@@ -1,0 +1,48 @@
+{
+  "id": "bo3-der-eisendrache",
+  "gameId": "bo3",
+  "gameTitle": "Black Ops 3",
+  "title": "Der Eisendrache",
+  "steps": [
+    {
+      "id": "upgrade-the-required-bows-and-build-the-ragnarok-dg-4",
+      "order": 1,
+      "clue": "Upgrade the required bows and build the Ragnarok DG-4."
+    },
+    {
+      "id": "shoot-the-four-sparking-objects-before-the-teleporter-resets",
+      "order": 2,
+      "clue": "Shoot the four sparking objects before the teleporter resets."
+    },
+    {
+      "id": "travel-to-the-past-and-collect-the-canister-fuses-and-safe-code",
+      "order": 3,
+      "clue": "Travel to the past and collect the canister, fuses, and safe code."
+    },
+    {
+      "id": "open-the-safe-install-the-fuses-and-coils-then-complete-both-memory-games",
+      "order": 4,
+      "clue": "Open the safe, install the fuses and coils, then complete both memory games."
+    },
+    {
+      "id": "press-the-green-button-shoot-the-fallen-capsule-and-collect-the-golden-rod",
+      "order": 5,
+      "clue": "Press the green button, shoot the fallen capsule, and collect the Golden Rod."
+    },
+    {
+      "id": "repeat-the-wisp-sequence-return-to-the-past-and-collect-the-stone-tablet",
+      "order": 6,
+      "clue": "Repeat the wisp sequence, return to the past, and collect the stone tablet."
+    },
+    {
+      "id": "complete-the-keeper-s-four-soul-rituals-and-teleport-the-mpd",
+      "order": 7,
+      "clue": "Complete the Keeper's four soul rituals and teleport the MPD."
+    },
+    {
+      "id": "defeat-the-keeper-then-use-the-summoning-key-to-destroy-the-moon",
+      "order": 8,
+      "clue": "Defeat the Keeper, then use the Summoning Key to destroy the Moon."
+    }
+  ]
+}

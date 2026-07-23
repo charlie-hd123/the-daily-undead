@@ -1,0 +1,38 @@
+{
+  "id": "bo2-die-rise",
+  "gameId": "bo2",
+  "gameTitle": "Black Ops 2",
+  "title": "Die Rise",
+  "steps": [
+    {
+      "id": "stand-on-the-four-elevator-symbols-at-the-same-time",
+      "order": 1,
+      "clue": "Stand on the four elevator symbols at the same time."
+    },
+    {
+      "id": "activate-the-four-floor-symbols-in-the-correct-order",
+      "order": 2,
+      "clue": "Activate the four floor symbols in the correct order."
+    },
+    {
+      "id": "shoot-the-two-orbs-from-the-dragon-statues-with-a-sniper-rifle",
+      "order": 3,
+      "clue": "Shoot the two orbs from the dragon statues with a sniper rifle."
+    },
+    {
+      "id": "shoot-both-orbs-with-the-sliquifier-until-they-spin",
+      "order": 4,
+      "clue": "Shoot both orbs with the Sliquifier until they spin."
+    },
+    {
+      "id": "aim-four-trample-steams-at-the-tower-and-launch-zombies-toward-it",
+      "order": 5,
+      "clue": "Aim four Trample Steams at the tower and launch zombies toward it."
+    },
+    {
+      "id": "punch-the-tower-columns-in-the-mahjong-tile-order",
+      "order": 6,
+      "clue": "Punch the tower columns in the Mahjong-tile order."
+    }
+  ]
+}

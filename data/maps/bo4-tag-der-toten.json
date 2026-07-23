@@ -1,0 +1,48 @@
+{
+  "id": "bo4-tag-der-toten",
+  "gameId": "bo4",
+  "gameTitle": "Black Ops 4",
+  "title": "Tag der Toten",
+  "steps": [
+    {
+      "id": "complete-two-hermit-trials-and-place-the-four-dials",
+      "order": 1,
+      "clue": "Complete two Hermit trials and place the four dials."
+    },
+    {
+      "id": "collect-the-three-offerings-and-retrieve-the-vril-vessel",
+      "order": 2,
+      "clue": "Collect the three offerings and retrieve the Vril Vessel."
+    },
+    {
+      "id": "return-the-three-orange-orbs-and-take-the-seal-of-duality",
+      "order": 3,
+      "clue": "Return the three orange orbs and take the Seal of Duality."
+    },
+    {
+      "id": "charge-the-seal-at-the-blue-campfire-with-samantha-s-music-box",
+      "order": 4,
+      "clue": "Charge the Seal at the blue campfire with Samantha's Music Box."
+    },
+    {
+      "id": "process-the-two-soapstones-and-use-the-fuse-to-obtain-the-elemental-shard",
+      "order": 5,
+      "clue": "Process the two Soapstones and use the fuse to obtain the Elemental Shard."
+    },
+    {
+      "id": "repeat-the-orb-and-campfire-sequence-then-charge-the-seal-at-four-pack-a-punch-sites",
+      "order": 6,
+      "clue": "Repeat the orb and campfire sequence, then charge the Seal at four Pack-a-Punch sites."
+    },
+    {
+      "id": "charge-the-seal-at-golden-pack-a-punch-and-escort-it-to-human-infusion",
+      "order": 7,
+      "clue": "Charge the Seal at Golden Pack-a-Punch and escort it to Human Infusion."
+    },
+    {
+      "id": "deliver-the-agarthan-device-to-the-hermit-and-enter-the-final-portal",
+      "order": 8,
+      "clue": "Deliver the Agarthan Device to the Hermit and enter the final portal."
+    }
+  ]
+}

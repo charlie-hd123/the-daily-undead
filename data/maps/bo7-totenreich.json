@@ -1,0 +1,38 @@
+{
+  "id": "bo7-totenreich",
+  "gameId": "bo7",
+  "gameTitle": "Black Ops 7",
+  "title": "Totenreich",
+  "steps": [
+    {
+      "id": "restore-power-and-unlock-pack-a-punch",
+      "order": 1,
+      "clue": "Restore power and unlock Pack-a-Punch."
+    },
+    {
+      "id": "follow-astrid-and-obtain-the-jotunn-star",
+      "order": 2,
+      "clue": "Follow Astrid and obtain the Jotunn Star."
+    },
+    {
+      "id": "repair-and-calibrate-the-wundersignal",
+      "order": 3,
+      "clue": "Repair and calibrate the Wundersignal."
+    },
+    {
+      "id": "collect-three-uranium-pieces-and-charge-the-atomkraft-core",
+      "order": 4,
+      "clue": "Collect three Uranium pieces and charge the Atomkraft Core."
+    },
+    {
+      "id": "use-the-shard-to-complete-the-vegvisir-rune-sequence",
+      "order": 5,
+      "clue": "Use the shard to complete the Vegvisir rune sequence."
+    },
+    {
+      "id": "enter-the-robot-head-and-defeat-dravakar",
+      "order": 6,
+      "clue": "Enter the robot head and defeat Dravakar."
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "id": "bo6-citadelle-des-morts",
+  "gameId": "bo6",
+  "gameTitle": "Black Ops 6",
+  "title": "Citadelle des Morts",
+  "steps": [
+    {
+      "id": "speak-with-krafft-and-collect-the-four-torn-pages",
+      "order": 1,
+      "clue": "Speak with Krafft and collect the four torn pages."
+    },
+    {
+      "id": "solve-the-six-symbol-code-and-restore-the-pages-to-the-book",
+      "order": 2,
+      "clue": "Solve the six-symbol code and restore the pages to the book."
+    },
+    {
+      "id": "complete-the-four-point-of-power-traps-in-page-order",
+      "order": 3,
+      "clue": "Complete the four Point of Power traps in page order."
+    },
+    {
+      "id": "obtain-all-four-elemental-swords-and-incantations",
+      "order": 4,
+      "clue": "Obtain all four elemental swords and incantations."
+    },
+    {
+      "id": "honor-the-knight-statues-in-the-displayed-order",
+      "order": 5,
+      "clue": "Honor the knight statues in the displayed order."
+    },
+    {
+      "id": "complete-the-four-elemental-orb-challenges",
+      "order": 6,
+      "clue": "Complete the four elemental orb challenges."
+    },
+    {
+      "id": "recover-the-guardian-key-and-place-it-beneath-the-statue",
+      "order": 7,
+      "clue": "Recover the Guardian Key and place it beneath the statue."
+    },
+    {
+      "id": "defeat-the-guardian",
+      "order": 8,
+      "clue": "Defeat the Guardian."
+    }
+  ]
+}

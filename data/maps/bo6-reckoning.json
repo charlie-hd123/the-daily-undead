@@ -1,0 +1,53 @@
+{
+  "id": "bo6-reckoning",
+  "gameId": "bo6",
+  "gameTitle": "Black Ops 6",
+  "title": "Reckoning",
+  "steps": [
+    {
+      "id": "unlock-pack-a-punch-and-obtain-the-gorgofex",
+      "order": 1,
+      "clue": "Unlock Pack-a-Punch and obtain the Gorgofex."
+    },
+    {
+      "id": "recover-the-dna-vial-and-open-the-teleportation-lab",
+      "order": 2,
+      "clue": "Recover the DNA vial and open the teleportation lab."
+    },
+    {
+      "id": "order-the-four-files-by-date-and-reboot-the-accelerator",
+      "order": 3,
+      "clue": "Order the four files by date and reboot the accelerator."
+    },
+    {
+      "id": "charge-the-gorgofex-and-clear-the-portal-crystals",
+      "order": 4,
+      "clue": "Charge the Gorgofex and clear the portal crystals."
+    },
+    {
+      "id": "cleanse-the-fungal-head-and-place-it-in-the-portal",
+      "order": 5,
+      "clue": "Cleanse the fungal head and place it in the portal."
+    },
+    {
+      "id": "build-franken-klaus-and-complete-his-two-terminal-tasks",
+      "order": 6,
+      "clue": "Build Franken-Klaus and complete his two terminal tasks."
+    },
+    {
+      "id": "capture-four-floating-items-and-activate-the-bio-aetheric-portal",
+      "order": 7,
+      "clue": "Capture four floating items and activate the bio-aetheric portal."
+    },
+    {
+      "id": "attune-the-sentinel-artifact-and-complete-both-elevator-vaults",
+      "order": 8,
+      "clue": "Attune the Sentinel Artifact and complete both elevator vaults."
+    },
+    {
+      "id": "choose-a-side-and-defeat-the-opposing-boss",
+      "order": 9,
+      "clue": "Choose a side and defeat the opposing boss."
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "cold-war-firebase-z",
+  "gameId": "cold-war",
+  "gameTitle": "Black Ops Cold War",
+  "title": "Firebase Z",
+  "steps": [
+    {
+      "id": "restore-the-three-reactors-and-speak-with-ravenov-peck-then-ravenov-again",
+      "order": 1,
+      "clue": "Restore the three reactors and speak with Ravenov, Peck, then Ravenov again."
+    },
+    {
+      "id": "mix-the-truth-serum-and-release-it-into-peck-s-room",
+      "order": 2,
+      "clue": "Mix the truth serum and release it into Peck's room."
+    },
+    {
+      "id": "trap-the-three-marked-mimics-and-recover-the-floppy-disk",
+      "order": 3,
+      "clue": "Trap the three marked Mimics and recover the floppy disk."
+    },
+    {
+      "id": "insert-the-disk-open-the-opc-and-obtain-the-aethermeter",
+      "order": 4,
+      "clue": "Insert the disk, open the OPC, and obtain the Aethermeter."
+    },
+    {
+      "id": "dig-up-and-secure-the-three-aether-crystals",
+      "order": 5,
+      "clue": "Dig up and secure the three Aether crystals."
+    },
+    {
+      "id": "insert-the-crystals-and-align-the-satellite-dish",
+      "order": 6,
+      "clue": "Insert the crystals and align the satellite dish."
+    },
+    {
+      "id": "enter-the-opc-and-defeat-orda",
+      "order": 7,
+      "clue": "Enter the OPC and defeat Orda."
+    }
+  ]
+}

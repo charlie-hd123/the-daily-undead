@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#151515">
+    <meta
+      name="description"
+      content="The Daily Undead — your daily Treyarch Zombies challenge. Reveal clues, identify the map, and put the steps in order."
+    >
+    <title>The Daily Undead</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./styles.css?v=20260722-12">
+  </head>
+  <body>
+    <header class="site-header">
+      <div>
+        <p class="eyebrow">Your daily Treyarch Zombies challenge</p>
+        <h1>The Daily Undead</h1>
+      </div>
+      <p id="puzzle-date" class="puzzle-date"></p>
+    </header>
+
+    <main id="app" class="app-shell" aria-live="polite">
+      <section class="panel loading-panel">
+        <h2>Loading today’s puzzle…</h2>
+      </section>
+    </main>
+
+    <noscript>
+      <p class="noscript">This game needs JavaScript enabled.</p>
+    </noscript>
+
+    <template id="clue-template">
+      <article class="clue-card">
+        <p class="clue-number"></p>
+        <p class="clue-text"></p>
+      </article>
+    </template>
+
+    <script type="module" src="./js/app.js?v=20260722-13"></script>
+  </body>
+</html>

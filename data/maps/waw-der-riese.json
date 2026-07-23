@@ -1,0 +1,28 @@
+{
+  "id": "waw-der-riese",
+  "gameId": "waw",
+  "gameTitle": "World at War",
+  "title": "Der Riese",
+  "steps": [
+    {
+      "id": "turn-on-the-power-and-link-all-three-teleporters",
+      "order": 1,
+      "clue": "Turn on the power and link all three teleporters."
+    },
+    {
+      "id": "pack-a-punch-a-bullet-based-weapon",
+      "order": 2,
+      "clue": "Pack-a-Punch a bullet-based weapon."
+    },
+    {
+      "id": "shoot-the-hidden-panel-in-the-alley-near-the-mainframe",
+      "order": 3,
+      "clue": "Shoot the hidden panel in the alley near the mainframe."
+    },
+    {
+      "id": "shoot-the-three-hidden-toys-around-the-map",
+      "order": 4,
+      "clue": "Shoot the three hidden toys around the map."
+    }
+  ]
+}

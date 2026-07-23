@@ -1,0 +1,38 @@
+{
+  "id": "bo7-paradox-junction",
+  "gameId": "bo7",
+  "gameTitle": "Black Ops 7",
+  "title": "Paradox Junction",
+  "steps": [
+    {
+      "id": "build-the-blundergat-and-upgrade-it-to-the-sundergat",
+      "order": 1,
+      "clue": "Build the Blundergat and upgrade it to the Sundergat."
+    },
+    {
+      "id": "restore-the-swing-and-meet-the-twins",
+      "order": 2,
+      "clue": "Restore the swing and meet the twins."
+    },
+    {
+      "id": "complete-the-hopscotch-bouncing-ball-and-four-square-trials",
+      "order": 3,
+      "clue": "Complete the hopscotch, bouncing-ball, and four-square trials."
+    },
+    {
+      "id": "charge-the-three-rewards-with-the-sundergat-and-deliver-them",
+      "order": 4,
+      "clue": "Charge the three rewards with the Sundergat and deliver them."
+    },
+    {
+      "id": "set-the-broken-clock-and-follow-the-twins-through-their-three-locations",
+      "order": 5,
+      "clue": "Set the broken clock and follow the twins through their three locations."
+    },
+    {
+      "id": "enter-the-portal-and-defeat-the-dark-heart",
+      "order": 6,
+      "clue": "Enter the portal and defeat the Dark Heart."
+    }
+  ]
+}

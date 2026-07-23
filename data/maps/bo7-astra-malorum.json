@@ -1,0 +1,48 @@
+{
+  "id": "bo7-astra-malorum",
+  "gameId": "bo7",
+  "gameTitle": "Black Ops 7",
+  "title": "Astra Malorum",
+  "steps": [
+    {
+      "id": "trap-o-s-c-a-r-three-ways-and-recover-the-lgm-1",
+      "order": 1,
+      "clue": "Trap O.S.C.A.R. three ways and recover the LGM-1."
+    },
+    {
+      "id": "eavesdrop-on-o-s-c-a-r-and-enter-the-planet-code",
+      "order": 2,
+      "clue": "Eavesdrop on O.S.C.A.R. and enter the planet code."
+    },
+    {
+      "id": "recover-thurston-s-brain-and-restart-the-teleporter-machinery",
+      "order": 3,
+      "clue": "Recover Thurston's brain and restart the teleporter machinery."
+    },
+    {
+      "id": "solve-the-reading-list-planet-alignment-and-mars-coordinates",
+      "order": 4,
+      "clue": "Solve the reading list, planet alignment, and Mars coordinates."
+    },
+    {
+      "id": "defend-the-portal-and-travel-to-mars",
+      "order": 5,
+      "clue": "Defend the portal and travel to Mars."
+    },
+    {
+      "id": "capture-the-ascendant-eye-and-place-it-in-the-device",
+      "order": 6,
+      "clue": "Capture the Ascendant Eye and place it in the device."
+    },
+    {
+      "id": "harmonize-the-five-pillars-in-the-displayed-order",
+      "order": 7,
+      "clue": "Harmonize the five pillars in the displayed order."
+    },
+    {
+      "id": "defeat-caltheris",
+      "order": 8,
+      "clue": "Defeat Caltheris."
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "id": "bo4-voyage-of-despair",
+  "gameId": "bo4",
+  "gameTitle": "Black Ops 4",
+  "title": "Voyage of Despair",
+  "steps": [
+    {
+      "id": "activate-the-sentinel-artifact",
+      "order": 1,
+      "clue": "Activate the Sentinel Artifact."
+    },
+    {
+      "id": "attune-all-four-pack-a-punch-pedestals",
+      "order": 2,
+      "clue": "Attune all four Pack-a-Punch pedestals."
+    },
+    {
+      "id": "match-the-clocks-to-the-bridge-engine-room-and-stern-levers",
+      "order": 3,
+      "clue": "Match the clocks to the bridge, engine-room, and stern levers."
+    },
+    {
+      "id": "create-the-four-elemental-portals-and-complete-their-trials-in-order",
+      "order": 4,
+      "clue": "Create the four elemental portals and complete their trials in order."
+    },
+    {
+      "id": "fill-the-turbine-room-and-pack-a-punch-the-sentinel-artifact",
+      "order": 5,
+      "clue": "Fill the Turbine Room and Pack-a-Punch the Sentinel Artifact."
+    },
+    {
+      "id": "activate-the-nine-planetary-symbols-around-the-ship",
+      "order": 6,
+      "clue": "Activate the nine planetary symbols around the ship."
+    },
+    {
+      "id": "memorize-the-model-and-collect-the-planets-in-its-displayed-order",
+      "order": 7,
+      "clue": "Memorize the model and collect the planets in its displayed order."
+    },
+    {
+      "id": "melt-a-path-through-the-ice-to-the-stern",
+      "order": 8,
+      "clue": "Melt a path through the ice to the stern."
+    },
+    {
+      "id": "enter-the-iceberg-and-defeat-the-eye",
+      "order": 9,
+      "clue": "Enter the iceberg and defeat the Eye."
+    }
+  ]
+}

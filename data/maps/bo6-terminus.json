@@ -1,0 +1,43 @@
+{
+  "id": "bo6-terminus",
+  "gameId": "bo6",
+  "gameTitle": "Black Ops 6",
+  "title": "Terminus",
+  "steps": [
+    {
+      "id": "use-the-beamsmasher-to-recover-the-hard-drive-and-deliver-it-to-peck",
+      "order": 1,
+      "clue": "Use the Beamsmasher to recover the hard drive and deliver it to Peck."
+    },
+    {
+      "id": "decode-nathan-s-chamber-release-him-and-defeat-his-altered-form",
+      "order": 2,
+      "clue": "Decode Nathan's chamber, release him, and defeat his altered form."
+    },
+    {
+      "id": "recover-the-keycard-and-repair-the-two-node-connectors",
+      "order": 3,
+      "clue": "Recover the keycard and repair the two node connectors."
+    },
+    {
+      "id": "hack-all-three-satellite-buoys-within-the-time-limit",
+      "order": 4,
+      "clue": "Hack all three satellite buoys within the time limit."
+    },
+    {
+      "id": "disarm-the-three-warheads-before-the-countdown-expires",
+      "order": 5,
+      "clue": "Disarm the three warheads before the countdown expires."
+    },
+    {
+      "id": "enter-the-docked-submarine-bay",
+      "order": 6,
+      "clue": "Enter the docked submarine bay."
+    },
+    {
+      "id": "defeat-patient-13",
+      "order": 7,
+      "clue": "Defeat Patient 13."
+    }
+  ]
+}

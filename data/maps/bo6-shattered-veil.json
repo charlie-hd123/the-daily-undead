@@ -1,0 +1,33 @@
+{
+  "id": "bo6-shattered-veil",
+  "gameId": "bo6",
+  "gameTitle": "Black Ops 6",
+  "title": "Shattered Veil",
+  "steps": [
+    {
+      "id": "unlock-pack-a-punch-and-obtain-the-ray-gun-mark-ii",
+      "order": 1,
+      "clue": "Unlock Pack-a-Punch and obtain the Ray Gun Mark II."
+    },
+    {
+      "id": "recover-the-three-canisters-and-craft-all-three-elemental-variants",
+      "order": 2,
+      "clue": "Recover the three canisters and craft all three elemental variants."
+    },
+    {
+      "id": "complete-the-three-variant-ritual-chains",
+      "order": 3,
+      "clue": "Complete the three variant ritual chains."
+    },
+    {
+      "id": "place-the-three-sentinel-artifacts-in-the-mainframe-chamber",
+      "order": 4,
+      "clue": "Place the three Sentinel Artifacts in the mainframe chamber."
+    },
+    {
+      "id": "enter-the-chamber-and-defeat-the-z-rex",
+      "order": 5,
+      "clue": "Enter the chamber and defeat the Z-Rex."
+    }
+  ]
+}

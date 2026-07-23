@@ -1,0 +1,33 @@
+{
+  "id": "bo1-call-of-the-dead",
+  "gameId": "bo1",
+  "gameTitle": "Black Ops",
+  "title": "Call of the Dead",
+  "steps": [
+    {
+      "id": "knife-the-door-and-find-the-fuse",
+      "order": 1,
+      "clue": "Knife the door and find the fuse."
+    },
+    {
+      "id": "destroy-all-four-red-generators",
+      "order": 2,
+      "clue": "Destroy all four red generators."
+    },
+    {
+      "id": "shoot-a-zombie-with-the-v-r11-inside-the-lighthouse-beam",
+      "order": 3,
+      "clue": "Shoot a zombie with the V-R11 inside the lighthouse beam."
+    },
+    {
+      "id": "collect-and-insert-the-golden-rod-into-the-tube-beside-the-door",
+      "order": 4,
+      "clue": "Collect and insert the Golden Rod into the tube beside the door."
+    },
+    {
+      "id": "knife-the-fuse-box",
+      "order": 5,
+      "clue": "Knife the fuse box."
+    }
+  ]
+}

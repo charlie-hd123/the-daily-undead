@@ -1,0 +1,33 @@
+{
+  "id": "bo1-ascension",
+  "gameId": "bo1",
+  "gameTitle": "Black Ops",
+  "title": "Ascension",
+  "steps": [
+    {
+      "id": "throw-a-gersh-device-outside-the-map-to-capture-the-generator",
+      "order": 1,
+      "clue": "Throw a Gersh Device outside the map to capture the generator."
+    },
+    {
+      "id": "simultaneously-hit-the-buttons-next-to-the-perk-machines-during-a-special-round",
+      "order": 2,
+      "clue": "Simultaneously hit the buttons next to the Perk Machines during a special round."
+    },
+    {
+      "id": "stand-in-front-of-the-clock-for-two-minutes",
+      "order": 3,
+      "clue": "Stand in front of the clock for two minutes."
+    },
+    {
+      "id": "collect-the-letters-in-the-sky-to-spell-l-u-n-a",
+      "order": 4,
+      "clue": "Collect the letters in the sky to spell L-U-N-A."
+    },
+    {
+      "id": "throw-a-gersh-device-at-the-orb-and-fire-upgraded-wonder-weapons-at-it",
+      "order": 5,
+      "clue": "Throw a Gersh Device at the orb and fire upgraded Wonder Weapons at it."
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "id": "bo7-kowakujo",
+  "gameId": "bo7",
+  "gameTitle": "Black Ops 7",
+  "title": "Kowakujō",
+  "steps": [
+    {
+      "id": "recapture-both-wards-and-remove-the-gate-glyphs",
+      "order": 1,
+      "clue": "Recapture both wards and remove the gate glyphs."
+    },
+    {
+      "id": "defeat-the-oni-open-the-sanctum-and-charge-the-world-seed",
+      "order": 2,
+      "clue": "Defeat the Oni, open the sanctum, and charge the World Seed."
+    },
+    {
+      "id": "build-the-maneki-neko-and-free-the-nekomancer",
+      "order": 3,
+      "clue": "Build the Maneki-Neko and free the Nekomancer."
+    },
+    {
+      "id": "light-all-eleven-lanterns-then-place-and-solve-the-fox-mask",
+      "order": 4,
+      "clue": "Light all eleven lanterns, then place and solve the Fox Mask."
+    },
+    {
+      "id": "gather-the-three-suspect-items-and-place-them-in-the-meditation-room",
+      "order": 5,
+      "clue": "Gather the three suspect items and place them in the Meditation Room."
+    },
+    {
+      "id": "complete-the-accomplice-and-poison-evidence-sets-in-order",
+      "order": 6,
+      "clue": "Complete the accomplice and poison evidence sets in order."
+    },
+    {
+      "id": "finish-the-cup-and-flag-trials-solve-the-murder-board-and-purify-the-sword",
+      "order": 7,
+      "clue": "Finish the cup and flag trials, solve the murder board, and purify the sword."
+    },
+    {
+      "id": "follow-the-new-kite-and-defeat-nyxara",
+      "order": 8,
+      "clue": "Follow the new kite and defeat Nyxara."
+    }
+  ]
+}

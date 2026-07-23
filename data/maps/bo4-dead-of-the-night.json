@@ -1,0 +1,33 @@
+{
+  "id": "bo4-dead-of-the-night",
+  "gameId": "bo4",
+  "gameTitle": "Black Ops 4",
+  "title": "Dead of the Night",
+  "steps": [
+    {
+      "id": "complete-the-three-crystal-visions-and-unlock-pack-a-punch",
+      "order": 1,
+      "clue": "Complete the three crystal visions and unlock Pack-a-Punch."
+    },
+    {
+      "id": "revisit-the-crystals-to-reveal-the-three-quest-lines",
+      "order": 2,
+      "clue": "Revisit the crystals to reveal the three quest lines."
+    },
+    {
+      "id": "complete-the-telescope-knight-and-effigy-quest-lines",
+      "order": 3,
+      "clue": "Complete the telescope, knight, and effigy quest lines."
+    },
+    {
+      "id": "place-the-three-stones-in-the-forest-gateway",
+      "order": 4,
+      "clue": "Place the three stones in the forest gateway."
+    },
+    {
+      "id": "enter-the-forest-and-defeat-the-werewolf",
+      "order": 5,
+      "clue": "Enter the forest and defeat the werewolf."
+    }
+  ]
+}

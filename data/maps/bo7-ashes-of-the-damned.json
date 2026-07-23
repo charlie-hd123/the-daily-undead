@@ -1,0 +1,48 @@
+{
+  "id": "bo7-ashes-of-the-damned",
+  "gameId": "bo7",
+  "gameTitle": "Black Ops 7",
+  "title": "Ashes of the Damned",
+  "steps": [
+    {
+      "id": "restore-power-and-install-t-e-d-d-and-pack-a-punch-on-ol-tessie",
+      "order": 1,
+      "clue": "Restore power and install T.E.D.D. and Pack-a-Punch on Ol' Tessie."
+    },
+    {
+      "id": "reactivate-klaus-and-use-him-to-recover-the-aether-barrel",
+      "order": 2,
+      "clue": "Reactivate Klaus and use him to recover the Aether Barrel."
+    },
+    {
+      "id": "charge-the-barrel-solve-the-cube-and-obtain-the-necrofluid-gauntlet",
+      "order": 3,
+      "clue": "Charge the barrel, solve the cube, and obtain the Necrofluid Gauntlet."
+    },
+    {
+      "id": "fully-upgrade-ol-tessie-and-concoct-the-serum",
+      "order": 4,
+      "clue": "Fully upgrade Ol' Tessie and concoct the serum."
+    },
+    {
+      "id": "use-the-three-keys-to-open-the-seal-of-sorrow-and-install-the-dg-2-turret",
+      "order": 5,
+      "clue": "Use the three keys to open the Seal of Sorrow and install the DG-2 turret."
+    },
+    {
+      "id": "complete-the-four-gauntlet-challenges",
+      "order": 6,
+      "clue": "Complete the four Gauntlet challenges."
+    },
+    {
+      "id": "collect-the-rally-orbs-in-the-required-route",
+      "order": 7,
+      "clue": "Collect the rally orbs in the required route."
+    },
+    {
+      "id": "defeat-veytharion-with-ol-tessie",
+      "order": 8,
+      "clue": "Defeat Veytharion with Ol' Tessie."
+    }
+  ]
+}

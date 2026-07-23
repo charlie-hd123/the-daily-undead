@@ -1,0 +1,48 @@
+{
+  "id": "bo4-alpha-omega",
+  "gameId": "bo4",
+  "gameTitle": "Black Ops 4",
+  "title": "Alpha Omega",
+  "steps": [
+    {
+      "id": "defend-the-generator-then-repair-the-four-ventilation-units",
+      "order": 1,
+      "clue": "Defend the generator, then repair the four ventilation units."
+    },
+    {
+      "id": "read-the-television-codes-set-the-punch-clocks-and-enter-the-spare-code",
+      "order": 2,
+      "clue": "Read the television codes, set the punch clocks, and enter the spare code."
+    },
+    {
+      "id": "lead-the-red-nova-6-crawler-to-the-transfusion-facility",
+      "order": 3,
+      "clue": "Lead the red Nova 6 crawler to the Transfusion Facility."
+    },
+    {
+      "id": "use-a-d-a-m-to-recover-and-return-the-stolen-canister",
+      "order": 4,
+      "clue": "Use A.D.A.M. to recover and return the stolen canister."
+    },
+    {
+      "id": "cool-and-install-the-server-then-enter-the-three-staff-codes",
+      "order": 5,
+      "clue": "Cool and install the server, then enter the three staff codes."
+    },
+    {
+      "id": "set-the-six-power-boxes-and-restore-the-bunker-power",
+      "order": 6,
+      "clue": "Set the six power boxes and restore the bunker power."
+    },
+    {
+      "id": "repair-a-d-a-m-then-escort-the-elemental-orb-to-the-interrogation-room",
+      "order": 7,
+      "clue": "Repair A.D.A.M., then escort the Elemental Orb to the interrogation room."
+    },
+    {
+      "id": "charge-the-four-canisters-return-the-avogadro-to-the-apd-and-transport-him",
+      "order": 8,
+      "clue": "Charge the four canisters, return the Avogadro to the APD, and transport him."
+    }
+  ]
+}

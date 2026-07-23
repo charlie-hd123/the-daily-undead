@@ -1,0 +1,38 @@
+{
+  "id": "bo3-shadows-of-evil",
+  "gameId": "bo3",
+  "gameTitle": "Black Ops 3",
+  "title": "Shadows of Evil",
+  "steps": [
+    {
+      "id": "complete-the-four-character-rituals-and-place-their-gateworms-in-the-rift",
+      "order": 1,
+      "clue": "Complete the four character rituals and place their Gateworms in the rift."
+    },
+    {
+      "id": "complete-the-final-ritual-in-the-sacred-place",
+      "order": 2,
+      "clue": "Complete the final ritual in the Sacred Place."
+    },
+    {
+      "id": "obtain-and-upgrade-all-four-apothicon-swords",
+      "order": 3,
+      "clue": "Obtain and upgrade all four Apothicon Swords."
+    },
+    {
+      "id": "defend-the-flag-at-all-eight-locations-and-return-it-to-the-four-ritual-altars",
+      "order": 4,
+      "clue": "Defend the flag at all eight locations and return it to the four ritual altars."
+    },
+    {
+      "id": "use-the-four-keepers-to-expose-and-trap-the-shadowman",
+      "order": 5,
+      "clue": "Use the four Keepers to expose and trap the Shadowman."
+    },
+    {
+      "id": "shock-the-three-tram-boxes-then-keep-the-rails-charged-while-one-player-shocks-the-gateworm",
+      "order": 6,
+      "clue": "Shock the three tram boxes, then keep the rails charged while one player shocks the gateworm."
+    }
+  ]
+}

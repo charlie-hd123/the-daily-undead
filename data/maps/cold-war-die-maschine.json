@@ -1,0 +1,43 @@
+{
+  "id": "cold-war-die-maschine",
+  "gameId": "cold-war",
+  "gameTitle": "Black Ops Cold War",
+  "title": "Die Maschine",
+  "steps": [
+    {
+      "id": "build-the-aetherscope-after-restoring-pack-a-punch",
+      "order": 1,
+      "clue": "Build the Aetherscope after restoring Pack-a-Punch."
+    },
+    {
+      "id": "give-vogel-s-diary-to-the-three-spectral-reflections",
+      "order": 2,
+      "clue": "Give Vogel's diary to the three spectral reflections."
+    },
+    {
+      "id": "unlock-the-terminal-and-fire-all-four-d-i-e-variants-at-the-chamber",
+      "order": 3,
+      "clue": "Unlock the terminal and fire all four D.I.E. variants at the chamber."
+    },
+    {
+      "id": "use-the-dark-aether-wrench-to-fire-the-tank-and-recover-the-missing-agent",
+      "order": 4,
+      "clue": "Use the Dark Aether Wrench to fire the tank and recover the missing agent."
+    },
+    {
+      "id": "trap-both-halves-of-a-split-megaton-in-the-chamber",
+      "order": 5,
+      "clue": "Trap both halves of a split Megaton in the chamber."
+    },
+    {
+      "id": "collect-orlov-s-family-photo-and-return-to-the-cyclotron",
+      "order": 6,
+      "clue": "Collect Orlov's family photo and return to the cyclotron."
+    },
+    {
+      "id": "protect-orlov-while-he-shuts-down-the-three-systems-then-escape",
+      "order": 7,
+      "clue": "Protect Orlov while he shuts down the three systems, then escape."
+    }
+  ]
+}

@@ -1,0 +1,210 @@
+{
+  "games": [
+    {
+      "id": "waw",
+      "title": "World at War",
+      "releaseOrder": 1
+    },
+    {
+      "id": "bo1",
+      "title": "Black Ops",
+      "releaseOrder": 2
+    },
+    {
+      "id": "bo2",
+      "title": "Black Ops 2",
+      "releaseOrder": 3
+    },
+    {
+      "id": "bo3",
+      "title": "Black Ops 3",
+      "releaseOrder": 4
+    },
+    {
+      "id": "bo4",
+      "title": "Black Ops 4",
+      "releaseOrder": 5
+    },
+    {
+      "id": "cold-war",
+      "title": "Black Ops Cold War",
+      "releaseOrder": 6
+    },
+    {
+      "id": "bo6",
+      "title": "Black Ops 6",
+      "releaseOrder": 7
+    },
+    {
+      "id": "bo7",
+      "title": "Black Ops 7",
+      "releaseOrder": 8
+    }
+  ],
+  "maps": [
+    "waw-der-riese.json",
+    "bo1-ascension.json",
+    "bo1-call-of-the-dead.json",
+    "bo1-shangri-la.json",
+    "bo1-moon.json",
+    "bo2-tranzit.json",
+    "bo2-die-rise.json",
+    "bo2-mob-of-the-dead.json",
+    "bo2-buried.json",
+    "bo2-origins.json",
+    "bo3-shadows-of-evil.json",
+    "bo3-der-eisendrache.json",
+    "bo3-zetsubou-no-shima.json",
+    "bo3-gorod-krovi.json",
+    "bo3-revelations.json",
+    "bo4-voyage-of-despair.json",
+    "bo4-ix.json",
+    "bo4-blood-of-the-dead.json",
+    "bo4-dead-of-the-night.json",
+    "bo4-ancient-evil.json",
+    "bo4-alpha-omega.json",
+    "bo4-tag-der-toten.json",
+    "cold-war-die-maschine.json",
+    "cold-war-firebase-z.json",
+    "cold-war-mauer-der-toten.json",
+    "cold-war-forsaken.json",
+    "bo6-liberty-falls.json",
+    "bo6-terminus.json",
+    "bo6-citadelle-des-morts.json",
+    "bo6-the-tomb.json",
+    "bo6-shattered-veil.json",
+    "bo6-reckoning.json",
+    "bo7-ashes-of-the-damned.json",
+    "bo7-astra-malorum.json",
+    "bo7-paradox-junction.json",
+    "bo7-totenreich.json",
+    "bo7-kowakujo.json"
+  ],
+  "selectionOnlyMaps": [
+    {
+      "id": "waw-nacht-der-untoten",
+      "gameId": "waw",
+      "title": "Nacht der Untoten",
+      "releaseDate": "2008-11-11"
+    },
+    {
+      "id": "waw-verruckt",
+      "gameId": "waw",
+      "title": "Verrückt",
+      "releaseDate": "2009-03-19"
+    },
+    {
+      "id": "waw-shi-no-numa",
+      "gameId": "waw",
+      "title": "Shi No Numa",
+      "releaseDate": "2009-06-11"
+    },
+    {
+      "id": "bo1-kino-der-toten",
+      "gameId": "bo1",
+      "title": "Kino Der Toten",
+      "releaseDate": "2010-11-09"
+    },
+    {
+      "id": "bo1-five",
+      "gameId": "bo1",
+      "title": "\"Five\"",
+      "releaseDate": "2010-11-09"
+    },
+    {
+      "id": "bo2-nuketown",
+      "gameId": "bo2",
+      "title": "Nuketown Zombies",
+      "releaseDate": "2012-11-13"
+    },
+    {
+      "id": "bo3-the-giant",
+      "gameId": "bo3",
+      "title": "The Giant",
+      "releaseDate": "2015-11-06"
+    },
+    {
+      "id": "bo4-classified",
+      "gameId": "bo4",
+      "title": "Classified",
+      "releaseDate": "2018-10-12"
+    },
+    {
+      "id": "cold-war-outbreak",
+      "gameId": "cold-war",
+      "title": "Outbreak",
+      "releaseDate": "2021-02-25"
+    }
+  ],
+  "mapOrder": {
+    "waw": [
+      "waw-nacht-der-untoten",
+      "waw-verruckt",
+      "waw-shi-no-numa",
+      "waw-der-riese"
+    ],
+    "bo1": [
+      "bo1-kino-der-toten",
+      "bo1-five",
+      "bo1-ascension",
+      "bo1-call-of-the-dead",
+      "bo1-shangri-la",
+      "bo1-moon"
+    ],
+    "bo2": [
+      "bo2-tranzit",
+      "bo2-nuketown",
+      "bo2-die-rise",
+      "bo2-mob-of-the-dead",
+      "bo2-buried",
+      "bo2-origins"
+    ],
+    "bo3": [
+      "bo3-shadows-of-evil",
+      "bo3-the-giant",
+      "bo3-der-eisendrache",
+      "bo3-zetsubou-no-shima",
+      "bo3-gorod-krovi",
+      "bo3-revelations"
+    ],
+    "bo4": [
+      "bo4-voyage-of-despair",
+      "bo4-ix",
+      "bo4-blood-of-the-dead",
+      "bo4-classified",
+      "bo4-dead-of-the-night",
+      "bo4-ancient-evil",
+      "bo4-alpha-omega",
+      "bo4-tag-der-toten"
+    ],
+    "cold-war": [
+      "cold-war-die-maschine",
+      "cold-war-firebase-z",
+      "cold-war-outbreak",
+      "cold-war-mauer-der-toten",
+      "cold-war-forsaken"
+    ],
+    "bo6": [
+      "bo6-terminus",
+      "bo6-liberty-falls",
+      "bo6-citadelle-des-morts",
+      "bo6-the-tomb",
+      "bo6-shattered-veil",
+      "bo6-reckoning"
+    ],
+    "bo7": [
+      "bo7-ashes-of-the-damned",
+      "bo7-astra-malorum",
+      "bo7-paradox-junction",
+      "bo7-totenreich",
+      "bo7-kowakujo"
+    ]
+  },
+  "answerEquivalents": [
+    {
+      "answerMapId": "waw-der-riese",
+      "acceptedMapIds": ["waw-der-riese", "bo3-the-giant"],
+      "displayTitle": "Der Riese / The Giant"
+    }
+  ]
+}
