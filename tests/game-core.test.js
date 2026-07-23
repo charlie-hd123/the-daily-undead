@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 
 import {
   buildDailyPuzzle,
+  calculateNextStreak,
   getAnswerDisplayTitle,
   getLocalDateKey,
   isAcceptedMapSelection,
@@ -104,6 +105,13 @@ test("step selection assigns order and removes a tapped selection", () => {
   assert.deepEqual(selection, ["a", "b", "c"]);
   assert.deepEqual(toggleOrderedSelection(selection, "b"), ["a", "c"]);
   assert.deepEqual(toggleOrderedSelection(selection, "d"), selection);
+});
+
+test("correct map answers increase the streak and wrong answers reset it", () => {
+  assert.equal(calculateNextStreak(0, true), 1);
+  assert.equal(calculateNextStreak(4, true), 5);
+  assert.equal(calculateNextStreak(5, false), 0);
+  assert.equal(calculateNextStreak(Number.NaN, true), 1);
 });
 
 test("date helpers use YYYY-MM-DD local dates", () => {
