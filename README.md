@@ -30,7 +30,7 @@ http://localhost:8080/?date=2026-07-21
 
 Progress is saved in the browser separately for each date. The date and puzzle selection use the player's local timezone.
 
-Completed games have a **Replay with a different map · Development** button. It clears that date's saved result and advances through a deterministic shuffle of the available maps. Each replay uses a different map until the pool cycles. When a map returns, it uses a different set of three clues; every available three-step combination is used before one repeats. The current replay is preserved across refreshes.
+Completed games have a **Replay with a different map - Only available whilst game in development** button. It clears that date's saved result and advances through a deterministic shuffle of the available maps. Each replay uses a different map until the pool cycles. When a map returns, it uses a different set of three clues; every available three-step combination is used before one repeats. The current replay is preserved across refreshes.
 
 ## Run the tests
 
