@@ -1,5 +1,6 @@
 import {
   buildDailyPuzzle,
+  calculateNextStreak,
   getAnswerDisplayTitle,
   getLocalDateKey,
   isAcceptedMapSelection,
@@ -7,11 +8,13 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20260722-5";
+} from "./game-core.js?v=20260723-1";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
+const streakLabel = document.querySelector("#streak-count");
 const clueTemplate = document.querySelector("#clue-template");
+const streakStorageKey = "the-daily-undead:streak";
 
 let catalog;
 let maps;
@@ -19,6 +22,7 @@ let selectableMaps;
 let puzzle;
 let state;
 let replayIndex = 0;
+let streakCount = 0;
 let lastResultClass = null;
 
 function escapeHtml(value) {
@@ -116,6 +120,7 @@ function createInitialState() {
     bonusOrder: [],
     bonusComplete: false,
     bonusFailed: false,
+    streakRecorded: false,
   };
 }
 
@@ -142,6 +147,39 @@ function saveReplayIndex(dateKey) {
   } catch {
     // Replays still rotate maps during this session when storage is disabled.
   }
+}
+
+function loadStreak() {
+  try {
+    const savedStreak = Number.parseInt(localStorage.getItem(streakStorageKey), 10);
+    return Number.isInteger(savedStreak) && savedStreak >= 0 ? savedStreak : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function saveStreak() {
+  try {
+    localStorage.setItem(streakStorageKey, String(streakCount));
+  } catch {
+    // The streak remains available for the current session when storage is disabled.
+  }
+}
+
+function updateStreakDisplay() {
+  streakLabel.textContent = String(streakCount);
+  streakLabel.closest(".streak-display").setAttribute(
+    "aria-label",
+    `Current streak: ${streakCount}`,
+  );
+}
+
+function recordMapResult(isCorrect) {
+  if (state.streakRecorded) return;
+
+  streakCount = calculateNextStreak(streakCount, isCorrect);
+  saveStreak();
+  updateStreakDisplay();
 }
 
 function buildNextReplayPuzzle(dateKey) {
@@ -334,7 +372,13 @@ function renderMapSelection() {
       puzzle.map.id,
       catalog.answerEquivalents,
     );
-    setState({ phase: "result", isCorrect, cluesRevealed: isCorrect ? 3 : state.cluesRevealed });
+    recordMapResult(isCorrect);
+    setState({
+      phase: "result",
+      isCorrect,
+      cluesRevealed: isCorrect ? 3 : state.cluesRevealed,
+      streakRecorded: true,
+    });
   });
 }
 
@@ -527,9 +571,11 @@ async function initialise() {
     await loadData();
     const dateKey = getDateKey();
     replayIndex = loadReplayIndex(dateKey);
+    streakCount = loadStreak();
     puzzle = buildDailyPuzzle(dateKey, maps, replayIndex);
     state = loadState();
     dateLabel.textContent = `${formatDate(dateKey)}${new URLSearchParams(window.location.search).has("date") ? " · Preview" : ""}`;
+    updateStreakDisplay();
     render();
   } catch (error) {
     console.error(error);

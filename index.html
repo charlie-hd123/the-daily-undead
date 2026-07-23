@@ -10,7 +10,7 @@
     >
     <title>The Daily Undead</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml">
-    <link rel="stylesheet" href="./styles.css?v=20260722-12">
+    <link rel="stylesheet" href="./styles.css?v=20260723-1">
   </head>
   <body>
     <header class="site-header">
@@ -18,7 +18,10 @@
         <p class="eyebrow">Your daily Treyarch Zombies challenge</p>
         <h1>The Daily Undead</h1>
       </div>
-      <p id="puzzle-date" class="puzzle-date"></p>
+      <div class="header-meta">
+        <p id="puzzle-date" class="puzzle-date"></p>
+        <p class="streak-display">Streak <strong id="streak-count">0</strong></p>
+      </div>
     </header>
 
     <main id="app" class="app-shell" aria-live="polite">
@@ -38,6 +41,6 @@
       </article>
     </template>
 
-    <script type="module" src="./js/app.js?v=20260722-13"></script>
+    <script type="module" src="./js/app.js?v=20260723-1"></script>
   </body>
 </html>

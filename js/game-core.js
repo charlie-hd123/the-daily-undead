@@ -120,6 +120,13 @@ export function toggleOrderedSelection(selectedIds, id, limit = 3) {
   return [...selectedIds, id];
 }
 
+export function calculateNextStreak(currentStreak, isCorrect) {
+  const safeCurrentStreak =
+    Number.isInteger(currentStreak) && currentStreak >= 0 ? currentStreak : 0;
+
+  return isCorrect ? safeCurrentStreak + 1 : 0;
+}
+
 export function orderMapsForGame(maps, gameId, orderedIds = []) {
   const positions = new Map(orderedIds.map((id, index) => [id, index]));
 
