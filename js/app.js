@@ -1,5 +1,7 @@
 import {
   buildDailyPuzzle,
+  calculateMapPoints,
+  calculateNextPoints,
   calculateNextStreak,
   getAnswerDisplayTitle,
   getLocalDateKey,
@@ -8,13 +10,16 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20260723-1";
+} from "./game-core.js?v=20260724-2";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
 const streakLabel = document.querySelector("#streak-count");
+const pointsLabel = document.querySelector("#points-count");
 const clueTemplate = document.querySelector("#clue-template");
 const streakStorageKey = "the-daily-undead:streak";
+const pointsStorageKey = "the-daily-undead:total-points";
+const bonusPointsValue = 20;
 
 let catalog;
 let maps;
@@ -23,6 +28,7 @@ let puzzle;
 let state;
 let replayIndex = 0;
 let streakCount = 0;
+let totalPoints = 0;
 let lastResultClass = null;
 
 function escapeHtml(value) {
@@ -109,7 +115,7 @@ async function loadData() {
 
 function createInitialState() {
   return {
-    stateVersion: 2,
+    stateVersion: 3,
     puzzleKey: puzzle.key,
     phase: "clues",
     cluesRevealed: 1,
@@ -121,6 +127,10 @@ function createInitialState() {
     bonusComplete: false,
     bonusFailed: false,
     streakRecorded: false,
+    mapPoints: 0,
+    bonusPoints: 0,
+    pointsRecorded: false,
+    bonusPointsRecorded: false,
   };
 }
 
@@ -166,12 +176,60 @@ function saveStreak() {
   }
 }
 
+function loadPoints() {
+  try {
+    const savedPoints = Number.parseInt(localStorage.getItem(pointsStorageKey), 10);
+    return Number.isInteger(savedPoints) && savedPoints >= 0 ? savedPoints : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function savePoints() {
+  try {
+    localStorage.setItem(pointsStorageKey, String(totalPoints));
+  } catch {
+    // The total remains available for the current session when storage is disabled.
+  }
+}
+
+function animateStat(label) {
+  const display = label.closest(".stat-display");
+  display.classList.remove("is-earned");
+  void display.offsetWidth;
+  display.classList.add("is-earned");
+  window.setTimeout(() => display.classList.remove("is-earned"), 850);
+}
+
 function updateStreakDisplay() {
   streakLabel.textContent = String(streakCount);
-  streakLabel.closest(".streak-display").setAttribute(
+  streakLabel.closest(".stat-display").setAttribute(
     "aria-label",
-    `Current streak: ${streakCount}`,
+    `Rounds survived: ${streakCount}`,
   );
+}
+
+function updatePointsDisplay() {
+  pointsLabel.textContent = String(totalPoints);
+  pointsLabel.closest(".stat-display").setAttribute(
+    "aria-label",
+    `Points: ${totalPoints}`,
+  );
+}
+
+function awardPoints(points, shouldAnimate = true) {
+  if (!Number.isInteger(points) || points <= 0) return;
+
+  totalPoints = calculateNextPoints(totalPoints, points, true);
+  savePoints();
+  updatePointsDisplay();
+  if (shouldAnimate) animateStat(pointsLabel);
+}
+
+function resetPoints() {
+  totalPoints = calculateNextPoints(totalPoints, 0, false);
+  savePoints();
+  updatePointsDisplay();
 }
 
 function recordMapResult(isCorrect) {
@@ -180,6 +238,11 @@ function recordMapResult(isCorrect) {
   streakCount = calculateNextStreak(streakCount, isCorrect);
   saveStreak();
   updateStreakDisplay();
+  if (isCorrect) {
+    animateStat(streakLabel);
+  } else {
+    resetPoints();
+  }
 }
 
 function buildNextReplayPuzzle(dateKey) {
@@ -202,8 +265,8 @@ function buildNextReplayPuzzle(dateKey) {
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey()));
-    if (saved?.stateVersion === 2 && saved?.puzzleKey === puzzle.key) {
-      return { ...createInitialState(), ...saved };
+    if ([2, 3].includes(saved?.stateVersion) && saved?.puzzleKey === puzzle.key) {
+      return { ...createInitialState(), ...saved, stateVersion: 3 };
     }
   } catch {
     // A corrupt or unavailable local save should not prevent play.
@@ -220,13 +283,31 @@ function saveState() {
   }
 }
 
+function migrateCompletedScore() {
+  if (state.phase !== "result") return;
+
+  if (!state.pointsRecorded) {
+    state.mapPoints = state.isCorrect ? calculateMapPoints(state.lockedClues) : 0;
+    awardPoints(state.mapPoints, false);
+    state.pointsRecorded = true;
+  }
+
+  if (!state.bonusPointsRecorded && (state.bonusComplete || state.bonusFailed)) {
+    state.bonusPoints = state.bonusComplete ? bonusPointsValue : 0;
+    awardPoints(state.bonusPoints, false);
+    state.bonusPointsRecorded = true;
+  }
+
+  saveState();
+}
+
 function setState(update) {
   state = { ...state, ...update };
   saveState();
   render();
 }
 
-function renderHeading(title, description, kicker = "Today’s puzzle") {
+function renderHeading(title, description, kicker = "Today’s round") {
   return `
     <div class="screen-heading">
       <p class="kicker">${escapeHtml(kicker)}</p>
@@ -372,12 +453,16 @@ function renderMapSelection() {
       puzzle.map.id,
       catalog.answerEquivalents,
     );
+    const mapPoints = isCorrect ? calculateMapPoints(state.lockedClues) : 0;
     recordMapResult(isCorrect);
+    if (!state.pointsRecorded) awardPoints(mapPoints);
     setState({
       phase: "result",
       isCorrect,
       cluesRevealed: isCorrect ? 3 : state.cluesRevealed,
       streakRecorded: true,
+      mapPoints,
+      pointsRecorded: true,
     });
   });
 }
@@ -429,8 +514,8 @@ function renderBonus() {
 
   return `
     <section class="bonus-panel">
-      <h3>Bonus Challenge: Put the steps in order</h3>
-      <p class="helper-text">Select the steps in the order they occur. Tap a selected step again to remove it and revise your order.</p>
+      <h3>Bonus Objective: Put the steps in order</h3>
+      <p class="helper-text">Select the steps in the order they occur for an extra ${bonusPointsValue} points. Tap a selected step again to remove it and revise your order.</p>
       <p class="selection-progress">Selected: ${state.bonusOrder.length} of 3</p>
       <ul class="order-choice-list">
         ${puzzle.displayedSteps
@@ -474,16 +559,16 @@ function renderResult() {
   const resultTitle = failedBonus
     ? "Not quite"
     : perfectResult
-      ? "Perfect!"
+      ? "Flawless Round!"
       : state.isCorrect
-        ? "Correct!"
-        : "Not this time";
+        ? "Round Survived!"
+        : "Game Over";
   const resultCopy = failedBonus
-    ? `You identified ${answerTitle}, but the step order was incorrect.`
+    ? `You identified ${answerTitle}, but the step order was incorrect. You still earned ${state.mapPoints} points this round.`
     : perfectResult
-      ? `You found ${answerTitle} using ${state.lockedClues} ${clueLabel} and got the steps in the correct order.`
+      ? `You found ${answerTitle} using ${state.lockedClues} ${clueLabel} and got the steps in the correct order. You earned ${state.mapPoints + state.bonusPoints} points this round.`
       : state.isCorrect
-        ? `You identified ${answerTitle} in ${state.lockedClues} ${clueLabel}.`
+        ? `You identified ${answerTitle} in ${state.lockedClues} ${clueLabel}. You earned ${state.mapPoints} points this round.`
         : `You chose ${selectedMap?.title ?? "an unknown map"}. Today’s answer was ${answerTitle}.`;
   const resultClass = failedBonus ? "partial" : perfectResult ? "perfect" : state.isCorrect ? "correct" : "failed";
   const animateResult = resultClass !== lastResultClass;
@@ -538,11 +623,16 @@ function renderResult() {
   });
   app.querySelector("#submit-order").addEventListener("click", () => {
     if (isCorrectOrder(state.bonusOrder, puzzle.chronologicalSteps)) {
-      setState({ bonusComplete: true });
+      if (!state.bonusPointsRecorded) awardPoints(bonusPointsValue);
+      setState({
+        bonusComplete: true,
+        bonusPoints: bonusPointsValue,
+        bonusPointsRecorded: true,
+      });
       return;
     }
 
-    setState({ bonusFailed: true });
+    setState({ bonusFailed: true, bonusPoints: 0, bonusPointsRecorded: true });
   });
 }
 
@@ -572,10 +662,13 @@ async function initialise() {
     const dateKey = getDateKey();
     replayIndex = loadReplayIndex(dateKey);
     streakCount = loadStreak();
+    totalPoints = loadPoints();
     puzzle = buildDailyPuzzle(dateKey, maps, replayIndex);
     state = loadState();
+    migrateCompletedScore();
     dateLabel.textContent = `${formatDate(dateKey)}${new URLSearchParams(window.location.search).has("date") ? " · Preview" : ""}`;
     updateStreakDisplay();
+    updatePointsDisplay();
     render();
   } catch (error) {
     console.error(error);

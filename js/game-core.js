@@ -127,6 +127,25 @@ export function calculateNextStreak(currentStreak, isCorrect) {
   return isCorrect ? safeCurrentStreak + 1 : 0;
 }
 
+export function calculateMapPoints(cluesRevealed) {
+  const pointsByClueCount = {
+    1: 30,
+    2: 20,
+    3: 10,
+  };
+
+  return pointsByClueCount[cluesRevealed] ?? 0;
+}
+
+export function calculateNextPoints(currentPoints, pointsEarned, isCorrect) {
+  const safeCurrentPoints =
+    Number.isInteger(currentPoints) && currentPoints >= 0 ? currentPoints : 0;
+  const safePointsEarned =
+    Number.isInteger(pointsEarned) && pointsEarned >= 0 ? pointsEarned : 0;
+
+  return isCorrect ? safeCurrentPoints + safePointsEarned : 0;
+}
+
 export function orderMapsForGame(maps, gameId, orderedIds = []) {
   const positions = new Map(orderedIds.map((id, index) => [id, index]));
 

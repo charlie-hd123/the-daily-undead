@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 
 import {
   buildDailyPuzzle,
+  calculateMapPoints,
+  calculateNextPoints,
   calculateNextStreak,
   getAnswerDisplayTitle,
   getLocalDateKey,
@@ -112,6 +114,21 @@ test("correct map answers increase the streak and wrong answers reset it", () =>
   assert.equal(calculateNextStreak(4, true), 5);
   assert.equal(calculateNextStreak(5, false), 0);
   assert.equal(calculateNextStreak(Number.NaN, true), 1);
+});
+
+test("map points reward answers that use fewer clues", () => {
+  assert.equal(calculateMapPoints(1), 30);
+  assert.equal(calculateMapPoints(2), 20);
+  assert.equal(calculateMapPoints(3), 10);
+  assert.equal(calculateMapPoints(4), 0);
+  assert.equal(calculateMapPoints(undefined), 0);
+});
+
+test("points accumulate on correct answers and reset after a wrong map", () => {
+  assert.equal(calculateNextPoints(40, 30, true), 70);
+  assert.equal(calculateNextPoints(70, 20, true), 90);
+  assert.equal(calculateNextPoints(90, 0, false), 0);
+  assert.equal(calculateNextPoints(Number.NaN, 20, true), 20);
 });
 
 test("date helpers use YYYY-MM-DD local dates", () => {
