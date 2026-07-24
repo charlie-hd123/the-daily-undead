@@ -17,7 +17,7 @@
       href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Barlow:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     >
-    <link rel="stylesheet" href="./styles.css?v=20260723-18">
+    <link rel="stylesheet" href="./styles.css?v=20260724-7">
   </head>
   <body>
     <header class="site-header">
@@ -30,13 +30,20 @@
       </div>
       <div class="header-meta">
         <p id="puzzle-date" class="puzzle-date"></p>
-        <p class="streak-display">Streak <strong id="streak-count">0</strong></p>
+        <div class="player-stats">
+          <p class="stat-display" aria-live="polite">
+            Rounds <strong id="streak-count">0</strong>
+          </p>
+          <p class="stat-display" aria-live="polite">
+            Points <strong id="points-count">0</strong>
+          </p>
+        </div>
       </div>
     </header>
 
     <main id="app" class="app-shell" aria-live="polite">
       <section class="panel loading-panel">
-        <h2>Loading today’s puzzle…</h2>
+        <h2>Loading today’s round…</h2>
       </section>
     </main>
 
@@ -51,6 +58,6 @@
       </article>
     </template>
 
-    <script type="module" src="./js/app.js?v=20260723-3"></script>
+    <script type="module" src="./js/app.js?v=20260724-11"></script>
   </body>
 </html>
