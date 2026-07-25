@@ -6,7 +6,7 @@ Players reveal one to three clues, lock in their clue score, choose a game and m
 
 The bonus ordering round uses tap-to-rank cards: tapping steps assigns 1, 2, and 3 in sequence, while tapping a selected card removes it and renumbers the remainder. Submission allows one attempt. An incorrect order fails the game immediately and cannot be retried unless the development replay starts a new map.
 
-A correct map and correct step order produce a gold **Perfect!** result banner with the map, clue count, and correct chronological order summarized on one screen.
+A correct map awards 50 points with one clue, 20 with two clues, or 10 with three clues. A correct step order doubles that map score and produces a gold **Double Points!** result banner with the map, clue count, and correct chronological order summarized on one screen.
 
 The player also has a browser-local streak. A correct map answer increases it immediately, whether or not the bonus order is correct. A wrong map answer resets it to zero. Development replays count as additional plays, and clearing the site's browser data resets the streak.
 

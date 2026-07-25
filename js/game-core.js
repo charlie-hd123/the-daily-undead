@@ -148,12 +148,17 @@ export function calculateNextStreak(currentStreak, isCorrect) {
 
 export function calculateMapPoints(cluesRevealed) {
   const pointsByClueCount = {
-    1: 30,
+    1: 50,
     2: 20,
     3: 10,
   };
 
   return pointsByClueCount[cluesRevealed] ?? 0;
+}
+
+export function calculateBonusPoints(mapPoints, isCorrectOrder) {
+  const safeMapPoints = Number.isInteger(mapPoints) && mapPoints >= 0 ? mapPoints : 0;
+  return isCorrectOrder ? safeMapPoints : 0;
 }
 
 export function calculateNextPoints(currentPoints, pointsEarned, isCorrect) {
