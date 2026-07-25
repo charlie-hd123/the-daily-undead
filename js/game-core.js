@@ -46,10 +46,10 @@ function getThreeStepCombinations(steps) {
   return combinations;
 }
 
-export function getLocalDateKey(date = new Date()) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
+export function getUtcDateKey(date = new Date()) {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const day = String(date.getUTCDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
@@ -58,8 +58,22 @@ export function isValidDateKey(value) {
     return false;
   }
 
-  const date = new Date(`${value}T00:00:00`);
-  return !Number.isNaN(date.getTime()) && getLocalDateKey(date) === value;
+  const date = new Date(`${value}T00:00:00Z`);
+  return !Number.isNaN(date.getTime()) && getUtcDateKey(date) === value;
+}
+
+export function getMillisecondsUntilNextUtcDay(date = new Date()) {
+  const nextUtcMidnight = Date.UTC(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate() + 1,
+  );
+
+  return Math.max(0, nextUtcMidnight - date.getTime());
+}
+
+function getUtcDayNumber(dateKey) {
+  return Math.floor(Date.parse(`${dateKey}T00:00:00Z`) / 86400000);
 }
 
 export function buildDailyPuzzle(dateKey, maps, rotationIndex = 0) {
@@ -72,14 +86,19 @@ export function buildDailyPuzzle(dateKey, maps, rotationIndex = 0) {
   }
 
   const replayIndex = Math.max(0, Math.floor(rotationIndex));
-  const mapRandom = createRng(hashString(`${dateKey}:map-order`));
+  const dayNumber = getUtcDayNumber(dateKey);
+  const mapCycle = Math.floor(dayNumber / eligibleMaps.length);
+  const mapPosition = ((dayNumber % eligibleMaps.length) + eligibleMaps.length) % eligibleMaps.length;
+  const mapRandom = createRng(hashString(`${mapCycle}:map-order`));
   const mapOrder = shuffle(eligibleMaps, mapRandom);
-  const safeRotationIndex = replayIndex % mapOrder.length;
+  const safeRotationIndex = (mapPosition + replayIndex) % mapOrder.length;
   const map = mapOrder[safeRotationIndex];
-  const mapOccurrence = Math.floor(replayIndex / mapOrder.length);
-  const combinationRandom = createRng(hashString(`${dateKey}:${map.id}:clue-combinations`));
+  const mapOccurrence = mapCycle + Math.floor((mapPosition + replayIndex) / mapOrder.length);
+  const combinationRandom = createRng(hashString(`${map.id}:clue-combinations`));
   const combinations = shuffle(getThreeStepCombinations(map.steps), combinationRandom);
-  const selectedSteps = combinations[mapOccurrence % combinations.length];
+  const combinationIndex =
+    ((mapOccurrence % combinations.length) + combinations.length) % combinations.length;
+  const selectedSteps = combinations[combinationIndex];
   const chronologicalSteps = [...selectedSteps].sort((left, right) => left.order - right.order);
   const displayRandom = createRng(hashString(`${dateKey}:${map.id}:${replayIndex}:display-order`));
   let displayedSteps = shuffle(selectedSteps, displayRandom);
@@ -129,12 +148,17 @@ export function calculateNextStreak(currentStreak, isCorrect) {
 
 export function calculateMapPoints(cluesRevealed) {
   const pointsByClueCount = {
-    1: 30,
+    1: 50,
     2: 20,
     3: 10,
   };
 
   return pointsByClueCount[cluesRevealed] ?? 0;
+}
+
+export function calculateBonusPoints(mapPoints, isCorrectOrder) {
+  const safeMapPoints = Number.isInteger(mapPoints) && mapPoints >= 0 ? mapPoints : 0;
+  return isCorrectOrder ? safeMapPoints : 0;
 }
 
 export function calculateNextPoints(currentPoints, pointsEarned, isCorrect) {

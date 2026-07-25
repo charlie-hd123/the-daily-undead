@@ -3,11 +3,13 @@ import assert from "node:assert/strict";
 
 import {
   buildDailyPuzzle,
+  calculateBonusPoints,
   calculateMapPoints,
   calculateNextPoints,
   calculateNextStreak,
   getAnswerDisplayTitle,
-  getLocalDateKey,
+  getMillisecondsUntilNextUtcDay,
+  getUtcDateKey,
   isAcceptedMapSelection,
   isCorrectOrder,
   isValidDateKey,
@@ -82,6 +84,17 @@ test("a map uses every three-clue combination before repeating one", () => {
   assert.equal(new Set(clueSets).size, 4);
 });
 
+test("daily map cycles use a new clue combination when a map returns", () => {
+  const singleMap = [maps[0]];
+  const first = buildDailyPuzzle("2026-07-20", singleMap);
+  const second = buildDailyPuzzle("2026-07-21", singleMap);
+
+  assert.notDeepEqual(
+    first.displayedSteps.map((step) => step.id).sort(),
+    second.displayedSteps.map((step) => step.id).sort(),
+  );
+});
+
 test("the displayed order starts differently from the bonus answer", () => {
   const puzzle = buildDailyPuzzle("2026-07-20", maps);
 
@@ -117,11 +130,21 @@ test("correct map answers increase the streak and wrong answers reset it", () =>
 });
 
 test("map points reward answers that use fewer clues", () => {
-  assert.equal(calculateMapPoints(1), 30);
+  assert.equal(calculateMapPoints(1), 50);
   assert.equal(calculateMapPoints(2), 20);
   assert.equal(calculateMapPoints(3), 10);
   assert.equal(calculateMapPoints(4), 0);
   assert.equal(calculateMapPoints(undefined), 0);
+});
+
+test("a correct step order doubles the map points", () => {
+  const twoCluePoints = calculateMapPoints(2);
+  const threeCluePoints = calculateMapPoints(3);
+  const oneCluePoints = calculateMapPoints(1);
+
+  assert.equal(twoCluePoints + calculateBonusPoints(twoCluePoints, true), 40);
+  assert.equal(threeCluePoints + calculateBonusPoints(threeCluePoints, false), 10);
+  assert.equal(oneCluePoints + calculateBonusPoints(oneCluePoints, true), 100);
 });
 
 test("points accumulate on correct answers and reset after a wrong map", () => {
@@ -131,8 +154,10 @@ test("points accumulate on correct answers and reset after a wrong map", () => {
   assert.equal(calculateNextPoints(Number.NaN, 20, true), 20);
 });
 
-test("date helpers use YYYY-MM-DD local dates", () => {
-  assert.equal(getLocalDateKey(new Date(2026, 6, 20)), "2026-07-20");
+test("date helpers use the worldwide UTC day boundary", () => {
+  assert.equal(getUtcDateKey(new Date("2026-07-20T23:59:59Z")), "2026-07-20");
+  assert.equal(getUtcDateKey(new Date("2026-07-21T00:00:00Z")), "2026-07-21");
+  assert.equal(getMillisecondsUntilNextUtcDay(new Date("2026-07-20T23:59:30Z")), 30000);
   assert.equal(isValidDateKey("2026-07-20"), true);
   assert.equal(isValidDateKey("2026-02-30"), false);
 });
