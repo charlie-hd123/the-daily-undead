@@ -92,7 +92,8 @@ button {
 }
 
 .site-header,
-.app-shell {
+.app-shell,
+.site-footer {
   width: min(100% - 1.25rem, 74rem);
   margin-inline: auto;
 }
@@ -189,6 +190,29 @@ h1 {
   display: grid;
   justify-items: end;
   gap: 0.45rem;
+}
+
+.round-timing {
+  display: grid;
+  justify-items: end;
+  gap: 0.25rem;
+}
+
+.next-round {
+  margin: 0;
+  color: rgb(199 207 221 / 62%);
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.next-round strong {
+  color: rgb(103 232 255 / 78%);
+  font-variant-numeric: tabular-nums;
 }
 
 .player-stats {
@@ -851,6 +875,19 @@ h1 {
   text-align: center;
 }
 
+.site-footer {
+  padding-block: 0.5rem 1.25rem;
+}
+
+.site-footer p {
+  max-width: 58rem;
+  margin: 0 auto;
+  color: rgb(168 178 199 / 38%);
+  font-size: 0.62rem;
+  line-height: 1.45;
+  text-align: center;
+}
+
 .loading-panel h2,
 .error-panel h2 {
   font-size: clamp(2rem, 8vw, 3.2rem);
@@ -868,7 +905,8 @@ h1 {
 
 @media (min-width: 22rem) {
   .site-header,
-  .app-shell {
+  .app-shell,
+  .site-footer {
     width: min(100% - 2rem, 74rem);
   }
 
@@ -901,9 +939,13 @@ h1 {
     display: contents;
   }
 
-  .puzzle-date {
+  .round-timing {
     grid-area: date;
     justify-self: start;
+    justify-items: start;
+  }
+
+  .puzzle-date {
     font-size: clamp(0.66rem, 1.45vw, 0.74rem);
     text-align: left;
   }
@@ -952,7 +994,7 @@ h1 {
   }
 
   .brand-lockup,
-  .puzzle-date,
+  .round-timing,
   .player-stats {
     grid-area: auto;
   }
@@ -975,6 +1017,10 @@ h1 {
   .puzzle-date {
     font-size: clamp(0.65rem, 3vw, 0.72rem);
     text-align: left;
+  }
+
+  .round-timing {
+    justify-items: start;
   }
 
   .player-stats {
@@ -1002,18 +1048,21 @@ h1 {
   }
 
   .brand-logo {
-    width: 3.55rem;
-    height: 3.55rem;
+    width: 4.1rem;
+    height: 4.1rem;
   }
 
   .eyebrow {
     max-width: none;
-    font-size: 0.73rem;
+    overflow: visible;
+    font-size: 0.8rem;
     letter-spacing: 0.095em;
+    text-overflow: clip;
+    white-space: normal;
   }
 
   h1 {
-    font-size: clamp(2.1rem, 9vw, 2.3rem);
+    font-size: clamp(2.45rem, 10.3vw, 2.8rem);
   }
 
   .screen-heading {

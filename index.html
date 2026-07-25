@@ -17,7 +17,7 @@
       href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Barlow:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     >
-    <link rel="stylesheet" href="./styles.css?v=20260724-7">
+    <link rel="stylesheet" href="./styles.css?v=20260725-1">
   </head>
   <body>
     <header class="site-header">
@@ -29,7 +29,10 @@
         </div>
       </div>
       <div class="header-meta">
-        <p id="puzzle-date" class="puzzle-date"></p>
+        <div class="round-timing">
+          <p id="puzzle-date" class="puzzle-date"></p>
+          <p class="next-round">Next Round <strong id="next-round-countdown">--:--:--</strong></p>
+        </div>
         <div class="player-stats">
           <p class="stat-display" aria-live="polite">
             Rounds <strong id="streak-count">0</strong>
@@ -47,6 +50,10 @@
       </section>
     </main>
 
+    <footer class="site-footer">
+      <p>The Daily Undead is an unofficial fan-made website and is not affiliated with, endorsed by, or sponsored by Activision, Treyarch, or Microsoft. Call of Duty®, Zombies, and all related names and assets are trademarks of their respective owners.</p>
+    </footer>
+
     <noscript>
       <p class="noscript">This game needs JavaScript enabled.</p>
     </noscript>
@@ -58,6 +65,6 @@
       </article>
     </template>
 
-    <script type="module" src="./js/app.js?v=20260724-11"></script>
+    <script type="module" src="./js/app.js?v=20260725-1"></script>
   </body>
 </html>

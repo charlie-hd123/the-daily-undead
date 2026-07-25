@@ -28,7 +28,7 @@ To preview another daily puzzle without waiting for tomorrow, add a date:
 http://localhost:8080/?date=2026-07-21
 ```
 
-Progress is saved in the browser separately for each date. The date and puzzle selection use the player's local timezone.
+Progress is saved in the browser separately for each date. Every player receives the next puzzle at 00:00 UTC, and the header countdown shows the time remaining until that worldwide rollover. The site synchronises against its host's clock when possible and falls back to the device clock when offline.
 
 Completed games have a **Replay with a different map - Only available whilst game in development** button. It clears that date's saved result and advances through a deterministic shuffle of the available maps. Each replay uses a different map until the pool cycles. When a map returns, it uses a different set of three clues; every available three-step combination is used before one repeats. The current replay is preserved across refreshes.
 
@@ -68,7 +68,7 @@ For each map:
 
 An optional `availableFrom` field in `YYYY-MM-DD` format can delay when a new map enters the daily rotation. Without it, the map is eligible immediately.
 
-The game deterministically chooses an eligible map and a shuffled three-step combination, then presents those clues in a non-chronological order. Replay variety remains deterministic so a refresh does not unexpectedly replace an in-progress puzzle. Adding or editing eligible content can change generated puzzles, so avoid changing the live data midway through a day.
+The game deterministically shuffles eligible maps into daily cycles so every map appears before that cycle repeats. Each return appearance advances to a different shuffled three-step combination, then presents those clues in a non-chronological order. Replay variety remains deterministic so a refresh does not unexpectedly replace an in-progress puzzle. Adding or editing eligible content can change generated puzzles, so avoid changing the live data midway through a day.
 
 Maps in `selectionOnlyMaps` inside `data/maps/index.json` appear in the answer grid without requiring a map JSON and never enter the daily rotation. `mapOrder` controls the release order shown within each game. `answerEquivalents` allows The Giant to count as a correct selection when Der Riese is the generated answer; both are then displayed as **Der Riese / The Giant** on the result screens.
 

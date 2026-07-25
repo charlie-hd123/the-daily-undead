@@ -4,18 +4,20 @@ import {
   calculateNextPoints,
   calculateNextStreak,
   getAnswerDisplayTitle,
-  getLocalDateKey,
+  getMillisecondsUntilNextUtcDay,
+  getUtcDateKey,
   isAcceptedMapSelection,
   isCorrectOrder,
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20260724-2";
+} from "./game-core.js?v=20260725-1";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
 const streakLabel = document.querySelector("#streak-count");
 const pointsLabel = document.querySelector("#points-count");
+const countdownLabel = document.querySelector("#next-round-countdown");
 const clueTemplate = document.querySelector("#clue-template");
 const streakStorageKey = "the-daily-undead:streak";
 const pointsStorageKey = "the-daily-undead:total-points";
@@ -30,6 +32,8 @@ let replayIndex = 0;
 let streakCount = 0;
 let totalPoints = 0;
 let lastResultClass = null;
+let clockOffset = 0;
+let liveDateKey;
 
 function escapeHtml(value) {
   return String(value)
@@ -42,7 +46,51 @@ function escapeHtml(value) {
 
 function getDateKey() {
   const previewDate = new URLSearchParams(window.location.search).get("date");
-  return previewDate && isValidDateKey(previewDate) ? previewDate : getLocalDateKey();
+  return previewDate && isValidDateKey(previewDate) ? previewDate : getUtcDateKey(getCurrentTime());
+}
+
+function getCurrentTime() {
+  return new Date(Date.now() + clockOffset);
+}
+
+async function synchroniseClock() {
+  const requestStarted = Date.now();
+
+  try {
+    const response = await fetch(`./index.html?clock=${requestStarted}`, {
+      method: "HEAD",
+      cache: "no-store",
+    });
+    const serverTime = Date.parse(response.headers.get("Date"));
+    if (!response.ok || Number.isNaN(serverTime)) return;
+
+    const requestFinished = Date.now();
+    clockOffset = serverTime + (requestFinished - requestStarted) / 2 - requestFinished;
+  } catch {
+    // The device clock is a safe fallback if the host time cannot be read.
+  }
+}
+
+function formatCountdown(milliseconds) {
+  const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
+  const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+  const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, "0");
+  const seconds = String(totalSeconds % 60).padStart(2, "0");
+  return `${hours}:${minutes}:${seconds}`;
+}
+
+function updateNextRoundCountdown() {
+  const now = getCurrentTime();
+  countdownLabel.textContent = formatCountdown(getMillisecondsUntilNextUtcDay(now));
+  countdownLabel.setAttribute(
+    "aria-label",
+    `${Math.ceil(getMillisecondsUntilNextUtcDay(now) / 1000)} seconds until the next round`,
+  );
+
+  const isPreview = new URLSearchParams(window.location.search).has("date");
+  if (!isPreview && liveDateKey && getUtcDateKey(now) !== liveDateKey) {
+    window.location.reload();
+  }
 }
 
 function formatDate(dateKey) {
@@ -658,8 +706,10 @@ function render() {
 
 async function initialise() {
   try {
+    await synchroniseClock();
     await loadData();
     const dateKey = getDateKey();
+    liveDateKey = getUtcDateKey(getCurrentTime());
     replayIndex = loadReplayIndex(dateKey);
     streakCount = loadStreak();
     totalPoints = loadPoints();
@@ -669,6 +719,8 @@ async function initialise() {
     dateLabel.textContent = `${formatDate(dateKey)}${new URLSearchParams(window.location.search).has("date") ? " · Preview" : ""}`;
     updateStreakDisplay();
     updatePointsDisplay();
+    updateNextRoundCountdown();
+    window.setInterval(updateNextRoundCountdown, 1000);
     render();
   } catch (error) {
     console.error(error);
