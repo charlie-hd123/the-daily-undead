@@ -4,11 +4,15 @@
 
 Players reveal one to three clues, lock in their clue score, choose a game and map without typing, then put the three selected Easter egg steps into chronological order for a gold perfect medal.
 
-The bonus ordering round uses tap-to-rank cards: tapping steps assigns 1, 2, and 3 in sequence, while tapping a selected card removes it and renumbers the remainder. Submission allows one attempt. An incorrect order fails the game immediately and cannot be retried unless the development replay starts a new map.
+The bonus ordering round uses tap-to-rank cards: tapping steps assigns 1, 2, and 3 in sequence, while tapping a selected card removes it and renumbers the remainder. Submission allows one attempt, and an incorrect order cannot be retried.
 
 A correct map awards 50 points with one clue, 20 with two clues, or 10 with three clues. A correct step order doubles that map score and produces a gold **Double Points!** result banner with the map, clue count, and correct chronological order summarized on one screen.
 
-The player also has a browser-local streak. A correct map answer increases it immediately, whether or not the bonus order is correct. A wrong map answer resets it to zero. Development replays count as additional plays, and clearing the site's browser data resets the streak.
+Finished results lead into a dedicated next-round screen with a large live countdown to the next UTC puzzle and a progress-aware reminder to return and keep building the player's Current Round and Points.
+
+Finished results also include a spoiler-free **Share score** action. Supported phones and browsers open the native share sheet; other modern browsers copy the dated result, Current Round, Points, Total Rounds, and canonical game link to the clipboard.
+
+The player also has a browser-local current-round streak. A correct map answer increases it immediately, whether or not the bonus order is correct, while a wrong map answer resets it to zero. Missing a daily map also resets Current Round and Points on the player's next visit. The missed-day screen always shows a revive option: players who had at least 50 points can spend 50 points to restore their run, while players without enough points see the disabled option before continuing to today's map. The same one-time revive is available after a Game Over. A separate Total Rounds count records every correctly identified map and does not reset after a loss. Clearing the site's browser data resets these values.
 
 This first version is a dependency-free static site designed to work on GitHub Pages. Its current answer content comes from `Easter Egg Steps - 22JUL2026.xlsm`: 259 ordered steps across 37 maps from World at War through Black Ops 7. Nine additional maps without full Easter eggs are selectable but excluded from the answer rotation.
 
@@ -28,9 +32,9 @@ To preview another daily puzzle without waiting for tomorrow, add a date:
 http://localhost:8080/?date=2026-07-21
 ```
 
-Progress is saved in the browser separately for each date. Every player receives the next puzzle at 00:00 UTC, and the header countdown shows the time remaining until that worldwide rollover. The site synchronises against its host's clock when possible and falls back to the device clock when offline.
+During development, the temporary **Dev button – advance a day** control at the bottom of the site advances this preview date by one day while preserving the current time-of-day.
 
-Completed games have a **Replay with a different map - Only available whilst game in development** button. It clears that date's saved result and advances through a deterministic shuffle of the available maps. Each replay uses a different map until the pool cycles. When a map returns, it uses a different set of three clues; every available three-step combination is used before one repeats. The current replay is preserved across refreshes.
+Progress is saved in the browser separately for each date. Every player receives the next puzzle at 00:00 UTC, and the header countdown shows the time remaining until that worldwide rollover. The site synchronises against its host's clock when possible and falls back to the device clock when offline.
 
 ## Run the tests
 
