@@ -17,20 +17,28 @@ import {
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
 const streakLabel = document.querySelector("#streak-count");
+const totalRoundsLabel = document.querySelector("#total-rounds-count");
 const pointsLabel = document.querySelector("#points-count");
 const countdownLabel = document.querySelector("#next-round-countdown");
+const advanceDevDayButton = document.querySelector("#advance-dev-day");
 const clueTemplate = document.querySelector("#clue-template");
 const streakStorageKey = "the-daily-undead:streak";
+const totalRoundsStorageKey = "the-daily-undead:total-rounds";
 const pointsStorageKey = "the-daily-undead:total-points";
+const lastPlayedDateStorageKey = "the-daily-undead:last-played-date";
+const missedDayStorageKey = "the-daily-undead:missed-day";
+const reviveCost = 50;
 
 let catalog;
 let maps;
 let selectableMaps;
 let puzzle;
 let state;
-let replayIndex = 0;
 let streakCount = 0;
+let totalRounds = 0;
 let totalPoints = 0;
+let lastPlayedDate = null;
+let missedDayState = null;
 let lastResultClass = null;
 let clockOffset = 0;
 let liveDateKey;
@@ -81,11 +89,17 @@ function formatCountdown(milliseconds) {
 
 function updateNextRoundCountdown() {
   const now = getCurrentTime();
-  countdownLabel.textContent = formatCountdown(getMillisecondsUntilNextUtcDay(now));
-  countdownLabel.setAttribute(
-    "aria-label",
-    `${Math.ceil(getMillisecondsUntilNextUtcDay(now) / 1000)} seconds until the next round`,
-  );
+  const millisecondsRemaining = getMillisecondsUntilNextUtcDay(now);
+  const formattedCountdown = formatCountdown(millisecondsRemaining);
+  const countdownAriaLabel = `${Math.ceil(millisecondsRemaining / 1000)} seconds until the next round`;
+
+  countdownLabel.textContent = formattedCountdown;
+  countdownLabel.setAttribute("aria-label", countdownAriaLabel);
+  const endScreenCountdown = document.querySelector("#end-screen-countdown");
+  if (endScreenCountdown) {
+    endScreenCountdown.textContent = formattedCountdown;
+    endScreenCountdown.setAttribute("aria-label", countdownAriaLabel);
+  }
 
   const isPreview = new URLSearchParams(window.location.search).has("date");
   if (!isPreview && liveDateKey && getUtcDateKey(now) !== liveDateKey) {
@@ -100,6 +114,27 @@ function formatDate(dateKey) {
     month: "short",
   }).format(new Date(`${dateKey}T12:00:00`));
 }
+
+function getFollowingDateKey(dateKey) {
+  const date = new Date(`${dateKey}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + 1);
+  return getUtcDateKey(date);
+}
+
+function getPreviousDateKey(dateKey) {
+  const date = new Date(`${dateKey}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() - 1);
+  return getUtcDateKey(date);
+}
+
+function advanceSimulatedDay() {
+  const currentDateKey = puzzle?.dateKey || getDateKey();
+  const searchParams = new URLSearchParams(window.location.search);
+  searchParams.set("date", getFollowingDateKey(currentDateKey));
+  window.location.search = searchParams.toString();
+}
+
+advanceDevDayButton.addEventListener("click", advanceSimulatedDay);
 
 function validateMap(map, source) {
   const requiredStrings = ["id", "gameId", "gameTitle", "title"];
@@ -163,7 +198,7 @@ async function loadData() {
 
 function createInitialState() {
   return {
-    stateVersion: 4,
+    stateVersion: 8,
     puzzleKey: puzzle.key,
     phase: "clues",
     cluesRevealed: 1,
@@ -175,6 +210,10 @@ function createInitialState() {
     bonusComplete: false,
     bonusFailed: false,
     streakRecorded: false,
+    totalRoundsRecorded: false,
+    roundsSurvivedBeforeLoss: 0,
+    pointsBeforeLoss: 0,
+    revived: false,
     mapPoints: 0,
     bonusPoints: 0,
     pointsRecorded: false,
@@ -184,27 +223,6 @@ function createInitialState() {
 
 function storageKey() {
   return `dead-drop:${puzzle.dateKey}`;
-}
-
-function replayStorageKey(dateKey) {
-  return `dead-drop:${dateKey}:replay-index`;
-}
-
-function loadReplayIndex(dateKey) {
-  try {
-    const savedIndex = Number.parseInt(localStorage.getItem(replayStorageKey(dateKey)), 10);
-    return Number.isInteger(savedIndex) && savedIndex >= 0 ? savedIndex : 0;
-  } catch {
-    return 0;
-  }
-}
-
-function saveReplayIndex(dateKey) {
-  try {
-    localStorage.setItem(replayStorageKey(dateKey), String(replayIndex));
-  } catch {
-    // Replays still rotate maps during this session when storage is disabled.
-  }
 }
 
 function loadStreak() {
@@ -221,6 +239,23 @@ function saveStreak() {
     localStorage.setItem(streakStorageKey, String(streakCount));
   } catch {
     // The streak remains available for the current session when storage is disabled.
+  }
+}
+
+function loadTotalRounds() {
+  try {
+    const savedTotal = Number.parseInt(localStorage.getItem(totalRoundsStorageKey), 10);
+    return Number.isInteger(savedTotal) && savedTotal >= 0 ? savedTotal : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function saveTotalRounds() {
+  try {
+    localStorage.setItem(totalRoundsStorageKey, String(totalRounds));
+  } catch {
+    // The lifetime total remains available for the current session when storage is disabled.
   }
 }
 
@@ -241,6 +276,102 @@ function savePoints() {
   }
 }
 
+function loadLastPlayedDate() {
+  try {
+    const savedDate = localStorage.getItem(lastPlayedDateStorageKey);
+    return savedDate && isValidDateKey(savedDate) ? savedDate : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveLastPlayedDate() {
+  try {
+    localStorage.setItem(lastPlayedDateStorageKey, lastPlayedDate);
+  } catch {
+    // The date remains available for the current session when storage is disabled.
+  }
+}
+
+function recordDailyParticipation(dateKey = puzzle.dateKey) {
+  if (!isValidDateKey(dateKey) || (lastPlayedDate && dateKey < lastPlayedDate)) return;
+
+  lastPlayedDate = dateKey;
+  saveLastPlayedDate();
+}
+
+function getElapsedUtcDays(fromDateKey, toDateKey) {
+  if (!isValidDateKey(fromDateKey) || !isValidDateKey(toDateKey)) return 0;
+  return Math.floor(
+    (Date.parse(`${toDateKey}T00:00:00Z`) - Date.parse(`${fromDateKey}T00:00:00Z`)) /
+      86400000,
+  );
+}
+
+function loadSavedMissedDayState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(missedDayStorageKey));
+    if (
+      isValidDateKey(saved?.dateKey) &&
+      Number.isInteger(saved?.missedDays) &&
+      saved.missedDays > 0 &&
+      Number.isInteger(saved?.roundsBeforeLoss) &&
+      saved.roundsBeforeLoss >= 0 &&
+      Number.isInteger(saved?.pointsBeforeLoss) &&
+      saved.pointsBeforeLoss >= 0
+    ) {
+      return saved;
+    }
+  } catch {
+    // A corrupt or unavailable missed-day save should not prevent play.
+  }
+
+  return null;
+}
+
+function saveMissedDayState() {
+  try {
+    localStorage.setItem(missedDayStorageKey, JSON.stringify(missedDayState));
+  } catch {
+    // The missed-day prompt remains available for the current session when storage is disabled.
+  }
+}
+
+function prepareMissedDayState(dateKey) {
+  const saved = loadSavedMissedDayState();
+  if (saved?.dateKey === dateKey) return saved;
+
+  const elapsedDays = getElapsedUtcDays(lastPlayedDate, dateKey);
+
+  if (saved && !saved.resolved && elapsedDays > 1) {
+    missedDayState = {
+      ...saved,
+      dateKey,
+      missedDays: elapsedDays - 1,
+    };
+    saveMissedDayState();
+    return missedDayState;
+  }
+
+  if (elapsedDays <= 1 || (streakCount === 0 && totalPoints === 0)) return null;
+
+  missedDayState = {
+    dateKey,
+    missedDays: elapsedDays - 1,
+    roundsBeforeLoss: streakCount,
+    pointsBeforeLoss: totalPoints,
+    revived: false,
+    resolved: false,
+  };
+
+  streakCount = 0;
+  totalPoints = 0;
+  saveStreak();
+  savePoints();
+  saveMissedDayState();
+  return missedDayState;
+}
+
 function animateStat(label) {
   const display = label.closest(".stat-display");
   display.classList.remove("is-earned");
@@ -253,7 +384,15 @@ function updateStreakDisplay() {
   streakLabel.textContent = String(streakCount);
   streakLabel.closest(".stat-display").setAttribute(
     "aria-label",
-    `Rounds survived: ${streakCount}`,
+    `Current round: ${streakCount}`,
+  );
+}
+
+function updateTotalRoundsDisplay() {
+  totalRoundsLabel.textContent = String(totalRounds);
+  totalRoundsLabel.closest(".stat-display").setAttribute(
+    "aria-label",
+    `Total rounds completed: ${totalRounds}`,
   );
 }
 
@@ -288,33 +427,32 @@ function recordMapResult(isCorrect) {
   updateStreakDisplay();
   if (isCorrect) {
     animateStat(streakLabel);
+    if (!state.totalRoundsRecorded) {
+      totalRounds += 1;
+      saveTotalRounds();
+      updateTotalRoundsDisplay();
+      animateStat(totalRoundsLabel);
+    }
   } else {
     resetPoints();
   }
 }
 
-function buildNextReplayPuzzle(dateKey) {
-  const currentMapId = puzzle.map.id;
-  let candidate = puzzle;
-
-  for (let attempt = 0; attempt < maps.length; attempt += 1) {
-    replayIndex += 1;
-    candidate = buildDailyPuzzle(dateKey, maps, replayIndex);
-
-    if (candidate.map.id !== currentMapId || maps.length === 1) {
-      break;
-    }
-  }
-
-  saveReplayIndex(dateKey);
-  return candidate;
-}
-
 function loadState() {
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey()));
-    if ([2, 3, 4].includes(saved?.stateVersion) && saved?.puzzleKey === puzzle.key) {
-      const migrated = { ...createInitialState(), ...saved, stateVersion: 4 };
+    if ([2, 3, 4, 5, 6, 7, 8].includes(saved?.stateVersion) && saved?.puzzleKey === puzzle.key) {
+      const migrated = { ...createInitialState(), ...saved, stateVersion: 8 };
+
+      if (
+        saved.stateVersion < 6 &&
+        migrated.phase === "result" &&
+        migrated.isCorrect &&
+        !migrated.bonusComplete &&
+        !migrated.bonusFailed
+      ) {
+        migrated.bonusOrder = [];
+      }
 
       if (saved.stateVersion < 4 && saved.pointsRecorded) {
         const previousMapPoints = Number.isInteger(saved.mapPoints) ? saved.mapPoints : 0;
@@ -352,6 +490,12 @@ function saveState() {
 
 function migrateCompletedScore() {
   if (state.phase !== "result") return;
+
+  if (state.isCorrect && !state.totalRoundsRecorded) {
+    totalRounds += 1;
+    saveTotalRounds();
+    state.totalRoundsRecorded = true;
+  }
 
   if (!state.pointsRecorded) {
     state.mapPoints = state.isCorrect ? calculateMapPoints(state.lockedClues) : 0;
@@ -521,13 +665,19 @@ function renderMapSelection() {
       catalog.answerEquivalents,
     );
     const mapPoints = isCorrect ? calculateMapPoints(state.lockedClues) : 0;
+    const roundsSurvivedBeforeLoss = isCorrect ? 0 : streakCount;
+    const pointsBeforeLoss = isCorrect ? 0 : totalPoints;
     recordMapResult(isCorrect);
     if (!state.pointsRecorded) awardPoints(mapPoints);
+    if (isCorrect) recordDailyParticipation();
     setState({
       phase: "result",
       isCorrect,
       cluesRevealed: isCorrect ? 3 : state.cluesRevealed,
       streakRecorded: true,
+      totalRoundsRecorded: isCorrect || state.totalRoundsRecorded,
+      roundsSurvivedBeforeLoss,
+      pointsBeforeLoss,
       mapPoints,
       pointsRecorded: true,
     });
@@ -617,68 +767,274 @@ function renderBonus() {
   `;
 }
 
+function renderNextRoundScreen() {
+  return `
+    <section class="next-round-screen" aria-labelledby="next-round-screen-title" aria-live="off">
+      <p class="kicker">Next round</p>
+      <h3 id="next-round-screen-title">Next map in</h3>
+      <strong id="end-screen-countdown" class="end-screen-countdown" aria-label="Time until the next round">--:--:--</strong>
+      <p class="next-round-motivation">Come back tomorrow to maintain your Current Round and Points.</p>
+    </section>
+  `;
+}
+
+function renderMissedDay() {
+  const survivedRoundLabel = missedDayState.roundsBeforeLoss === 1 ? "Round" : "Rounds";
+  const preLossPointLabel = missedDayState.pointsBeforeLoss === 1 ? "Point" : "Points";
+  const missedMapCopy = missedDayState.missedDays === 1
+    ? "You missed yesterday’s map, so your Current Round and Points have been reset."
+    : `You missed ${missedDayState.missedDays} daily maps, so your Current Round and Points have been reset.`;
+  const canRevive = missedDayState.pointsBeforeLoss >= reviveCost;
+
+  if (missedDayState.revived) {
+    app.innerHTML = `
+      <section class="panel missed-day-panel">
+        <div class="result-banner revived animate">
+          <h2>Revived!</h2>
+          <p>You spent ${reviveCost} points and saved your run.</p>
+          <p class="survival-summary">Current Round restored to <strong>${missedDayState.roundsBeforeLoss}</strong> with <strong>${totalPoints}</strong> ${totalPoints === 1 ? "Point" : "Points"}</p>
+        </div>
+        <div class="actions">
+          <button id="continue-after-missed-day" class="button primary" type="button">Play today’s map</button>
+        </div>
+      </section>
+    `;
+  } else {
+    app.innerHTML = `
+      <section class="panel missed-day-panel">
+        <div class="result-banner failed animate">
+          <h2>Your run has ended</h2>
+          <p>${escapeHtml(missedMapCopy)}</p>
+          <p class="survival-summary">You had survived <strong>${missedDayState.roundsBeforeLoss}</strong> ${survivedRoundLabel} with <strong>${missedDayState.pointsBeforeLoss}</strong> ${preLossPointLabel}</p>
+        </div>
+        <section class="revive-offer" aria-labelledby="missed-day-revive-title">
+          <div>
+            <h3 id="missed-day-revive-title">Save your run?</h3>
+            <p>${
+              canRevive
+                ? `Spend ${reviveCost} points to restore Current Round ${missedDayState.roundsBeforeLoss} and keep your remaining points.`
+                : `You need at least ${reviveCost} points to restore Current Round ${missedDayState.roundsBeforeLoss}.`
+            }</p>
+          </div>
+          <button id="revive-missed-day" class="button revive-button" type="button" ${canRevive ? "" : "disabled"}>
+            ${canRevive ? `Revive · ${reviveCost} Points` : "Revive unavailable"}
+          </button>
+        </section>
+        <div class="actions">
+          <button id="continue-after-missed-day" class="button" type="button">Continue without revive</button>
+        </div>
+      </section>
+    `;
+  }
+
+  app.querySelector("#revive-missed-day")?.addEventListener("click", () => {
+    if (!canRevive || missedDayState.revived) return;
+
+    totalPoints = missedDayState.pointsBeforeLoss - reviveCost;
+    streakCount = missedDayState.roundsBeforeLoss;
+    missedDayState = { ...missedDayState, revived: true };
+    savePoints();
+    saveStreak();
+    recordDailyParticipation(getPreviousDateKey(puzzle.dateKey));
+    saveMissedDayState();
+    updatePointsDisplay();
+    updateStreakDisplay();
+    animateStat(pointsLabel);
+    animateStat(streakLabel);
+    renderMissedDay();
+  });
+
+  app.querySelector("#continue-after-missed-day").addEventListener("click", () => {
+    missedDayState = { ...missedDayState, resolved: true };
+    saveMissedDayState();
+    lastResultClass = null;
+    render();
+  });
+}
+
+function buildScoreSharePayload() {
+  const shareRound = !state.isCorrect && !state.revived
+    ? state.roundsSurvivedBeforeLoss
+    : streakCount;
+  const sharePoints = !state.isCorrect && !state.revived
+    ? state.pointsBeforeLoss
+    : totalPoints;
+  const shareUrl = document.querySelector('link[rel="canonical"]')?.href || window.location.href;
+
+  const scoreText = [
+    `The Daily Undead · ${formatDate(puzzle.dateKey)}`,
+    `Round: ${shareRound}`,
+    `Points: ${sharePoints}`,
+    `Total Rounds: ${totalRounds}`,
+    "",
+    "Will you survive?",
+  ].join("\n");
+
+  return {
+    title: "The Daily Undead",
+    scoreText,
+    text: `${scoreText}\n${shareUrl}`,
+    url: shareUrl,
+  };
+}
+
+async function copyScoreText(text) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textArea = document.createElement("textarea");
+  textArea.value = text;
+  textArea.setAttribute("readonly", "");
+  textArea.style.position = "fixed";
+  textArea.style.opacity = "0";
+  document.body.append(textArea);
+  textArea.select();
+  const copied = document.execCommand("copy");
+  textArea.remove();
+
+  if (!copied) throw new Error("Copying is not supported in this browser.");
+}
+
+async function shareScore(button, status) {
+  const payload = buildScoreSharePayload();
+
+  if (typeof navigator.share === "function") {
+    const hasTouchInput = navigator.maxTouchPoints > 0;
+    const nativePayload = hasTouchInput
+      ? { title: payload.title, text: payload.scoreText, url: payload.url }
+      : { title: payload.title, text: payload.text };
+
+    try {
+      await navigator.share(nativePayload);
+      button.textContent = "Shared!";
+      status.textContent = "Your score was shared.";
+      return;
+    } catch (error) {
+      if (error?.name === "AbortError") return;
+    }
+  }
+
+  try {
+    await copyScoreText(payload.text);
+    button.textContent = "Score copied!";
+    status.textContent = "Sharing wasn’t available, so your score was copied instead.";
+  } catch {
+    status.textContent = "Couldn’t share automatically. Please try again.";
+  }
+}
+
 function renderResult() {
   const selectedMap = selectableMaps.find((map) => map.id === state.selectedMapId);
   const answerTitle = getPuzzleAnswerTitle();
   const failedBonus = state.isCorrect && state.bonusFailed;
   const perfectResult = state.isCorrect && state.bonusComplete;
+  const revivedResult = !state.isCorrect && state.revived;
   const clueLabel = state.lockedClues === 1 ? "clue" : "clues";
-  const resultTitle = failedBonus
-    ? "Not quite"
-    : perfectResult
-      ? "Double Points!"
-      : state.isCorrect
-        ? "Round Survived!"
-        : "Game Over";
-  const resultCopy = failedBonus
-    ? `You identified ${answerTitle}, but the step order was incorrect. You still earned ${state.mapPoints} points this round.`
-    : perfectResult
-      ? `You found ${answerTitle} using ${state.lockedClues} ${clueLabel} and got the steps in the correct order. You earned ${state.mapPoints + state.bonusPoints} points this round.`
-      : state.isCorrect
-        ? `You identified ${answerTitle} in ${state.lockedClues} ${clueLabel}. You earned ${state.mapPoints} points this round.`
-        : `You chose ${selectedMap?.title ?? "an unknown map"}. Today’s answer was ${answerTitle}.`;
-  const resultClass = failedBonus ? "partial" : perfectResult ? "perfect" : state.isCorrect ? "correct" : "failed";
+  const resultTitle = revivedResult
+    ? "Revived!"
+    : failedBonus
+      ? "Not quite"
+      : perfectResult
+        ? "Double Points!"
+        : state.isCorrect
+          ? "Round Survived!"
+          : "Game Over";
+  const resultCopy = revivedResult
+    ? `You spent ${reviveCost} points and kept your run alive. Today’s answer was ${answerTitle}.`
+    : failedBonus
+      ? `You identified ${answerTitle}, but the step order was incorrect. You still earned ${state.mapPoints} points this round.`
+      : perfectResult
+        ? `You found ${answerTitle} using ${state.lockedClues} ${clueLabel} and got the steps in the correct order. You earned ${state.mapPoints + state.bonusPoints} points this round.`
+        : state.isCorrect
+          ? `You identified ${answerTitle} in ${state.lockedClues} ${clueLabel}. You earned ${state.mapPoints} points this round.`
+          : `You chose ${selectedMap?.title ?? "an unknown map"}. Today’s answer was ${answerTitle}.`;
+  const resultClass = revivedResult
+    ? "revived"
+    : failedBonus
+      ? "partial"
+      : perfectResult
+        ? "perfect"
+        : state.isCorrect
+          ? "correct"
+          : "failed";
   const animateResult = resultClass !== lastResultClass;
   lastResultClass = resultClass;
-  const showReplay = !state.isCorrect || state.bonusComplete || state.bonusFailed;
+  const isFinished = !state.isCorrect || state.bonusComplete || state.bonusFailed;
+  const survivedRoundLabel = state.roundsSurvivedBeforeLoss === 1 ? "Round" : "Rounds";
+  const preLossPointLabel = state.pointsBeforeLoss === 1 ? "Point" : "Points";
+  const showReviveOffer = !state.isCorrect && !state.revived;
+  const canRevive =
+    showReviveOffer &&
+    Number.isInteger(state.pointsBeforeLoss) &&
+    state.pointsBeforeLoss >= reviveCost;
 
   app.innerHTML = `
     <section class="panel">
       <div class="result-banner ${resultClass}${animateResult ? " animate" : ""}">
         <h2>${resultTitle}</h2>
         <p>${escapeHtml(resultCopy)}</p>
+        ${
+          !state.isCorrect
+            ? state.revived
+              ? `<p class="survival-summary">Current Round restored to <strong>${state.roundsSurvivedBeforeLoss}</strong></p>`
+              : `<p class="survival-summary">You survived <strong>${state.roundsSurvivedBeforeLoss}</strong> ${survivedRoundLabel} with <strong>${state.pointsBeforeLoss}</strong> ${preLossPointLabel}</p>`
+            : ""
+        }
       </div>
+      ${
+        showReviveOffer
+          ? `<section class="revive-offer" aria-labelledby="revive-title">
+              <div>
+                <h3 id="revive-title">Need a revive?</h3>
+                <p>${
+                  canRevive
+                    ? `Spend ${reviveCost} points to restore Current Round ${state.roundsSurvivedBeforeLoss}.`
+                    : `You need at least ${reviveCost} points to restore Current Round ${state.roundsSurvivedBeforeLoss}.`
+                }</p>
+              </div>
+              <button id="revive-player" class="button revive-button" type="button" ${canRevive ? "" : "disabled"}>
+                ${canRevive ? `Revive · ${reviveCost} Points` : "Revive unavailable"}
+              </button>
+            </section>`
+          : ""
+      }
       ${state.isCorrect ? renderBonus() : '<h3>Today’s three clues</h3><div id="clue-list" class="clue-list"></div>'}
       ${
-        showReplay
-          ? `<div class="actions">
-              <button id="replay-puzzle" class="button" type="button">Replay with a different map - Only available whilst game in development</button>
-            </div>`
+        isFinished
+          ? `<div class="actions share-score-actions">
+              <button id="share-score" class="button share-score-button" type="button">Share score</button>
+            </div>
+            <p id="share-score-status" class="share-score-status" aria-live="polite"></p>`
           : ""
       }
     </section>
+    ${isFinished ? renderNextRoundScreen() : ""}
   `;
+
+  updateNextRoundCountdown();
 
   if (!state.isCorrect) {
     renderClueCards(app.querySelector("#clue-list"), 3);
   }
-  if (showReplay) {
-    app.querySelector("#replay-puzzle").addEventListener("click", () => {
-      const dateKey = puzzle.dateKey;
+  app.querySelector("#revive-player")?.addEventListener("click", () => {
+    if (!canRevive) return;
 
-      try {
-        localStorage.removeItem(storageKey());
-      } catch {
-        // Reset the in-memory state even when storage is disabled.
-      }
-
-      puzzle = buildNextReplayPuzzle(dateKey);
-      state = createInitialState();
-      saveState();
-      render();
-    });
-  }
-
+    totalPoints = state.pointsBeforeLoss - reviveCost;
+    streakCount = state.roundsSurvivedBeforeLoss;
+    savePoints();
+    saveStreak();
+    recordDailyParticipation();
+    updatePointsDisplay();
+    updateStreakDisplay();
+    animateStat(pointsLabel);
+    animateStat(streakLabel);
+    setState({ revived: true });
+  });
+  app.querySelector("#share-score")?.addEventListener("click", (event) => {
+    shareScore(event.currentTarget, app.querySelector("#share-score-status"));
+  });
   if (!state.isCorrect || state.bonusComplete || state.bonusFailed) return;
 
   app.querySelectorAll("[data-bonus-step-id]").forEach((button) => {
@@ -730,18 +1086,31 @@ async function initialise() {
     await loadData();
     const dateKey = getDateKey();
     liveDateKey = getUtcDateKey(getCurrentTime());
-    replayIndex = loadReplayIndex(dateKey);
     streakCount = loadStreak();
+    totalRounds = loadTotalRounds();
     totalPoints = loadPoints();
-    puzzle = buildDailyPuzzle(dateKey, maps, replayIndex);
+    lastPlayedDate = loadLastPlayedDate();
+    puzzle = buildDailyPuzzle(dateKey, maps);
     state = loadState();
     migrateCompletedScore();
+    if (state.phase === "result" && (state.isCorrect || state.revived)) {
+      recordDailyParticipation(dateKey);
+    } else if (!lastPlayedDate && (streakCount > 0 || totalPoints > 0)) {
+      // Preserve existing players' progress when missed-day tracking is first introduced.
+      recordDailyParticipation(dateKey);
+    }
+    missedDayState = prepareMissedDayState(dateKey);
     dateLabel.textContent = `${formatDate(dateKey)}${new URLSearchParams(window.location.search).has("date") ? " · Preview" : ""}`;
     updateStreakDisplay();
+    updateTotalRoundsDisplay();
     updatePointsDisplay();
     updateNextRoundCountdown();
     window.setInterval(updateNextRoundCountdown, 1000);
-    render();
+    if (missedDayState && !missedDayState.resolved) {
+      renderMissedDay();
+    } else {
+      render();
+    }
   } catch (error) {
     console.error(error);
     app.innerHTML = `
