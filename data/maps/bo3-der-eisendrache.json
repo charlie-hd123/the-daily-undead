@@ -3,6 +3,7 @@
   "gameId": "bo3",
   "gameTitle": "Black Ops 3",
   "title": "Der Eisendrache",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "upgrade-the-required-bows-and-build-the-ragnarok-dg-4",

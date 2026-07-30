@@ -3,6 +3,7 @@
   "gameId": "bo6",
   "gameTitle": "Black Ops 6",
   "title": "Terminus",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "use-the-beamsmasher-to-recover-the-hard-drive-and-deliver-it-to-peck",

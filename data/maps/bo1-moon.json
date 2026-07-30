@@ -3,6 +3,7 @@
   "gameId": "bo1",
   "gameTitle": "Black Ops",
   "title": "Moon",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "complete-simon-says-on-the-four-computers-outside-the-receiving-bay",

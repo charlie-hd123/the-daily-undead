@@ -3,6 +3,7 @@
   "gameId": "bo3",
   "gameTitle": "Black Ops 3",
   "title": "Revelations",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "shoot-the-four-tombstones-in-the-required-order",

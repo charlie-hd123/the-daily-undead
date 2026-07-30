@@ -3,6 +3,7 @@
   "gameId": "bo4",
   "gameTitle": "Black Ops 4",
   "title": "Tag der Toten",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "complete-two-hermit-trials-and-place-the-four-dials",

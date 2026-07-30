@@ -3,6 +3,7 @@
   "gameId": "bo2",
   "gameTitle": "Black Ops 2",
   "title": "Buried",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "build-the-guillotine-beside-the-saloon",

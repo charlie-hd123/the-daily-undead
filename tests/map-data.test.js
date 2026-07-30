@@ -2,13 +2,15 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 
+import { isValidDateKey } from "../js/game-core.js";
+
 const mapsDirectory = new URL("../data/maps/", import.meta.url);
 
 async function readJson(filename) {
   return JSON.parse(await fs.readFile(new URL(filename, mapsDirectory), "utf8"));
 }
 
-test("the manifest contains all games and maps from the updated workbook", async () => {
+test("the manifest contains the expected games and maps", async () => {
   const catalog = await readJson("index.json");
 
   assert.deepEqual(
@@ -93,15 +95,25 @@ test("every selectable map keeps its official spelling and capitalisation", asyn
 
 test("every manifest map is valid and belongs to a selectable game", async () => {
   const catalog = await readJson("index.json");
-  const gameIds = new Set(catalog.games.map((game) => game.id));
+  const gameTitles = new Map(catalog.games.map((game) => [game.id, game.title]));
   const mapIds = new Set();
   let stepCount = 0;
 
   for (const filename of catalog.maps) {
     const map = await readJson(filename);
 
-    assert.equal(gameIds.has(map.gameId), true, `${filename} has an unknown gameId`);
+    assert.equal(gameTitles.has(map.gameId), true, `${filename} has an unknown gameId`);
+    assert.equal(
+      map.gameTitle,
+      gameTitles.get(map.gameId),
+      `${filename} has a gameTitle that does not match its gameId`,
+    );
     assert.equal(mapIds.has(map.id), false, `${filename} has a duplicate map id`);
+    assert.equal(
+      isValidDateKey(map.availableFrom),
+      true,
+      `${filename} needs a valid availableFrom date; new maps must use a future UTC date, not today`,
+    );
     assert.equal(map.steps.length >= 3, true, `${filename} needs at least three steps`);
     assert.deepEqual(
       map.steps.map((step) => step.order),
@@ -113,6 +125,9 @@ test("every manifest map is valid and belongs to a selectable game", async () =>
       map.steps.length,
       `${filename} has duplicate step ids`,
     );
+    for (const step of map.steps) {
+      assert.equal(typeof step.clue === "string" && step.clue.trim().length > 0, true);
+    }
 
     mapIds.add(map.id);
     stepCount += map.steps.length;

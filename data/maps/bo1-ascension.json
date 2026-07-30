@@ -3,6 +3,7 @@
   "gameId": "bo1",
   "gameTitle": "Black Ops",
   "title": "Ascension",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "throw-a-gersh-device-outside-the-map-to-capture-the-generator",

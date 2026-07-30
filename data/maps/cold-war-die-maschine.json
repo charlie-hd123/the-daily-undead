@@ -3,6 +3,7 @@
   "gameId": "cold-war",
   "gameTitle": "Black Ops Cold War",
   "title": "Die Maschine",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "build-the-aetherscope-after-restoring-pack-a-punch",

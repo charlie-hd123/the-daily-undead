@@ -3,6 +3,7 @@
   "gameId": "bo3",
   "gameTitle": "Black Ops 3",
   "title": "Shadows of Evil",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "complete-the-four-character-rituals-and-place-their-gateworms-in-the-rift",

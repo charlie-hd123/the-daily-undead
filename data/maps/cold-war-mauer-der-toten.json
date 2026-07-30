@@ -3,6 +3,7 @@
   "gameId": "cold-war",
   "gameTitle": "Black Ops Cold War",
   "title": "Mauer der Toten",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "use-klaus-and-the-crbr-s-blazer-to-open-the-hidden-lab",

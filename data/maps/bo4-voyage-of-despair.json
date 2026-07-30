@@ -3,6 +3,7 @@
   "gameId": "bo4",
   "gameTitle": "Black Ops 4",
   "title": "Voyage of Despair",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "activate-the-sentinel-artifact",

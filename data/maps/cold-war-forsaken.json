@@ -3,6 +3,7 @@
   "gameId": "cold-war",
   "gameTitle": "Black Ops Cold War",
   "title": "Forsaken",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "lift-the-facility-lockdown-and-release-the-forsaken",

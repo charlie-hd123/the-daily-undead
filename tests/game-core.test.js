@@ -63,6 +63,20 @@ test("future maps are excluded and exactly three clues are selected", () => {
   assert.equal(puzzle.displayedSteps.length, 3);
 });
 
+test("maps without a valid availability date cannot enter the daily rotation", () => {
+  const missingDate = { ...maps[0], availableFrom: undefined };
+  const invalidDate = { ...maps[0], id: "invalid-date", availableFrom: "2026-02-30" };
+
+  assert.throws(
+    () => buildDailyPuzzle("2026-07-20", [missingDate, invalidDate]),
+    /No eligible maps/,
+  );
+});
+
+test("daily puzzle generation rejects invalid input dates", () => {
+  assert.throws(() => buildDailyPuzzle("2026-02-30", maps), /valid UTC date/);
+});
+
 test("replay rotation changes the map and cycles through the eligible pool", () => {
   const firstPlay = buildDailyPuzzle("2026-07-20", maps, 0);
   const firstReplay = buildDailyPuzzle("2026-07-20", maps, 1);
