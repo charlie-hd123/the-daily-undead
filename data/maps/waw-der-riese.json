@@ -3,6 +3,7 @@
   "gameId": "waw",
   "gameTitle": "World at War",
   "title": "Der Riese",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "turn-on-the-power-and-link-all-three-teleporters",

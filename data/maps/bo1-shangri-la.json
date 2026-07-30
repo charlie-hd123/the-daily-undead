@@ -3,6 +3,7 @@
   "gameId": "bo1",
   "gameTitle": "Black Ops",
   "title": "Shangri-La",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "press-the-spawn-buttons-together-to-activate-the-eclipse",

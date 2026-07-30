@@ -3,6 +3,7 @@
   "gameId": "bo4",
   "gameTitle": "Black Ops 4",
   "title": "Alpha Omega",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "defend-the-generator-then-repair-the-four-ventilation-units",

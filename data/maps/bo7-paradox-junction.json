@@ -3,6 +3,7 @@
   "gameId": "bo7",
   "gameTitle": "Black Ops 7",
   "title": "Paradox Junction",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "build-the-blundergat-and-upgrade-it-to-the-sundergat",

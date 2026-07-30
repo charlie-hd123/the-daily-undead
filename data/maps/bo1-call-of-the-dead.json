@@ -3,6 +3,7 @@
   "gameId": "bo1",
   "gameTitle": "Black Ops",
   "title": "Call of the Dead",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "knife-the-door-and-find-the-fuse",

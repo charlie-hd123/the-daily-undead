@@ -3,6 +3,7 @@
   "gameId": "bo6",
   "gameTitle": "Black Ops 6",
   "title": "Liberty Falls",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "contact-the-trapped-scientist-and-obtain-the-thrustodyne",

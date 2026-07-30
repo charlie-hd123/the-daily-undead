@@ -3,6 +3,7 @@
   "gameId": "cold-war",
   "gameTitle": "Black Ops Cold War",
   "title": "Firebase Z",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "restore-the-three-reactors-and-speak-with-ravenov-peck-then-ravenov-again",

@@ -77,12 +77,22 @@ function getUtcDayNumber(dateKey) {
 }
 
 export function buildDailyPuzzle(dateKey, maps, rotationIndex = 0) {
+  if (!isValidDateKey(dateKey) || !Array.isArray(maps)) {
+    throw new Error("A valid UTC date and map list are required.");
+  }
+
   const eligibleMaps = maps
-    .filter((map) => map.steps.length >= 3 && (!map.availableFrom || map.availableFrom <= dateKey))
+    .filter(
+      (map) =>
+        Array.isArray(map.steps) &&
+        map.steps.length >= 3 &&
+        isValidDateKey(map.availableFrom) &&
+        map.availableFrom <= dateKey,
+    )
     .sort((left, right) => left.id.localeCompare(right.id));
 
   if (eligibleMaps.length === 0) {
-    throw new Error("No maps with at least three steps are available for this date.");
+    throw new Error("No eligible maps are available for this date.");
   }
 
   const replayIndex = Math.max(0, Math.floor(rotationIndex));

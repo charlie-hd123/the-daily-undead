@@ -3,6 +3,7 @@
   "gameId": "bo7",
   "gameTitle": "Black Ops 7",
   "title": "Totenreich",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "restore-power-and-unlock-pack-a-punch",

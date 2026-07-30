@@ -3,6 +3,7 @@
   "gameId": "bo7",
   "gameTitle": "Black Ops 7",
   "title": "Kowakujō",
+  "availableFrom": "2026-07-29",
   "steps": [
     {
       "id": "recapture-both-wards-and-remove-the-gate-glyphs",
