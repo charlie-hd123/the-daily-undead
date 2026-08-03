@@ -6,39 +6,39 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "build-the-guillotine-beside-the-saloon",
+      "id": "build-the-gallows-beside-the-courthouse",
       "order": 1,
-      "clue": "Build the guillotine beside the saloon."
+      "clue": "Build the gallows beside the courthouse."
     },
     {
-      "id": "power-the-four-red-orbs-with-the-paralyzer",
+      "id": "shatter-all-four-red-orbs-with-a-turbine-powered-subsurface-resonator",
       "order": 2,
-      "clue": "Power the four red orbs with the Paralyzer."
+      "clue": "Shatter all four red orbs with a Turbine-powered Subsurface Resonator."
     },
     {
-      "id": "knock-down-the-lantern-charge-it-with-mansion-ghosts-and-place-it-on-the-symbol",
+      "id": "knock-down-the-floating-lantern-with-a-grenade",
       "order": 3,
-      "clue": "Knock down the lantern, charge it with mansion ghosts, and place it on the symbol."
+      "clue": "Knock down the floating lantern with a grenade."
+    },
+    {
+      "id": "charge-the-lantern-with-zombies-killed-by-arthur-then-place-it-on-the-rooftop-symbol",
+      "order": 4,
+      "clue": "Charge the lantern with zombies killed by Arthur, then place it on the rooftop symbol."
     },
     {
       "id": "decode-the-message-and-strike-the-three-named-tunnel-signs",
-      "order": 4,
+      "order": 5,
       "clue": "Decode the message and strike the three named tunnel signs."
     },
     {
-      "id": "guide-the-wisp-to-the-guillotine-and-charge-it-with-zombie-souls",
-      "order": 5,
-      "clue": "Guide the wisp to the guillotine and charge it with zombie souls."
-    },
-    {
-      "id": "use-a-time-bomb-at-the-guillotine-and-retrieve-the-switch-from-the-future",
+      "id": "guide-the-wisp-to-the-gallows-trigger-the-time-bomb-then-guide-it-there-again",
       "order": 6,
-      "clue": "Use a Time Bomb at the guillotine and retrieve the switch from the future."
+      "clue": "Guide the wisp to the gallows, trigger the Time Bomb, then guide it there again."
     },
     {
-      "id": "attach-the-switch-then-pull-the-four-maze-levers-in-the-correct-order",
+      "id": "ring-the-nine-bells-as-directed-by-the-mansion-switchboard",
       "order": 7,
-      "clue": "Attach the switch, then pull the four maze levers in the correct order."
+      "clue": "Ring the nine bells as directed by the mansion switchboard."
     },
     {
       "id": "make-a-wish-and-complete-the-sharpshooter-targets",

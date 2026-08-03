@@ -6,39 +6,49 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "contact-the-trapped-scientist-and-obtain-the-thrustodyne",
+      "id": "collect-the-thrustodyne-parts-from-the-bowling-alley-groundskeeper-s-shed-and-radio-house",
       "order": 1,
-      "clue": "Contact the trapped scientist and obtain the Thrustodyne."
+      "clue": "Collect the Thrustodyne parts from the bowling alley, Groundskeeper’s shed and Radio House."
     },
     {
-      "id": "pull-in-the-three-ltg-parts-and-build-the-device",
+      "id": "build-the-thrustodyne-and-receive-dr-panos-s-instructions-in-the-church",
       "order": 2,
-      "clue": "Pull in the three LTG parts and build the device."
+      "clue": "Build the Thrustodyne and receive Dr. Panos’s instructions in the church."
     },
     {
-      "id": "defend-the-ltg-weaken-the-hvt-and-charge-the-first-canister",
+      "id": "use-the-thrustodyne-to-collect-the-three-ltg-parts",
       "order": 3,
-      "clue": "Defend the LTG, weaken the HVT, and charge the first canister."
+      "clue": "Use the Thrustodyne to collect the three LTG parts."
     },
     {
-      "id": "calibrate-the-three-projectors-to-release-the-second-canister",
+      "id": "build-the-ltg-on-the-bank-rooftop",
       "order": 4,
-      "clue": "Calibrate the three projectors to release the second canister."
+      "clue": "Build the LTG on the bank rooftop."
     },
     {
-      "id": "move-the-ltg-repeat-the-hvt-capture-and-return-the-second-canister",
+      "id": "defend-the-ltg-capture-an-hvt-s-essence-then-return-the-first-canister",
       "order": 5,
-      "clue": "Move the LTG, repeat the HVT capture, and return the second canister."
+      "clue": "Defend the LTG, capture an HVT’s essence, then return the first canister."
     },
     {
-      "id": "activate-the-dimensional-gateway",
+      "id": "use-the-strauss-counter-to-calibrate-three-projectors-and-release-the-second-canister",
       "order": 6,
-      "clue": "Activate the dimensional gateway."
+      "clue": "Use the Strauss Counter to calibrate three projectors and release the second canister."
     },
     {
-      "id": "survive-the-church-lockdown-and-defeat-its-three-elite-waves",
+      "id": "move-the-ltg-repeat-the-hvt-capture-then-return-the-second-canister",
       "order": 7,
-      "clue": "Survive the church lockdown and defeat its three elite waves."
+      "clue": "Move the LTG, repeat the HVT capture, then return the second canister."
+    },
+    {
+      "id": "activate-the-s-d-g-in-the-church-to-begin-the-final-encounter",
+      "order": 8,
+      "clue": "Activate the S.D.G. in the church to begin the final encounter."
+    },
+    {
+      "id": "survive-the-church-lockdown-defeating-the-hvt-mangler-and-abomination",
+      "order": 9,
+      "clue": "Survive the church lockdown, defeating the HVT Mangler and Abomination."
     }
   ]
 }

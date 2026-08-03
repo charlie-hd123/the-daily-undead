@@ -11,39 +11,39 @@
       "clue": "Build and upgrade all four staffs."
     },
     {
-      "id": "place-the-staffs-in-their-four-matching-holders",
+      "id": "place-the-upgraded-staffs-in-their-four-matching-pedestals",
       "order": 2,
-      "clue": "Place the staffs in their four matching holders."
+      "clue": "Place the upgraded staffs in their four matching pedestals."
     },
     {
-      "id": "press-the-robot-button-and-throw-a-g-strike-onto-the-stone-seal",
+      "id": "press-the-button-inside-a-robot-and-throw-a-g-strike-onto-the-stone-seal",
       "order": 3,
-      "clue": "Press the robot button and throw a G-Strike onto the stone seal."
+      "clue": "Press the button inside a robot and throw a G-Strike onto the stone seal."
     },
     {
-      "id": "deploy-the-maxis-drone-into-the-opened-pit-and-defeat-the-panzers",
+      "id": "deploy-the-maxis-drone-into-the-opened-seal-and-defeat-the-panzersoldat-horde",
       "order": 4,
-      "clue": "Deploy the Maxis Drone into the opened pit and defeat the Panzers."
+      "clue": "Deploy the Maxis Drone into the opened seal and defeat the Panzersoldat horde."
     },
     {
-      "id": "shoot-down-the-glowing-plane-and-kill-its-pilot-while-in-zombie-blood",
+      "id": "shoot-down-the-glowing-plane-then-kill-its-pilot-while-in-zombie-blood",
       "order": 5,
-      "clue": "Shoot down the glowing plane and kill its pilot while in Zombie Blood."
+      "clue": "Shoot down the glowing plane, then kill its pilot while in Zombie Blood."
     },
     {
-      "id": "upgrade-every-player-s-one-inch-punch-inside-the-excavation-site",
+      "id": "upgrade-the-one-inch-punch-by-punching-glowing-templars-beneath-the-excavation-site",
       "order": 6,
-      "clue": "Upgrade every player's One Inch Punch inside the excavation site."
+      "clue": "Upgrade the One Inch Punch by punching glowing Templars beneath the excavation site."
     },
     {
-      "id": "return-the-staffs-to-the-crazy-place-and-collect-100-souls",
+      "id": "return-all-four-staffs-to-the-crazy-place-and-collect-one-hundred-zombie-souls",
       "order": 7,
-      "clue": "Return the staffs to the Crazy Place and collect 100 souls."
+      "clue": "Return all four staffs to the Crazy Place and collect one hundred zombie souls."
     },
     {
-      "id": "release-maxis-into-the-central-portal",
+      "id": "send-the-maxis-drone-into-the-central-portal-to-free-samantha",
       "order": 8,
-      "clue": "Release Maxis into the central portal."
+      "clue": "Send the Maxis Drone into the central portal to free Samantha."
     }
   ]
 }

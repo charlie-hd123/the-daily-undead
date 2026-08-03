@@ -6,39 +6,49 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "use-the-beamsmasher-to-recover-the-hard-drive-and-deliver-it-to-peck",
+      "id": "activate-the-three-amp-generators-to-restore-power-and-raise-pack-a-punch",
       "order": 1,
-      "clue": "Use the Beamsmasher to recover the hard drive and deliver it to Peck."
+      "clue": "Activate the three AMP Generators to restore power and raise Pack-a-Punch."
     },
     {
-      "id": "decode-nathan-s-chamber-release-him-and-defeat-his-altered-form",
+      "id": "open-the-research-office-with-dead-wire-activate-the-laptops-and-solve-the-resonator-equations",
       "order": 2,
-      "clue": "Decode Nathan's chamber, release him, and defeat his altered form."
+      "clue": "Open the Research Office with Dead Wire, activate the laptops and solve the Resonator equations."
     },
     {
-      "id": "recover-the-keycard-and-repair-the-two-node-connectors",
+      "id": "charge-the-multiphasic-resonator-at-the-island-orbs-and-build-the-dri-11-beamsmasher",
       "order": 3,
-      "clue": "Recover the keycard and repair the two node connectors."
+      "clue": "Charge the Multiphasic Resonator at the island orbs and build the DRI-11 Beamsmasher."
     },
     {
-      "id": "hack-all-three-satellite-buoys-within-the-time-limit",
+      "id": "use-the-beamsmasher-to-recover-the-hard-drive-then-release-and-defeat-nathan",
       "order": 4,
-      "clue": "Hack all three satellite buoys within the time limit."
+      "clue": "Use the Beamsmasher to recover the Hard Drive, then release and defeat Nathan."
     },
     {
-      "id": "disarm-the-three-warheads-before-the-countdown-expires",
+      "id": "recover-the-project-janus-keycard-and-survive-the-shipwreck-lockdown-to-obtain-the-node-connectors",
       "order": 5,
-      "clue": "Disarm the three warheads before the countdown expires."
+      "clue": "Recover the Project Janus Keycard and survive the shipwreck lockdown to obtain the Node Connectors."
     },
     {
-      "id": "enter-the-docked-submarine-bay",
+      "id": "repair-the-network-lines-and-retrieve-the-hacking-device-from-peck",
       "order": 6,
-      "clue": "Enter the docked submarine bay."
+      "clue": "Repair the network lines and retrieve the Hacking Device from Peck."
     },
     {
-      "id": "defeat-patient-13",
+      "id": "hack-the-three-satellite-buoys-within-two-minutes",
       "order": 7,
-      "clue": "Defeat Patient 13."
+      "clue": "Hack the three satellite buoys within two minutes."
+    },
+    {
+      "id": "defuse-the-three-bombs-in-the-bio-lab-within-five-minutes",
+      "order": 8,
+      "clue": "Defuse the three bombs in the Bio Lab within five minutes."
+    },
+    {
+      "id": "enter-the-boss-arena-and-defeat-patient-13",
+      "order": 9,
+      "clue": "Enter the boss arena and defeat Patient 13."
     }
   ]
 }

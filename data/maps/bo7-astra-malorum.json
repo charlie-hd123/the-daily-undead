@@ -6,44 +6,54 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "trap-o-s-c-a-r-three-ways-and-recover-the-lgm-1",
+      "id": "repair-the-harmonic-oculus-and-defend-it-to-unlock-pack-a-punch",
       "order": 1,
-      "clue": "Trap O.S.C.A.R. three ways and recover the LGM-1."
+      "clue": "Repair the Harmonic Oculus and defend it to unlock Pack-a-Punch."
     },
     {
-      "id": "eavesdrop-on-o-s-c-a-r-and-enter-the-planet-code",
+      "id": "trap-o-s-c-a-r-with-three-contraptions-and-recover-the-lgm-1",
       "order": 2,
-      "clue": "Eavesdrop on O.S.C.A.R. and enter the planet code."
+      "clue": "Trap O.S.C.A.R. with three contraptions and recover the LGM-1."
     },
     {
-      "id": "recover-thurston-s-brain-and-restart-the-teleporter-machinery",
+      "id": "eavesdrop-on-o-s-c-a-r-enter-the-planet-code-and-recover-the-cryo-chamber-key",
       "order": 3,
-      "clue": "Recover Thurston's brain and restart the teleporter machinery."
+      "clue": "Eavesdrop on O.S.C.A.R., enter the planet code, and recover the Cryo Chamber Key."
     },
     {
-      "id": "solve-the-reading-list-planet-alignment-and-mars-coordinates",
+      "id": "extract-thurston-s-brain-defend-the-perfusion-machine-and-install-it-in-machina-astralis",
       "order": 4,
-      "clue": "Solve the reading list, planet alignment, and Mars coordinates."
+      "clue": "Extract Thurston’s brain, defend the Perfusion Machine, and install it in Machina Astralis."
     },
     {
-      "id": "defend-the-portal-and-travel-to-mars",
+      "id": "enter-mars-s-coordinates-solve-thurston-s-reading-list-and-recover-neptune",
       "order": 5,
-      "clue": "Defend the portal and travel to Mars."
+      "clue": "Enter Mars’s coordinates, solve Thurston’s Reading List, and recover Neptune."
     },
     {
-      "id": "capture-the-ascendant-eye-and-place-it-in-the-device",
+      "id": "install-neptune-and-align-the-three-planets-with-their-indicated-directions",
       "order": 6,
-      "clue": "Capture the Ascendant Eye and place it in the device."
+      "clue": "Install Neptune and align the three planets with their indicated directions."
     },
     {
-      "id": "harmonize-the-five-pillars-in-the-displayed-order",
+      "id": "defend-the-portal-from-o-s-c-a-r-s-drones-and-travel-to-mars",
       "order": 7,
-      "clue": "Harmonize the five pillars in the displayed order."
+      "clue": "Defend the portal from O.S.C.A.R.’s drones and travel to Mars."
     },
     {
-      "id": "defeat-caltheris",
+      "id": "install-the-perfusion-machine-shoot-the-distant-pylons-in-order-and-capture-the-ascendant-eye",
       "order": 8,
-      "clue": "Defeat Caltheris."
+      "clue": "Install the Perfusion Machine, shoot the distant pylons in order, and capture the Ascendant Eye."
+    },
+    {
+      "id": "place-the-ascendant-eye-and-activate-the-five-pillars-with-the-lgm-1",
+      "order": 9,
+      "clue": "Place the Ascendant Eye and activate the five pillars with the LGM-1."
+    },
+    {
+      "id": "interact-with-the-mars-pillars-in-the-harmonic-oculus-sequence-then-defeat-caltheris",
+      "order": 10,
+      "clue": "Interact with the Mars pillars in the Harmonic Oculus sequence, then defeat Caltheris."
     }
   ]
 }

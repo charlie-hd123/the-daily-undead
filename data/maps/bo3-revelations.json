@@ -6,49 +6,54 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "shoot-the-four-tombstones-in-the-required-order",
+      "id": "shoot-the-four-character-tombstones-in-the-required-order",
       "order": 1,
-      "clue": "Shoot the four tombstones in the required order."
+      "clue": "Shoot the four character tombstones in the required order."
     },
     {
-      "id": "obtain-and-play-the-three-audio-reels-in-sequence",
+      "id": "defend-the-keeper-protector-during-its-ritual-then-collect-and-play-the-first-audio-reel",
       "order": 2,
-      "clue": "Obtain and play the three audio reels in sequence."
+      "clue": "Defend the Keeper Protector during its ritual, then collect and play the first audio reel."
     },
     {
-      "id": "reconstruct-s-o-p-h-i-a-from-the-scattered-bones",
+      "id": "throw-li-l-arnies-into-all-nine-apothicon-holes-defeat-the-margwas-then-play-the-second-audio-reel",
       "order": 3,
-      "clue": "Reconstruct S.O.P.H.I.A. from the scattered bones."
+      "clue": "Throw Li'l Arnies into all nine Apothicon holes, defeat the Margwas, then play the second audio reel."
     },
     {
-      "id": "teleport-to-the-bedroom-and-place-the-kronorium-on-the-stage",
+      "id": "collect-the-six-scattered-bones-reconstruct-s-o-p-h-i-a-s-body-then-play-the-final-audio-reel",
       "order": 4,
-      "clue": "Teleport to the bedroom and place the Kronorium on the stage."
+      "clue": "Collect the six scattered bones, reconstruct S.O.P.H.I.A.’s body, then play the final audio reel."
     },
     {
-      "id": "charge-the-four-apothicon-eggs-into-gateworms",
+      "id": "direct-all-four-corruption-engine-lasers-then-escort-s-o-p-h-i-a-to-kino-der-toten",
       "order": 5,
-      "clue": "Charge the four Apothicon Eggs into Gateworms."
+      "clue": "Direct all four Corruption Engine lasers, then escort S.O.P.H.I.A. to Kino der Toten."
     },
     {
-      "id": "use-the-gateworms-to-retrieve-the-four-runes-of-creation",
+      "id": "teleport-to-samantha-s-bedroom-retrieve-the-kronorium-then-place-it-on-the-kino-stage",
       "order": 6,
-      "clue": "Use the Gateworms to retrieve the four Runes of Creation."
+      "clue": "Teleport to Samantha’s bedroom, retrieve the Kronorium, then place it on the Kino stage."
     },
     {
-      "id": "enter-the-kronorium-symbols-and-recover-the-summoning-key",
+      "id": "hatch-the-four-apothicon-eggs-into-gateworms-and-retrieve-the-four-runes-of-creation",
       "order": 7,
-      "clue": "Enter the Kronorium symbols and recover the Summoning Key."
+      "clue": "Hatch the four Apothicon Eggs into Gateworms and retrieve the four Runes of Creation."
     },
     {
-      "id": "throw-the-summoning-key-at-the-seven-marked-objects",
+      "id": "enter-the-kronorium-symbols-survive-the-four-enemy-waves-and-recover-the-summoning-key",
       "order": 8,
-      "clue": "Throw the Summoning Key at the seven marked objects."
+      "clue": "Enter the Kronorium symbols, survive the four enemy waves and recover the Summoning Key."
     },
     {
-      "id": "charge-the-key-break-the-shadowman-s-shield-and-defeat-him",
+      "id": "strike-the-seven-marked-objects-around-the-map-with-the-summoning-key",
       "order": 9,
-      "clue": "Charge the key, break the Shadowman's shield, and defeat him."
+      "clue": "Strike the seven marked objects around the map with the Summoning Key."
+    },
+    {
+      "id": "throw-the-summoning-key-at-s-o-p-h-i-a-then-seal-the-shadowman-inside-the-apothicon",
+      "order": 10,
+      "clue": "Throw the Summoning Key at S.O.P.H.I.A., then seal the Shadowman inside the Apothicon."
     }
   ]
 }

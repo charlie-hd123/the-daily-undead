@@ -6,34 +6,44 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "build-the-blundergat-and-upgrade-it-to-the-sundergat",
+      "id": "recover-the-truck-keys-in-the-future-then-move-the-truck-in-the-past",
       "order": 1,
-      "clue": "Build the Blundergat and upgrade it to the Sundergat."
+      "clue": "Recover the truck keys in the future, then move the truck in the past."
     },
     {
-      "id": "restore-the-swing-and-meet-the-twins",
+      "id": "recover-the-four-parts-and-build-the-blundergat",
       "order": 2,
-      "clue": "Restore the swing and meet the twins."
+      "clue": "Recover the four parts and build the Blundergat."
     },
     {
-      "id": "complete-the-hopscotch-bouncing-ball-and-four-square-trials",
+      "id": "collect-the-swing-seat-and-chalk-then-talk-to-the-twins",
       "order": 3,
-      "clue": "Complete the hopscotch, bouncing-ball, and four-square trials."
+      "clue": "Collect the swing seat and chalk, then talk to the Twins."
     },
     {
-      "id": "charge-the-three-rewards-with-the-sundergat-and-deliver-them",
+      "id": "complete-the-tree-piano-and-toy-box-puzzles-and-beat-the-twins-three-games",
       "order": 4,
-      "clue": "Charge the three rewards with the Sundergat and deliver them."
+      "clue": "Complete the tree, piano and toy box puzzles and beat the Twins’ three games."
     },
     {
-      "id": "set-the-broken-clock-and-follow-the-twins-through-their-three-locations",
+      "id": "charge-the-music-box-music-sheet-and-cymbals-with-the-sundergat",
       "order": 5,
-      "clue": "Set the broken clock and follow the twins through their three locations."
+      "clue": "Charge the Music Box, Music Sheet and Cymbals with the Sundergat."
     },
     {
-      "id": "enter-the-portal-and-defeat-the-dark-heart",
+      "id": "set-the-doomsday-clock-then-adjust-it-while-teleporting-to-summon-the-twins",
       "order": 6,
-      "clue": "Enter the portal and defeat the Dark Heart."
+      "clue": "Set the Doomsday Clock, then adjust it while teleporting to summon the Twins."
+    },
+    {
+      "id": "follow-the-twins-through-the-piano-toy-box-and-fireplace-locations",
+      "order": 7,
+      "clue": "Follow the Twins through the piano, toy box and fireplace locations."
+    },
+    {
+      "id": "speak-to-the-twins-at-the-swing-enter-the-portal-then-defeat-the-dark-heart",
+      "order": 8,
+      "clue": "Speak to the Twins at the swing, enter the portal, then defeat the Dark Heart."
     }
   ]
 }

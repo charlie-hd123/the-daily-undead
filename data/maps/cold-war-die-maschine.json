@@ -6,39 +6,49 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "build-the-aetherscope-after-restoring-pack-a-punch",
+      "id": "restore-power-activate-the-particle-accelerator-and-build-pack-a-punch-in-the-dark-aether",
       "order": 1,
-      "clue": "Build the Aetherscope after restoring Pack-a-Punch."
+      "clue": "Restore power, activate the Particle Accelerator and build Pack-a-Punch in the Dark Aether."
     },
     {
-      "id": "give-vogel-s-diary-to-the-three-spectral-reflections",
+      "id": "build-the-aetherscope-deliver-vogel-s-diary-to-the-three-spectral-reflections-and-enter-the-password",
       "order": 2,
-      "clue": "Give Vogel's diary to the three spectral reflections."
+      "clue": "Build the Aetherscope, deliver Vogel’s diary to the three spectral reflections and enter the password."
     },
     {
-      "id": "unlock-the-terminal-and-fire-all-four-d-i-e-variants-at-the-chamber",
+      "id": "obtain-the-d-i-e-shockwave-and-use-its-four-elemental-upgrades-on-the-decontamination-chamber",
       "order": 3,
-      "clue": "Unlock the terminal and fire all four D.I.E. variants at the chamber."
+      "clue": "Obtain the D.I.E. Shockwave and use its four elemental upgrades on the decontamination chamber."
     },
     {
-      "id": "use-the-dark-aether-wrench-to-fire-the-tank-and-recover-the-missing-agent",
+      "id": "witness-the-medical-bay-reflection-and-recover-the-dark-aether-wrench",
       "order": 4,
-      "clue": "Use the Dark Aether Wrench to fire the tank and recover the missing agent."
+      "clue": "Witness the Medical Bay reflection and recover the Dark Aether Wrench."
     },
     {
-      "id": "trap-both-halves-of-a-split-megaton-in-the-chamber",
+      "id": "repair-the-tank-and-use-it-to-recover-the-decontamination-agent",
       "order": 5,
-      "clue": "Trap both halves of a split Megaton in the chamber."
+      "clue": "Repair the tank and use it to recover the Decontamination Agent."
     },
     {
-      "id": "collect-orlov-s-family-photo-and-return-to-the-cyclotron",
+      "id": "trap-both-megaton-halves-inside-the-chamber-and-begin-the-purification-process",
       "order": 6,
-      "clue": "Collect Orlov's family photo and return to the cyclotron."
+      "clue": "Trap both Megaton halves inside the chamber and begin the purification process."
     },
     {
-      "id": "protect-orlov-while-he-shuts-down-the-three-systems-then-escape",
+      "id": "enter-the-dark-aether-and-recover-orlov-s-family-photograph",
       "order": 7,
-      "clue": "Protect Orlov while he shuts down the three systems, then escape."
+      "clue": "Enter the Dark Aether and recover Orlov’s family photograph."
+    },
+    {
+      "id": "defend-orlov-as-he-shuts-down-the-particle-accelerator",
+      "order": 8,
+      "clue": "Defend Orlov as he shuts down the Particle Accelerator."
+    },
+    {
+      "id": "escape-projekt-endstation-while-avoiding-the-electrical-surges-then-board-the-exfil-helicopter",
+      "order": 9,
+      "clue": "Escape Projekt Endstation while avoiding the electrical surges, then board the exfil helicopter."
     }
   ]
 }

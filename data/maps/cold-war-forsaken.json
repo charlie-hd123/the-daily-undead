@@ -6,29 +6,49 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "lift-the-facility-lockdown-and-release-the-forsaken",
+      "id": "activate-the-staging-area-teleporter-and-escape-the-accelerating-rounds",
       "order": 1,
-      "clue": "Lift the facility lockdown and release the Forsaken."
+      "clue": "Activate the Staging Area teleporter and escape the accelerating rounds."
     },
     {
-      "id": "collect-the-neutralizer-housing-monitor-fuel-tank-and-three-catalyzed-shards",
+      "id": "collect-four-parts-in-anytown-and-repair-the-fuel-processing-teleporter",
       "order": 2,
-      "clue": "Collect the Neutralizer housing, monitor, fuel tank, and three catalyzed shards."
+      "clue": "Collect four parts in Anytown and repair the Fuel Processing teleporter."
     },
     {
-      "id": "build-and-activate-the-aetherium-neutralizer",
+      "id": "defeat-the-abomination-enter-the-observation-tower-and-unlock-pack-a-punch",
       "order": 3,
-      "clue": "Build and activate the Aetherium Neutralizer."
+      "clue": "Defeat the Abomination, enter the Observation Tower and unlock Pack-a-Punch."
     },
     {
-      "id": "escort-it-through-the-phase-and-open-the-containment-door",
+      "id": "press-the-hidden-red-button-in-the-observation-tower-to-reveal-the-forsaken",
       "order": 4,
-      "clue": "Escort it through the Phase and open the containment door."
+      "clue": "Press the hidden red button in the Observation Tower to reveal the Forsaken."
     },
     {
-      "id": "charge-the-turrets-destroy-the-weak-points-and-complete-the-capture",
+      "id": "use-the-chrysalax-to-destroy-three-giant-aetherium-crystals-and-collect-their-crystal-shards",
       "order": 5,
-      "clue": "Charge the turrets, destroy the weak points, and complete the capture."
+      "clue": "Use the Chrysalax to destroy three giant Aetherium Crystals and collect their Crystal Shards."
+    },
+    {
+      "id": "feed-the-crystal-shards-to-abominations-kill-them-and-collect-the-catalyzed-crystal-shards",
+      "order": 6,
+      "clue": "Feed the Crystal Shards to Abominations, kill them and collect the Catalyzed Crystal Shards."
+    },
+    {
+      "id": "build-the-aetherium-neutralizer-with-its-three-parts-and-three-catalyzed-crystal-shards",
+      "order": 7,
+      "clue": "Build the Aetherium Neutralizer with its three parts and three Catalyzed Crystal Shards."
+    },
+    {
+      "id": "escort-the-neutralizer-down-main-street-refuelling-it-with-orange-crystal-shards",
+      "order": 8,
+      "clue": "Escort the Neutralizer down Main Street, refuelling it with orange crystal shards."
+    },
+    {
+      "id": "charge-maxis-s-laser-cannons-and-strike-the-forsaken-s-exposed-weak-points-to-defeat-him",
+      "order": 9,
+      "clue": "Charge Maxis’s laser cannons and strike the Forsaken’s exposed weak points to defeat him."
     }
   ]
 }

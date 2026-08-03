@@ -6,49 +6,59 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "light-the-eternal-flame-and-ignite-the-three-oil-spills",
+      "id": "activate-the-sentinel-artifact-obtain-the-golden-bridle-and-ride-pegasus-to-dark-delphi",
       "order": 1,
-      "clue": "Light the Eternal Flame and ignite the three oil spills."
+      "clue": "Activate the Sentinel Artifact, obtain the Golden Bridle and ride Pegasus to Dark Delphi."
     },
     {
-      "id": "use-charon-to-destroy-four-glowing-eyed-statues",
+      "id": "free-the-two-caged-eagles-and-defend-the-center-of-the-world",
       "order": 2,
-      "clue": "Use Charon to destroy four glowing-eyed statues."
+      "clue": "Free the two caged eagles and defend the Center of the World."
     },
     {
-      "id": "connect-the-four-gear-mechanisms-with-apollo-s-will",
+      "id": "reignite-the-eternal-flame-and-light-the-three-oil-spills-with-apollo-s-will",
       "order": 3,
-      "clue": "Connect the four gear mechanisms with Apollo's Will."
+      "clue": "Reignite the Eternal Flame and light the three oil spills with Apollo’s Will."
     },
     {
-      "id": "use-gaia-to-reveal-and-complete-the-three-symbol-groups",
+      "id": "use-the-redeemed-hand-of-charon-to-destroy-the-four-glowing-statues",
       "order": 4,
-      "clue": "Use Gaia to reveal and complete the three symbol groups."
+      "clue": "Use the Redeemed Hand of Charon to destroy the four glowing statues."
     },
     {
-      "id": "free-and-place-ra-s-scepter",
+      "id": "repair-the-hidden-cogs-with-apollo-s-will-and-turn-the-statues-inward",
       "order": 5,
-      "clue": "Free and place Ra's Scepter."
+      "clue": "Repair the hidden cogs with Apollo’s Will and turn the statues inward."
     },
     {
-      "id": "install-the-golden-pole-and-solve-the-three-ring-sundial",
+      "id": "complete-the-ra-and-danu-challenges-recover-ra-s-scepter-and-solve-the-sundial",
       "order": 6,
-      "clue": "Install the golden pole and solve the three-ring sundial."
+      "clue": "Complete the Ra and Danu challenges, recover Ra’s Scepter and solve the sundial."
     },
     {
-      "id": "complete-the-amphitheater-sharpshooter-trial",
+      "id": "complete-the-amphitheater-shooting-gallery-using-the-hands-of-god",
       "order": 7,
-      "clue": "Complete the amphitheater sharpshooter trial."
+      "clue": "Complete the Amphitheater shooting gallery using the Hands of God."
     },
     {
-      "id": "open-the-river-of-sorrow-door-and-fire-the-charged-ballista",
+      "id": "enter-the-symbols-on-the-door-at-the-river-of-sorrow",
       "order": 8,
-      "clue": "Open the River of Sorrow door and fire the charged ballista."
+      "clue": "Enter the symbols on the door at the River of Sorrow."
     },
     {
-      "id": "defeat-perseus",
+      "id": "use-the-pegasus-strike-to-summon-the-ballista",
       "order": 9,
-      "clue": "Defeat Perseus."
+      "clue": "Use the Pegasus Strike to summon the Ballista."
+    },
+    {
+      "id": "aim-the-ballista-with-ouranos-and-poison-apollo-s-will-to-fire-it-at-the-python",
+      "order": 10,
+      "clue": "Aim the Ballista with Ouranos and poison Apollo’s Will to fire it at the Python."
+    },
+    {
+      "id": "enter-the-portal-and-defeat-pegasus-and-perseus",
+      "order": 11,
+      "clue": "Enter the portal and defeat Pegasus and Perseus."
     }
   ]
 }

@@ -6,49 +6,59 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "activate-the-sentinel-artifact",
+      "id": "activate-the-sentinel-artifact-and-unlock-pack-a-punch-at-the-four-pedestals",
       "order": 1,
-      "clue": "Activate the Sentinel Artifact."
+      "clue": "Activate the Sentinel Artifact and unlock Pack-a-Punch at the four pedestals."
     },
     {
-      "id": "attune-all-four-pack-a-punch-pedestals",
+      "id": "read-the-altered-clocks-and-set-the-elemental-dials-around-the-ship",
       "order": 2,
-      "clue": "Attune all four Pack-a-Punch pedestals."
+      "clue": "Read the altered clocks and set the elemental dials around the ship."
     },
     {
-      "id": "match-the-clocks-to-the-bridge-engine-room-and-stern-levers",
+      "id": "kill-matching-elemental-catalysts-beside-the-four-sparking-outlets",
       "order": 3,
-      "clue": "Match the clocks to the bridge, engine-room, and stern levers."
+      "clue": "Kill matching elemental Catalysts beside the four sparking outlets."
     },
     {
-      "id": "create-the-four-elemental-portals-and-complete-their-trials-in-order",
+      "id": "complete-the-poison-water-electric-and-fire-trials-in-order-to-recover-the-sentinel-artifact",
       "order": 4,
-      "clue": "Create the four elemental portals and complete their trials in order."
+      "clue": "Complete the Poison, Water, Electric and Fire trials in order to recover the Sentinel Artifact."
     },
     {
-      "id": "fill-the-turbine-room-and-pack-a-punch-the-sentinel-artifact",
+      "id": "use-the-poison-kraken-to-shoot-the-nine-pipes-and-flood-the-turbine-room",
       "order": 5,
-      "clue": "Fill the Turbine Room and Pack-a-Punch the Sentinel Artifact."
+      "clue": "Use the Poison Kraken to shoot the nine pipes and flood the Turbine Room."
     },
     {
-      "id": "activate-the-nine-planetary-symbols-around-the-ship",
+      "id": "place-the-sentinel-artifact-inside-the-turbine-room-s-pack-a-punch-machine",
       "order": 6,
-      "clue": "Activate the nine planetary symbols around the ship."
+      "clue": "Place the Sentinel Artifact inside the Turbine Room’s Pack-a-Punch machine."
     },
     {
-      "id": "memorize-the-model-and-collect-the-planets-in-its-displayed-order",
+      "id": "activate-the-nine-planet-symbols-and-reveal-their-order-using-the-cargo-hold-model",
       "order": 7,
-      "clue": "Memorize the model and collect the planets in its displayed order."
+      "clue": "Activate the nine planet symbols and reveal their order using the Cargo Hold model."
     },
     {
-      "id": "melt-a-path-through-the-ice-to-the-stern",
+      "id": "shoot-the-planets-in-the-displayed-order-and-collect-their-falling-orbs",
       "order": 8,
-      "clue": "Melt a path through the ice to the stern."
+      "clue": "Shoot the planets in the displayed order and collect their falling orbs."
     },
     {
-      "id": "enter-the-iceberg-and-defeat-the-eye",
+      "id": "collect-the-sun-orb-and-destroy-the-ice-blocks-from-the-forecastle-to-the-poop-deck",
       "order": 9,
-      "clue": "Enter the iceberg and defeat the Eye."
+      "clue": "Collect the Sun orb and destroy the ice blocks from the Forecastle to the Poop Deck."
+    },
+    {
+      "id": "enter-the-final-ritual-and-recover-the-sentinel-artifact-underwater",
+      "order": 10,
+      "clue": "Enter the final ritual and recover the Sentinel Artifact underwater."
+    },
+    {
+      "id": "survive-the-five-arenas-and-defeat-the-eye-of-odin",
+      "order": 11,
+      "clue": "Survive the five arenas and defeat the Eye of Odin."
     }
   ]
 }

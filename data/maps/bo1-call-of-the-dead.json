@@ -6,9 +6,9 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "knife-the-door-and-find-the-fuse",
+      "id": "find-the-missing-fuse-and-insert-it-beside-the-locked-door",
       "order": 1,
-      "clue": "Knife the door and find the fuse."
+      "clue": "Find the missing fuse and insert it beside the locked door."
     },
     {
       "id": "destroy-all-four-red-generators",
@@ -21,14 +21,14 @@
       "clue": "Shoot a zombie with the V-R11 inside the lighthouse beam."
     },
     {
-      "id": "collect-and-insert-the-golden-rod-into-the-tube-beside-the-door",
+      "id": "collect-the-golden-rod-and-insert-it-into-the-tube-beside-the-door",
       "order": 4,
-      "clue": "Collect and insert the Golden Rod into the tube beside the door."
+      "clue": "Collect the Golden Rod and insert it into the tube beside the door."
     },
     {
-      "id": "knife-the-fuse-box",
+      "id": "knife-the-sparking-fuse-box-to-receive-the-wunderwaffe-dg-2",
       "order": 5,
-      "clue": "Knife the fuse box."
+      "clue": "Knife the sparking fuse box to receive the Wunderwaffe DG-2."
     }
   ]
 }

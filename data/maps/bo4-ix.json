@@ -6,39 +6,49 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "defeat-the-four-champions-and-place-their-heads-on-the-temple-spikes",
+      "id": "ring-the-four-tower-gongs-defeat-their-champions-and-place-their-heads-on-the-spikes",
       "order": 1,
-      "clue": "Defeat the four champions and place their heads on the temple spikes."
+      "clue": "Ring the four tower gongs, defeat their champions and place their heads on the spikes."
     },
     {
-      "id": "prepare-the-bone-meal-charcoal-and-dung",
+      "id": "obtain-the-death-of-orion-and-combine-bone-meal-burnt-wood-and-dung-to-create-fertilizer",
       "order": 2,
-      "clue": "Prepare the bone meal, charcoal, and dung."
+      "clue": "Obtain the Death of Orion and combine bone meal, burnt wood and dung to create fertilizer."
     },
     {
-      "id": "ferment-the-mixture-trigger-fire-bomb-above-it-and-complete-the-danu-trial",
+      "id": "get-fire-bomb-kills-on-the-fertilizer-and-destroy-the-red-pods-throughout-danu-tower",
       "order": 3,
-      "clue": "Ferment the mixture, trigger Fire Bomb above it, and complete the Danu trial."
+      "clue": "Get Fire Bomb kills on the fertilizer and destroy the red pods throughout Danu Tower."
     },
     {
-      "id": "ignite-four-bull-symbols-and-complete-both-ra-obelisk-trials",
+      "id": "ignite-the-four-bull-symbols-with-the-brazen-bull-and-defeat-the-summoned-champions",
       "order": 4,
-      "clue": "Ignite four bull symbols and complete both Ra obelisk trials."
+      "clue": "Ignite the four bull symbols with the Brazen Bull and defeat the summoned champions."
     },
     {
-      "id": "raise-and-charge-the-four-lightning-rods-then-survive-the-arena-trial",
+      "id": "read-the-ra-obelisk-and-kill-the-special-enemies-in-the-displayed-order",
       "order": 5,
-      "clue": "Raise and charge the four lightning rods, then survive the arena trial."
+      "clue": "Read the Ra Obelisk and kill the special enemies in the displayed order."
     },
     {
-      "id": "activate-the-nine-underground-symbols-and-complete-the-pit-trial",
+      "id": "raise-the-four-metal-rods-charge-them-with-kill-o-watt-and-survive-the-arena-challenge",
       "order": 6,
-      "clue": "Activate the nine underground symbols and complete the pit trial."
+      "clue": "Raise the four metal rods, charge them with Kill-O-Watt and survive the Arena challenge."
     },
     {
-      "id": "enter-the-red-portal-and-defeat-the-war-elephants",
+      "id": "shoot-the-three-symbol-sets-with-serket-s-kiss-and-survive-the-lockdown-in-the-pit",
       "order": 7,
-      "clue": "Enter the red portal and defeat the war elephants."
+      "clue": "Shoot the three symbol sets with Serket’s Kiss and survive the lockdown in The Pit."
+    },
+    {
+      "id": "enter-the-arena-portal-and-defeat-the-waves-of-gladiators-and-tigers",
+      "order": 8,
+      "clue": "Enter the Arena portal and defeat the waves of Gladiators and Tigers."
+    },
+    {
+      "id": "defeat-fury-and-wrath-the-two-war-elephants",
+      "order": 9,
+      "clue": "Defeat Fury and Wrath, the two war elephants."
     }
   ]
 }

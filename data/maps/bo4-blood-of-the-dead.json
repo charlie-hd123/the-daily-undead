@@ -6,44 +6,54 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "spirit-blast-the-rooftop-voltmeter-to-reveal-pack-a-punch",
+      "id": "use-brutus-to-open-the-warden-s-ritual-chamber",
       "order": 1,
-      "clue": "Spirit-blast the rooftop voltmeter to reveal Pack-a-Punch."
+      "clue": "Use Brutus to open the Warden’s Ritual Chamber."
     },
     {
-      "id": "use-brutus-to-open-the-hidden-ritual-room-and-take-the-red-stone",
+      "id": "activate-the-electric-chair-and-place-the-red-stone-in-richtofen-s-lab-to-release-the-spectral-bird",
       "order": 2,
-      "clue": "Use Brutus to open the hidden ritual room and take the red stone."
+      "clue": "Activate the electric chair and place the red stone in Richtofen’s Lab to release the Spectral Bird."
     },
     {
-      "id": "place-the-stone-track-the-spectral-bird-and-recover-the-kronorium",
+      "id": "track-the-spectral-bird-and-spirit-blast-it-over-three-rounds",
       "order": 3,
-      "clue": "Place the stone, track the spectral bird, and recover the Kronorium."
+      "clue": "Track the Spectral Bird and Spirit Blast it over three rounds."
     },
     {
-      "id": "read-its-numbers-and-complete-all-five-portal-challenges",
+      "id": "use-zombie-blood-and-the-hell-s-retriever-to-recover-the-kronorium-from-the-final-bird",
       "order": 4,
-      "clue": "Read its numbers and complete all five portal challenges."
+      "clue": "Use Zombie Blood and the Hell’s Retriever to recover the Kronorium from the final bird."
     },
     {
-      "id": "add-the-five-red-orbs-to-the-laboratory-map",
+      "id": "place-the-kronorium-in-the-ritual-chamber-and-use-its-codes-to-direct-the-lighthouse",
       "order": 5,
-      "clue": "Add the five red orbs to the laboratory map."
+      "clue": "Place the Kronorium in the Ritual Chamber and use its codes to direct the lighthouse."
     },
     {
-      "id": "return-to-the-warden-escape-the-cells-and-collect-brutus-s-orb",
+      "id": "complete-the-five-lighthouse-trials-and-collect-their-red-stones",
       "order": 6,
-      "clue": "Return to the Warden, escape the cells, and collect Brutus's orb."
+      "clue": "Complete the five lighthouse trials and collect their red stones."
     },
     {
-      "id": "place-the-final-orb-and-enter-the-dark-mechanism",
+      "id": "place-the-five-stones-in-richtofen-s-map-then-confront-the-warden-in-the-ritual-chamber",
       "order": 7,
-      "clue": "Place the final orb and enter the Dark Mechanism."
+      "clue": "Place the five stones in Richtofen’s map, then confront the Warden in the Ritual Chamber."
     },
     {
-      "id": "defeat-brutus-and-complete-richtofen-s-sacrifice",
+      "id": "escape-the-prison-cells-follow-the-spectral-bird-and-recover-the-final-red-stone",
       "order": 8,
-      "clue": "Defeat Brutus and complete Richtofen's sacrifice."
+      "clue": "Escape the prison cells, follow the Spectral Bird and recover the final red stone."
+    },
+    {
+      "id": "place-the-final-stone-in-richtofen-s-map-and-enter-the-dark-mechanism-chamber",
+      "order": 9,
+      "clue": "Place the final stone in Richtofen’s map and enter the Dark Mechanism chamber."
+    },
+    {
+      "id": "destroy-the-warden-s-spectral-orbs-charge-the-dark-mechanism-and-sacrifice-richtofen",
+      "order": 10,
+      "clue": "Destroy the Warden’s spectral orbs, charge the Dark Mechanism and sacrifice Richtofen."
     }
   ]
 }

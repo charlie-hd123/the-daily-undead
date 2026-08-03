@@ -6,44 +6,64 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "defend-the-generator-then-repair-the-four-ventilation-units",
+      "id": "survive-the-generators-lockdown-and-repair-the-nova-6-ventilation-units",
       "order": 1,
-      "clue": "Defend the generator, then repair the four ventilation units."
+      "clue": "Survive the Generators lockdown and repair the Nova-6 ventilation units."
     },
     {
-      "id": "read-the-television-codes-set-the-punch-clocks-and-enter-the-spare-code",
+      "id": "activate-rushmore-use-the-galvaknuckles-on-the-television-and-set-the-six-house-clocks",
       "order": 2,
-      "clue": "Read the television codes, set the punch clocks, and enter the spare code."
+      "clue": "Activate Rushmore, use the Galvaknuckles on the television and set the six house clocks."
     },
     {
-      "id": "lead-the-red-nova-6-crawler-to-the-transfusion-facility",
+      "id": "guide-the-red-nova-6-crawler-into-the-transfusion-facility",
       "order": 3,
-      "clue": "Lead the red Nova 6 crawler to the Transfusion Facility."
+      "clue": "Guide the red Nova-6 Crawler into the Transfusion Facility."
     },
     {
-      "id": "use-a-d-a-m-to-recover-and-return-the-stolen-canister",
+      "id": "activate-the-a-d-a-m-robot-by-entering-the-codes-into-rushmore",
       "order": 4,
-      "clue": "Use A.D.A.M. to recover and return the stolen canister."
+      "clue": "Activate the A.D.A.M. robot by entering the codes into Rushmore."
     },
     {
-      "id": "cool-and-install-the-server-then-enter-the-three-staff-codes",
+      "id": "use-the-a-d-a-m-robot-to-obtain-marlton-s-element-115-canister",
       "order": 5,
-      "clue": "Cool and install the server, then enter the three staff codes."
+      "clue": "Use the A.D.A.M. robot to obtain Marlton’s Element 115 canister."
     },
     {
-      "id": "set-the-six-power-boxes-and-restore-the-bunker-power",
+      "id": "use-a-jolting-jack-to-free-the-power-core-and-deliver-it-to-operations",
       "order": 6,
-      "clue": "Set the six power boxes and restore the bunker power."
+      "clue": "Use a Jolting Jack to free the Power Core and deliver it to Operations."
     },
     {
-      "id": "repair-a-d-a-m-then-escort-the-elemental-orb-to-the-interrogation-room",
+      "id": "use-brain-rot-to-reveal-the-three-painting-codes-and-enter-them-into-rushmore",
       "order": 7,
-      "clue": "Repair A.D.A.M., then escort the Elemental Orb to the interrogation room."
+      "clue": "Use Brain Rot to reveal the three painting codes and enter them into Rushmore."
     },
     {
-      "id": "charge-the-four-canisters-return-the-avogadro-to-the-apd-and-transport-him",
+      "id": "set-the-six-bunker-switches-and-restore-power-at-the-power-house",
       "order": 8,
-      "clue": "Charge the four canisters, return the Avogadro to the APD, and transport him."
+      "clue": "Set the six bunker switches and restore power at the Power House."
+    },
+    {
+      "id": "complete-the-three-a-d-a-m-mannequin-lockdowns-and-rebuild-the-unit-in-apd-interrogation",
+      "order": 9,
+      "clue": "Complete the three A.D.A.M. mannequin lockdowns and rebuild the unit in APD Interrogation."
+    },
+    {
+      "id": "escort-the-elemental-orb-into-the-repaired-a-d-a-m-unit",
+      "order": 10,
+      "clue": "Escort the Elemental Orb into the repaired A.D.A.M. Unit."
+    },
+    {
+      "id": "release-the-avogadro-and-charge-the-four-backup-soul-canisters",
+      "order": 11,
+      "clue": "Release the Avogadro and charge the four backup soul canisters."
+    },
+    {
+      "id": "force-the-avogadro-back-into-the-a-p-d-and-recover-the-elemental-shard",
+      "order": 12,
+      "clue": "Force the Avogadro back into the A.P.D. and recover the Elemental Shard."
     }
   ]
 }

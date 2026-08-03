@@ -6,29 +6,39 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "obtain-the-skull-of-nan-sapwe",
+      "id": "temporarily-power-both-laboratories-and-open-the-bunker",
       "order": 1,
+      "clue": "Temporarily power both laboratories and open the bunker."
+    },
+    {
+      "id": "obtain-the-skull-of-nan-sapwe",
+      "order": 2,
       "clue": "Obtain the Skull of Nan Sapwe."
     },
     {
-      "id": "use-it-to-reveal-the-blueprint-and-elevator-machinery",
-      "order": 2,
-      "clue": "Use it to reveal the blueprint and elevator machinery."
-    },
-    {
-      "id": "collect-the-three-missing-cogs",
+      "id": "use-the-skull-of-nan-sapwe-to-restore-the-hidden-elevator-plans",
       "order": 3,
-      "clue": "Collect the three missing cogs."
+      "clue": "Use the Skull of Nan Sapwe to restore the hidden elevator plans."
     },
     {
-      "id": "install-the-cogs-and-activate-the-elevator",
+      "id": "collect-three-cogs-using-the-anti-aircraft-gun-electrified-zipline-and-anywhere-but-here",
       "order": 4,
-      "clue": "Install the cogs and activate the elevator."
+      "clue": "Collect three cogs using the anti-aircraft gun, electrified zipline and Anywhere But Here!"
     },
     {
-      "id": "descend-and-defeat-the-giant-thrasher",
+      "id": "install-the-three-cogs-and-activate-the-elevator",
       "order": 5,
-      "clue": "Descend and defeat the giant Thrasher."
+      "clue": "Install the three cogs and activate the elevator."
+    },
+    {
+      "id": "descend-beneath-the-bunker-and-clear-the-roots-with-the-upgraded-kt-4",
+      "order": 6,
+      "clue": "Descend beneath the bunker and clear the roots with the upgraded KT-4."
+    },
+    {
+      "id": "defeat-mutated-takeo-by-destroying-his-four-exposed-spores",
+      "order": 7,
+      "clue": "Defeat Mutated Takeo by destroying his four exposed spores."
     }
   ]
 }

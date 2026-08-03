@@ -6,34 +6,54 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "restore-power-and-unlock-pack-a-punch",
+      "id": "restore-power-sync-the-glocke-drop-controller-and-call-in-pack-a-punch",
       "order": 1,
-      "clue": "Restore power and unlock Pack-a-Punch."
+      "clue": "Restore power, sync the Glocke Drop Controller and call in Pack-a-Punch."
     },
     {
-      "id": "follow-astrid-and-obtain-the-jotunn-star",
+      "id": "collect-the-chain-links-chilly-chunks-and-lantern-then-restore-astrid-in-the-burial-grounds",
       "order": 2,
-      "clue": "Follow Astrid and obtain the Jotunn Star."
+      "clue": "Collect the Chain Links, Chilly Chunks and Lantern, then restore Astrid in the Burial Grounds."
     },
     {
-      "id": "repair-and-calibrate-the-wundersignal",
+      "id": "follow-astrid-to-the-lighthouse-and-obtain-the-jotunn-star",
       "order": 3,
-      "clue": "Repair and calibrate the Wundersignal."
+      "clue": "Follow Astrid to the lighthouse and obtain the Jotunn Star."
     },
     {
-      "id": "collect-three-uranium-pieces-and-charge-the-atomkraft-core",
+      "id": "use-the-crowbar-and-flak-round-to-recover-the-transmitter-and-install-it-in-tyr-s-head",
       "order": 4,
-      "clue": "Collect three Uranium pieces and charge the Atomkraft Core."
+      "clue": "Use the Crowbar and Flak Round to recover the Transmitter and install it in Tyr’s Head."
     },
     {
-      "id": "use-the-shard-to-complete-the-vegvisir-rune-sequence",
+      "id": "decode-tyr-s-blinking-lights-to-obtain-the-wunderbarrage-controller",
       "order": 5,
-      "clue": "Use the shard to complete the Vegvisir rune sequence."
+      "clue": "Decode Tyr’s blinking lights to obtain the Wunderbarrage Controller."
     },
     {
-      "id": "enter-the-robot-head-and-defeat-dravakar",
+      "id": "collect-the-three-uranium-canisters-and-assemble-the-atomkraft-core",
       "order": 6,
-      "clue": "Enter the robot head and defeat Dravakar."
+      "clue": "Collect the three Uranium Canisters and assemble the Atomkraft Core."
+    },
+    {
+      "id": "charge-the-atomkraft-core-and-deliver-it-to-storm-bridge-to-obtain-the-dravakar-shard",
+      "order": 7,
+      "clue": "Charge the Atomkraft Core and deliver it to Storm Bridge to obtain the Dravakar Shard."
+    },
+    {
+      "id": "cook-the-dravakar-shard-with-the-jotunn-star-and-a-disciple-injection-to-obtain-the-sunstone",
+      "order": 8,
+      "clue": "Cook the Dravakar Shard with the Jotunn Star and a Disciple Injection to obtain the Sunstone."
+    },
+    {
+      "id": "use-the-sunstone-to-reveal-and-ignite-the-three-rune-marked-bonfires-in-order",
+      "order": 9,
+      "clue": "Use the Sunstone to reveal and ignite the three rune-marked bonfires in order."
+    },
+    {
+      "id": "enter-tyr-s-head-and-defeat-dravakar",
+      "order": 10,
+      "clue": "Enter Tyr’s Head and defeat Dravakar."
     }
   ]
 }

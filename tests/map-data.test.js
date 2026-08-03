@@ -133,7 +133,7 @@ test("every manifest map is valid and belongs to a selectable game", async () =>
     stepCount += map.steps.length;
   }
 
-  assert.equal(stepCount, 259);
+  assert.equal(stepCount, 311);
 
   const jsonFiles = (await fs.readdir(mapsDirectory))
     .filter((filename) => filename.endsWith(".json") && filename !== "index.json")
