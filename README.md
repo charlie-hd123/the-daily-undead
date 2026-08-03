@@ -14,7 +14,7 @@ Finished results also include a spoiler-free **Share score** action. Supported p
 
 The player also has a browser-local current-round streak. A correct map answer increases it immediately, whether or not the bonus order is correct, while a wrong map answer resets it to zero. Missing a daily map also resets Current Round and Points on the player's next visit. The missed-day screen and Game Over screen offer a revive when the player has enough points. Successful revives cost progressively more during the current run across both loss types: 100, 250, 500, 750, 1,000, 1,500, 2,000, 3,000, 4,000, then 5,000 points. Every later revive in that run remains at the 5,000-point ceiling. If a loss is not revived, the run ends and the revive price resets to 100 points for the next run. A separate Total Rounds count records every correctly identified map and does not reset after a loss. Clearing the site's browser data resets these values.
 
-The game is a dependency-free static site designed to work on GitHub Pages. The catalogue contains 259 ordered steps across 37 answer maps from World at War through Black Ops 7. Nine additional maps without full Easter eggs are selectable but excluded from the answer rotation.
+The game is a dependency-free static site designed to work on GitHub Pages. The catalogue contains 311 ordered steps across 37 answer maps from World at War through Black Ops 7. Nine additional maps without full Easter eggs are selectable but excluded from the answer rotation.
 
 ## Run locally
 

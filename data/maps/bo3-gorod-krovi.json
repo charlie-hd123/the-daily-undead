@@ -21,29 +21,34 @@
       "clue": "Insert the cylinder and enter KRONOS into S.O.P.H.I.A."
     },
     {
-      "id": "place-the-six-silver-trophies-beneath-the-monitor",
+      "id": "place-the-six-trophies-beneath-s-o-p-h-i-a-s-monitor",
       "order": 4,
-      "clue": "Place the six silver trophies beneath the monitor."
+      "clue": "Place the six trophies beneath S.O.P.H.I.A.’s monitor."
     },
     {
-      "id": "complete-s-o-p-h-i-a-s-six-challenges",
+      "id": "complete-the-first-five-trophy-challenges",
       "order": 5,
-      "clue": "Complete S.O.P.H.I.A.'s six challenges."
+      "clue": "Complete the first five trophy challenges."
     },
     {
-      "id": "deliver-the-power-core-to-nikolai-s-mech",
+      "id": "use-the-keycard-to-complete-the-group-935-download-in-the-hatchery",
       "order": 6,
-      "clue": "Deliver the power core to Nikolai's mech."
+      "clue": "Use the keycard to complete the Group 935 download in the Hatchery."
     },
     {
-      "id": "release-s-o-p-h-i-a-and-use-the-hidden-grate-to-free-nikolai",
+      "id": "collect-the-power-core-from-s-o-p-h-i-a-and-deliver-it-to-nikolai-s-mech",
       "order": 7,
-      "clue": "Release S.O.P.H.I.A. and use the hidden grate to free Nikolai."
+      "clue": "Collect the power core from S.O.P.H.I.A. and deliver it to Nikolai’s mech."
     },
     {
-      "id": "defeat-the-dragon-and-nikolai",
+      "id": "enter-the-sewer-beneath-s-o-p-h-i-a-to-reach-the-boss-arena",
       "order": 8,
-      "clue": "Defeat the dragon and Nikolai."
+      "clue": "Enter the sewer beneath S.O.P.H.I.A. to reach the boss arena."
+    },
+    {
+      "id": "defeat-the-dragon-then-destroy-nikolai-s-mech",
+      "order": 9,
+      "clue": "Defeat the dragon, then destroy Nikolai’s mech."
     }
   ]
 }

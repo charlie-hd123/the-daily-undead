@@ -6,44 +6,59 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "complete-two-hermit-trials-and-place-the-four-dials",
+      "id": "repair-the-ziplines-and-complete-two-of-the-hermit-s-challenge-totems",
       "order": 1,
-      "clue": "Complete two Hermit trials and place the four dials."
+      "clue": "Repair the ziplines and complete two of the Hermit’s challenge totems."
     },
     {
-      "id": "collect-the-three-offerings-and-retrieve-the-vril-vessel",
+      "id": "place-the-hermit-s-dials-in-artifact-storage-and-collect-the-three-apothicon-offerings",
       "order": 2,
-      "clue": "Collect the three offerings and retrieve the Vril Vessel."
+      "clue": "Place the Hermit’s dials in Artifact Storage and collect the three Apothicon offerings."
     },
     {
-      "id": "return-the-three-orange-orbs-and-take-the-seal-of-duality",
+      "id": "follow-the-apothicon-s-clue-and-blast-open-the-safe-containing-the-seal-of-duality",
       "order": 3,
-      "clue": "Return the three orange orbs and take the Seal of Duality."
+      "clue": "Follow the Apothicon’s clue and blast open the safe containing the Seal of Duality."
     },
     {
-      "id": "charge-the-seal-at-the-blue-campfire-with-samantha-s-music-box",
+      "id": "return-the-three-blood-orbs-and-purify-the-seal-with-samantha-s-music-box",
       "order": 4,
-      "clue": "Charge the Seal at the blue campfire with Samantha's Music Box."
+      "clue": "Return the three blood orbs and purify the Seal with Samantha’s Music Box."
     },
     {
-      "id": "process-the-two-soapstones-and-use-the-fuse-to-obtain-the-elemental-shard",
+      "id": "charge-the-fire-and-ice-soapstones-and-use-them-to-obtain-the-fuse",
       "order": 5,
-      "clue": "Process the two Soapstones and use the fuse to obtain the Elemental Shard."
+      "clue": "Charge the Fire and Ice Soapstones and use them to obtain the fuse."
     },
     {
-      "id": "repeat-the-orb-and-campfire-sequence-then-charge-the-seal-at-four-pack-a-punch-sites",
+      "id": "power-the-lighthouse-station-door-and-recover-the-elemental-shard",
       "order": 6,
-      "clue": "Repeat the orb and campfire sequence, then charge the Seal at four Pack-a-Punch sites."
+      "clue": "Power the Lighthouse Station door and recover the Elemental Shard."
     },
     {
-      "id": "charge-the-seal-at-golden-pack-a-punch-and-escort-it-to-human-infusion",
+      "id": "use-the-elemental-shard-and-repeat-the-blood-orb-purification-ritual",
       "order": 7,
-      "clue": "Charge the Seal at Golden Pack-a-Punch and escort it to Human Infusion."
+      "clue": "Use the Elemental Shard and repeat the blood-orb purification ritual."
     },
     {
-      "id": "deliver-the-agarthan-device-to-the-hermit-and-enter-the-final-portal",
+      "id": "give-the-seal-to-the-hermit-and-survive-the-lighthouse-lockdown",
       "order": 8,
-      "clue": "Deliver the Agarthan Device to the Hermit and enter the final portal."
+      "clue": "Give the Seal to the Hermit and survive the Lighthouse lockdown."
+    },
+    {
+      "id": "charge-the-seal-at-the-four-pack-a-punch-machines-and-purify-it-again",
+      "order": 9,
+      "clue": "Charge the Seal at the four Pack-a-Punch machines and purify it again."
+    },
+    {
+      "id": "charge-the-agarthan-device-at-golden-pack-a-punch-and-escort-it-through-the-collapsing-map",
+      "order": 10,
+      "clue": "Charge the Agarthan Device at Golden Pack-a-Punch and escort it through the collapsing map."
+    },
+    {
+      "id": "return-the-agarthan-device-to-the-hermit-then-retrieve-it-at-the-forecastle",
+      "order": 11,
+      "clue": "Return the Agarthan Device to the Hermit, then retrieve it at the Forecastle."
     }
   ]
 }

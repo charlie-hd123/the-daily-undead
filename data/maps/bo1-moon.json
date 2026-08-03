@@ -6,39 +6,34 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "complete-simon-says-on-the-four-computers-outside-the-receiving-bay",
+      "id": "play-one-game-of-samantha-says-on-the-four-computers-outside-the-receiving-area",
       "order": 1,
-      "clue": "Complete Simon Says on the four computers outside the Receiving Bay"
+      "clue": "Play one game of Samantha Says on the four computers outside the Receiving Area."
     },
     {
-      "id": "within-60-seconds-hack-the-four-glowing-green-terminals",
+      "id": "in-the-laboratories-hack-a-red-button-then-hack-four-green-terminals-within-sixty-seconds",
       "order": 2,
-      "clue": "Within 60 seconds, hack the four glowing green terminals."
+      "clue": "In the Laboratories, hack a red button, then hack four green terminals within sixty seconds."
     },
     {
-      "id": "shoot-it-with-the-wave-gun-when-it-reaches-the-satellite-dish",
+      "id": "shoot-the-vril-sphere-from-the-satellite-dish-with-the-wave-gun-and-guide-it-to-the-mpd",
       "order": 3,
-      "clue": "Shoot it with the Wave Gun when it reaches the satellite dish."
+      "clue": "Shoot the Vril Sphere from the satellite dish with the Wave Gun and guide it to the MPD."
     },
     {
-      "id": "grenade-the-shelf-beside-the-teleporter-and-throw-a-gersh-device-at-the-fallen-plates",
+      "id": "fill-the-raised-mpd-canister-with-zombie-souls-then-pull-the-switch-to-reveal-samantha",
       "order": 4,
-      "clue": "Grenade the shelf beside the teleporter and throw a Gersh Device at the fallen plates."
+      "clue": "Fill the raised MPD canister with zombie souls, then pull the switch to reveal Samantha."
     },
     {
-      "id": "throw-a-qed-at-the-plates-near-quick-revive",
+      "id": "fill-all-four-mpd-canisters-then-insert-the-charged-vril-device-into-the-pyramid",
       "order": 5,
-      "clue": "Throw a QED at the plates near Quick Revive."
+      "clue": "Fill all four MPD canisters, then insert the charged Vril Device into the pyramid."
     },
     {
-      "id": "insert-the-charged-vril-device-into-the-pyramid",
+      "id": "replay-samantha-says-three-times-then-throw-a-gersh-device-at-the-vril-sphere-to-destroy-earth",
       "order": 6,
-      "clue": "Insert the charged Vril Device into the pyramid."
-    },
-    {
-      "id": "throw-a-qed-at-the-vril-sphere",
-      "order": 7,
-      "clue": "Throw a QED at the Vril Sphere."
+      "clue": "Replay Samantha Says three times, then throw a Gersh Device at the Vril Sphere to destroy Earth."
     }
   ]
 }

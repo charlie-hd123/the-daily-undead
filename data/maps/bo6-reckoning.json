@@ -6,49 +6,49 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "unlock-pack-a-punch-and-obtain-the-gorgofex",
+      "id": "destroy-the-aetherium-crystals-to-unlock-pack-a-punch-and-activate-the-particle-accelerator",
       "order": 1,
-      "clue": "Unlock Pack-a-Punch and obtain the Gorgofex."
+      "clue": "Destroy the Aetherium Crystals to unlock Pack-a-Punch and activate the Particle Accelerator."
     },
     {
-      "id": "recover-the-dna-vial-and-open-the-teleportation-lab",
+      "id": "complete-the-syringe-chain-and-open-the-t2-teleportation-lab",
       "order": 2,
-      "clue": "Recover the DNA vial and open the teleportation lab."
+      "clue": "Complete the Syringe chain and open the T2 Teleportation Lab."
     },
     {
-      "id": "order-the-four-files-by-date-and-reboot-the-accelerator",
+      "id": "activate-franken-klaus-complete-his-s-a-m-trial-and-escort-him-into-the-lab",
       "order": 3,
-      "clue": "Order the four files by date and reboot the accelerator."
+      "clue": "Activate Franken-Klaus, complete his S.A.M. Trial and escort him into the lab."
     },
     {
-      "id": "charge-the-gorgofex-and-clear-the-portal-crystals",
+      "id": "order-the-four-project-janus-files-and-enter-their-code-into-franken-klaus-s-terminal",
       "order": 4,
-      "clue": "Charge the Gorgofex and clear the portal crystals."
+      "clue": "Order the four Project Janus files and enter their code into Franken-Klaus’s terminal."
     },
     {
-      "id": "cleanse-the-fungal-head-and-place-it-in-the-portal",
+      "id": "complete-the-gorgofex-project-janus-brain-and-fungal-head-objectives",
       "order": 5,
-      "clue": "Cleanse the fungal head and place it in the portal."
+      "clue": "Complete the Gorgofex, Project Janus brain and Fungal Head objectives."
     },
     {
-      "id": "build-franken-klaus-and-complete-his-two-terminal-tasks",
+      "id": "capture-four-floating-objects-with-the-vacuum-seal-devices",
       "order": 6,
-      "clue": "Build Franken-Klaus and complete his two terminal tasks."
+      "clue": "Capture four floating objects with the Vacuum-Seal Devices."
     },
     {
-      "id": "capture-four-floating-items-and-activate-the-bio-aetheric-portal",
+      "id": "complete-the-portal-lockdown-enter-the-portal-and-interact-with-the-sentinel-artifact",
       "order": 7,
-      "clue": "Capture four floating items and activate the bio-aetheric portal."
+      "clue": "Complete the portal lockdown, enter the portal and interact with the Sentinel Artifact."
     },
     {
-      "id": "attune-the-sentinel-artifact-and-complete-both-elevator-vaults",
+      "id": "charge-the-l-t-g-devices-and-destroy-the-aether-crystals-to-reach-the-rooftop",
       "order": 8,
-      "clue": "Attune the Sentinel Artifact and complete both elevator vaults."
+      "clue": "Charge the L.T.G. Devices and destroy the Aether crystals to reach the rooftop."
     },
     {
-      "id": "choose-a-side-and-defeat-the-opposing-boss",
+      "id": "defeat-s-a-m-or-uber-richtofen-depending-on-your-chosen-side",
       "order": 9,
-      "clue": "Choose a side and defeat the opposing boss."
+      "clue": "Defeat S.A.M. or Uber Richtofen, depending on your chosen side."
     }
   ]
 }

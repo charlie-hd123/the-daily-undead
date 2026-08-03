@@ -6,54 +6,49 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "press-the-spawn-buttons-together-to-activate-the-eclipse",
+      "id": "press-the-temple-button-and-match-all-twelve-pairs-of-floor-symbols",
       "order": 1,
-      "clue": "Press the spawn buttons together to activate the Eclipse."
+      "clue": "Press the temple button and match all twelve pairs of floor symbols."
     },
     {
-      "id": "match-all-12-pairs-of-floor-symbols",
+      "id": "have-three-players-stand-on-the-grate-while-the-fourth-hits-the-water-slide-switch",
       "order": 2,
-      "clue": "Match all 12 pairs of floor symbols."
+      "clue": "Have three players stand on the grate while the fourth hits the water-slide switch."
     },
     {
-      "id": "with-three-players-standing-on-the-grate-the-fourth-player-activates-the-slide-switch",
+      "id": "free-the-crystal-above-the-slide-shrink-it-with-the-31-79-jgb215-then-launch-it-from-the-geyser",
       "order": 3,
-      "clue": "With three players standing on the grate, the fourth player activates the slide switch."
+      "clue": "Free the crystal above the slide, shrink it with the 31-79 JGb215, then launch it from the geyser."
     },
     {
-      "id": "explode-the-crystal-above-the-slide-then-shrink-it",
+      "id": "turn-the-valve-and-lead-a-napalm-zombie-past-all-four-gas-leaks",
       "order": 4,
-      "clue": "Explode the crystal above the slide then shrink it."
+      "clue": "Turn the valve and lead a Napalm Zombie past all four gas leaks."
     },
     {
-      "id": "lead-a-napalm-zombie-past-all-four-gas-leaks",
+      "id": "plug-the-tunnel-holes-with-explosive-mines-then-press-the-waterfall-brick",
       "order": 5,
-      "clue": "Lead a Napalm Zombie past all four gas leaks."
+      "clue": "Plug the tunnel holes with explosive mines, then press the waterfall brick."
     },
     {
-      "id": "trigger-spikemores-facing-the-four-tunnel-holes-then-press-the-waterfall-brick",
+      "id": "knife-all-twelve-wall-panels-then-destroy-the-wooden-trap-near-the-minecart",
       "order": 6,
-      "clue": "Trigger Spikemores facing the four tunnel holes, then press the waterfall brick."
+      "clue": "Knife all twelve wall panels, then destroy the wooden trap near the minecart."
     },
     {
-      "id": "knife-all-12-wall-panels",
+      "id": "rotate-the-four-mud-room-dials-to-the-correct-symbols",
       "order": 7,
-      "clue": "Knife all 12 wall panels."
+      "clue": "Rotate the four mud-room dials to the correct symbols."
     },
     {
-      "id": "destroy-the-wooden-snare-trap-near-the-minecart",
+      "id": "knife-the-four-correct-gongs-shoot-the-crystal-then-catch-the-falling-dynamite",
       "order": 8,
-      "clue": "Destroy the wooden snare trap near the minecart."
+      "clue": "Knife the four correct gongs, shoot the crystal, then catch the falling dynamite."
     },
     {
-      "id": "knife-the-four-correct-gongs-until-the-crystals-glow-yellow",
+      "id": "shrink-the-meteorite-use-the-dynamite-behind-pack-a-punch-then-collect-the-focusing-stone",
       "order": 9,
-      "clue": "Knife the four correct gongs until the crystals glow yellow."
-    },
-    {
-      "id": "catch-the-falling-dynamite",
-      "order": 10,
-      "clue": "Catch the falling dynamite."
+      "clue": "Shrink the meteorite, use the dynamite behind Pack-a-Punch, then collect the Focusing Stone."
     }
   ]
 }

@@ -6,9 +6,9 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "restore-power-and-install-t-e-d-d-and-pack-a-punch-on-ol-tessie",
+      "id": "install-t-e-d-d-s-head-to-activate-ol-tessie",
       "order": 1,
-      "clue": "Restore power and install T.E.D.D. and Pack-a-Punch on Ol' Tessie."
+      "clue": "Install T.E.D.D.’s head to activate Ol’ Tessie."
     },
     {
       "id": "reactivate-klaus-and-use-him-to-recover-the-aether-barrel",
@@ -16,34 +16,34 @@
       "clue": "Reactivate Klaus and use him to recover the Aether Barrel."
     },
     {
-      "id": "charge-the-barrel-solve-the-cube-and-obtain-the-necrofluid-gauntlet",
+      "id": "charge-the-aether-barrel-solve-the-cube-and-obtain-the-necrofluid-gauntlet",
       "order": 3,
-      "clue": "Charge the barrel, solve the cube, and obtain the Necrofluid Gauntlet."
+      "clue": "Charge the Aether Barrel, solve the cube and obtain the Necrofluid Gauntlet."
     },
     {
-      "id": "fully-upgrade-ol-tessie-and-concoct-the-serum",
+      "id": "prepare-the-serum-and-complete-the-lockdown-in-yuri-s-lab",
       "order": 4,
-      "clue": "Fully upgrade Ol' Tessie and concoct the serum."
+      "clue": "Prepare the serum and complete the lockdown in Yuri’s Lab."
     },
     {
       "id": "use-the-three-keys-to-open-the-seal-of-sorrow-and-install-the-dg-2-turret",
       "order": 5,
-      "clue": "Use the three keys to open the Seal of Sorrow and install the DG-2 turret."
+      "clue": "Use the three keys to open the Seal of Sorrow and install the DG-2 Turret."
     },
     {
-      "id": "complete-the-four-gauntlet-challenges",
+      "id": "use-the-clock-tower-to-charge-the-necrofluid-gauntlet-and-complete-the-four-location-challenges",
       "order": 6,
-      "clue": "Complete the four Gauntlet challenges."
+      "clue": "Use the clock tower to charge the Necrofluid Gauntlet and complete the four location challenges."
     },
     {
-      "id": "collect-the-rally-orbs-in-the-required-route",
+      "id": "collect-the-twelve-wisps-with-ol-tessie-along-the-required-route",
       "order": 7,
-      "clue": "Collect the rally orbs in the required route."
+      "clue": "Collect the twelve wisps with Ol’ Tessie along the required route."
     },
     {
-      "id": "defeat-veytharion-with-ol-tessie",
+      "id": "use-ol-tessie-to-defeat-veytharion",
       "order": 8,
-      "clue": "Defeat Veytharion with Ol' Tessie."
+      "clue": "Use Ol’ Tessie to defeat Veytharion."
     }
   ]
 }

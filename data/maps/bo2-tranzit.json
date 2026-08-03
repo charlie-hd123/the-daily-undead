@@ -6,29 +6,29 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "build-a-turbine-and-use-it-to-access-the-power-station",
+      "id": "turn-on-the-power-then-switch-it-back-off-when-maxis-instructs-you",
       "order": 1,
-      "clue": "Build a Turbine and use it to access the power station."
+      "clue": "Turn on the power, then switch it back off when Maxis instructs you."
     },
     {
-      "id": "turn-on-the-power-then-switch-it-back-off",
+      "id": "wait-for-lightning-above-the-pylon-then-spawn-the-avogadro",
       "order": 2,
-      "clue": "Turn on the power, then switch it back off."
+      "clue": "Wait for lightning above the pylon, then spawn the Avogadro."
     },
     {
-      "id": "place-two-turbines-beneath-the-pylon-and-lure-the-electric-enemy-underneath-it",
+      "id": "place-two-turbines-beneath-the-pylon-and-lure-the-avogadro-underneath-it",
       "order": 3,
-      "clue": "Place two Turbines beneath the pylon and lure the electric enemy underneath it."
+      "clue": "Place two Turbines beneath the pylon and lure the Avogadro underneath it."
     },
     {
-      "id": "throw-an-emp-grenade-at-the-enemy-while-it-is-beneath-the-pylon",
+      "id": "defeat-the-avogadro-beneath-the-pylon-with-an-emp-grenade",
       "order": 4,
-      "clue": "Throw an EMP Grenade at the enemy while it is beneath the pylon."
+      "clue": "Defeat the Avogadro beneath the pylon with an EMP Grenade."
     },
     {
-      "id": "place-turbines-beneath-two-active-streetlights",
+      "id": "place-turbines-beneath-two-streetlights-to-activate-the-pylon",
       "order": 5,
-      "clue": "Place Turbines beneath two active streetlights."
+      "clue": "Place Turbines beneath two streetlights to activate the pylon."
     }
   ]
 }

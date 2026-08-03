@@ -6,43 +6,53 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "upgrade-the-required-bows-and-build-the-ragnarok-dg-4",
+      "id": "feed-the-three-dragons-to-obtain-the-wrath-of-the-ancients",
       "order": 1,
-      "clue": "Upgrade the required bows and build the Ragnarok DG-4."
+      "clue": "Feed the three dragons to obtain the Wrath of the Ancients."
     },
     {
-      "id": "shoot-the-four-sparking-objects-before-the-teleporter-resets",
+      "id": "complete-the-elemental-upgrades-for-the-wrath-of-the-ancients",
       "order": 2,
-      "clue": "Shoot the four sparking objects before the teleporter resets."
+      "clue": "Complete the elemental upgrades for the Wrath of the Ancients."
     },
     {
-      "id": "travel-to-the-past-and-collect-the-canister-fuses-and-safe-code",
+      "id": "shoot-four-wisps-with-an-upgraded-bow-before-time-runs-out",
       "order": 3,
-      "clue": "Travel to the past and collect the canister, fuses, and safe code."
+      "clue": "Shoot four wisps with an upgraded bow before time runs out."
     },
     {
-      "id": "open-the-safe-install-the-fuses-and-coils-then-complete-both-memory-games",
+      "id": "travel-to-the-past-for-the-soul-canister-fuses-and-safe-code",
       "order": 4,
-      "clue": "Open the safe, install the fuses and coils, then complete both memory games."
+      "clue": "Travel to the past for the soul canister, fuses and safe code."
     },
     {
-      "id": "press-the-green-button-shoot-the-fallen-capsule-and-collect-the-golden-rod",
+      "id": "open-the-safe-install-the-tesla-fuses-then-complete-both-memory-games",
       "order": 5,
-      "clue": "Press the green button, shoot the fallen capsule, and collect the Golden Rod."
+      "clue": "Open the safe, install the Tesla fuses, then complete both memory games."
     },
     {
-      "id": "repeat-the-wisp-sequence-return-to-the-past-and-collect-the-stone-tablet",
+      "id": "use-the-death-ray-to-bring-down-dempsey-s-capsule-then-collect-the-vril-device",
       "order": 6,
-      "clue": "Repeat the wisp sequence, return to the past, and collect the stone tablet."
+      "clue": "Use the Death Ray to bring down Dempsey’s capsule, then collect the Vril Device."
     },
     {
-      "id": "complete-the-keeper-s-four-soul-rituals-and-teleport-the-mpd",
+      "id": "shoot-the-wisps-a-second-time-and-return-to-the-past-for-the-stone-tablet",
       "order": 7,
-      "clue": "Complete the Keeper's four soul rituals and teleport the MPD."
+      "clue": "Shoot the wisps a second time and return to the past for the stone tablet."
+    },
+    {
+      "id": "complete-the-keeper-s-four-soul-circles-then-place-the-soul-canister-in-the-returned-mpd",
+      "order": 8,
+      "clue": "Complete the Keeper’s four soul circles, then place the soul canister in the returned MPD."
+    },
+    {
+      "id": "place-the-ragnarok-dg-4s-around-the-mpd-to-enter-the-boss-fight",
+      "order": 9,
+      "clue": "Place the Ragnarok DG-4s around the MPD to enter the boss fight."
     },
     {
       "id": "defeat-the-keeper-then-use-the-summoning-key-to-destroy-the-moon",
-      "order": 8,
+      "order": 10,
       "clue": "Defeat the Keeper, then use the Summoning Key to destroy the Moon."
     }
   ]

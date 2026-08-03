@@ -6,39 +6,49 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "build-the-staff-of-ice-and-upgrade-it-to-ull-s-arrow",
+      "id": "place-the-amulet-in-the-temple-to-open-the-dark-aether-nexus",
       "order": 1,
-      "clue": "Build the Staff of Ice and upgrade it to Ull's Arrow."
+      "clue": "Place the amulet in the temple to open the Dark Aether Nexus."
     },
     {
-      "id": "complete-the-vermin-statue-challenge-and-return-its-energy",
+      "id": "collect-the-monocle-and-complete-the-bull-and-hunter-mural-lockdowns-to-obtain-the-staff-parts",
       "order": 2,
-      "clue": "Complete the Vermin statue challenge and return its energy."
+      "clue": "Collect the Monocle and complete the Bull and Hunter mural lockdowns to obtain the Staff parts."
     },
     {
-      "id": "complete-the-parasite-statue-challenge-and-return-its-energy",
+      "id": "defend-the-staff-of-ice-during-its-construction-in-the-dark-aether-nexus",
       "order": 3,
-      "clue": "Complete the Parasite statue challenge and return its energy."
+      "clue": "Defend the Staff of Ice during its construction in the Dark Aether Nexus."
     },
     {
-      "id": "complete-the-doppelghast-statue-challenge-and-return-its-energy",
+      "id": "freeze-three-lanterns-within-ten-seconds",
       "order": 4,
-      "clue": "Complete the Doppelghast statue challenge and return its energy."
+      "clue": "Freeze three lanterns within ten seconds."
     },
     {
-      "id": "complete-the-amalgam-statue-challenge-and-return-its-energy",
+      "id": "lower-three-symbol-rocks-then-shoot-their-symbols-on-the-blocked-gateway",
       "order": 5,
-      "clue": "Complete the Amalgam statue challenge and return its energy."
+      "clue": "Lower three symbol rocks, then shoot their symbols on the blocked gateway."
     },
     {
-      "id": "cross-the-opened-bridge-and-activate-the-sentinel-artifact",
+      "id": "escort-the-purple-orb-to-upgrade-the-staff-of-ice",
       "order": 6,
-      "clue": "Cross the opened bridge and activate the Sentinel Artifact."
+      "clue": "Escort the purple orb to upgrade the Staff of Ice."
     },
     {
-      "id": "complete-the-artifact-boss-fight",
+      "id": "complete-the-vermin-and-parasite-statue-trials-and-return-their-energy",
       "order": 7,
-      "clue": "Complete the artifact boss fight."
+      "clue": "Complete the Vermin and Parasite statue trials and return their energy."
+    },
+    {
+      "id": "complete-the-doppelghast-and-amalgam-statue-trials-and-return-their-energy",
+      "order": 8,
+      "clue": "Complete the Doppelghast and Amalgam statue trials and return their energy."
+    },
+    {
+      "id": "cross-the-opened-bridge-and-defeat-the-sentinel-artifact",
+      "order": 9,
+      "clue": "Cross the opened bridge and defeat the Sentinel Artifact."
     }
   ]
 }

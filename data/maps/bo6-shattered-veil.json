@@ -6,29 +6,54 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "unlock-pack-a-punch-and-obtain-the-ray-gun-mark-ii",
+      "id": "collect-the-fuse-from-the-library-and-the-circuit-board-from-the-director-s-quarters",
       "order": 1,
-      "clue": "Unlock Pack-a-Punch and obtain the Ray Gun Mark II."
+      "clue": "Collect the Fuse from the Library and the Circuit Board from the Director’s Quarters."
     },
     {
-      "id": "recover-the-three-canisters-and-craft-all-three-elemental-variants",
+      "id": "repair-the-elevator-to-reach-s-a-m-and-pack-a-punch",
       "order": 2,
-      "clue": "Recover the three canisters and craft all three elemental variants."
+      "clue": "Repair the elevator to reach S.A.M. and Pack-a-Punch."
     },
     {
-      "id": "complete-the-three-variant-ritual-chains",
+      "id": "kill-a-lab-technician-in-the-mainframe-chamber-and-collect-its-floppy-disk",
       "order": 3,
-      "clue": "Complete the three variant ritual chains."
+      "clue": "Kill a Lab Technician in the Mainframe Chamber and collect its Floppy Disk."
     },
     {
-      "id": "place-the-three-sentinel-artifacts-in-the-mainframe-chamber",
+      "id": "use-the-floppy-disk-to-obtain-the-project-janus-protocol-word",
       "order": 4,
-      "clue": "Place the three Sentinel Artifacts in the mainframe chamber."
+      "clue": "Use the Floppy Disk to obtain the Project Janus protocol word."
     },
     {
-      "id": "enter-the-chamber-and-defeat-the-z-rex",
+      "id": "decode-the-protocol-using-the-nursery-chalkboard-then-enter-the-code-in-the-service-tunnel",
       "order": 5,
-      "clue": "Enter the chamber and defeat the Z-Rex."
+      "clue": "Decode the protocol using the Nursery chalkboard, then enter the code in the Service Tunnel."
+    },
+    {
+      "id": "defeat-the-hvt-doppelghast-and-collect-its-severed-arm",
+      "order": 6,
+      "clue": "Defeat the HVT Doppelghast and collect its Severed Arm."
+    },
+    {
+      "id": "use-the-severed-arm-on-the-biometric-scanner-to-obtain-the-ray-gun-mark-ii",
+      "order": 7,
+      "clue": "Use the Severed Arm on the biometric scanner to obtain the Ray Gun Mark II."
+    },
+    {
+      "id": "recover-three-canisters-and-craft-wraith-fire-rot-blight-and-preservation",
+      "order": 8,
+      "clue": "Recover three canisters and craft Wraith Fire, Rot Blight and Preservation."
+    },
+    {
+      "id": "complete-their-three-liminal-rituals-to-charge-the-sentinel-artifact",
+      "order": 9,
+      "clue": "Complete their three Liminal rituals to charge the Sentinel Artifact."
+    },
+    {
+      "id": "give-the-charged-sentinel-artifact-to-s-a-m-then-defeat-the-z-rex",
+      "order": 10,
+      "clue": "Give the charged Sentinel Artifact to S.A.M., then defeat the Z-Rex."
     }
   ]
 }

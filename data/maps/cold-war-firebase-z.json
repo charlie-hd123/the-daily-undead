@@ -6,39 +6,49 @@
   "availableFrom": "2026-07-29",
   "steps": [
     {
-      "id": "restore-the-three-reactors-and-speak-with-ravenov-peck-then-ravenov-again",
+      "id": "travel-to-omega-base-and-activate-the-three-aether-reactors-to-restore-power",
       "order": 1,
-      "clue": "Restore the three reactors and speak with Ravenov, Peck, then Ravenov again."
+      "clue": "Travel to Omega Base and activate the three Aether Reactors to restore power."
     },
     {
-      "id": "mix-the-truth-serum-and-release-it-into-peck-s-room",
+      "id": "obtain-ravenov-s-id-badge-concoct-the-truth-serum-and-use-it-on-peck",
       "order": 2,
-      "clue": "Mix the truth serum and release it into Peck's room."
+      "clue": "Obtain Ravenov’s ID Badge, concoct the truth serum and use it on Peck."
     },
     {
-      "id": "trap-the-three-marked-mimics-and-recover-the-floppy-disk",
+      "id": "capture-three-mimics-with-essence-traps-to-obtain-the-floppy-disk",
       "order": 3,
-      "clue": "Trap the three marked Mimics and recover the floppy disk."
+      "clue": "Capture three Mimics with Essence Traps to obtain the Floppy Disk."
     },
     {
-      "id": "insert-the-disk-open-the-opc-and-obtain-the-aethermeter",
+      "id": "insert-the-floppy-disk-and-open-the-omega-portal-chamber",
       "order": 4,
-      "clue": "Insert the disk, open the OPC, and obtain the Aethermeter."
+      "clue": "Insert the Floppy Disk and open the Omega Portal Chamber."
     },
     {
-      "id": "dig-up-and-secure-the-three-aether-crystals",
+      "id": "use-the-aethermeter-shovel-and-rai-k-84-to-recover-the-three-aetherium-crystals",
       "order": 5,
-      "clue": "Dig up and secure the three Aether crystals."
+      "clue": "Use the Aethermeter, shovel and RAI K-84 to recover the three Aetherium Crystals."
     },
     {
-      "id": "insert-the-crystals-and-align-the-satellite-dish",
+      "id": "place-the-crystals-inside-the-aether-reactors-and-return-to-the-portal-chamber",
       "order": 6,
-      "clue": "Insert the crystals and align the satellite dish."
+      "clue": "Place the crystals inside the Aether Reactors and return to the Portal Chamber."
     },
     {
-      "id": "enter-the-opc-and-defeat-orda",
+      "id": "align-the-satellite-with-requiem-s-signal",
       "order": 7,
-      "clue": "Enter the OPC and defeat Orda."
+      "clue": "Align the satellite with Requiem’s signal."
+    },
+    {
+      "id": "activate-the-portal-and-rescue-maxis",
+      "order": 8,
+      "clue": "Activate the portal and rescue Maxis."
+    },
+    {
+      "id": "return-to-the-village-and-defeat-orda",
+      "order": 9,
+      "clue": "Return to the village and defeat Orda."
     }
   ]
 }
