@@ -21,6 +21,11 @@ test("the published page uses local fonts and privacy-safe external links", asyn
     /href="https:\/\/tally\.so\/r\/q4XeD7"[^>]*rel="noopener noreferrer"[^>]*referrerpolicy="no-referrer"/,
   );
   assert.match(html, /id="advance-dev-day"[^>]*hidden/);
+  assert.match(html, /id="advance-dev-day"[^>]*>ADVANCE A DAY<\/button>/);
+  assert.match(
+    html,
+    /trademarks of their respective owners\.[\s\S]*id="advance-dev-day"[\s\S]*<\/p>/,
+  );
 });
 
 test("the page's local release assets exist", async () => {
@@ -63,5 +68,18 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260730-6"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260812-1"]));
+});
+
+test("the clue count stays editable until a map is confirmed", async () => {
+  const app = await readProjectFile("js/app.js");
+
+  assert.match(app, /id="back-to-clues"[^>]*>Back to clues<\/button>/);
+  assert.match(app, /setState\(\{ phase: "clues", selectedGameId: null, selectedMapId: null \}\)/);
+  assert.match(app, /setState\(\{ phase: "game", lockedClues: null \}\)/);
+  assert.match(
+    app.match(/function renderMapSelection\(\)[\s\S]*?\n}\n/)[0],
+    /lockedClues: state\.cluesRevealed/,
+  );
+  assert.doesNotMatch(app, /phase: "clue-review"/);
 });

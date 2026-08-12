@@ -1187,20 +1187,18 @@ h1 {
 }
 
 .dev-day-button {
-  display: block;
-  margin: 0.8rem auto 0;
-  padding: 0.48rem 0.8rem;
-  border: 1px dashed rgb(247 200 92 / 34%);
-  border-radius: 0.55rem;
-  background: rgb(247 200 92 / 6%);
-  color: rgb(247 200 92 / 68%);
+  display: inline;
+  margin: 0 0 0 0.35rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
   cursor: pointer;
-  font-family: var(--font-display);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  opacity: 0.72;
+  transition: color 150ms ease, opacity 150ms ease;
 }
 
 .dev-day-button[hidden] {
@@ -1208,14 +1206,14 @@ h1 {
 }
 
 .dev-day-button:hover {
-  border-color: rgb(247 200 92 / 68%);
-  background: rgb(247 200 92 / 11%);
-  color: var(--essence);
+  color: rgb(168 178 199 / 62%);
+  opacity: 1;
 }
 
 .dev-day-button:focus-visible {
-  outline: 3px solid #fff;
-  outline-offset: 3px;
+  border-radius: 0.15rem;
+  outline: 2px solid var(--aether-cyan);
+  outline-offset: 0.15rem;
 }
 
 .loading-panel h2,
