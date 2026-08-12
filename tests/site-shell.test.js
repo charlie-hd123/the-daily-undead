@@ -69,7 +69,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260812-3"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260812-4"]));
 });
 
 test("hover highlights are limited to precise pointers", async () => {

@@ -2,7 +2,7 @@
 
 **Your daily Treyarch Zombies challenge**
 
-Players reveal one to three clues, lock in their clue score, choose a game and map without typing, then put the three selected Easter egg steps into chronological order for a gold perfect medal.
+Players reveal one to three clues, select a game and map without typing, then optionally put the three selected main-quest steps into chronological order for Double Points.
 
 The bonus ordering round uses tap-to-rank cards: tapping steps assigns 1, 2, and 3 in sequence, while tapping a selected card removes it and renumbers the remainder. Submission allows one attempt, and an incorrect order cannot be retried.
 
@@ -16,7 +16,7 @@ The player also has a browser-local current-round streak. A correct map answer i
 
 The game is a dependency-free static site designed to work on GitHub Pages. The catalogue contains 311 ordered steps across 37 answer maps from World at War through Black Ops 7. Nine additional maps without full Easter eggs are selectable but excluded from the answer rotation.
 
-Community totals are served separately by a Cloudflare Worker and D1 database. A map guess is counted only when the player confirms it. A browser-local anonymous ID and a database uniqueness constraint prevent refreshes and repeat submissions from increasing the same daily puzzle more than once. The game remains fully playable if the statistics API is unavailable. See [worker/README.md](worker/README.md) for the complete beginner-friendly Cloudflare setup and testing guide.
+Community statistics appear above the footer: unique players today, total games played all-time, and yesterday's map solve percentage. They are served by a Cloudflare Worker and D1 database. A play is counted when a map is confirmed; the bonus order does not affect the count or solve result. A browser-local anonymous ID and a database uniqueness constraint prevent refreshes and repeat submissions from increasing the same daily puzzle more than once. The game remains fully playable if the statistics API is unavailable. See [worker/README.md](worker/README.md) for the live configuration, database queries, deployment, and recovery guide.
 
 ## Run locally
 
@@ -36,6 +36,8 @@ http://localhost:8080/?date=2026-07-29
 
 During local development, the **Dev button – advance a day** control at the bottom of the site advances this preview date by one day while preserving the current time-of-day. The control is enabled only on `localhost` and is removed on the public website.
 
+Localhost uses a local Worker at `http://localhost:8787`; it never submits attempts to the production community database. If the local Worker is not running, the game still works and the community figures show `—`. Future-date previews are also rejected by the Worker, so **Advance a day** cannot affect live totals.
+
 Progress is saved in the browser separately for each date. Every player receives the next puzzle at 00:00 UTC, and the header countdown shows the time remaining until that worldwide rollover. The site synchronises against its host's clock when possible and falls back to the device clock when offline.
 
 ## Run the tests
@@ -46,7 +48,7 @@ With Node.js installed:
 npm test
 ```
 
-The tests cover deterministic daily selection, map availability dates, clue selection, bonus-order checking, catalogue integrity, missed-day progression, revives, future preview protection, and the published page's local assets and privacy-sensitive links.
+The tests cover deterministic daily selection, map availability dates, clue selection, bonus-order checking, catalogue integrity, missed-day progression, revives, community submission deduplication, Worker validation and CORS, future preview protection, and the published page's assets and privacy-sensitive links.
 
 ## Add or update map data
 
@@ -91,7 +93,7 @@ No build command or GitHub Action is required. The included `CNAME` file connect
 
 ## Player data and feedback
 
-Game progress is stored in the player's browser using local storage. The site has no player accounts, advertising cookies, or external font requests. Community statistics use a random browser-local identifier; the Worker hashes it before D1 storage and records only the puzzle/date, answer map, and correct/incorrect result. Cloudflare Web Analytics is also loaded by the published page. Clearing the site's browser data removes saved game progress and creates a new anonymous community identifier on the next completed attempt.
+Game progress is stored in the player's browser using local storage. The site has no player accounts, advertising cookies, or external font requests. Community statistics use a random browser-local identifier; the Worker hashes it before D1 storage and records only the puzzle/date, answer map, and correct/incorrect result. The bonus-step order is not sent. Cloudflare Web Analytics and Worker invocation logs are enabled in the Cloudflare account. Clearing the site's browser data removes saved game progress and creates a new anonymous community identifier on the next completed attempt.
 
 The footer links to the optional [feedback form](https://tally.so/r/q4XeD7). It opens only when a player chooses it, sends no referring page address, and lets players submit without giving an email address. Screenshots and email addresses are optional. Review and delete form submissions in Tally when they are no longer needed; automatic retention controls require a paid Tally plan. If the form address changes, update the footer link in `index.html` and this README.
 

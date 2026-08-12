@@ -12,7 +12,7 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20260812-3";
+} from "./game-core.js?v=20260812-4";
 import {
   calculateReviveCost,
   canUseRequestedPreviewDate,
@@ -22,14 +22,14 @@ import {
   purchaseMissedDayRevive,
   resetReviveCount,
   shouldResetReviveCycle,
-} from "./progression.js?v=20260812-3";
+} from "./progression.js?v=20260812-4";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
-  getCommunityStatsApiUrl,
+  resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20260812-3";
+} from "./community-stats.js?v=20260812-4";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -45,8 +45,7 @@ const communityGamesTotalLabel = document.querySelector("#community-games-total"
 const communityYesterdaySolvedLabel = document.querySelector("#community-yesterday-solved");
 const communityYesterdayMapLabel = document.querySelector("#community-yesterday-map");
 const isLocalDevelopment = isLocalDevelopmentHostname(window.location.hostname);
-const communityStatsApiUrl = getCommunityStatsApiUrl()
-  || (isLocalDevelopment ? "http://localhost:8787" : null);
+const communityStatsApiUrl = resolveCommunityStatsApiUrl({ isLocalDevelopment });
 const streakStorageKey = "the-daily-undead:streak";
 const totalRoundsStorageKey = "the-daily-undead:total-rounds";
 const pointsStorageKey = "the-daily-undead:total-points";

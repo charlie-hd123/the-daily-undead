@@ -44,6 +44,15 @@ export function getCommunityStatsApiUrl(documentObject = globalThis.document) {
   }
 }
 
+export function resolveCommunityStatsApiUrl({
+  isLocalDevelopment,
+  documentObject = globalThis.document,
+} = {}) {
+  return isLocalDevelopment
+    ? "http://localhost:8787"
+    : getCommunityStatsApiUrl(documentObject);
+}
+
 function submittedPuzzleKey(puzzleDate) {
   return `${submittedPuzzleStoragePrefix}${puzzleDate}`;
 }
