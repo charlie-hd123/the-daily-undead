@@ -34,6 +34,13 @@ test("Worker accepts a complete live attempt and rejects historical writes", () 
   assert.match(validateAttempt({ ...validAttempt, isCorrect: "yes" }, today), /true or false/);
 });
 
+test("Worker accepts long puzzle identifiers generated from descriptive step ids", () => {
+  const longPuzzleId = `${today}:cold-war-mauer-der-toten:${"step-".repeat(50)}`;
+
+  assert.ok(longPuzzleId.length > 256);
+  assert.equal(validateAttempt({ ...validAttempt, puzzleId: longPuzzleId }, today), null);
+});
+
 test("Worker CORS only allows configured browser origins", () => {
   const env = { ALLOWED_ORIGINS: "https://thedailyundead.com,http://localhost:8080" };
   const request = (origin) => new Request("https://worker.example/api/stats", {
