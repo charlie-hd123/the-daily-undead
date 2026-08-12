@@ -45,6 +45,7 @@ test("the page's local release assets exist", async () => {
     "assets/fonts/barlow-condensed-900.ttf",
     "styles.css",
     "js/app.js",
+    "js/community-stats.js",
     "js/game-core.js",
     "js/progression.js",
   ];
@@ -68,7 +69,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260812-2"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260812-3"]));
 });
 
 test("hover highlights are limited to precise pointers", async () => {
@@ -91,4 +92,23 @@ test("the clue count stays editable until a map is confirmed", async () => {
     /lockedClues: state\.cluesRevealed/,
   );
   assert.doesNotMatch(app, /phase: "clue-review"/);
+});
+
+test("community statistics are placed near the bottom and contain no frontend credentials", async () => {
+  const [html, app, workerConfig] = await Promise.all([
+    readProjectFile("index.html"),
+    readProjectFile("js/app.js"),
+    readProjectFile("worker/wrangler.jsonc"),
+  ]);
+
+  assert.match(
+    html,
+    /<\/main>[\s\S]*class="community-stats"[\s\S]*class="site-footer"/,
+  );
+  assert.match(html, /id="community-players-today"/);
+  assert.match(html, /id="community-games-total"/);
+  assert.match(html, /id="community-yesterday-solved"/);
+  assert.match(app, /recordCommunityAttempt\(isCorrect\)/);
+  assert.doesNotMatch(`${html}\n${app}`, /(?:api[_-]?token|account[_-]?token|database[_-]?id)/i);
+  assert.match(workerConfig, /"binding": "DB"/);
 });

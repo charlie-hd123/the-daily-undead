@@ -12,7 +12,7 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20260812-2";
+} from "./game-core.js?v=20260812-3";
 import {
   calculateReviveCost,
   canUseRequestedPreviewDate,
@@ -22,7 +22,14 @@ import {
   purchaseMissedDayRevive,
   resetReviveCount,
   shouldResetReviveCycle,
-} from "./progression.js?v=20260812-2";
+} from "./progression.js?v=20260812-3";
+import {
+  fetchCommunityStats,
+  formatCommunityCount,
+  formatSolvePercentage,
+  getCommunityStatsApiUrl,
+  submitCommunityAttempt,
+} from "./community-stats.js?v=20260812-3";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -32,7 +39,14 @@ const pointsLabel = document.querySelector("#points-count");
 const countdownLabel = document.querySelector("#next-round-countdown");
 const advanceDevDayButton = document.querySelector("#advance-dev-day");
 const clueTemplate = document.querySelector("#clue-template");
+const communityStatsContainer = document.querySelector(".community-stats");
+const communityPlayersTodayLabel = document.querySelector("#community-players-today");
+const communityGamesTotalLabel = document.querySelector("#community-games-total");
+const communityYesterdaySolvedLabel = document.querySelector("#community-yesterday-solved");
+const communityYesterdayMapLabel = document.querySelector("#community-yesterday-map");
 const isLocalDevelopment = isLocalDevelopmentHostname(window.location.hostname);
+const communityStatsApiUrl = getCommunityStatsApiUrl()
+  || (isLocalDevelopment ? "http://localhost:8787" : null);
 const streakStorageKey = "the-daily-undead:streak";
 const totalRoundsStorageKey = "the-daily-undead:total-rounds";
 const pointsStorageKey = "the-daily-undead:total-points";
@@ -171,6 +185,59 @@ function getPreviousDateKey(dateKey) {
   const date = new Date(`${dateKey}T00:00:00Z`);
   date.setUTCDate(date.getUTCDate() - 1);
   return getUtcDateKey(date);
+}
+
+function updateCommunityStatsDisplay(stats) {
+  communityPlayersTodayLabel.textContent = formatCommunityCount(stats?.playersToday);
+  communityGamesTotalLabel.textContent = formatCommunityCount(stats?.totalGames);
+  communityYesterdaySolvedLabel.textContent = formatSolvePercentage(stats?.yesterday?.solvePercentage);
+  communityStatsContainer.dataset.status = stats ? "ready" : "unavailable";
+}
+
+function prepareCommunityStatsDisplay() {
+  const yesterdayDateKey = getPreviousDateKey(puzzle.dateKey);
+
+  try {
+    const yesterdayPuzzle = buildDailyPuzzle(yesterdayDateKey, maps);
+    communityYesterdayMapLabel.textContent = getAnswerDisplayTitle(
+      yesterdayPuzzle.map,
+      catalog.answerEquivalents,
+    );
+  } catch {
+    communityYesterdayMapLabel.textContent = "yesterday’s map";
+  }
+
+  if (!communityStatsApiUrl) {
+    updateCommunityStatsDisplay(null);
+    return;
+  }
+
+  fetchCommunityStats({
+    apiUrl: communityStatsApiUrl,
+    puzzleDate: puzzle.dateKey,
+  })
+    .then(updateCommunityStatsDisplay)
+    .catch(() => updateCommunityStatsDisplay(null));
+}
+
+function recordCommunityAttempt(isCorrect) {
+  // Preview puzzles never contribute to the live community totals.
+  if (!communityStatsApiUrl || puzzle.dateKey !== liveDateKey) return;
+
+  submitCommunityAttempt({
+    apiUrl: communityStatsApiUrl,
+    puzzleDate: puzzle.dateKey,
+    puzzleId: puzzle.key,
+    mapId: puzzle.map.id,
+    mapName: getPuzzleAnswerTitle(),
+    isCorrect,
+  })
+    .then((stats) => {
+      if (stats) updateCommunityStatsDisplay(stats);
+    })
+    .catch(() => {
+      // A failed stats request must never interrupt or alter the game result.
+    });
 }
 
 function advanceSimulatedDay() {
@@ -678,7 +745,7 @@ function renderClues() {
     <section class="panel">
       ${renderHeading(
         "Which Zombies map is it?",
-        "Identify the map from its main quest steps. Reveal as few clues as possible before locking in.",
+        "Identify the map from its main quest steps. Reveal as few clues as possible to earn more points.",
       )}
       <div id="clue-list" class="clue-list"></div>
       <div class="actions">
@@ -686,7 +753,7 @@ function renderClues() {
           ${state.cluesRevealed >= 3 ? "All clues revealed" : "Reveal next clue"}
         </button>
         <button id="lock-answer" class="button primary" type="button">
-          Lock in your answer · ${state.cluesRevealed} ${state.cluesRevealed === 1 ? "clue" : "clues"}
+          Select map · ${state.cluesRevealed} ${state.cluesRevealed === 1 ? "clue" : "clues"}
         </button>
       </div>
     </section>
@@ -812,6 +879,7 @@ function renderMapSelection() {
     recordMapResult(isCorrect);
     if (!state.pointsRecorded) awardPoints(mapPoints);
     if (isCorrect) recordDailyParticipation();
+    recordCommunityAttempt(isCorrect);
     setState({
       phase: "result",
       isCorrect,
@@ -1251,7 +1319,11 @@ async function initialise() {
     lastPlayedDate = loadLastPlayedDate();
     puzzle = buildDailyPuzzle(dateKey, maps);
     state = loadState();
+    prepareCommunityStatsDisplay();
     migrateCompletedScore();
+    if (state.phase === "result" && typeof state.isCorrect === "boolean") {
+      recordCommunityAttempt(state.isCorrect);
+    }
     if (state.phase === "result" && (state.isCorrect || state.revived)) {
       recordDailyParticipation(dateKey);
     } else if (!lastPlayedDate && (streakCount > 0 || totalPoints > 0)) {
