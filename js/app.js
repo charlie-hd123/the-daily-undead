@@ -12,7 +12,7 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20260730-6";
+} from "./game-core.js?v=20260812-1";
 import {
   calculateReviveCost,
   canUseRequestedPreviewDate,
@@ -22,7 +22,7 @@ import {
   purchaseMissedDayRevive,
   resetReviveCount,
   shouldResetReviveCycle,
-} from "./progression.js?v=20260730-6";
+} from "./progression.js?v=20260812-1";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -702,7 +702,7 @@ function renderClues() {
     );
   });
   app.querySelector("#lock-answer").addEventListener("click", () => {
-    setState({ phase: "game", lockedClues: state.cluesRevealed });
+    setState({ phase: "game", lockedClues: null });
   });
 }
 
@@ -711,7 +711,7 @@ function renderGameSelection() {
 
   app.innerHTML = `
     <section class="panel">
-      ${renderHeading("Choose the game", `Your score is locked at ${state.lockedClues} ${state.lockedClues === 1 ? "clue" : "clues"}.`, "Lock in your answer")}
+      ${renderHeading("Choose the game", `You have revealed ${state.cluesRevealed} ${state.cluesRevealed === 1 ? "clue" : "clues"}.`, "Lock in your answer")}
       <ul class="card-grid">
         ${games
           .map(
@@ -726,10 +726,16 @@ function renderGameSelection() {
           )
           .join("")}
       </ul>
+      <div class="actions">
+        <button id="back-to-clues" class="button" type="button">Back to clues</button>
+      </div>
     </section>
   `;
 
   focusAfterRender("game-selection");
+  app.querySelector("#back-to-clues").addEventListener("click", () => {
+    setState({ phase: "clues", selectedGameId: null, selectedMapId: null });
+  });
   app.querySelectorAll("[data-game-id]").forEach((button) => {
     button.addEventListener("click", () => {
       setState({
@@ -799,7 +805,7 @@ function renderMapSelection() {
       puzzle.map.id,
       catalog.answerEquivalents,
     );
-    const mapPoints = isCorrect ? calculateMapPoints(state.lockedClues) : 0;
+    const mapPoints = isCorrect ? calculateMapPoints(state.cluesRevealed) : 0;
     const reviveCostOffered = isCorrect ? 0 : calculateReviveCost(reviveCount);
     const roundsSurvivedBeforeLoss = isCorrect ? 0 : streakCount;
     const pointsBeforeLoss = isCorrect ? 0 : totalPoints;
@@ -809,6 +815,7 @@ function renderMapSelection() {
     setState({
       phase: "result",
       isCorrect,
+      lockedClues: state.cluesRevealed,
       cluesRevealed: isCorrect ? 3 : state.cluesRevealed,
       streakRecorded: true,
       totalRoundsRecorded: isCorrect || state.totalRoundsRecorded,
