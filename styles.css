@@ -165,9 +165,58 @@ button {
 
 .site-header,
 .app-shell,
+.community-stats,
 .site-footer {
   width: min(100% - 1.25rem, 74rem);
   margin-inline: auto;
+}
+
+.community-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin-top: -1.75rem;
+  margin-bottom: 1.4rem;
+  border-top: 1px solid rgb(156 181 223 / 12%);
+  border-bottom: 1px solid rgb(156 181 223 / 12%);
+}
+
+.community-stat {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.38rem;
+  margin: 0;
+  padding: 0.85rem 1rem;
+  color: rgb(168 178 199 / 68%);
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.045em;
+  line-height: 1.25;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.community-stat + .community-stat {
+  border-left: 1px solid rgb(156 181 223 / 10%);
+}
+
+.community-stat strong {
+  flex: 0 0 auto;
+  color: rgb(246 247 251 / 88%);
+  font-size: 1.08rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.community-stats[data-status="unavailable"] .community-stat {
+  color: rgb(168 178 199 / 48%);
+}
+
+.community-stats[data-status="unavailable"] .community-stat strong {
+  color: rgb(246 247 251 / 52%);
 }
 
 .site-header {
@@ -1246,6 +1295,7 @@ h1 {
 @media (min-width: 22rem) {
   .site-header,
   .app-shell,
+  .community-stats,
   .site-footer {
     width: min(100% - 2rem, 74rem);
   }
@@ -1350,6 +1400,30 @@ h1 {
 
   .app-shell {
     padding-block: 0.5rem 2rem;
+  }
+
+  .community-stats {
+    grid-template-columns: 1fr;
+    margin-top: -0.8rem;
+    margin-bottom: 1rem;
+    padding-block: 0.35rem;
+  }
+
+  .community-stat {
+    justify-content: flex-start;
+    padding: 0.42rem 0.5rem;
+    font-size: 0.74rem;
+    text-align: left;
+  }
+
+  .community-stat + .community-stat {
+    border-left: 0;
+  }
+
+  .community-stat strong {
+    min-width: 4.25rem;
+    font-size: 1rem;
+    text-align: right;
   }
 
   .panel {

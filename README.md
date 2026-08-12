@@ -16,6 +16,8 @@ The player also has a browser-local current-round streak. A correct map answer i
 
 The game is a dependency-free static site designed to work on GitHub Pages. The catalogue contains 311 ordered steps across 37 answer maps from World at War through Black Ops 7. Nine additional maps without full Easter eggs are selectable but excluded from the answer rotation.
 
+Community totals are served separately by a Cloudflare Worker and D1 database. A map guess is counted only when the player confirms it. A browser-local anonymous ID and a database uniqueness constraint prevent refreshes and repeat submissions from increasing the same daily puzzle more than once. The game remains fully playable if the statistics API is unavailable. See [worker/README.md](worker/README.md) for the complete beginner-friendly Cloudflare setup and testing guide.
+
 ## Run locally
 
 From this folder, start any static file server. Python is already available on most Macs:
@@ -89,7 +91,7 @@ No build command or GitHub Action is required. The included `CNAME` file connect
 
 ## Player data and feedback
 
-Game progress is stored only in the player's browser using local storage. The site has no player accounts, analytics, advertising cookies, or external font requests. Clearing the site's browser data removes the saved game progress on that device.
+Game progress is stored in the player's browser using local storage. The site has no player accounts, advertising cookies, or external font requests. Community statistics use a random browser-local identifier; the Worker hashes it before D1 storage and records only the puzzle/date, answer map, and correct/incorrect result. Cloudflare Web Analytics is also loaded by the published page. Clearing the site's browser data removes saved game progress and creates a new anonymous community identifier on the next completed attempt.
 
 The footer links to the optional [feedback form](https://tally.so/r/q4XeD7). It opens only when a player chooses it, sends no referring page address, and lets players submit without giving an email address. Screenshots and email addresses are optional. Review and delete form submissions in Tally when they are no longer needed; automatic retention controls require a paid Tally plan. If the form address changes, update the footer link in `index.html` and this README.
 
@@ -102,7 +104,9 @@ assets/fonts/          Locally hosted Barlow fonts and their OFL licence
 js/app.js              Screens, interactions, saved progress
 js/game-core.js        Seeded daily puzzle and order logic
 js/progression.js      Missed-day, revive, and preview rules
+js/community-stats.js  Anonymous attempt submission and aggregate display
 data/maps/index.json   Game list and map-file manifest
 data/maps/*.json       One content file per map
+worker/                Cloudflare Worker, D1 migration, and setup guide
 tests/                 Logic tests
 ```

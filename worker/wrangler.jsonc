@@ -1,0 +1,18 @@
+{
+  "name": "daily-undead-stats",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-12",
+  "workers_dev": true,
+  "vars": {
+    "ALLOWED_ORIGINS": "https://thedailyundead.com,https://www.thedailyundead.com,http://localhost:8080,http://127.0.0.1:8080"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "daily-undead-stats",
+      "database_id": "5393c72c-c0fa-489b-9c98-991032e38646",
+      "preview_database_id": "daily-undead-stats-local",
+      "migrations_dir": "migrations"
+    }
+  ]
+}
