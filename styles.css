@@ -576,12 +576,14 @@ h1 {
   text-transform: uppercase;
 }
 
-.button:hover,
-.card-button:hover,
-.order-choice:hover {
-  border-color: rgb(103 232 255 / 72%);
-  background: linear-gradient(145deg, rgb(31 47 73 / 98%), rgb(18 27 44 / 98%));
-  box-shadow: 0 0 0 1px rgb(103 232 255 / 10%), 0 0.9rem 2rem rgb(0 0 0 / 22%);
+@media (hover: hover) and (pointer: fine) {
+  .button:hover,
+  .card-button:hover,
+  .order-choice:hover {
+    border-color: rgb(103 232 255 / 72%);
+    background: linear-gradient(145deg, rgb(31 47 73 / 98%), rgb(18 27 44 / 98%));
+    box-shadow: 0 0 0 1px rgb(103 232 255 / 10%), 0 0.9rem 2rem rgb(0 0 0 / 22%);
+  }
 }
 
 .button:focus-visible,
@@ -608,10 +610,12 @@ h1 {
   box-shadow: 0 0.8rem 2.2rem rgb(255 138 72 / 16%), inset 0 1px 0 rgb(255 255 255 / 36%);
 }
 
-.button.primary:hover {
-  border-color: transparent;
-  background: linear-gradient(110deg, #ffe08a 0%, #ffc16b 48%, #ff9c63 100%);
-  box-shadow: 0 0 0 1px rgb(255 222 137 / 38%), 0 0.9rem 2.5rem rgb(255 138 72 / 25%);
+@media (hover: hover) and (pointer: fine) {
+  .button.primary:hover {
+    border-color: transparent;
+    background: linear-gradient(110deg, #ffe08a 0%, #ffc16b 48%, #ff9c63 100%);
+    box-shadow: 0 0 0 1px rgb(255 222 137 / 38%), 0 0.9rem 2.5rem rgb(255 138 72 / 25%);
+  }
 }
 
 .button:disabled {
@@ -927,9 +931,11 @@ h1 {
   box-shadow: 0 0.7rem 1.8rem rgb(103 232 255 / 13%);
 }
 
-.revive-button:hover {
-  border-color: transparent;
-  background: linear-gradient(110deg, #a7f3ff, #b69cff);
+@media (hover: hover) and (pointer: fine) {
+  .revive-button:hover {
+    border-color: transparent;
+    background: linear-gradient(110deg, #a7f3ff, #b69cff);
+  }
 }
 
 .revive-button:disabled,
@@ -952,9 +958,11 @@ h1 {
   box-shadow: 0 0.7rem 1.8rem rgb(103 232 255 / 8%);
 }
 
-.share-score-button:hover {
-  border-color: rgb(103 232 255 / 72%);
-  background: linear-gradient(120deg, rgb(103 232 255 / 19%), rgb(158 119 255 / 18%));
+@media (hover: hover) and (pointer: fine) {
+  .share-score-button:hover {
+    border-color: rgb(103 232 255 / 72%);
+    background: linear-gradient(120deg, rgb(103 232 255 / 19%), rgb(158 119 255 / 18%));
+  }
 }
 
 .share-score-status {
@@ -1176,8 +1184,10 @@ h1 {
   text-underline-offset: 0.18em;
 }
 
-.feedback-link a:hover {
-  color: var(--aether-cyan);
+@media (hover: hover) and (pointer: fine) {
+  .feedback-link a:hover {
+    color: var(--aether-cyan);
+  }
 }
 
 .feedback-link a:focus-visible {
@@ -1205,9 +1215,11 @@ h1 {
   display: none !important;
 }
 
-.dev-day-button:hover {
-  color: rgb(168 178 199 / 62%);
-  opacity: 1;
+@media (hover: hover) and (pointer: fine) {
+  .dev-day-button:hover {
+    color: rgb(168 178 199 / 62%);
+    opacity: 1;
+  }
 }
 
 .dev-day-button:focus-visible {
