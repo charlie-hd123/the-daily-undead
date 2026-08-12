@@ -1426,9 +1426,9 @@ h1 {
   }
 
   .community-stat strong {
-    min-width: 4.25rem;
+    min-width: 0;
     font-size: 1rem;
-    text-align: right;
+    text-align: left;
   }
 
   .panel {
