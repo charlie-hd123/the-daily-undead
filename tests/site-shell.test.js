@@ -69,7 +69,20 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260812-4"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260812-5"]));
+});
+
+test("mobile community statistics center each row and allow long labels to wrap", async () => {
+  const css = await readProjectFile("styles.css");
+
+  assert.match(
+    css,
+    /@media \(max-width: 35rem\)[\s\S]*?\.community-stat \{\s*justify-content: center;/,
+  );
+  assert.match(
+    css,
+    /\.community-stat > span \{\s*min-width: 0;\s*overflow-wrap: anywhere;/,
+  );
 });
 
 test("hover highlights are limited to precise pointers", async () => {
