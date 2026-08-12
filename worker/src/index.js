@@ -63,7 +63,7 @@ export function validateAttempt(payload, todayDateKey) {
   if (!textIsValid(payload.playerId, 128)) return "playerId is invalid.";
   if (!isValidDateKey(payload.puzzleDate)) return "puzzleDate is invalid.";
   if (payload.puzzleDate !== todayDateKey) return "Only today’s live puzzle can be submitted.";
-  if (!textIsValid(payload.puzzleId, 256) || !payload.puzzleId.startsWith(`${payload.puzzleDate}:`)) {
+  if (!textIsValid(payload.puzzleId, 1024) || !payload.puzzleId.startsWith(`${payload.puzzleDate}:`)) {
     return "puzzleId is invalid.";
   }
   if (!textIsValid(payload.mapId, 100)) return "mapId is invalid.";
