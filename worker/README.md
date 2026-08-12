@@ -1,216 +1,179 @@
-# Community statistics setup
+# Community statistics operations guide
 
-The website stays on GitHub Pages. This folder deploys a separate Cloudflare Worker that exposes two small JSON endpoints backed by D1:
+The Daily Undead remains a static GitHub Pages site. Community statistics are handled separately by a Cloudflare Worker and D1 database.
 
-- `GET /api/stats?date=YYYY-MM-DD` reads the three community totals.
-- `POST /api/attempts` records a finalized map guess once per browser and UTC puzzle date.
-
-The browser creates a random local ID. The Worker hashes it with SHA-256 before writing it to D1, and the database's `UNIQUE (puzzle_date, player_hash)` rule prevents repeat submissions from increasing a day twice. No IP address, account, email address, or raw browser ID is stored in D1.
-
-The all-time counter includes an estimated baseline of 100 historical games from before tracking launched. Migration `0002_seed_historical_total.sql` applies that baseline without lowering a genuine total that has already passed it.
-
-## Before you start
-
-You need a Cloudflare account. The production setup can be completed entirely in the Cloudflare dashboard; Node.js and Wrangler are only needed for the command-line and fully local options below.
-
-This repository is currently configured for:
+## Live production configuration
 
 - Worker: `daily-undead-stats`
+- API: `https://api.thedailyundead.com`
 - D1 database: `daily-undead-stats`
-- Production API: `https://api.thedailyundead.com`
-- D1 binding name: `DB`
+- D1 binding: `DB`
+- Worker variable: `ALLOWED_ORIGINS`
+- Custom domain: `api.thedailyundead.com`
+- `workers.dev` URL: disabled; the custom domain is the only production address
+- Observability: invocation logs enabled, traces disabled
+- Cron triggers, queues, routes, build hooks, and secrets: none
 
-If using Wrangler, open a terminal in the repository root—the folder containing `index.html`. If `npx --version` fails, install the current Node.js LTS release first.
+The frontend API address is the public metadata value in `index.html`; it is not a credential. Cloudflare API tokens and account credentials must never be added to frontend files.
 
-## 1. Sign in to Cloudflare from Wrangler
+The Worker exposes:
 
-Type:
+- `GET /health` for a simple health check.
+- `GET /api/stats?date=YYYY-MM-DD` for players today, total games, and yesterday's result.
+- `POST /api/attempts` for a completed current-day map guess.
 
-```sh
-npx wrangler@latest login
+## What counts and what is stored
+
+A play is recorded only when the player confirms a map. Visiting, refreshing, revealing clues, choosing a game, or completing the bonus order does not create a new attempt.
+
+The browser creates a random local identifier. The Worker hashes it with SHA-256 before D1 storage. D1's `UNIQUE (puzzle_date, player_hash)` rule is the final protection against repeat submissions from one browser on one UTC date. Another browser or device can count separately.
+
+The database stores the puzzle/date, answer map, correct/incorrect map result, hashed browser identifier, and submission time. It does not store player accounts, email addresses, the raw browser identifier, or the bonus-step order. Worker invocation logs are a separate Cloudflare operational feature and can contain normal request metadata.
+
+The all-time total started with an estimated 100 historical games from before tracking launched. `migrations/0002_seed_historical_total.sql` documents that one-time baseline and cannot reduce a total that has already passed 100.
+
+## Current schema
+
+The schema is versioned in:
+
+- `migrations/0001_create_attempts.sql` — tables, index, and aggregate trigger.
+- `migrations/0002_seed_historical_total.sql` — guarded historical baseline.
+
+D1 contains three application tables:
+
+- `attempts` — one accepted browser/date entry per completed map guess.
+- `daily_stats` — daily attempt and correct-answer aggregates plus the answer map.
+- `community_totals` — the all-time total.
+
+`sqlite_sequence` is created by SQLite for auto-increment bookkeeping and should be left alone.
+
+## View entries in the Cloudflare dashboard
+
+1. Sign in to [Cloudflare](https://dash.cloudflare.com/).
+2. Open **Storage & databases → D1 SQL Database**.
+3. Select **daily-undead-stats → Studio**.
+4. Click `attempts` to see raw accepted entries, or create a query and run:
+
+```sql
+SELECT
+  id,
+  puzzle_date,
+  answer_map_name AS map,
+  CASE is_correct WHEN 1 THEN 'Correct' ELSE 'Incorrect' END AS result,
+  created_at
+FROM attempts
+ORDER BY id DESC;
 ```
 
-Wrangler opens Cloudflare in your browser. Select the account that will own the Worker, click **Allow**, and return to the terminal after the success message. This login stays on your computer; it is not added to the repository or frontend JavaScript.
+`created_at` is UTC. The long `player_hash` is intentionally unreadable and is useful only for duplicate prevention.
 
-## 2. Create the D1 database
+To inspect the daily solve rate:
 
-Type:
-
-```sh
-npx wrangler@latest d1 create daily-undead-stats
+```sql
+SELECT
+  puzzle_date,
+  attempts,
+  correct,
+  ROUND(100.0 * correct / attempts) AS solve_percentage,
+  answer_map_name
+FROM daily_stats
+ORDER BY puzzle_date DESC;
 ```
 
-Cloudflare prints a `database_id` UUID. Copy it. Open `worker/wrangler.jsonc` and replace `REPLACE_WITH_YOUR_D1_DATABASE_ID` with the UUID, leaving the quotation marks in place.
+To confirm the database remains internally consistent:
 
-Dashboard alternative:
-
-1. Sign in at [dash.cloudflare.com](https://dash.cloudflare.com/).
-2. In the left sidebar, click **Storage & Databases → D1 SQL database**.
-3. Click **Create database**.
-4. Enter `daily-undead-stats` and click **Create**.
-5. On the database overview, copy its **Database ID** into `worker/wrangler.jsonc` as described above.
-
-## 3. Create the schema
-
-The schema is versioned in `worker/migrations/0001_create_attempts.sql`. Apply it to production by typing:
-
-```sh
-npx wrangler@latest d1 migrations apply daily-undead-stats --remote --config worker/wrangler.jsonc
+```sql
+SELECT
+  (SELECT COUNT(*) FROM attempts) AS raw_attempts,
+  (SELECT COALESCE(SUM(attempts), 0) FROM daily_stats) AS stored_attempts,
+  (SELECT COALESCE(SUM(is_correct), 0) FROM attempts) AS raw_correct,
+  (SELECT COALESCE(SUM(correct), 0) FROM daily_stats) AS stored_correct,
+  (SELECT total_games FROM community_totals WHERE id = 1) AS all_time_total;
 ```
 
-Wrangler shows the pending migration and asks for confirmation. Type `y` and press Return.
+Use `SELECT` queries for routine inspection. Avoid the Studio **Add row** and **Delete row** controls unless intentionally repairing data.
 
-Dashboard alternative:
+## Local development
 
-1. Open **Storage & Databases → D1 SQL database → daily-undead-stats**.
-2. Click **D1 Studio** (called **Console** in some dashboard versions).
-3. Open `worker/migrations/0001_create_attempts.sql` locally.
-4. Paste one complete SQL statement at a time into the editor and click **Run**. For the final trigger, include the whole `CREATE TRIGGER ... BEGIN ... END;` block as one statement.
-5. Refresh the table tree and confirm it contains `attempts`, `daily_stats`, and `community_totals`.
+Install a current Node.js release, then run these commands from the repository root.
 
-Cloudflare's editor normally runs the statement containing the cursor unless text is selected. Running the file statement by statement avoids accidentally skipping part of the schema.
-
-Use either method. The migration command is recommended because it records which migration was applied.
-
-## 4. Create, bind, and deploy the Worker
-
-Type:
-
-```sh
-npx wrangler@latest deploy --config worker/wrangler.jsonc
-```
-
-On the first deployment, Wrangler creates `daily-undead-stats`. The `d1_databases` block in `worker/wrangler.jsonc` also creates its `DB` binding, so no database password is required. Cloudflare prints a URL similar to:
-
-```text
-https://daily-undead-stats.YOUR-SUBDOMAIN.workers.dev
-```
-
-Copy it without a trailing slash.
-
-To verify the binding in Cloudflare:
-
-1. Open **Workers & Pages**.
-2. Click **daily-undead-stats**.
-3. Click **Settings → Bindings**.
-4. Confirm a D1 binding named `DB` connects to `daily-undead-stats`.
-
-If it is missing, click **Add binding → D1 database**, enter `DB` as the variable name, choose `daily-undead-stats`, and click **Add binding**. A later Wrangler deployment will also restore it from the config file.
-
-Dashboard-only alternative:
-
-1. Open **Workers & Pages** and click **Create application**.
-2. Choose **Start with Hello World** (the wording can also be **Start with a template**), name it `daily-undead-stats`, and click **Deploy**.
-3. Open the new Worker and click **Edit code**.
-4. Replace the sample file with all of `worker/src/index.js`, then click **Deploy**.
-5. Open the Worker's **Bindings** tab, click **Add binding**, choose **D1 database**, set the variable name to `DB`, choose `daily-undead-stats`, and save.
-6. Open **Settings → Variables and secrets**, click **Add variable**, choose **Text**, and enter:
-
-   - Name: `ALLOWED_ORIGINS`
-   - Value: `https://thedailyundead.com,https://www.thedailyundead.com,http://localhost:8080,http://127.0.0.1:8080`
-
-7. Save the variable. It is configuration, not a secret; no Cloudflare token belongs here or in the frontend.
-8. If the binding or variable was added after the code deployment, redeploy the latest Worker version if Cloudflare prompts you to do so.
-
-## 5. Connect the GitHub Pages frontend
-
-Open `index.html` and find:
-
-```html
-<meta name="daily-undead-stats-api" content="https://api.thedailyundead.com">
-```
-
-For a different deployment, paste its Worker or custom-domain URL into `content`, for example:
-
-```html
-<meta name="daily-undead-stats-api" content="https://daily-undead-stats.YOUR-SUBDOMAIN.workers.dev">
-```
-
-This public URL is not a credential. Never put Cloudflare API tokens, account tokens, or D1 credentials in this tag or any frontend file.
-
-Commit and push the change to the branch GitHub Pages publishes. The existing Pages settings and `CNAME` stay unchanged.
-
-## 6. CORS and domains
-
-`worker/wrangler.jsonc` already allows browser requests from:
-
-- `https://thedailyundead.com`
-- `https://www.thedailyundead.com`
-- `http://localhost:8080`
-- `http://127.0.0.1:8080`
-
-If the site is used directly at a GitHub Pages URL, add its exact origin to `ALLOWED_ORIGINS`, separated by a comma—for example, `https://your-name.github.io`, with no path or trailing slash. Deploy again afterward. The Worker reflects only listed origins. Do not change this to `*`.
-
-Custom Worker domain used by this site:
-
-1. Open **Workers & Pages → daily-undead-stats → Domains**.
-2. Under **Custom Domains and Routes**, click **Add Domain**.
-3. Search for and select `thedailyundead.com`.
-4. Enter `api` as the subdomain and click **Add domain**.
-5. Once it appears in the domains table, use `https://api.thedailyundead.com` in the frontend meta tag.
-
-The `workers.dev` URL remains a fallback. The first-party domain is preferable here because some browser privacy filters block generic Worker hostnames.
-
-## Environment variables and secrets
-
-There are no required secrets. The only Worker variable is `ALLOWED_ORIGINS`, committed in `worker/wrangler.jsonc`. The D1 binding is named `DB` and exists only in the Worker runtime.
-
-The site never receives a Cloudflare API token or direct D1 access. Its random browser ID travels over HTTPS and is immediately hashed before database storage.
-
-## Test locally
-
-Create the local-only schema:
+Apply the schema to local-only D1 storage:
 
 ```sh
 npx wrangler@latest d1 migrations apply daily-undead-stats --local --config worker/wrangler.jsonc
 ```
 
-In terminal 1, start the Worker and local D1:
+Start the local Worker and D1 in terminal 1:
 
 ```sh
 npx wrangler@latest dev --config worker/wrangler.jsonc
 ```
 
-It should listen at `http://localhost:8787`.
-
-In terminal 2, start the static site:
+Start the static site in terminal 2:
 
 ```sh
 python3 -m http.server 8080
 ```
 
-Open [http://localhost:8080](http://localhost:8080). Localhost automatically uses `http://localhost:8787`, even while the production meta tag is blank or points to the deployed Worker.
+Open [http://localhost:8080](http://localhost:8080). Localhost always uses `http://localhost:8787`, regardless of the production API URL in `index.html`. If the local Worker is unavailable, the game continues normally and community figures show `—`.
 
-To test counting cleanly:
+The **Advance a day** preview never writes to production. The frontend submits only when the puzzle date equals the real current UTC date, and the Worker independently rejects non-current dates.
 
-1. Open DevTools → **Application** (Chrome/Edge) or **Storage** (Firefox/Safari).
-2. In Local Storage for `http://localhost:8080`, remove keys beginning with `the-daily-undead:community-` and the current `dead-drop:` key.
-3. Refresh, choose a map, and click **Confirm map**.
-4. The local total should become `1`. Refreshing the completed result must leave it at `1`.
-5. Use a private window to simulate another browser/device; its completed guess should increase the total to `2`.
+To simulate a fresh local browser, remove local-storage keys beginning with `the-daily-undead:community-` plus the current `dead-drop:` key. A completed local guess should count once; refreshing must leave the total unchanged.
 
-Inspect local D1 rows with:
+## Deploy Worker code from the dashboard
+
+1. Open **Workers & Pages → daily-undead-stats → Edit code**.
+2. Replace `worker.js` with the complete contents of `worker/src/index.js`.
+3. Check the editor reports no problems.
+4. Click **Deploy**.
+5. Open `https://api.thedailyundead.com/health` and confirm `{"ok":true}`.
+6. Verify a read without inserting data:
 
 ```sh
-npx wrangler@latest d1 execute daily-undead-stats --local --config worker/wrangler.jsonc --command "SELECT puzzle_date, answer_map_name, is_correct, created_at FROM attempts ORDER BY id DESC;"
+curl -i -H 'Origin: https://thedailyundead.com' \
+  'https://api.thedailyundead.com/api/stats?date=YYYY-MM-DD'
 ```
 
-## Test production
+The response should be `200` and include `Access-Control-Allow-Origin: https://thedailyundead.com`.
 
-After deploying the Worker and publishing the configured frontend:
+## Deploy with Wrangler
 
-1. Open `https://api.thedailyundead.com/health`. It should return `{"ok":true}`. If a browser extension blocks direct API pages, use `curl -i https://api.thedailyundead.com/health` or continue with the site/network check below.
-2. Open `https://thedailyundead.com`, then open browser DevTools → **Network**.
-3. Refresh and confirm `GET /api/stats?...` returns `200`.
-4. Complete today's map guess and confirm `POST /api/attempts` returns `200` and the counters update.
-5. Refresh. The totals must not increase again.
-6. Open **Storage & Databases → D1 SQL database → daily-undead-stats → Console** and run:
+Wrangler can reproduce the configuration in `worker/wrangler.jsonc`:
 
-```sql
-SELECT puzzle_date, COUNT(*) AS players, SUM(is_correct) AS correct
-FROM attempts
-GROUP BY puzzle_date
-ORDER BY puzzle_date DESC;
+```sh
+npx wrangler@latest login
+npx wrangler@latest d1 migrations apply daily-undead-stats --remote --config worker/wrangler.jsonc
+npx wrangler@latest deploy --config worker/wrangler.jsonc
 ```
 
-The frontend deliberately ignores submission errors. If the Worker or D1 is unavailable, the game still loads and completes; community numbers show `—` until the next successful read.
+Treat `worker/wrangler.jsonc` as the source of truth when deploying with Wrangler. It keeps the `workers.dev` URL disabled and binds production D1 as `DB`.
+
+## Recreate or verify dashboard configuration
+
+If the Worker ever has to be recreated:
+
+1. Create a D1 database named `daily-undead-stats` under **Storage & databases → D1 SQL Database**.
+2. In D1 Studio, apply each complete statement from `0001_create_attempts.sql`, followed by `0002_seed_historical_total.sql`. Run the entire `CREATE TRIGGER ... BEGIN ... END;` block as one statement.
+3. Create a Worker named `daily-undead-stats` and deploy `src/index.js`.
+4. Under **Bindings**, add D1 database `daily-undead-stats` with variable name `DB`.
+5. Under **Settings → Variables and secrets**, add the text variable:
+
+   ```text
+   ALLOWED_ORIGINS=https://thedailyundead.com,https://www.thedailyundead.com,http://localhost:8080,http://127.0.0.1:8080
+   ```
+
+6. Under **Domains**, disable the production `workers.dev` URL.
+7. Add the custom domain `api.thedailyundead.com`.
+8. Leave routes, cron triggers, queues, build hooks, and secrets empty.
+
+## Production verification after publishing the site
+
+1. Open `https://thedailyundead.com` and confirm all three figures load.
+2. Complete the current-day map guess in one browser.
+3. Confirm players today and the all-time total each increase by one.
+4. Refresh and confirm they do not increase again.
+5. Check `attempts` in D1 Studio for exactly one row from that browser/date.
+6. The following UTC day, confirm the previous day's solve percentage equals correct attempts divided by all attempts, rounded to the nearest whole percentage.
+
+Statistics errors are deliberately non-blocking. If the Worker or D1 is unavailable, the game remains playable and community figures show `—`.

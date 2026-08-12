@@ -6,6 +6,7 @@ import {
   formatSolvePercentage,
   getCommunityStatsApiUrl,
   getOrCreateAnonymousPlayerId,
+  resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
 } from "../js/community-stats.js";
 
@@ -40,6 +41,27 @@ test("stats API configuration accepts HTTPS and local HTTP only", () => {
   assert.equal(getCommunityStatsApiUrl(documentWith("http://localhost:8787")), "http://localhost:8787");
   assert.equal(getCommunityStatsApiUrl(documentWith("http://stats.example.com")), null);
   assert.equal(getCommunityStatsApiUrl(documentWith("")), null);
+});
+
+test("local development uses local D1 instead of production statistics", () => {
+  const productionDocument = {
+    querySelector: () => ({ content: "https://api.thedailyundead.com" }),
+  };
+
+  assert.equal(
+    resolveCommunityStatsApiUrl({
+      isLocalDevelopment: true,
+      documentObject: productionDocument,
+    }),
+    "http://localhost:8787",
+  );
+  assert.equal(
+    resolveCommunityStatsApiUrl({
+      isLocalDevelopment: false,
+      documentObject: productionDocument,
+    }),
+    "https://api.thedailyundead.com",
+  );
 });
 
 test("a successful attempt is sent once per browser and puzzle", async () => {
