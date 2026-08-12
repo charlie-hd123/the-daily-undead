@@ -68,7 +68,16 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260812-1"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260812-2"]));
+});
+
+test("hover highlights are limited to precise pointers", async () => {
+  const css = await readProjectFile("styles.css");
+
+  assert.match(
+    css,
+    /@media \(hover: hover\) and \(pointer: fine\) \{\s*\.button:hover,\s*\.card-button:hover,\s*\.order-choice:hover/,
+  );
 });
 
 test("the clue count stays editable until a map is confirmed", async () => {

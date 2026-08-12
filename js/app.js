@@ -12,7 +12,7 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20260812-1";
+} from "./game-core.js?v=20260812-2";
 import {
   calculateReviveCost,
   canUseRequestedPreviewDate,
@@ -22,7 +22,7 @@ import {
   purchaseMissedDayRevive,
   resetReviveCount,
   shouldResetReviveCycle,
-} from "./progression.js?v=20260812-1";
+} from "./progression.js?v=20260812-2";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
