@@ -69,7 +69,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260812-6"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260813-4"]));
 });
 
 test("mobile community statistics center each row and allow long labels to wrap", async () => {

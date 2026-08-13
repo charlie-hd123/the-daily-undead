@@ -10,7 +10,7 @@ A correct map awards 50 points with one clue, 20 with two clues, or 10 with thre
 
 Finished results lead into a dedicated next-round screen with a large live countdown to the next UTC puzzle and a progress-aware reminder to return and keep building the player's Current Round and Points.
 
-Finished results also include a spoiler-free **Share score** action. Supported phones and browsers open the native share sheet; other modern browsers copy the dated result, Current Round, Points, Total Rounds, and canonical game link to the clipboard.
+Finished results also include a spoiler-free **Share with your squad** action. Supported phones and browsers open the native share sheet; other modern browsers copy the dated result, Current Round, Points, Total Rounds, and canonical game link to the clipboard.
 
 The player also has a browser-local current-round streak. A correct map answer increases it immediately, whether or not the bonus order is correct, while a wrong map answer resets it to zero. Missing a daily map also resets Current Round and Points on the player's next visit. The missed-day screen and Game Over screen offer a revive when the player has enough points. Successful revives cost progressively more during the current run across both loss types: 100, 250, 500, 750, 1,000, 1,500, 2,000, 3,000, 4,000, then 5,000 points. Every later revive in that run remains at the 5,000-point ceiling. If a loss is not revived, the run ends and the revive price resets to 100 points for the next run. A separate Total Rounds count records every correctly identified map and does not reset after a loss. Clearing the site's browser data resets these values.
 
