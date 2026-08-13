@@ -12,7 +12,7 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20260812-6";
+} from "./game-core.js?v=20260813-4";
 import {
   calculateReviveCost,
   canUseRequestedPreviewDate,
@@ -22,14 +22,14 @@ import {
   purchaseMissedDayRevive,
   resetReviveCount,
   shouldResetReviveCycle,
-} from "./progression.js?v=20260812-6";
+} from "./progression.js?v=20260813-4";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20260812-6";
+} from "./community-stats.js?v=20260813-4";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -1081,19 +1081,19 @@ function buildScoreSharePayload() {
   const shareUrl = document.querySelector('link[rel="canonical"]')?.href || window.location.href;
 
   const scoreText = [
-    `The Daily Undead · ${formatDate(puzzle.dateKey)}`,
-    `Round: ${shareRound}`,
-    `Points: ${sharePoints}`,
-    `Total Rounds: ${totalRounds}`,
+    `🧟 The Daily Undead · ${formatDate(puzzle.dateKey)}`,
     "",
-    "Will you survive?",
+    `🔥 Current Round: ${shareRound}`,
+    `⚡ Points: ${sharePoints}`,
+    `🏆 Total Rounds: ${totalRounds}`,
+    "",
+    "Think you can do better?",
+    "Give it a try!",
   ].join("\n");
 
   return {
-    title: "The Daily Undead",
     scoreText,
-    text: `${scoreText}\n${shareUrl}`,
-    url: shareUrl,
+    text: `${scoreText}\n\n${shareUrl}`,
   };
 }
 
@@ -1120,13 +1120,8 @@ async function shareScore(button, status) {
   const payload = buildScoreSharePayload();
 
   if (typeof navigator.share === "function") {
-    const hasTouchInput = navigator.maxTouchPoints > 0;
-    const nativePayload = hasTouchInput
-      ? { title: payload.title, text: payload.scoreText, url: payload.url }
-      : { title: payload.title, text: payload.text };
-
     try {
-      await navigator.share(nativePayload);
+      await navigator.share({ text: payload.text });
       button.textContent = "Shared!";
       status.textContent = "Your score was shared.";
       return;
@@ -1225,7 +1220,7 @@ function renderResult() {
       ${
         isFinished
           ? `<div class="actions share-score-actions">
-              <button id="share-score" class="button share-score-button" type="button">Share score</button>
+              <button id="share-score" class="button share-score-button" type="button">Share with your squad</button>
             </div>
             <p id="share-score-status" class="share-score-status" aria-live="polite"></p>`
           : ""
