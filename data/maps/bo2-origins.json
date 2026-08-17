@@ -8,42 +8,50 @@
     {
       "id": "build-and-upgrade-all-four-staffs",
       "order": 1,
-      "clue": "Build and upgrade all four staffs."
+      "hardClue": "Build four elemental weapons from scattered parts, then upgrade each one.",
+      "clue": "Build and upgrade all four elemental staffs."
     },
     {
       "id": "place-the-upgraded-staffs-in-their-four-matching-pedestals",
       "order": 2,
-      "clue": "Place the upgraded staffs in their four matching pedestals."
+      "hardClue": "Place the four upgraded weapons in their matching pedestals.",
+      "clue": "Place the four upgraded staffs in their matching pedestals."
     },
     {
       "id": "press-the-button-inside-a-robot-and-throw-a-g-strike-onto-the-stone-seal",
       "order": 3,
+      "hardClue": "Press the red button inside a giant robot, then throw an explosive marker onto the stone seal.",
       "clue": "Press the button inside a robot and throw a G-Strike onto the stone seal."
     },
     {
       "id": "deploy-the-maxis-drone-into-the-opened-seal-and-defeat-the-panzersoldat-horde",
       "order": 4,
+      "hardClue": "Deploy the drone into the opened seal and defeat the horde.",
       "clue": "Deploy the Maxis Drone into the opened seal and defeat the Panzersoldat horde."
     },
     {
       "id": "shoot-down-the-glowing-plane-then-kill-its-pilot-while-in-zombie-blood",
       "order": 5,
+      "hardClue": "Shoot down the glowing plane, then kill the invisible pilot.",
       "clue": "Shoot down the glowing plane, then kill its pilot while in Zombie Blood."
     },
     {
       "id": "upgrade-the-one-inch-punch-by-punching-glowing-templars-beneath-the-excavation-site",
       "order": 6,
+      "hardClue": "Punch twenty enemies underground to upgrade your melee attack.",
       "clue": "Upgrade the One Inch Punch by punching glowing Templars beneath the excavation site."
     },
     {
       "id": "return-all-four-staffs-to-the-crazy-place-and-collect-one-hundred-zombie-souls",
       "order": 7,
+      "hardClue": "Return the four upgraded weapons to their original realm and collect one hundred zombie souls.",
       "clue": "Return all four staffs to the Crazy Place and collect one hundred zombie souls."
     },
     {
       "id": "send-the-maxis-drone-into-the-central-portal-to-free-samantha",
       "order": 8,
-      "clue": "Send the Maxis Drone into the central portal to free Samantha."
+      "hardClue": "Deploy the drone beneath the central portal.",
+      "clue": "Deploy the Maxis Drone beneath the central portal to free Samantha."
     }
   ]
 }

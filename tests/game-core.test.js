@@ -56,6 +56,29 @@ test("the same date creates the same daily puzzle", () => {
   assert.deepEqual(first.displayedSteps, second.displayedSteps);
 });
 
+test("changing clue wording does not change puzzle identity or step selection", () => {
+  const original = buildDailyPuzzle("2026-07-20", maps);
+  const rewrittenMaps = maps.map((map) => ({
+    ...map,
+    steps: map.steps.map((step) => ({
+      ...step,
+      hardClue: `Hard ${step.id}`,
+      clue: `Full ${step.id}`,
+    })),
+  }));
+  const rewritten = buildDailyPuzzle("2026-07-20", rewrittenMaps);
+
+  assert.equal(rewritten.key, original.key);
+  assert.deepEqual(
+    rewritten.displayedSteps.map((step) => step.id),
+    original.displayedSteps.map((step) => step.id),
+  );
+  assert.deepEqual(
+    rewritten.chronologicalSteps.map((step) => step.id),
+    original.chronologicalSteps.map((step) => step.id),
+  );
+});
+
 test("future maps are excluded and exactly three clues are selected", () => {
   const puzzle = buildDailyPuzzle("2026-07-20", maps);
 

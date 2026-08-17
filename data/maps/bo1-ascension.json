@@ -8,31 +8,37 @@
     {
       "id": "throw-a-gersh-device-outside-the-map-to-pull-in-the-generator",
       "order": 1,
+      "hardClue": "Throw a device outside the map to pull in the generator.",
       "clue": "Throw a Gersh Device outside the map to pull in the generator."
     },
     {
       "id": "activate-the-glowing-monitor-beneath-the-stairs-near-the-stamin-up-lunar-lander",
       "order": 2,
+      "hardClue": "Activate the glowing monitor beneath the stairs to reveal a triangular symbol.",
       "clue": "Activate the glowing monitor beneath the stairs near the Lunar Lander."
     },
     {
       "id": "simultaneously-press-the-buttons-beside-the-four-perk-machines-during-a-space-monkey-round",
       "order": 3,
-      "clue": "Simultaneously press the buttons beside the four Perk Machines during a special round."
+      "hardClue": "Simultaneously press the buttons beside the four Perk Machines during a special round.",
+      "clue": "Simultaneously press the buttons beside the four Perk Machines during a Space Monkey round."
     },
     {
       "id": "stand-on-the-pressure-plate-facing-the-clock-for-two-minutes",
       "order": 4,
-      "clue": "Stand on the pressure plate facing the clock for two minutes."
+      "hardClue": "Stand on the pressure plate facing the clock for two minutes.",
+      "clue": "Stand on the pressure plate in the launch area and face the clock for two minutes."
     },
     {
       "id": "collect-the-letters-in-the-sky-to-spell-l-u-n-a",
       "order": 5,
+      "hardClue": "Collect the four letters in the sky.",
       "clue": "Collect the letters in the sky to spell L-U-N-A."
     },
     {
       "id": "use-a-gersh-device-on-the-orb-then-attack-with-upgraded-wonder-weapons-and-matryoshka-dolls",
       "order": 6,
+      "hardClue": "Use a device on the glowing orb, then attack it with several upgraded weapons.",
       "clue": "Use a Gersh Device on the orb, then attack with upgraded Wonder Weapons and Matryoshka Dolls."
     }
   ]

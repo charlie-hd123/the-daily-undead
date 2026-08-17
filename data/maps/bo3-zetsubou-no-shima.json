@@ -8,37 +8,44 @@
     {
       "id": "temporarily-power-both-laboratories-and-open-the-bunker",
       "order": 1,
+      "hardClue": "Temporarily power both facilities, then open the bunker.",
       "clue": "Temporarily power both laboratories and open the bunker."
     },
     {
       "id": "obtain-the-skull-of-nan-sapwe",
       "order": 2,
-      "clue": "Obtain the Skull of Nan Sapwe."
+      "hardClue": "Complete the four skull rituals to obtain the ancient weapon.",
+      "clue": "Complete the four skull rituals to obtain the Skull of Nan Sapwe."
     },
     {
       "id": "use-the-skull-of-nan-sapwe-to-restore-the-hidden-elevator-plans",
       "order": 3,
+      "hardClue": "Use the ancient weapon to restore the hidden elevator plans.",
       "clue": "Use the Skull of Nan Sapwe to restore the hidden elevator plans."
     },
     {
       "id": "collect-three-cogs-using-the-anti-aircraft-gun-electrified-zipline-and-anywhere-but-here",
       "order": 4,
+      "hardClue": "Collect three cogs from a hidden room, from beneath a zipline and from a destroyed aircraft.",
       "clue": "Collect three cogs using the anti-aircraft gun, electrified zipline and Anywhere But Here!"
     },
     {
       "id": "install-the-three-cogs-and-activate-the-elevator",
       "order": 5,
+      "hardClue": "Install the three cogs and activate the elevator.",
       "clue": "Install the three cogs and activate the elevator."
     },
     {
       "id": "descend-beneath-the-bunker-and-clear-the-roots-with-the-upgraded-kt-4",
       "order": 6,
-      "clue": "Descend beneath the bunker and clear the roots with the upgraded Wonder Weapon."
+      "hardClue": "Descend beneath the bunker and clear the roots with the upgraded Wonder Weapon.",
+      "clue": "Descend beneath the bunker and clear the roots with the upgraded KT-4."
     },
     {
       "id": "defeat-mutated-takeo-by-destroying-his-four-exposed-spores",
       "order": 7,
-      "clue": "Defeat Mutated Takeo by destroying his four exposed spores."
+      "hardClue": "Defeat the boss by destroying his four exposed spores.",
+      "clue": "Defeat Mutated Takeo by shooting his four exposed spores with the Masamune."
     }
   ]
 }

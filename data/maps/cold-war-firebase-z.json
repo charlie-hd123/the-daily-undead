@@ -8,47 +8,56 @@
     {
       "id": "travel-to-omega-base-and-activate-the-three-aether-reactors-to-restore-power",
       "order": 1,
+      "hardClue": "Travel through the teleporter and activate three reactors to restore power.",
       "clue": "Travel to Omega Base and activate the three Aether Reactors to restore power."
     },
     {
       "id": "obtain-ravenov-s-id-badge-concoct-the-truth-serum-and-use-it-on-peck",
       "order": 2,
-      "clue": "Obtain Ravenov’s ID Badge, concoct the truth serum and use it on Peck."
+      "hardClue": "Obtain an ID badge, mix three compounds and pump the truth serum into the scientist’s office.",
+      "clue": "Obtain Ravenov’s ID Badge, create the truth serum and pump it into Peck’s office."
     },
     {
       "id": "capture-three-mimics-with-essence-traps-to-obtain-the-floppy-disk",
       "order": 3,
-      "clue": "Capture three Mimics with Essence Traps to obtain the Floppy Disk."
+      "hardClue": "Capture three specific enemies and recover their memories to obtain a disk.",
+      "clue": "Capture the three required Mimics with Essence Traps to obtain the Floppy Disk."
     },
     {
       "id": "insert-the-floppy-disk-and-open-the-omega-portal-chamber",
       "order": 4,
-      "clue": "Insert the Floppy Disk and open the Omega Portal Chamber."
+      "hardClue": "Insert the disk into the computer to open the sealed portal chamber.",
+      "clue": "Insert the Floppy Disk into the computer to open the Omega Portal Chamber."
     },
     {
       "id": "use-the-aethermeter-shovel-and-rai-k-84-to-recover-the-three-aetherium-crystals",
       "order": 5,
-      "clue": "Use the Aethermeter, shovel and Wonder Weapon to recover the three Aetherium Crystals."
+      "hardClue": "Dig up three crystal canisters and complete their different challenges.",
+      "clue": "Use the Aethermeter, shovel and RAI K-84 to recover the three Aetherium Crystal canisters."
     },
     {
       "id": "place-the-crystals-inside-the-aether-reactors-and-return-to-the-portal-chamber",
       "order": 6,
-      "clue": "Place the crystals inside the Aether Reactors and return to the Portal Chamber."
+      "hardClue": "Place the three crystal canisters inside the reactors and return to the portal.",
+      "clue": "Place the Aetherium Crystal canisters inside the three Aether Reactors and return to the OPC."
     },
     {
       "id": "align-the-satellite-with-requiem-s-signal",
       "order": 7,
-      "clue": "Align the satellite with Requiem’s signal."
+      "hardClue": "Use the computer to align the dish with the unidentified satellite.",
+      "clue": "Align the satellite dish with Requiem’s satellite."
     },
     {
       "id": "activate-the-portal-and-rescue-maxis",
       "order": 8,
-      "clue": "Activate the portal and rescue Maxis."
+      "hardClue": "Activate the portal and rescue the trapped operative.",
+      "clue": "Activate the OPC portal and rescue Samantha Maxis."
     },
     {
       "id": "return-to-the-village-and-defeat-orda",
       "order": 9,
-      "clue": "Return to the village and defeat Orda."
+      "hardClue": "Return to the starting village and defeat the giant creature.",
+      "clue": "Return to the Village and defeat Orda."
     }
   ]
 }

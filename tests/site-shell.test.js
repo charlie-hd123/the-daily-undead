@@ -69,7 +69,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260813-5"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260817-1"]));
 });
 
 test("mobile community statistics center each row and allow long labels to wrap", async () => {
@@ -109,6 +109,16 @@ test("the clue count stays editable until a map is confirmed", async () => {
     /lockedClues: state\.cluesRevealed/,
   );
   assert.doesNotMatch(app, /phase: "clue-review"/);
+});
+
+test("the guessing screen uses hard clues and the ordering bonus uses full clues", async () => {
+  const app = await readProjectFile("js/app.js");
+  const clueCard = app.match(/function createClueCard\(step, index\) \{[\s\S]*?\n\}/)[0];
+  const bonus = app.match(/function renderBonus\(\) \{[\s\S]*?\n\}/)[0];
+
+  assert.match(clueCard, /textContent = step\.hardClue/);
+  assert.match(bonus, /escapeHtml\(step\.clue\)/);
+  assert.doesNotMatch(bonus, /step\.hardClue/);
 });
 
 test("community statistics are placed near the bottom and contain no frontend credentials", async () => {

@@ -8,47 +8,56 @@
     {
       "id": "restore-power-and-unlock-pack-a-punch-at-checkpoint-charlie",
       "order": 1,
-      "clue": "Restore power and unlock Pack-a-Punch at Checkpoint Charlie."
+      "hardClue": "Restore power, then defeat the ritual leader to unlock Pack-a-Punch.",
+      "clue": "Restore power, then defeat the Disciple at Checkpoint Charlie to unlock Pack-a-Punch."
     },
     {
       "id": "activate-klaus-and-obtain-the-crbr-s",
       "order": 2,
-      "clue": "Activate Klaus and obtain the CRBR-S."
+      "hardClue": "Activate and upgrade the robot, then obtain the Wonder Weapon.",
+      "clue": "Activate and upgrade Klaus, then obtain the CRBR-S."
     },
     {
       "id": "use-klaus-and-the-crbr-s-blazer-to-open-the-secret-lab",
       "order": 3,
+      "hardClue": "Have the robot break the wall, then melt the metal barrier with a weapon variant.",
       "clue": "Use Klaus and the CRBR-S Blazer to open the Secret Lab."
     },
     {
       "id": "charge-the-three-canisters-with-tempest-essence-and-return-them-to-the-conversion-unit",
       "order": 4,
-      "clue": "Charge the three canisters with Tempest essence and return them to the Conversion Unit."
+      "hardClue": "Charge three canisters with electrical enemies and return them to the conversion unit.",
+      "clue": "Charge three canisters with Tempest essence and return them to the Conversion Unit."
     },
     {
       "id": "use-klaus-to-stop-the-train",
       "order": 5,
-      "clue": "Use Klaus to stop the train."
+      "hardClue": "Position the upgraded robot on the tracks.",
+      "clue": "Use upgraded Klaus to stop the train."
     },
     {
       "id": "recover-the-warhead-and-rico-s-keycard-then-activate-the-disruptor-satellite",
       "order": 6,
+      "hardClue": "Recover a warhead and keycard from the train, then activate the satellite.",
       "clue": "Recover the Warhead and Rico’s Keycard, then activate the Disruptor Satellite."
     },
     {
       "id": "defeat-the-hvt-megaton-and-use-its-uranium-to-craft-two-uranium-devices",
       "order": 7,
+      "hardClue": "Defeat the priority target and use its uranium to craft two devices.",
       "clue": "Defeat the HVT Megaton and use its uranium to craft two Uranium Devices."
     },
     {
       "id": "collide-the-uranium-devices-on-the-rooftop-zipline-then-repeat-the-process-to-charge-the-warhead",
       "order": 8,
-      "clue": "Collide the Uranium Devices on the rooftop zipline, then repeat the process to charge the Warhead."
+      "hardClue": "Collide the two devices on the zipline, insert the result into the warhead, then repeat.",
+      "clue": "Collide the Uranium Devices on the zipline, insert the Cleansed Rock into the Warhead, then repeat."
     },
     {
       "id": "defeat-valentina-and-defend-klaus-as-he-carries-the-warhead-into-the-portal",
       "order": 9,
-      "clue": "Defeat Valentina and defend Klaus as he carries the Warhead into the portal."
+      "hardClue": "Defeat the boss, then defend your ally as he carries the warhead into the portal.",
+      "clue": "Defeat Valentina, then defend Klaus as he carries the Warhead into the portal."
     }
   ]
 }

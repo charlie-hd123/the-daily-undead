@@ -8,52 +8,62 @@
     {
       "id": "feed-the-three-dragons-to-obtain-the-wrath-of-the-ancients",
       "order": 1,
-      "clue": "Feed the three dragons to obtain the Wrath of the Ancients."
+      "hardClue": "Feed the three flaming stone statues.",
+      "clue": "Feed the three stone dragons to obtain the Wrath of the Ancients."
     },
     {
       "id": "complete-the-elemental-upgrades-for-the-wrath-of-the-ancients",
       "order": 2,
+      "hardClue": "Upgrade the base weapon into four elemental variants.",
       "clue": "Complete the elemental upgrades for the Wrath of the Ancients."
     },
     {
       "id": "shoot-four-wisps-with-an-upgraded-bow-before-time-runs-out",
       "order": 3,
+      "hardClue": "Shoot four wisps around the map before time runs out.",
       "clue": "Shoot four wisps with an upgraded bow before time runs out."
     },
     {
       "id": "travel-to-the-past-for-the-soul-canister-fuses-and-safe-code",
       "order": 4,
+      "hardClue": "Travel to the past for the soul canister, fuses and safe code.",
       "clue": "Travel to the past for the soul canister, fuses and safe code."
     },
     {
       "id": "open-the-safe-install-the-tesla-fuses-then-complete-both-memory-games",
       "order": 5,
+      "hardClue": "Open the safe, install the two fuses, then complete both memory games.",
       "clue": "Open the safe, install the Tesla fuses, then complete both memory games."
     },
     {
       "id": "use-the-death-ray-to-bring-down-dempsey-s-capsule-then-collect-the-vril-device",
       "order": 6,
+      "hardClue": "Bring down the capsule with the electrical trap, then collect the device.",
       "clue": "Use the Death Ray to bring down Dempsey’s capsule, then collect the Vril Device."
     },
     {
       "id": "shoot-the-wisps-a-second-time-and-return-to-the-past-for-the-stone-tablet",
       "order": 7,
+      "hardClue": "Shoot the wisps a second time and return to the past for the stone tablet.",
       "clue": "Shoot the wisps a second time and return to the past for the stone tablet."
     },
     {
       "id": "complete-the-keeper-s-four-soul-circles-then-place-the-soul-canister-in-the-returned-mpd",
       "order": 8,
-      "clue": "Complete the Keeper’s four soul circles, then place the soul canister in the returned MPD."
+      "hardClue": "Fill the tablet with souls at four locations, then insert the canister into the ancient device.",
+      "clue": "Fill the Keeper’s tablet with souls at four locations, then insert the Soul Canister into the MPD."
     },
     {
       "id": "place-the-ragnarok-dg-4s-around-the-mpd-to-enter-the-boss-fight",
       "order": 9,
-      "clue": "Place the Ragnarok DG-4s around the MPD to enter the boss fight."
+      "hardClue": "Place the specialist weapons on the pressure plates around the device.",
+      "clue": "Place the Ragnarok DG-4s on the pressure plates around the MPD to enter the boss fight."
     },
     {
       "id": "defeat-the-keeper-then-use-the-summoning-key-to-destroy-the-moon",
       "order": 10,
-      "clue": "Defeat the Keeper, then use the Summoning Key to destroy the Moon."
+      "hardClue": "Defeat the boss, then use the artifact at the control terminal.",
+      "clue": "Defeat the Keeper, then use the Summoning Key to launch the rockets and destroy the Moon."
     }
   ]
 }

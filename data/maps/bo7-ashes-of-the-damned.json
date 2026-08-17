@@ -8,42 +8,50 @@
     {
       "id": "install-t-e-d-d-s-head-to-activate-ol-tessie",
       "order": 1,
+      "hardClue": "Install the robotic head to activate the vehicle.",
       "clue": "Install T.E.D.D.’s head to activate Ol’ Tessie."
     },
     {
       "id": "reactivate-klaus-and-use-him-to-recover-the-aether-barrel",
       "order": 2,
-      "clue": "Reactivate Klaus and use him to recover the Aether Barrel."
+      "hardClue": "Reactivate the robot and use it to activate the red scanner for the barrel.",
+      "clue": "Reactivate Klaus and use him to activate the scanner for the Aether Barrel."
     },
     {
       "id": "charge-the-aether-barrel-solve-the-cube-and-obtain-the-necrofluid-gauntlet",
       "order": 3,
-      "clue": "Charge the Aether Barrel, solve the cube and obtain the Necrofluid Gauntlet."
+      "hardClue": "Charge the barrel at three locations, solve the cube and obtain the Wonder Weapon.",
+      "clue": "Charge the Aether Barrel at the Power Pumps and solve the Vault of Flesh for the Necrofluid Gauntlet."
     },
     {
       "id": "prepare-the-serum-and-complete-the-lockdown-in-yuri-s-lab",
       "order": 4,
-      "clue": "Prepare the serum and complete the lockdown in Yuri’s Lab."
+      "hardClue": "Decode three ingredient clues, prepare the serum and survive the lab lockdown.",
+      "clue": "Decode the ciphers, prepare the serum and complete the lockdown in Yuri’s Lab."
     },
     {
       "id": "use-the-three-keys-to-open-the-seal-of-sorrow-and-install-the-dg-2-turret",
       "order": 5,
-      "clue": "Use the three keys to open the Seal of Sorrow and install the DG-2 Turret."
+      "hardClue": "Recover three burdened keys, open the chained seal and install the turret.",
+      "clue": "Use the three keys to open the Seal of Sorrow and install the DG-2 Turret on Ol’ Tessie."
     },
     {
       "id": "use-the-clock-tower-to-charge-the-necrofluid-gauntlet-and-complete-the-four-location-challenges",
       "order": 6,
+      "hardClue": "Use the clock tower to charge the Wonder Weapon and complete the four location challenges.",
       "clue": "Use the clock tower to charge the Necrofluid Gauntlet and complete the four location challenges."
     },
     {
       "id": "collect-the-twelve-wisps-with-ol-tessie-along-the-required-route",
       "order": 7,
-      "clue": "Collect the twelve wisps with Ol’ Tessie along the required route."
+      "hardClue": "Drive through four locations to collect twelve memory wisps.",
+      "clue": "Collect twelve memory wisps with Ol’ Tessie along the required route."
     },
     {
       "id": "use-ol-tessie-to-defeat-veytharion",
       "order": 8,
-      "clue": "Use Ol’ Tessie to defeat Veytharion."
+      "hardClue": "Avoid missile strikes and the purple beam, then use well-timed impact attacks to defeat the boss.",
+      "clue": "Avoid Veytharion’s missiles and purple beam, then ram his critical points with Ol’ Tessie to defeat him."
     }
   ]
 }

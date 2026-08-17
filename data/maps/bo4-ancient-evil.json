@@ -8,57 +8,68 @@
     {
       "id": "activate-the-sentinel-artifact-obtain-the-golden-bridle-and-ride-pegasus-to-dark-delphi",
       "order": 1,
+      "hardClue": "Activate the artifact, collect the bridle and ride to the underworld.",
       "clue": "Activate the Sentinel Artifact, obtain the Golden Bridle and ride Pegasus to Dark Delphi."
     },
     {
       "id": "free-the-two-caged-eagles-and-defend-the-center-of-the-world",
       "order": 2,
-      "clue": "Free the two caged eagles and defend the Center of the World."
+      "hardClue": "Free the two caged birds, then survive the lockdown at the center of the underworld.",
+      "clue": "Free the two caged eagles and survive the Center of the World lockdown to unlock Pack-a-Punch."
     },
     {
       "id": "reignite-the-eternal-flame-and-light-the-three-oil-spills-with-apollo-s-will",
       "order": 3,
-      "clue": "Reignite the Eternal Flame and light the three oil spills with Apollo’s Will."
+      "hardClue": "Ignite the shield’s spear, then light the three oil spills around the map.",
+      "clue": "Light Apollo’s Will with the Eternal Flame, then ignite the three oil spills around the map."
     },
     {
       "id": "use-the-redeemed-hand-of-charon-to-destroy-the-four-glowing-statues",
       "order": 4,
-      "clue": "Use the Redeemed Hand of Charon to destroy the four glowing statues."
+      "hardClue": "Stand in the charged pool and shoot the four statues with glowing eyes.",
+      "clue": "Stand in a Redeemed Hand of Charon shot and shoot the four statues with glowing blue eyes."
     },
     {
       "id": "repair-the-hidden-cogs-with-apollo-s-will-and-turn-the-statues-inward",
       "order": 5,
-      "clue": "Repair the hidden cogs with Apollo’s Will and turn the statues inward."
+      "hardClue": "Synchronize three hidden cog sets, then turn the three rotating statues inward.",
+      "clue": "Use Apollo’s Will to synchronize the three hidden cog sets, then turn the three statues inward."
     },
     {
       "id": "complete-the-ra-and-danu-challenges-recover-ra-s-scepter-and-solve-the-sundial",
       "order": 6,
-      "clue": "Complete the Ra and Danu challenges, recover Ra’s Scepter and solve the sundial."
+      "hardClue": "Complete the symbol puzzle, solve the sundial and defend the statue’s beam.",
+      "clue": "Complete the Danu symbol puzzle, solve the sundial and defend Ra to recover his Scepter."
     },
     {
       "id": "complete-the-amphitheater-shooting-gallery-using-the-hands-of-god",
       "order": 7,
-      "clue": "Complete the Amphitheater shooting gallery using the Hands of God."
+      "hardClue": "Stand on the matching colored circles and kill the corresponding enemies across three phases.",
+      "clue": "Complete the three-phase Amphitheater shooting challenge using the Hands of God."
     },
     {
       "id": "enter-the-symbols-on-the-door-at-the-river-of-sorrow",
       "order": 8,
-      "clue": "Enter the symbols on the door at the River of Sorrow."
+      "hardClue": "Shoot six symbols on the hidden door in the correct order.",
+      "clue": "Shoot the six symbols on the River of Sorrow door in the correct order."
     },
     {
       "id": "use-the-pegasus-strike-to-summon-the-ballista",
       "order": 9,
-      "clue": "Use the Pegasus Strike to summon the Ballista."
+      "hardClue": "Place the special equipment on the blue circle to raise the siege weapon.",
+      "clue": "Place the Pegasus Strike on the blue circle to raise the Ballista."
     },
     {
       "id": "aim-the-ballista-with-ouranos-and-poison-apollo-s-will-to-fire-it-at-the-python",
       "order": 10,
-      "clue": "Aim the Ballista with Ouranos and poison Apollo’s Will to fire it at the Python."
+      "hardClue": "Aim the siege weapon with the wind weapon, then coat the spear in acid and fire at the serpent.",
+      "clue": "Aim the Ballista with the Redeemed Hand of Ouranos, coat Apollo’s Will in acid and fire at the Python."
     },
     {
       "id": "enter-the-portal-and-defeat-pegasus-and-perseus",
       "order": 11,
-      "clue": "Enter the portal and defeat Pegasus and Perseus."
+      "hardClue": "Enter the portal and defeat the winged creature, then the demigod.",
+      "clue": "Enter the portal and defeat Pegasus, then Perseus."
     }
   ]
 }

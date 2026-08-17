@@ -8,46 +8,55 @@
     {
       "id": "collect-the-thrustodyne-parts-from-the-bowling-alley-groundskeeper-s-shed-and-radio-house",
       "order": 1,
+      "hardClue": "Collect three parts using a pressure gauge, locked shed and electronics store.",
       "clue": "Collect the Thrustodyne parts from the bowling alley, Groundskeeper’s shed and Radio House."
     },
     {
       "id": "build-the-thrustodyne-and-receive-dr-panos-s-instructions-in-the-church",
       "order": 2,
+      "hardClue": "Build the Wonder Weapon, then receive the scientist’s instructions in the church.",
       "clue": "Build the Thrustodyne and receive Dr. Panos’s instructions in the church."
     },
     {
       "id": "use-the-thrustodyne-to-collect-the-three-ltg-parts",
       "order": 3,
+      "hardClue": "Use the Wonder Weapon to pull in three unreachable parts.",
       "clue": "Use the Thrustodyne to collect the three LTG parts."
     },
     {
       "id": "build-the-ltg-on-the-bank-rooftop",
       "order": 4,
+      "hardClue": "Assemble the device on the bank rooftop.",
       "clue": "Build the LTG on the bank rooftop."
     },
     {
       "id": "defend-the-ltg-capture-an-hvt-s-essence-then-return-the-first-canister",
       "order": 5,
-      "clue": "Defend the LTG, capture an HVT’s essence, then return the first canister."
+      "hardClue": "Defend the device, capture a powerful enemy’s essence and return the filled canister.",
+      "clue": "Defend the LTG, capture an HVT’s essence and return the first Aether Canister."
     },
     {
       "id": "use-the-strauss-counter-to-calibrate-three-projectors-and-release-the-second-canister",
       "order": 6,
-      "clue": "Use the Strauss Counter to calibrate three projectors and release the second canister."
+      "hardClue": "Use the handheld counter to calibrate three projectors and release another canister.",
+      "clue": "Use the Strauss Counter to calibrate three projectors and release the second Aether Canister."
     },
     {
       "id": "move-the-ltg-repeat-the-hvt-capture-then-return-the-second-canister",
       "order": 7,
-      "clue": "Move the LTG, repeat the HVT capture, then return the second canister."
+      "hardClue": "Locate the device, defend it again, capture another enemy’s essence, then return the second canister.",
+      "clue": "Move the LTG, repeat the HVT capture and return the second Aether Canister."
     },
     {
       "id": "activate-the-s-d-g-in-the-church-to-begin-the-final-encounter",
       "order": 8,
+      "hardClue": "Activate the machine in the church to begin the final encounter.",
       "clue": "Activate the S.D.G. in the church to begin the final encounter."
     },
     {
       "id": "survive-the-church-lockdown-defeating-the-hvt-mangler-and-abomination",
       "order": 9,
+      "hardClue": "Survive three waves inside the church, including two powerful enemies.",
       "clue": "Survive the church lockdown, defeating the HVT Mangler and Abomination."
     }
   ]

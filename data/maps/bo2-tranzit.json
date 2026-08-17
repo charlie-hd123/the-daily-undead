@@ -8,27 +8,32 @@
     {
       "id": "turn-on-the-power-then-switch-it-back-off-when-maxis-instructs-you",
       "order": 1,
+      "hardClue": "Turn on the power, then switch it back off.",
       "clue": "Turn on the power, then switch it back off when Maxis instructs you."
     },
     {
       "id": "wait-for-lightning-above-the-pylon-then-spawn-the-avogadro",
       "order": 2,
-      "clue": "Wait for lightning above the pylon, then spawn the Avogadro."
+      "hardClue": "Wait for lightning, then wait for the electric enemy to appear.",
+      "clue": "Wait for lightning above the pylon, then wait for the Avogadro to appear."
     },
     {
       "id": "place-two-turbines-beneath-the-pylon-and-lure-the-avogadro-underneath-it",
       "order": 3,
+      "hardClue": "Place two portable devices beneath the pylon and lure the electric enemy underneath it.",
       "clue": "Place two Turbines beneath the pylon and lure the Avogadro underneath it."
     },
     {
       "id": "defeat-the-avogadro-beneath-the-pylon-with-an-emp-grenade",
       "order": 4,
-      "clue": "Defeat the electrical enemy beneath the pylon with an EMP Grenade."
+      "hardClue": "Defeat the electrical enemy beneath the pylon with a tactical grenade.",
+      "clue": "Defeat the Avogadro beneath the pylon with an EMP Grenade."
     },
     {
       "id": "place-turbines-beneath-two-streetlights-to-activate-the-pylon",
       "order": 5,
-      "clue": "Place Turbines beneath two streetlights to activate the pylon."
+      "hardClue": "Place two portable devices beneath separate streetlights to activate the pylon.",
+      "clue": "Place two Turbines beneath two streetlights to activate the pylon."
     }
   ]
 }

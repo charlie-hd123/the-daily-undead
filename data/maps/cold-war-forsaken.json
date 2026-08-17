@@ -8,47 +8,56 @@
     {
       "id": "activate-the-staging-area-teleporter-and-escape-the-accelerating-rounds",
       "order": 1,
-      "clue": "Activate the Staging Area teleporter and escape the accelerating rounds."
+      "hardClue": "Activate the teleporter and escape the rapidly advancing rounds.",
+      "clue": "Activate the Staging Area teleporter and escape the rapidly advancing rounds."
     },
     {
       "id": "collect-four-parts-in-anytown-and-repair-the-fuel-processing-teleporter",
       "order": 2,
+      "hardClue": "Collect four parts and repair the broken teleporter.",
       "clue": "Collect four parts in Anytown and repair the Fuel Processing teleporter."
     },
     {
       "id": "defeat-the-abomination-enter-the-observation-tower-and-unlock-pack-a-punch",
       "order": 3,
+      "hardClue": "Defeat the three-headed enemy, then lift the facility lockdown.",
       "clue": "Defeat the Abomination, enter the Observation Tower and unlock Pack-a-Punch."
     },
     {
       "id": "press-the-hidden-red-button-in-the-observation-tower-to-reveal-the-forsaken",
       "order": 4,
+      "hardClue": "Press the hidden red button beside the covered windows.",
       "clue": "Press the hidden red button in the Observation Tower to reveal the Forsaken."
     },
     {
       "id": "use-the-chrysalax-to-destroy-three-giant-aetherium-crystals-and-collect-their-crystal-shards",
       "order": 5,
-      "clue": "Use the Chrysalax to destroy three giant Aetherium Crystals and collect their Crystal Shards."
+      "hardClue": "Destroy the orbiting orbs around three large crystals with the Wonder Weapon.",
+      "clue": "Use the Chrysalax to destroy orbs around three Aetherium Crystals, then collect their Crystal Shards."
     },
     {
       "id": "feed-the-crystal-shards-to-abominations-kill-them-and-collect-the-catalyzed-crystal-shards",
       "order": 6,
-      "clue": "Feed the Crystal Shards to Abominations, kill them and collect the Catalyzed Crystal Shards."
+      "hardClue": "Feed the shards to three large enemies, then kill them to recover altered shards.",
+      "clue": "Feed the Crystal Shards to Abominations, then kill them to collect Catalyzed Crystal Shards."
     },
     {
       "id": "build-the-aetherium-neutralizer-with-its-three-parts-and-three-catalyzed-crystal-shards",
       "order": 7,
+      "hardClue": "Build the protective device using three parts and three altered crystal shards.",
       "clue": "Build the Aetherium Neutralizer with its three parts and three Catalyzed Crystal Shards."
     },
     {
       "id": "escort-the-neutralizer-down-main-street-refuelling-it-with-orange-crystal-shards",
       "order": 8,
-      "clue": "Escort the Neutralizer down Main Street, refuelling it with orange crystal shards."
+      "hardClue": "Escort the device, refueling it with orange crystal shards.",
+      "clue": "Escort the Aetherium Neutralizer down Main Street, refueling it with orange crystal shards."
     },
     {
       "id": "charge-maxis-s-laser-cannons-and-strike-the-forsaken-s-exposed-weak-points-to-defeat-him",
       "order": 9,
-      "clue": "Charge Maxis’s laser cannons and strike the Forsaken’s exposed weak points to defeat him."
+      "hardClue": "Break the boss’s armor, charge two cannons and fire them at the exposed weak points.",
+      "clue": "Break the Forsaken’s armor, charge Maxis’s laser cannons and fire them at his exposed weak points."
     }
   ]
 }

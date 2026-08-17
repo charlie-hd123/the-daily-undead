@@ -8,42 +8,50 @@
     {
       "id": "activate-the-sentinel-artifact-and-reveal-the-three-crystal-visions",
       "order": 1,
-      "clue": "Activate the Sentinel Artifact and reveal the three crystal visions."
+      "hardClue": "Activate the ancient artifact, then reveal three visions inside hidden crystals.",
+      "clue": "Activate the Sentinel Artifact, then reveal the three crystal visions."
     },
     {
       "id": "complete-the-clock-perk-statue-and-ghost-challenges-to-collect-the-three-tuning-forks",
       "order": 2,
+      "hardClue": "Complete the three challenges revealed by the crystal visions.",
       "clue": "Complete the clock, Perk Statue and ghost challenges to collect the three Tuning Forks."
     },
     {
       "id": "use-the-tuning-forks-to-open-the-forest",
       "order": 3,
-      "clue": "Use the Tuning Forks to open the Forest."
+      "hardClue": "Use the three items to open the path into the woods.",
+      "clue": "Use the three Tuning Forks to open the Forest."
     },
     {
       "id": "reveal-the-telescope-effigy-and-knight-rituals-then-prepare-silver-bullets-and-alistair-s-annihilator",
       "order": 4,
+      "hardClue": "Reveal three ritual paths and prepare the required ammunition and Wonder Weapon.",
       "clue": "Reveal the Telescope, Effigy and Knight rituals, then prepare Silver Bullets and Alistair’s Annihilator."
     },
     {
       "id": "complete-the-three-crystal-challenges-and-collect-their-stone-slabs",
       "order": 5,
-      "clue": "Complete the three crystal challenges and collect their stone slabs."
+      "hardClue": "Complete the three ritual questlines and collect their stone slabs.",
+      "clue": "Complete the Telescope, Effigy and Knight questlines and collect their three stone slabs."
     },
     {
       "id": "open-the-stone-door-in-the-forest-and-enter-the-boss-arena",
       "order": 6,
-      "clue": "Open the stone door in the Forest and enter the boss arena."
+      "hardClue": "Open the stone slab door in the woods and enter.",
+      "clue": "Open the stone slab door in the Forest and enter the boss arena."
     },
     {
       "id": "align-the-statue-beams-to-reveal-and-damage-the-werewolf",
       "order": 7,
-      "clue": "Align the statue beams to reveal and damage the Werewolf."
+      "hardClue": "Align the statue beams with the glowing square to trap and damage the boss.",
+      "clue": "Align the statue beams with the green square to trap and damage the Shadow Werewolf."
     },
     {
       "id": "find-the-hidden-green-square-realign-the-statue-beams-and-defeat-the-werewolf",
       "order": 8,
-      "clue": "Find the hidden green square, realign the statue beams and defeat the Werewolf."
+      "hardClue": "Locate the hidden square and realign the beams to defeat the boss.",
+      "clue": "Reveal the hidden green square and realign the statue beams to defeat the Shadow Werewolf."
     }
   ]
 }

@@ -8,42 +8,50 @@
     {
       "id": "recover-the-truck-keys-in-the-future-then-move-the-truck-in-the-past",
       "order": 1,
+      "hardClue": "Recover the vehicle keys, then move the truck.",
       "clue": "Recover the truck keys in the future, then move the truck in the past."
     },
     {
       "id": "recover-the-four-parts-and-build-the-blundergat",
       "order": 2,
+      "hardClue": "Collect four parts across both timelines and assemble the Wonder Weapon.",
       "clue": "Recover the four parts and build the Blundergat."
     },
     {
       "id": "collect-the-swing-seat-and-chalk-then-talk-to-the-twins",
       "order": 3,
-      "clue": "Collect the swing seat and chalk, then talk to the Twins."
+      "hardClue": "Collect the swing seat and chalk, restoring the playground.",
+      "clue": "Collect the swing seat and chalk, then place them at the Twins’ swing."
     },
     {
       "id": "complete-the-tree-piano-and-toy-box-puzzles-and-beat-the-twins-three-games",
       "order": 4,
-      "clue": "Complete the tree, piano and toy box puzzles and beat the Twins’ three games."
+      "hardClue": "Complete the three puzzles, then win the childhood games.",
+      "clue": "Complete the tree, piano and toy box puzzles, then beat the Twins’ three games."
     },
     {
       "id": "charge-the-music-box-music-sheet-and-cymbals-with-the-sundergat",
       "order": 5,
-      "clue": "Charge the Music Box, Music Sheet and Cymbals with the Sundergat."
+      "hardClue": "Charge three musical items with zombie souls using the upgraded Wonder Weapon.",
+      "clue": "Charge the Music Box, Music Sheet and Cymbals with Sundergat kills."
     },
     {
       "id": "set-the-doomsday-clock-then-adjust-it-while-teleporting-to-summon-the-twins",
       "order": 6,
-      "clue": "Set the Doomsday Clock, then adjust it while teleporting to summon the Twins."
+      "hardClue": "Set the clock to midnight, then shoot one hand while switching timelines.",
+      "clue": "Set the Doomsday Clock to midnight, then shoot the red hand while teleporting."
     },
     {
       "id": "follow-the-twins-through-the-piano-toy-box-and-fireplace-locations",
       "order": 7,
-      "clue": "Follow the Twins through the piano, toy box and fireplace locations."
+      "hardClue": "Follow the figures from one object to the next, then return to the swing.",
+      "clue": "Follow the Twins from the piano to the toy box, fireplace and swing."
     },
     {
       "id": "speak-to-the-twins-at-the-swing-enter-the-portal-then-defeat-the-dark-heart",
       "order": 8,
-      "clue": "Speak to the Twins at the swing, enter the portal, then defeat the Dark Heart."
+      "hardClue": "Interact at the swing set, enter the portal, then defeat the boss.",
+      "clue": "Speak to the Twins at the swing set, enter the portal, then defeat the Dark Heart."
     }
   ]
 }

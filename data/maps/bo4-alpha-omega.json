@@ -8,62 +8,74 @@
     {
       "id": "survive-the-generators-lockdown-and-repair-the-nova-6-ventilation-units",
       "order": 1,
-      "clue": "Survive the Generators lockdown and repair the Nova-6 ventilation units."
+      "hardClue": "Survive an underground lockdown, then repair four damaged ventilation units.",
+      "clue": "Survive the Generators lockdown, then repair the four Nova-6 ventilation units."
     },
     {
       "id": "activate-rushmore-use-the-galvaknuckles-on-the-television-and-set-the-six-house-clocks",
       "order": 2,
-      "clue": "Activate Rushmore, use the Galvaknuckles on the television and set the six house clocks."
+      "hardClue": "Get a melee kill by the television, set five clocks and enter the final time into the computer.",
+      "clue": "Get a Galvaknuckles kill by the television, set five clocks and enter the final time into Rushmore."
     },
     {
       "id": "guide-the-red-nova-6-crawler-into-the-transfusion-facility",
       "order": 3,
+      "hardClue": "Guide the glowing crawler into the medical facility.",
       "clue": "Guide the red Nova-6 Crawler into the Transfusion Facility."
     },
     {
       "id": "activate-the-a-d-a-m-robot-by-entering-the-codes-into-rushmore",
       "order": 4,
-      "clue": "Activate the A.D.A.M. robot by entering the codes into Rushmore."
+      "hardClue": "Enter four hidden codes into the computer, then activate the robot.",
+      "clue": "Enter the four activation codes into Rushmore, then activate Sergeant A.D.A.M. in Storage."
     },
     {
       "id": "use-the-a-d-a-m-robot-to-obtain-marlton-s-element-115-canister",
       "order": 5,
-      "clue": "Use the A.D.A.M. robot to obtain Marlton’s Element 115 canister."
+      "hardClue": "Lead the robot to the hidden intruder and collect the canister he throws out.",
+      "clue": "Lead Sergeant A.D.A.M. to Marlton’s door and collect the Element 115 canister."
     },
     {
       "id": "use-a-jolting-jack-to-free-the-power-core-and-deliver-it-to-operations",
       "order": 6,
-      "clue": "Use a Jolting Jack to free the Power Core and deliver it to Operations."
+      "hardClue": "Have an electrical enemy open the server, then deliver its core before it overheats.",
+      "clue": "Use a Jolting Jack to open the Power House server, then use the Telepads to deliver its core."
     },
     {
       "id": "use-brain-rot-to-reveal-the-three-painting-codes-and-enter-them-into-rushmore",
       "order": 7,
-      "clue": "Use Brain Rot to reveal the three painting codes and enter them into Rushmore."
+      "hardClue": "Have zombies knock down three paintings, then enter the revealed codes into the computer.",
+      "clue": "Use Brain Rot zombies to knock down three paintings, then enter the revealed codes into Rushmore."
     },
     {
       "id": "set-the-six-bunker-switches-and-restore-power-at-the-power-house",
       "order": 8,
-      "clue": "Set the six bunker switches and restore power at the Power House."
+      "hardClue": "Set six underground switches correctly, then restore the main power.",
+      "clue": "Set the six bunker power switches correctly, then restore power at the Power House."
     },
     {
       "id": "complete-the-three-a-d-a-m-mannequin-lockdowns-and-rebuild-the-unit-in-apd-interrogation",
       "order": 9,
-      "clue": "Complete the three A.D.A.M. mannequin lockdowns and rebuild the unit in APD Interrogation."
+      "hardClue": "Complete three mannequin lockdowns, then repair the unit in the interrogation room.",
+      "clue": "Complete three A.D.A.M. mannequin lockdowns, then repair the unit in APD Interrogation."
     },
     {
       "id": "escort-the-elemental-orb-into-the-repaired-a-d-a-m-unit",
       "order": 10,
+      "hardClue": "Escort the floating orb into the repaired unit.",
       "clue": "Escort the Elemental Orb into the repaired A.D.A.M. Unit."
     },
     {
       "id": "release-the-avogadro-and-charge-the-four-backup-soul-canisters",
       "order": 11,
-      "clue": "Release the Avogadro and charge the four backup soul canisters."
+      "hardClue": "Fill one soul canister to release the enemy, then charge four backup canisters.",
+      "clue": "Fill the APD soul canister to release Avogadro, then charge the four backup soul canisters."
     },
     {
       "id": "force-the-avogadro-back-into-the-a-p-d-and-recover-the-elemental-shard",
       "order": 12,
-      "clue": "Force the Avogadro back into the A.P.D. and recover the Elemental Shard."
+      "hardClue": "Force the boss back into the containment device, then recover the shard.",
+      "clue": "Force the Avogadro back into the APD, send him to TranZit, then recover the Elemental Shard."
     }
   ]
 }
