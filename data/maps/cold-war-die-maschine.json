@@ -8,47 +8,56 @@
     {
       "id": "restore-power-activate-the-particle-accelerator-and-build-pack-a-punch-in-the-dark-aether",
       "order": 1,
+      "hardClue": "Restore power, activate the accelerator and assemble the upgrade machine in the other dimension.",
       "clue": "Restore power, activate the Particle Accelerator and build Pack-a-Punch in the Dark Aether."
     },
     {
       "id": "build-the-aetherscope-deliver-vogel-s-diary-to-the-three-spectral-reflections-and-enter-the-password",
       "order": 2,
-      "clue": "Build the Aetherscope, deliver Vogel’s diary to the three spectral reflections and enter the password."
+      "hardClue": "Build the viewing device, give the diary to three spectral reflections and enter the password.",
+      "clue": "Build the Aetherscope, give Vogel’s diary to the three spectral reflections and enter the password."
     },
     {
       "id": "obtain-the-d-i-e-shockwave-and-use-its-four-elemental-upgrades-on-the-decontamination-chamber",
       "order": 3,
-      "clue": "Obtain the D.I.E. Shockwave and use its four elemental upgrades on the decontamination chamber."
+      "hardClue": "Obtain the Wonder Weapon and use its four variants on the matching colored ports.",
+      "clue": "Obtain the D.I.E. Shockwave and use its elemental upgrades on the matching containment-unit ports."
     },
     {
       "id": "witness-the-medical-bay-reflection-and-recover-the-dark-aether-wrench",
       "order": 4,
-      "clue": "Witness the Medical Bay reflection and recover the Dark Aether Wrench."
+      "hardClue": "Witness the medical-room reflection, then collect the wrench it leaves behind.",
+      "clue": "Witness the Medical Bay reflection, then collect the Dark Aether Wrench."
     },
     {
       "id": "repair-the-tank-and-use-it-to-recover-the-decontamination-agent",
       "order": 5,
-      "clue": "Repair the tank and use it to recover the Decontamination Agent."
+      "hardClue": "Use the wrench on the tank, then make it fire to recover the containment agent.",
+      "clue": "Use the Dark Aether Wrench on the tank, then make it fire to recover the Decontamination Agent."
     },
     {
       "id": "trap-both-megaton-halves-inside-the-chamber-and-begin-the-purification-process",
       "order": 6,
-      "clue": "Trap both Megaton halves inside the chamber and begin the purification process."
+      "hardClue": "Trap both halves of the special enemy inside the containment unit, then start the process.",
+      "clue": "Trap both Megaton halves inside the Containment Unit, then begin the decontamination process."
     },
     {
       "id": "enter-the-dark-aether-and-recover-orlov-s-family-photograph",
       "order": 7,
+      "hardClue": "Enter the alternate dimension and recover the family photograph.",
       "clue": "Enter the Dark Aether and recover Orlov’s family photograph."
     },
     {
       "id": "defend-orlov-as-he-shuts-down-the-particle-accelerator",
       "order": 8,
+      "hardClue": "Defend the scientist while he shuts down the accelerator.",
       "clue": "Defend Orlov as he shuts down the Particle Accelerator."
     },
     {
       "id": "escape-projekt-endstation-while-avoiding-the-electrical-surges-then-board-the-exfil-helicopter",
       "order": 9,
-      "clue": "Escape Projekt Endstation while avoiding the electrical surges, then board the exfil helicopter."
+      "hardClue": "Escape the facility while avoiding electrical surges, then reach the helicopter.",
+      "clue": "Escape Projekt Endstation while avoiding electrical surges, then board the exfil helicopter."
     }
   ]
 }

@@ -8,47 +8,56 @@
     {
       "id": "recapture-both-wards-defeat-the-oni-and-awaken-the-world-seed",
       "order": 1,
-      "clue": "Recapture both Wards, defeat the Oni and awaken the World Seed."
+      "hardClue": "Recapture two zones, defeat the armored enemy and unlock the upgrade machine.",
+      "clue": "Recapture both Wards, defeat the Oni and unlock Pack-a-Punch at the World Seed."
     },
     {
       "id": "build-the-maneki-neko-and-rescue-the-cat-to-obtain-the-nekomancer",
       "order": 2,
-      "clue": "Build the Maneki-Neko and rescue the cat to obtain the Wonder Weapon."
+      "hardClue": "Build a three-part tactical device, then rescue the caged animal to obtain the Wonder Weapon.",
+      "clue": "Build the Maneki-Neko and rescue the Nekomata to obtain the Nekomancer."
     },
     {
       "id": "light-the-eleven-lanterns-with-the-nekomancer-and-investigate-the-spirit-in-the-war-room",
       "order": 3,
-      "clue": "Light the eleven lanterns with the Nekomancer and investigate the spirit in the War Room."
+      "hardClue": "Light eleven lanterns with the Wonder Weapon before time runs out, then investigate the spirit.",
+      "clue": "Light the eleven lanterns with the Nekomancer, then investigate the spirit in the War Room."
     },
     {
       "id": "recover-the-fox-mask-and-complete-the-mask-wall-sequence",
       "order": 4,
-      "clue": "Recover the Fox Mask and complete the mask-wall sequence."
+      "hardClue": "Recover a mask and kill masked enemies in the displayed order for three rounds.",
+      "clue": "Recover the Fox Mask and complete the three-round mask-wall sequence."
     },
     {
       "id": "chase-the-fox-mask-and-collect-the-evidence-revealing-the-first-suspect",
       "order": 5,
-      "clue": "Chase the Fox Mask and collect the evidence revealing the first suspect."
+      "hardClue": "Shoot the moving mask at three locations to collect evidence.",
+      "clue": "Chase the Fox Mask and collect the three pieces of suspect evidence."
     },
     {
       "id": "complete-the-coin-purse-poison-sake-cup-clock-and-flag-steps-to-reveal-the-remaining-evidence",
       "order": 6,
-      "clue": "Complete the coin purse, poison, Sake Cup, clock and flag steps to reveal the remaining evidence."
+      "hardClue": "Complete four investigation branches to gather evidence.",
+      "clue": "Complete the accomplice, poison, Sake Cup and clock-and-banner investigations."
     },
     {
       "id": "match-the-evidence-to-each-suspect-and-solve-the-zodiac-dial",
       "order": 7,
-      "clue": "Match the evidence to each suspect and solve the Zodiac Dial."
+      "hardClue": "Match five pieces of evidence to their paintings, then solve the animal dial.",
+      "clue": "Match the evidence to the five paintings, then solve the Zodiac Dial."
     },
     {
       "id": "defeat-the-onryo-and-open-the-route-to-the-volcano",
       "order": 8,
-      "clue": "Defeat the Onryo and open the route to the volcano."
+      "hardClue": "Defeat the elite enemy by breaking its mask defenses.",
+      "clue": "Defeat the Onryo by destroying its masks when immune, then open the route to the volcano."
     },
     {
       "id": "travel-to-the-volcano-and-defeat-nyxara",
       "order": 9,
-      "clue": "Travel to the volcano and defeat Nyxara."
+      "hardClue": "Capture the immune zones and attack the boss’s weak spots.",
+      "clue": "Capture the Oni flag zones, then attack Nyxara’s glowing weak points to defeat her."
     }
   ]
 }

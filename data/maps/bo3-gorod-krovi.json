@@ -8,47 +8,56 @@
     {
       "id": "power-the-hatchery-generator-with-a-valkyrie-drone",
       "order": 1,
-      "clue": "Power the Hatchery generator with a Valkyrie Drone."
+      "hardClue": "Destroy a flying enemy beside the generator to power it.",
+      "clue": "Destroy a Valkyrie Drone beside the Hatchery generator to power it."
     },
     {
       "id": "solve-the-six-valves-and-retrieve-the-master-code-cylinder",
       "order": 2,
+      "hardClue": "Configure the six valves to retrieve the cylinder.",
       "clue": "Solve the six valves and retrieve the Master Code Cylinder."
     },
     {
       "id": "insert-the-cylinder-and-enter-kronos-into-s-o-p-h-i-a",
       "order": 3,
-      "clue": "Insert the cylinder and enter KRONOS into S.O.P.H.I.A."
+      "hardClue": "Insert the cylinder and shoot its rings to enter the password.",
+      "clue": "Insert the Master Code Cylinder and enter KRONOS into S.O.P.H.I.A."
     },
     {
       "id": "place-the-six-trophies-beneath-s-o-p-h-i-a-s-monitor",
       "order": 4,
+      "hardClue": "Place the six trophies beneath the monitor.",
       "clue": "Place the six trophies beneath S.O.P.H.I.A.’s monitor."
     },
     {
       "id": "complete-the-first-five-trophy-challenges",
       "order": 5,
-      "clue": "Complete the first five trophy challenges."
+      "hardClue": "Complete the five randomly ordered challenges.",
+      "clue": "Complete the first five S.O.P.H.I.A. challenges."
     },
     {
       "id": "use-the-keycard-to-complete-the-group-935-download-in-the-hatchery",
       "order": 6,
-      "clue": "Use the keycard to complete the Group 935 download in the Hatchery."
+      "hardClue": "Complete the data download with the keycard, then return it to the computer.",
+      "clue": "Complete the Group 935 download in the Hatchery, then return the keycard to S.O.P.H.I.A."
     },
     {
       "id": "collect-the-power-core-from-s-o-p-h-i-a-and-deliver-it-to-nikolai-s-mech",
       "order": 7,
-      "clue": "Collect the power core from S.O.P.H.I.A. and deliver it to Nikolai’s mech."
+      "hardClue": "Collect the power core and use the specialist weapon to deliver it to the mech.",
+      "clue": "Collect S.O.P.H.I.A.’s power core and deliver it to Nikolai’s mech with the Gauntlet of Siegfried."
     },
     {
       "id": "enter-the-sewer-beneath-s-o-p-h-i-a-to-reach-the-boss-arena",
       "order": 8,
+      "hardClue": "Enter the sewer revealed beneath the computer.",
       "clue": "Enter the sewer beneath S.O.P.H.I.A. to reach the boss arena."
     },
     {
       "id": "defeat-the-dragon-then-destroy-nikolai-s-mech",
       "order": 9,
-      "clue": "Defeat the dragon, then destroy Nikolai’s mech."
+      "hardClue": "Defeat the flying enemy, then destroy the mech’s exposed power cores.",
+      "clue": "Defeat the dragon, then destroy Nikolai’s mech by shooting its exposed power cores."
     }
   ]
 }

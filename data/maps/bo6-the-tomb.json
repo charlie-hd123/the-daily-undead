@@ -8,46 +8,55 @@
     {
       "id": "place-the-amulet-in-the-temple-to-open-the-dark-aether-nexus",
       "order": 1,
-      "clue": "Place the amulet in the temple to open the Dark Aether Nexus."
+      "hardClue": "Place the amulet on the stone pedestal to open the portal.",
+      "clue": "Place the amulet on the Temple pedestal to open the Dark Aether Nexus."
     },
     {
       "id": "collect-the-monocle-and-complete-the-bull-and-hunter-mural-lockdowns-to-obtain-the-staff-parts",
       "order": 2,
+      "hardClue": "Collect three weapon parts from a special enemy and two mural lockdowns.",
       "clue": "Collect the Monocle and complete the Bull and Hunter mural lockdowns to obtain the Staff parts."
     },
     {
       "id": "defend-the-staff-of-ice-during-its-construction-in-the-dark-aether-nexus",
       "order": 3,
+      "hardClue": "Defend the Wonder Weapon while it is constructed in the alternate dimension.",
       "clue": "Defend the Staff of Ice during its construction in the Dark Aether Nexus."
     },
     {
       "id": "freeze-three-lanterns-within-ten-seconds",
       "order": 4,
-      "clue": "Freeze three lanterns within ten seconds."
+      "hardClue": "Freeze three lanterns within ten seconds.",
+      "clue": "Freeze three Dark Aether Lanterns with the Staff of Ice within ten seconds."
     },
     {
       "id": "lower-three-symbol-rocks-then-shoot-their-symbols-on-the-blocked-gateway",
       "order": 5,
-      "clue": "Lower three symbol rocks, then shoot their symbols on the blocked gateway."
+      "hardClue": "Lower three marked rocks, then shoot their symbols on the blocked gateway.",
+      "clue": "Lower three symbol rocks with the Staff of Ice, then shoot their symbols on the blocked Gateway."
     },
     {
       "id": "escort-the-purple-orb-to-upgrade-the-staff-of-ice",
       "order": 6,
-      "clue": "Escort the purple orb to upgrade the Staff of Ice."
+      "hardClue": "Escort the purple orb and fill it with souls to upgrade the weapon.",
+      "clue": "Escort the purple orb through the Dark Aether Nexus to upgrade the Staff of Ice."
     },
     {
       "id": "complete-the-vermin-and-parasite-statue-trials-and-return-their-energy",
       "order": 7,
-      "clue": "Complete the Vermin and Parasite statue trials and return their energy."
+      "hardClue": "Complete the crawling and flying creature statue trials and return their energy.",
+      "clue": "Complete the Vermin and Parasite statue trials and return their Amulet Energy to the Nexus."
     },
     {
       "id": "complete-the-doppelghast-and-amalgam-statue-trials-and-return-their-energy",
       "order": 8,
-      "clue": "Complete the Doppelghast and Amalgam statue trials and return their energy."
+      "hardClue": "Complete the special and elite creature statue trials and return their energy.",
+      "clue": "Complete the Doppelghast and Amalgam statue trials and return their Amulet Energy to the Nexus."
     },
     {
       "id": "cross-the-opened-bridge-and-defeat-the-sentinel-artifact",
       "order": 9,
+      "hardClue": "Cross the bridge and defeat the spinning laser boss.",
       "clue": "Cross the opened bridge and defeat the Sentinel Artifact."
     }
   ]

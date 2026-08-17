@@ -8,31 +8,37 @@
     {
       "id": "stand-on-the-four-elevator-symbols-at-the-same-time",
       "order": 1,
+      "hardClue": "Stand on the four golden symbols at the same time.",
       "clue": "Stand on the four elevator symbols at the same time."
     },
     {
       "id": "activate-the-four-floor-symbols-in-the-correct-order",
       "order": 2,
+      "hardClue": "Activate the four matching floor symbols in the correct order.",
       "clue": "Activate the four floor symbols in the correct order."
     },
     {
       "id": "shoot-the-two-orbs-from-the-dragons-mouths-with-a-sniper-rifle",
       "order": 3,
+      "hardClue": "Shoot the two orbs from the statues’ mouths with a sniper rifle.",
       "clue": "Shoot the two orbs from the dragons’ mouths with a sniper rifle."
     },
     {
       "id": "kill-zombies-in-the-buddha-room-then-fire-the-upgraded-ballistic-knife-inside",
       "order": 4,
-      "clue": "Kill zombies in the Buddha Room, then fire the upgraded Ballistic Knife inside."
+      "hardClue": "Kill fifteen zombies in the statue room, then fire an upgraded knife inside.",
+      "clue": "Kill fifteen zombies in the Buddha Room, then fire the upgraded Ballistic Knife inside."
     },
     {
       "id": "align-four-trample-steams-on-the-lion-symbols-and-bounce-both-orbs-across-the-rooftops",
       "order": 5,
-      "clue": "Align four Trample Steams on the lion symbols and bounce both orbs across the rooftops."
+      "hardClue": "Align four launch devices on the floor symbols, then bounce both orbs between them.",
+      "clue": "Align four Trample Steams on the lion symbols, then bounce both orbs between them."
     },
     {
       "id": "punch-the-tower-columns-with-galvaknuckles-in-the-order-shown-by-the-mahjong-tiles",
       "order": 6,
+      "hardClue": "Punch the tower columns in the order indicated by hidden tiles.",
       "clue": "Punch the tower columns with Galvaknuckles in the order shown by the Mahjong tiles."
     }
   ]

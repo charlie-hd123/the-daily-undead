@@ -8,51 +8,61 @@
     {
       "id": "collect-the-fuse-from-the-library-and-the-circuit-board-from-the-director-s-quarters",
       "order": 1,
-      "clue": "Collect the Fuse from the Library and the Circuit Board from the Director’s Quarters."
+      "hardClue": "Collect two repair parts from the Library and Director’s Quarters office.",
+      "clue": "Collect the Fuse from the Library and Circuit Board from the Director’s Quarters."
     },
     {
       "id": "repair-the-elevator-to-reach-s-a-m-and-pack-a-punch",
       "order": 2,
+      "hardClue": "Repair the elevator to access the lower facility and Pack-a-Punch.",
       "clue": "Repair the elevator to reach S.A.M. and Pack-a-Punch."
     },
     {
       "id": "kill-a-lab-technician-in-the-mainframe-chamber-and-collect-its-floppy-disk",
       "order": 3,
-      "clue": "Kill a Lab Technician in the Mainframe Chamber and collect its Floppy Disk."
+      "hardClue": "Kill the Lab Technician and collect the Floppy Disk.",
+      "clue": "Kill the Lab Technician in the Mainframe Chamber and collect the Floppy Disk."
     },
     {
       "id": "use-the-floppy-disk-to-obtain-the-project-janus-protocol-word",
       "order": 4,
+      "hardClue": "Use the Floppy Disk to obtain a four-letter protocol word.",
       "clue": "Use the Floppy Disk to obtain the Project Janus protocol word."
     },
     {
       "id": "decode-the-protocol-using-the-nursery-chalkboard-then-enter-the-code-in-the-service-tunnel",
       "order": 5,
+      "hardClue": "Decode the word using a chalkboard, then enter the resulting code underground.",
       "clue": "Decode the protocol using the Nursery chalkboard, then enter the code in the Service Tunnel."
     },
     {
       "id": "defeat-the-hvt-doppelghast-and-collect-its-severed-arm",
       "order": 6,
+      "hardClue": "Defeat the enemy behind the coded door and collect its severed arm.",
       "clue": "Defeat the HVT Doppelghast and collect its Severed Arm."
     },
     {
       "id": "use-the-severed-arm-on-the-biometric-scanner-to-obtain-the-ray-gun-mark-ii",
       "order": 7,
+      "hardClue": "Use the severed arm on a biometric scanner to retrieve the Wonder Weapon.",
       "clue": "Use the Severed Arm on the biometric scanner to obtain the Ray Gun Mark II."
     },
     {
       "id": "recover-three-canisters-and-craft-wraith-fire-rot-blight-and-preservation",
       "order": 8,
-      "clue": "Recover three canisters and craft Wraith Fire, Rot Blight and Preservation."
+      "hardClue": "Obtain three canisters and use them to create three Wonder Weapon variants.",
+      "clue": "Obtain three canisters and craft Wraith Fire, Rot Blight and Preservation."
     },
     {
       "id": "complete-their-three-liminal-rituals-to-charge-the-sentinel-artifact",
       "order": 9,
-      "clue": "Complete their three Liminal rituals to charge the Sentinel Artifact."
+      "hardClue": "Complete the three rituals to charge the artifact.",
+      "clue": "Complete the three Liminal rituals to charge the Sentinel Artifact."
     },
     {
       "id": "give-the-charged-sentinel-artifact-to-s-a-m-then-defeat-the-z-rex",
       "order": 10,
+      "hardClue": "Give the charged artifact to the AI, then defeat the giant creature.",
       "clue": "Give the charged Sentinel Artifact to S.A.M., then defeat the Z-Rex."
     }
   ]

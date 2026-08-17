@@ -8,46 +8,55 @@
     {
       "id": "activate-the-three-amp-generators-to-restore-power-and-raise-pack-a-punch",
       "order": 1,
+      "hardClue": "Activate three generators to restore power and raise the submerged machine.",
       "clue": "Activate the three AMP Generators to restore power and raise Pack-a-Punch."
     },
     {
       "id": "open-the-research-office-with-dead-wire-activate-the-laptops-and-solve-the-resonator-equations",
       "order": 2,
+      "hardClue": "Open the research room with electrical damage, activate three laptops and solve the equations.",
       "clue": "Open the Research Office with Dead Wire, activate the laptops and solve the Resonator equations."
     },
     {
       "id": "charge-the-multiphasic-resonator-at-the-island-orbs-and-build-the-dri-11-beamsmasher",
       "order": 3,
-      "clue": "Charge the Multiphasic Resonator at the island orbs and build the Wonder Weapon."
+      "hardClue": "Use the resonator at three colored island orbs, then build the Wonder Weapon.",
+      "clue": "Use the Multiphasic Resonator at the three island orbs, then build the DRI-11 Beamsmasher."
     },
     {
       "id": "use-the-beamsmasher-to-recover-the-hard-drive-then-release-and-defeat-nathan",
       "order": 4,
-      "clue": "Use the Beamsmasher to recover the Hard Drive, then release and defeat Nathan."
+      "hardClue": "Use the Wonder Weapon to recover a hard drive, then free and defeat the prisoner.",
+      "clue": "Use the Beamsmasher to recover the Hard Drive, find Nathan’s code, then release and defeat him."
     },
     {
       "id": "recover-the-project-janus-keycard-and-survive-the-shipwreck-lockdown-to-obtain-the-node-connectors",
       "order": 5,
-      "clue": "Recover the Project Janus Keycard and survive the shipwreck lockdown to obtain the Node Connectors."
+      "hardClue": "Use the recovered keycard to enter the wreck and survive the lockdown for two connectors.",
+      "clue": "Use the Project Janus Keycard to enter the Shipwreck for the Node Connectors."
     },
     {
       "id": "repair-the-network-lines-and-retrieve-the-hacking-device-from-peck",
       "order": 6,
-      "clue": "Repair the network lines and retrieve the Hacking Device from Peck."
+      "hardClue": "Use the two connectors to repair the network, then collect the hacking device.",
+      "clue": "Repair two network lines with the Node Connectors, then retrieve the Hacking Device from Peck."
     },
     {
       "id": "hack-the-three-satellite-buoys-within-two-minutes",
       "order": 7,
+      "hardClue": "Hack three floating transmitters within two minutes.",
       "clue": "Hack the three satellite buoys within two minutes."
     },
     {
       "id": "defuse-the-three-bombs-in-the-bio-lab-within-five-minutes",
       "order": 8,
+      "hardClue": "Defuse three explosives in the laboratory within five minutes.",
       "clue": "Defuse the three bombs in the Bio Lab within five minutes."
     },
     {
       "id": "enter-the-boss-arena-and-defeat-patient-13",
       "order": 9,
+      "hardClue": "Enter the arena and defeat the giant tentacled creature.",
       "clue": "Enter the boss arena and defeat Patient 13."
     }
   ]

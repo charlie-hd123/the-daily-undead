@@ -12,7 +12,7 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20260813-5";
+} from "./game-core.js?v=20260817-1";
 import {
   calculateReviveCost,
   canUseRequestedPreviewDate,
@@ -22,14 +22,14 @@ import {
   purchaseMissedDayRevive,
   resetReviveCount,
   shouldResetReviveCycle,
-} from "./progression.js?v=20260813-5";
+} from "./progression.js?v=20260817-1";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20260813-5";
+} from "./community-stats.js?v=20260817-1";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -286,6 +286,8 @@ function validateMap(map, source) {
       !step.id ||
       !Number.isInteger(step.order) ||
       step.order < 1 ||
+      typeof step.hardClue !== "string" ||
+      !step.hardClue ||
       typeof step.clue !== "string" ||
       !step.clue ||
       stepIds.has(step.id) ||
@@ -719,7 +721,7 @@ function renderHeading(title, description, kicker = "Today’s round") {
 function createClueCard(step, index) {
   const card = clueTemplate.content.firstElementChild.cloneNode(true);
   card.querySelector(".clue-number").textContent = `Clue ${index + 1}`;
-  card.querySelector(".clue-text").textContent = step.clue;
+  card.querySelector(".clue-text").textContent = step.hardClue;
   return card;
 }
 

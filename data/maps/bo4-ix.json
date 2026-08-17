@@ -8,46 +8,55 @@
     {
       "id": "ring-the-four-tower-gongs-defeat-their-champions-and-place-their-heads-on-the-spikes",
       "order": 1,
+      "hardClue": "Summon four champions, defeat them and place their heads on spikes.",
       "clue": "Ring the four tower gongs, defeat their champions and place their heads on the spikes."
     },
     {
       "id": "obtain-the-death-of-orion-and-combine-bone-meal-burnt-wood-and-dung-to-create-fertilizer",
       "order": 2,
+      "hardClue": "Grind a marked skull into powder, then combine it with burnt wood and dung to make fertilizer.",
       "clue": "Obtain the Death of Orion and combine bone meal, burnt wood and dung to create fertilizer."
     },
     {
       "id": "get-fire-bomb-kills-on-the-fertilizer-and-destroy-the-red-pods-throughout-danu-tower",
       "order": 3,
-      "clue": "Get Fire Bomb kills on the fertilizer and destroy the red pods throughout Danu Tower."
+      "hardClue": "Get a Fire Bomb kill over the fertilizer, then destroy three red pods throughout the tower.",
+      "clue": "Get a Fire Bomb kill over the fertilizer, then destroy the three red pods throughout Danu Tower."
     },
     {
       "id": "ignite-the-four-bull-symbols-with-the-brazen-bull-and-defeat-the-summoned-champions",
       "order": 4,
-      "clue": "Ignite the four bull symbols with the Brazen Bull and defeat the summoned champions."
+      "hardClue": "Ignite four hidden symbols with the shield, then defeat the summoned champions.",
+      "clue": "Ignite the four bull symbols with the Brazen Bull, then defeat the summoned champions."
     },
     {
       "id": "read-the-ra-obelisk-and-kill-the-special-enemies-in-the-displayed-order",
       "order": 5,
+      "hardClue": "Read the obelisk and kill the special enemies in the displayed order.",
       "clue": "Read the Ra Obelisk and kill the special enemies in the displayed order."
     },
     {
       "id": "raise-the-four-metal-rods-charge-them-with-kill-o-watt-and-survive-the-arena-challenge",
       "order": 6,
-      "clue": "Raise the four metal rods, charge them with Kill-O-Watt and survive the Arena challenge."
+      "hardClue": "Raise four metal rods, charge them with electrical kills and survive the challenge.",
+      "clue": "Raise the four metal rods, charge them using Kill-O-Watt and survive the Arena challenge."
     },
     {
       "id": "shoot-the-three-symbol-sets-with-serket-s-kiss-and-survive-the-lockdown-in-the-pit",
       "order": 7,
+      "hardClue": "Hit three symbol sets with one shot each, then survive the three-phase lockdown.",
       "clue": "Shoot the three symbol sets with Serket’s Kiss and survive the lockdown in The Pit."
     },
     {
       "id": "enter-the-arena-portal-and-defeat-the-waves-of-gladiators-and-tigers",
       "order": 8,
+      "hardClue": "Enter the portal and defeat waves of warriors and beasts.",
       "clue": "Enter the Arena portal and defeat the waves of Gladiators and Tigers."
     },
     {
       "id": "defeat-fury-and-wrath-the-two-war-elephants",
       "order": 9,
+      "hardClue": "Defeat the two enormous armored beasts.",
       "clue": "Defeat Fury and Wrath, the two war elephants."
     }
   ]

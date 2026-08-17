@@ -2,7 +2,7 @@
 
 **Your daily Treyarch Zombies challenge**
 
-Players reveal one to three clues, select a game and map without typing, then optionally put the three selected main-quest steps into chronological order for Double Points.
+Players reveal one to three hard clues, select a game and map without typing, then optionally put the three selected main-quest steps into chronological order using their full clue wording for Double Points.
 
 The bonus ordering round uses tap-to-rank cards: tapping steps assigns 1, 2, and 3 in sequence, while tapping a selected card removes it and renumbers the remainder. Submission allows one attempt, and an incorrect order cannot be retried.
 
@@ -62,22 +62,37 @@ There is one JSON file per map in `data/maps/`. Each map has this shape:
   "title": "Example Map",
   "availableFrom": "2026-08-01",
   "steps": [
-    { "id": "turn-on-power", "order": 1, "clue": "Turn on the power." },
-    { "id": "collect-parts", "order": 2, "clue": "Collect the three device parts." },
-    { "id": "activate-device", "order": 3, "clue": "Activate the completed device." }
+    {
+      "id": "turn-on-power",
+      "order": 1,
+      "hardClue": "Restore the facility's electrical systems.",
+      "clue": "Turn on the power."
+    },
+    {
+      "id": "collect-parts",
+      "order": 2,
+      "hardClue": "Recover three components for a device.",
+      "clue": "Collect the three device parts."
+    },
+    {
+      "id": "activate-device",
+      "order": 3,
+      "hardClue": "Use the completed mechanism.",
+      "clue": "Activate the completed device."
+    }
   ]
 }
 ```
 
 For each map:
 
-1. Create or replace its JSON file. Use unique map and step IDs, at least three steps, and unique chronological `order` numbers. Four or more steps are recommended so repeat appearances can use different clues.
+1. Create or replace its JSON file. Use unique map and step IDs, at least three steps, and unique chronological `order` numbers. Every step needs a hard `hardClue` for the initial guess and a full `clue` for the ordering bonus. Four or more steps are recommended so repeat appearances can use different clues.
 2. Set `gameId` to one of the IDs in `data/maps/index.json`.
 3. Add the filename to the `maps` array in `data/maps/index.json`.
 
 Every answer map must include an `availableFrom` field in `YYYY-MM-DD` format. **When adding a new map, set this to a future UTC date, not today.** This prevents a deployment from changing the live puzzle for players who have already started or completed it.
 
-The game deterministically shuffles eligible maps into daily cycles so every map appears before that cycle repeats. Each return appearance advances to a different shuffled three-step combination, then presents those clues in a non-chronological order. Replay variety remains deterministic so a refresh does not unexpectedly replace an in-progress puzzle. Adding or editing content that is already eligible can change generated puzzles, so deploy new maps before their future `availableFrom` date and avoid editing an eligible answer map during a live UTC day.
+The game deterministically shuffles eligible maps into daily cycles so every map appears before that cycle repeats. Each return appearance advances to a different shuffled three-step combination, then presents those clues in a non-chronological order. Replay variety remains deterministic so a refresh does not unexpectedly replace an in-progress puzzle. Changing `hardClue` or `clue` wording is safe because puzzle identity uses map and step IDs; changing IDs, step order, step count, map eligibility, or map-array order can alter generated puzzles. Deploy new maps before their future `availableFrom` date and avoid those identity-affecting edits during a live UTC day.
 
 Maps in `selectionOnlyMaps` inside `data/maps/index.json` appear in the answer grid without requiring a map JSON and never enter the daily rotation. `mapOrder` controls the release order shown within each game. `answerEquivalents` allows The Giant to count as a correct selection when Der Riese is the generated answer; both are then displayed as **Der Riese / The Giant** on the result screens.
 

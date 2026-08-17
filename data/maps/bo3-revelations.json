@@ -8,52 +8,62 @@
     {
       "id": "shoot-the-four-character-tombstones-in-the-required-order",
       "order": 1,
+      "hardClue": "Shoot the four character tombstones in the required order.",
       "clue": "Shoot the four character tombstones in the required order."
     },
     {
       "id": "defend-the-keeper-protector-during-its-ritual-then-collect-and-play-the-first-audio-reel",
       "order": 2,
+      "hardClue": "Defend the summoned ally during its ritual.",
       "clue": "Defend the Keeper Protector during its ritual, then collect and play the first audio reel."
     },
     {
       "id": "throw-li-l-arnies-into-all-nine-apothicon-holes-defeat-the-margwas-then-play-the-second-audio-reel",
       "order": 3,
-      "clue": "Throw the tactical Wonder Weapon into all holes, defeat the Margwas, then play the second audio reel."
+      "hardClue": "Throw the tactical Wonder Weapon into all nine holes.",
+      "clue": "Throw Li’l Arnies into all nine Apothicon holes, defeat the Margwas, then play the second audio reel."
     },
     {
       "id": "collect-the-six-scattered-bones-reconstruct-s-o-p-h-i-a-s-body-then-play-the-final-audio-reel",
       "order": 4,
-      "clue": "Collect the six scattered bones, reconstruct S.O.P.H.I.A.’s body, then play the final audio reel."
+      "hardClue": "Collect six scattered bones and reconstruct the body.",
+      "clue": "Collect six scattered bones, reconstruct S.O.P.H.I.A.’s body, then play the final audio reel."
     },
     {
       "id": "direct-all-four-corruption-engine-lasers-then-escort-s-o-p-h-i-a-to-kino-der-toten",
       "order": 5,
-      "clue": "Direct all four Corruption Engine lasers, then escort S.O.P.H.I.A. to the theater."
+      "hardClue": "Aim four turrets at the floating rocks, then escort the machine to the theater.",
+      "clue": "Aim the four Corruption Engine turrets at the floating rocks, then escort S.O.P.H.I.A. to Kino der Toten."
     },
     {
       "id": "teleport-to-samantha-s-bedroom-retrieve-the-kronorium-then-place-it-on-the-kino-stage",
       "order": 6,
-      "clue": "Teleport to Samantha’s bedroom, retrieve the Kronorium, then place it on the stage."
+      "hardClue": "Use the powered teleporter to enter a bedroom and retrieve the book.",
+      "clue": "Teleport to Samantha’s bedroom, retrieve the Kronorium, then place it on the Kino stage."
     },
     {
       "id": "hatch-the-four-apothicon-eggs-into-gateworms-and-retrieve-the-four-runes-of-creation",
       "order": 7,
+      "hardClue": "Hatch four eggs into creatures, then use them to locate four hidden runes.",
       "clue": "Hatch the four Apothicon Eggs into Gateworms and retrieve the four Runes of Creation."
     },
     {
       "id": "enter-the-kronorium-symbols-survive-the-four-enemy-waves-and-recover-the-summoning-key",
       "order": 8,
-      "clue": "Enter the Kronorium symbols, survive the four enemy waves and recover the Summoning Key."
+      "hardClue": "Enter four symbols in the correct order, survive four enemy waves, then recover the artifact.",
+      "clue": "Enter the Kronorium symbols, survive the four Margwa waves, then recover the Summoning Key."
     },
     {
       "id": "strike-the-seven-marked-objects-around-the-map-with-the-summoning-key",
       "order": 9,
-      "clue": "Strike the seven marked objects around the map with the Summoning Key."
+      "hardClue": "Strike seven relics around the map with the spherical artifact.",
+      "clue": "Strike the seven map relics with the Summoning Key."
     },
     {
       "id": "throw-the-summoning-key-at-s-o-p-h-i-a-then-seal-the-shadowman-inside-the-apothicon",
       "order": 10,
-      "clue": "Throw the Summoning Key at S.O.P.H.I.A., then seal the Shadowman inside the Apothicon."
+      "hardClue": "Charge the artifact, throw it, then force the boss into the creature’s mouth.",
+      "clue": "Charge the Summoning Key, throw it at S.O.P.H.I.A., then force the Shadowman into the Apothicon."
     }
   ]
 }

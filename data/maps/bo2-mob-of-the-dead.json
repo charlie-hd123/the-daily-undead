@@ -8,31 +8,37 @@
     {
       "id": "build-the-plane-and-fly-to-the-golden-gate-bridge",
       "order": 1,
+      "hardClue": "Assemble five parts on the roof, then use the completed vehicle to reach another area.",
       "clue": "Build the plane and fly to the Golden Gate Bridge."
     },
     {
       "id": "refuel-the-plane-and-fly-to-the-bridge-twice-more",
       "order": 2,
+      "hardClue": "Collect five fuel cans and refuel the vehicle to make the journey twice more.",
       "clue": "Refuel the plane and fly to the bridge twice more."
     },
     {
       "id": "in-afterlife-enter-the-four-prisoner-numbers-on-the-spiral-staircase-keypad",
       "order": 3,
+      "hardClue": "Enter four three-digit codes on the keypad at the bottom of the spiral staircase.",
       "clue": "In Afterlife, enter the four prisoner numbers on the spiral-staircase keypad."
     },
     {
       "id": "follow-the-five-headphone-recordings-to-the-roof",
       "order": 4,
+      "hardClue": "Follow the five headphone recordings to the roof.",
       "clue": "Follow the five headphone recordings to the roof."
     },
     {
       "id": "have-every-player-enter-afterlife-and-board-the-plane-from-the-roof",
       "order": 5,
+      "hardClue": "Have every player enter their spectral form and board the vehicle from the roof.",
       "clue": "Have every player enter Afterlife and board the plane from the roof."
     },
     {
       "id": "have-weasel-kill-the-other-mobsters-on-the-bridge-to-break-the-cycle",
       "order": 6,
+      "hardClue": "Have one player defeat the other three on the bridge.",
       "clue": "Have Weasel kill the other mobsters on the bridge to break the cycle."
     }
   ]

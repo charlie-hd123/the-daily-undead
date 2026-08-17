@@ -8,46 +8,55 @@
     {
       "id": "destroy-the-aetherium-crystals-to-unlock-pack-a-punch-and-activate-the-particle-accelerator",
       "order": 1,
-      "clue": "Destroy the Aetherium Crystals to unlock Pack-a-Punch and activate the Particle Accelerator."
+      "hardClue": "Activate the Particle Accelerator and destroy the crystal deposits.",
+      "clue": "Activate the Particle Accelerator and destroy the Aetherium deposits to unlock Pack-a-Punch."
     },
     {
       "id": "complete-the-syringe-chain-and-open-the-t2-teleportation-lab",
       "order": 2,
-      "clue": "Complete the Syringe chain and open the T2 Teleportation Lab."
+      "hardClue": "Complete the syringe chain and open the hidden lab.",
+      "clue": "Complete the Syringe chain and use the Fowler Mutant Injection to open the T2 Teleportation Lab."
     },
     {
       "id": "activate-franken-klaus-complete-his-s-a-m-trial-and-escort-him-into-the-lab",
       "order": 3,
-      "clue": "Activate Franken-Klaus, complete his S.A.M. Trial and escort him into the lab."
+      "hardClue": "Assemble and activate the robot, complete a trial and escort it into the lab.",
+      "clue": "Activate Franken-Klaus, complete his S.A.M. Trial and escort him into the Teleportation Lab."
     },
     {
       "id": "order-the-four-project-janus-files-and-enter-their-code-into-franken-klaus-s-terminal",
       "order": 4,
-      "clue": "Order the four Project Janus files and enter their code into Franken-Klaus’s terminal."
+      "hardClue": "Order four files by date and enter their numbers into the terminal.",
+      "clue": "Order the four Project Janus files by date and enter their code into Franken-Klaus’s terminal."
     },
     {
       "id": "complete-the-gorgofex-project-janus-brain-and-fungal-head-objectives",
       "order": 5,
-      "clue": "Complete the Gorgofex, Project Janus brain and Fungal Head objectives."
+      "hardClue": "Obtain the Wonder Weapon, deliver the brain and prepare the portal with the severed head.",
+      "clue": "Obtain the Gorgofex, deliver the Project Janus brain and prepare the portal with the Fungal Head."
     },
     {
       "id": "capture-four-floating-objects-with-the-vacuum-seal-devices",
       "order": 6,
+      "hardClue": "Capture four floating objects with the Vacuum-Seal Devices.",
       "clue": "Capture four floating objects with the Vacuum-Seal Devices."
     },
     {
       "id": "complete-the-portal-lockdown-enter-the-portal-and-interact-with-the-sentinel-artifact",
       "order": 7,
-      "clue": "Complete the portal lockdown, enter the portal and interact with the Sentinel Artifact."
+      "hardClue": "Complete the portal lockdown, enter the portal and interact with the artifact.",
+      "clue": "Complete the portal lockdown, enter Tower 3 and interact with the Sentinel Artifact."
     },
     {
       "id": "charge-the-l-t-g-devices-and-destroy-the-aether-crystals-to-reach-the-rooftop",
       "order": 8,
-      "clue": "Charge the L.T.G. Devices and destroy the Aether crystals to reach the rooftop."
+      "hardClue": "Charge three canisters, then destroy the crystals to reach the rooftop.",
+      "clue": "Charge the three L.T.G. Canisters and destroy the Aether crystals to reach the rooftop."
     },
     {
       "id": "defeat-s-a-m-or-uber-richtofen-depending-on-your-chosen-side",
       "order": 9,
+      "hardClue": "Defeat either boss, depending on your chosen side.",
       "clue": "Defeat S.A.M. or Uber Richtofen, depending on your chosen side."
     }
   ]

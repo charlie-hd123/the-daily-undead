@@ -8,42 +8,50 @@
     {
       "id": "build-the-gallows-beside-the-courthouse",
       "order": 1,
+      "hardClue": "Assemble the four parts beside the courthouse.",
       "clue": "Build the gallows beside the courthouse."
     },
     {
       "id": "shatter-all-four-red-orbs-with-a-turbine-powered-subsurface-resonator",
       "order": 2,
+      "hardClue": "Destroy all four red orbs using a powered buildable device.",
       "clue": "Shatter all four red orbs with a Turbine-powered Subsurface Resonator."
     },
     {
       "id": "knock-down-the-floating-lantern-with-a-grenade",
       "order": 3,
+      "hardClue": "Knock down the floating lantern with a grenade.",
       "clue": "Knock down the floating lantern with a grenade."
     },
     {
       "id": "charge-the-lantern-with-zombies-killed-by-arthur-then-place-it-on-the-rooftop-symbol",
       "order": 4,
-      "clue": "Charge the lantern then place it on the rooftop symbol."
+      "hardClue": "Charge the lantern, then place it on the rooftop symbol.",
+      "clue": "Charge the lantern with zombies killed by Arthur, then place it on the rooftop symbol."
     },
     {
       "id": "decode-the-message-and-strike-the-three-named-tunnel-signs",
       "order": 5,
-      "clue": "Decode the message and strike the three named tunnel signs."
+      "hardClue": "Decode the message and strike the three correct signs in the tunnels.",
+      "clue": "Decode the lantern message and strike the three named tunnel signs."
     },
     {
       "id": "guide-the-wisp-to-the-gallows-trigger-the-time-bomb-then-guide-it-there-again",
       "order": 6,
+      "hardClue": "Guide the wisp to the gallows, travel back in time, then guide it there again.",
       "clue": "Guide the wisp to the gallows, trigger the Time Bomb, then guide it there again."
     },
     {
       "id": "ring-the-nine-bells-as-directed-by-the-mansion-switchboard",
       "order": 7,
+      "hardClue": "Ring the nine bells as directed by the switchboard.",
       "clue": "Ring the nine bells as directed by the mansion switchboard."
     },
     {
       "id": "make-a-wish-and-complete-the-sharpshooter-targets",
       "order": 8,
-      "clue": "Make a wish and complete the sharpshooter targets."
+      "hardClue": "Make a wish, then shoot all the targets that appear.",
+      "clue": "Make a wish at the fountain, then complete the Sharpshooter challenge."
     }
   ]
 }

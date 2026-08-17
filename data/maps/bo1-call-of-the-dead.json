@@ -8,27 +8,32 @@
     {
       "id": "find-the-missing-fuse-and-insert-it-beside-the-locked-door",
       "order": 1,
+      "hardClue": "Find the missing fuse and insert it beside the locked door.",
       "clue": "Find the missing fuse and insert it beside the locked door."
     },
     {
       "id": "destroy-all-four-red-generators",
       "order": 2,
-      "clue": "Destroy all four red generators."
+      "hardClue": "Destroy the four generators around the map.",
+      "clue": "Destroy all four red generators around the map using explosives."
     },
     {
       "id": "shoot-a-zombie-with-the-v-r11-inside-the-lighthouse-beam",
       "order": 3,
-      "clue": "Transform a zombie inside the lighthouse beam with the Wonder Weapon."
+      "hardClue": "Transform a zombie inside the beam of light with the Wonder Weapon.",
+      "clue": "Transform a zombie inside the lighthouse beam with the V-R11."
     },
     {
       "id": "collect-the-golden-rod-and-insert-it-into-the-tube-beside-the-door",
       "order": 4,
+      "hardClue": "Collect the rod and insert it into the tube beside the door.",
       "clue": "Collect the Golden Rod and insert it into the tube beside the door."
     },
     {
       "id": "knife-the-sparking-fuse-box-to-receive-the-wunderwaffe-dg-2",
       "order": 5,
-      "clue": "Knife the sparking fuse box to receive the Wunderwaffe DG-2."
+      "hardClue": "Knife the sparking fuse box to receive a temporary Wonder Weapon.",
+      "clue": "Knife the sparking fuse box to receive a temporary Wunderwaffe DG-2."
     }
   ]
 }

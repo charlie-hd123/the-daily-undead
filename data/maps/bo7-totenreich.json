@@ -8,52 +8,62 @@
     {
       "id": "restore-power-sync-the-glocke-drop-controller-and-call-in-pack-a-punch",
       "order": 1,
+      "hardClue": "Restore power, sync the drop controller and call in the upgrade machine.",
       "clue": "Restore power, sync the Glocke Drop Controller and call in Pack-a-Punch."
     },
     {
       "id": "collect-the-chain-links-chilly-chunks-and-lantern-then-restore-astrid-in-the-burial-grounds",
       "order": 2,
-      "clue": "Collect the Chain Links, Chilly Chunks and Lantern, then restore Astrid in the Burial Grounds."
+      "hardClue": "Collect three items, open the hidden room and solve the constellation puzzle.",
+      "clue": "Collect the Chain Links, Chilly Chunks and Lantern, then solve the Burial Grounds constellations."
     },
     {
       "id": "follow-astrid-to-the-lighthouse-and-obtain-the-jotunn-star",
       "order": 3,
+      "hardClue": "Follow the spirit to the top of the tower and obtain the Wonder Weapon.",
       "clue": "Follow Astrid to the lighthouse and obtain the Jotunn Star."
     },
     {
       "id": "use-the-crowbar-and-flak-round-to-recover-the-transmitter-and-install-it-in-tyr-s-head",
       "order": 4,
-      "clue": "Use the Crowbar and Flak Round to recover the Transmitter and install it in Tyr’s Head."
+      "hardClue": "Use a crowbar and a large gun to recover a transmitter.",
+      "clue": "Use the Crowbar and Flak Gun Round to recover the Transmitter and install it in Tyr’s Head."
     },
     {
       "id": "decode-tyr-s-blinking-lights-to-obtain-the-wunderbarrage-controller",
       "order": 5,
-      "clue": "Decode Tyr’s blinking lights to obtain the Wunderbarrage Controller."
+      "hardClue": "Decode two blinking lights and calibrate the radio equipment to obtain the controller.",
+      "clue": "Decode Tyr’s blinking lights and calibrate the radio tower to obtain the Wunderbarrage Controller."
     },
     {
       "id": "collect-the-three-uranium-canisters-and-assemble-the-atomkraft-core",
       "order": 6,
+      "hardClue": "Collect three radioactive cylinders and solve the machine puzzle to assemble the core.",
       "clue": "Collect the three Uranium Canisters and assemble the Atomkraft Core."
     },
     {
       "id": "charge-the-atomkraft-core-and-deliver-it-to-storm-bridge-to-obtain-the-dravakar-shard",
       "order": 7,
+      "hardClue": "Charge the core during a lockdown, then deliver it to the bridge.",
       "clue": "Charge the Atomkraft Core and deliver it to Storm Bridge to obtain the Dravakar Shard."
     },
     {
       "id": "cook-the-dravakar-shard-with-the-jotunn-star-and-a-disciple-injection-to-obtain-the-sunstone",
       "order": 8,
-      "clue": "Cook the Dravakar Shard with the Jotunn Star and a Disciple Injection to obtain the Sunstone."
+      "hardClue": "Ignite the shard, feed enemies into the fire and survive the lockdown to obtain a stone.",
+      "clue": "Ignite the Dravakar Shard with the Jotunn Star, use a Disciple Injection and obtain the Sunstone."
     },
     {
       "id": "use-the-sunstone-to-reveal-and-ignite-the-three-rune-marked-bonfires-in-order",
       "order": 9,
+      "hardClue": "Use the stone to reveal three runes, then ignite their matching fires in order.",
       "clue": "Use the Sunstone to reveal and ignite the three rune-marked bonfires in order."
     },
     {
       "id": "enter-tyr-s-head-and-defeat-dravakar",
       "order": 10,
-      "clue": "Enter Tyr’s Head and defeat Dravakar."
+      "hardClue": "Destroy the rotating heads, dodge the patterned rock barrages and finish the boss.",
+      "clue": "Destroy the rotating heads, dodge the patterned rock barrages and defeat Dravakar."
     }
   ]
 }

@@ -8,37 +8,44 @@
     {
       "id": "defeat-the-doppelghast-and-use-its-blood-aetherium-crystal-to-unlock-pack-a-punch",
       "order": 1,
+      "hardClue": "Release the creature from the locked container and use its crystal to unlock Pack-a-Punch.",
       "clue": "Defeat the Doppelghast and use its Blood Aetherium Crystal to unlock Pack-a-Punch."
     },
     {
       "id": "speak-with-krafft-and-claim-the-four-bastard-swords-using-stamps",
       "order": 2,
-      "clue": "Speak with Krafft and claim the four Bastard Swords using Stamps."
+      "hardClue": "Speak with the man behind the dungeon door, then use four stamps to claim the knights’ weapons.",
+      "clue": "Speak with Krafft, then use Stamps to claim the four Bastard Swords."
     },
     {
       "id": "upgrade-the-four-swords-obtain-their-incantations-and-complete-the-torn-page-puzzle",
       "order": 3,
-      "clue": "Upgrade the four swords, obtain their incantations, and complete the torn-page puzzle."
+      "hardClue": "Upgrade the four elemental weapons, obtain their spells and restore the four torn pages.",
+      "clue": "Upgrade the four swords, obtain their incantations and restore the four torn pages."
     },
     {
       "id": "honour-the-knight-statues-with-their-matching-swords-and-incantations-in-the-displayed-order",
       "order": 4,
-      "clue": "Honour the knight statues with their matching swords and incantations in the displayed order."
+      "hardClue": "Use the matching weapons and spells on the four knights in the revealed order.",
+      "clue": "Honor the knight statues with their matching swords and incantations in the revealed order."
     },
     {
       "id": "complete-the-four-elemental-mystic-orb-challenges",
       "order": 5,
+      "hardClue": "Complete four elemental challenges to fully charge the orb.",
       "clue": "Complete the four elemental Mystic Orb challenges."
     },
     {
       "id": "place-the-charged-mystic-orb-in-the-animal-symbol-wall-and-recover-the-guardian-key",
       "order": 6,
+      "hardClue": "Place the charged orb in the animal-symbol wall and recover the key.",
       "clue": "Place the charged Mystic Orb in the animal-symbol wall and recover the Guardian Key."
     },
     {
       "id": "place-the-key-beneath-the-town-square-statue-and-defeat-the-guardian",
       "order": 7,
-      "clue": "Place the key beneath the Town Square statue and defeat the Guardian."
+      "hardClue": "Place the key beneath the Town Square statue and defeat the stone giant.",
+      "clue": "Place the Guardian Key beneath the Town Square statue and defeat the Guardian."
     }
   ]
 }

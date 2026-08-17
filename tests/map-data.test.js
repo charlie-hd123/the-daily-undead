@@ -126,6 +126,7 @@ test("every manifest map is valid and belongs to a selectable game", async () =>
       `${filename} has duplicate step ids`,
     );
     for (const step of map.steps) {
+      assert.equal(typeof step.hardClue === "string" && step.hardClue.trim().length > 0, true);
       assert.equal(typeof step.clue === "string" && step.clue.trim().length > 0, true);
     }
 

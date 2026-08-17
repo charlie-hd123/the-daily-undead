@@ -8,46 +8,55 @@
     {
       "id": "press-the-temple-button-and-match-all-twelve-pairs-of-floor-symbols",
       "order": 1,
-      "clue": "Press the temple button and match all twelve pairs of floor symbols."
+      "hardClue": "Press the skull button, then match the pairs of symbols on the floor.",
+      "clue": "Press the skull button, then match all twelve pairs of floor symbols."
     },
     {
       "id": "have-three-players-stand-on-the-grate-while-the-fourth-hits-the-water-slide-switch",
       "order": 2,
-      "clue": "Have three players stand on the grate while the fourth hits the water-slide switch."
+      "hardClue": "Have three players stand on the grate while the fourth activates a hidden switch.",
+      "clue": "Have three players stand on the grate while the fourth activates the hidden switch on the water slide."
     },
     {
       "id": "free-the-crystal-above-the-slide-shrink-it-with-the-31-79-jgb215-then-launch-it-from-the-geyser",
       "order": 3,
-      "clue": "Free the crystal above the slide, shrink it with the Wonder Weapon, then launch it from the geyser."
+      "hardClue": "Free the crystal, shrink it with the Wonder Weapon, then launch it into the air.",
+      "clue": "Free the crystal above the slide, shrink it with the 31-79 JGb215, then launch it from the geyser."
     },
     {
       "id": "turn-the-valve-and-lead-a-napalm-zombie-past-all-four-gas-leaks",
       "order": 4,
+      "hardClue": "Turn the valve and lead the special zombie past all four gas leaks.",
       "clue": "Turn the valve and lead a Napalm Zombie past all four gas leaks."
     },
     {
       "id": "plug-the-tunnel-holes-with-explosive-mines-then-press-the-waterfall-brick",
       "order": 5,
+      "hardClue": "Plug the tunnel holes with explosive mines, then press the hidden brick.",
       "clue": "Plug the tunnel holes with explosive mines, then press the waterfall brick."
     },
     {
       "id": "knife-all-twelve-wall-panels-then-destroy-the-wooden-trap-near-the-minecart",
       "order": 6,
-      "clue": "Knife all twelve wall panels, then destroy the wooden trap near the minecart."
+      "hardClue": "Knife all twelve wall panels, then destroy the wooden structure.",
+      "clue": "Knife all twelve wall panels, then destroy the tent near the minecart."
     },
     {
       "id": "rotate-the-four-mud-room-dials-to-the-correct-symbols",
       "order": 7,
+      "hardClue": "Rotate the four stone dials to the correct symbols.",
       "clue": "Rotate the four mud-room dials to the correct symbols."
     },
     {
       "id": "knife-the-four-correct-gongs-shoot-the-crystal-then-catch-the-falling-dynamite",
       "order": 8,
+      "hardClue": "Knife the gongs, shoot the crystal, then catch the falling explosives.",
       "clue": "Knife the four correct gongs, shoot the crystal, then catch the falling dynamite."
     },
     {
       "id": "shrink-the-meteorite-use-the-dynamite-behind-pack-a-punch-then-collect-the-focusing-stone",
       "order": 9,
+      "hardClue": "Shrink the meteorite, use the dynamite behind the temple wall, then collect the artifact.",
       "clue": "Shrink the meteorite, use the dynamite behind Pack-a-Punch, then collect the Focusing Stone."
     }
   ]

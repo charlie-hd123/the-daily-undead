@@ -8,57 +8,68 @@
     {
       "id": "repair-the-ziplines-and-complete-two-of-the-hermit-s-challenge-totems",
       "order": 1,
-      "clue": "Repair the ziplines and complete two of the Hermit’s challenge totems."
+      "hardClue": "Repair the ziplines and complete the totem challenges.",
+      "clue": "Repair the ziplines and complete all challenges from two of the Hermit’s Challenge Totems."
     },
     {
       "id": "place-the-hermit-s-dials-in-artifact-storage-and-collect-the-three-apothicon-offerings",
       "order": 2,
-      "clue": "Place the Hermit’s dials in Artifact Storage and collect the three Apothicon offerings."
+      "hardClue": "Place the four dials in storage, then collect three offerings from the riddles.",
+      "clue": "Place the Hermit’s four dials in Artifact Storage, then collect the three Apothicon offerings."
     },
     {
       "id": "follow-the-apothicon-s-clue-and-blast-open-the-safe-containing-the-seal-of-duality",
       "order": 3,
-      "clue": "Follow the Apothicon’s clue and blast open the safe containing the Seal of Duality."
+      "hardClue": "Follow the final riddle and use explosives to open the hidden safe.",
+      "clue": "Follow the Apothicon’s final riddle and blast open the safe containing the Seal of Duality."
     },
     {
       "id": "return-the-three-blood-orbs-and-purify-the-seal-with-samantha-s-music-box",
       "order": 4,
-      "clue": "Return the three blood orbs and purify the Seal with Samantha’s Music Box."
+      "hardClue": "Freeze and return three scattered orbs, then purify the Seal at the campfire.",
+      "clue": "Freeze and return the three orange orbs, then purify the Seal with Samantha’s Music Box."
     },
     {
       "id": "charge-the-fire-and-ice-soapstones-and-use-them-to-obtain-the-fuse",
       "order": 5,
-      "clue": "Charge the Fire and Ice Soapstones and use them to obtain the fuse."
+      "hardClue": "Heat and cool the two stones, then use them to obtain a fuse.",
+      "clue": "Heat and cool the two Soapstones, then use them to obtain the fuse."
     },
     {
       "id": "power-the-lighthouse-station-door-and-recover-the-elemental-shard",
       "order": 6,
+      "hardClue": "Power the sealed door, then recover the shard inside.",
       "clue": "Power the Lighthouse Station door and recover the Elemental Shard."
     },
     {
       "id": "use-the-elemental-shard-and-repeat-the-blood-orb-purification-ritual",
       "order": 7,
-      "clue": "Use the Elemental Shard and repeat the blood-orb purification ritual."
+      "hardClue": "Return the shard, repeat the three-orb ritual, then purify the Seal again.",
+      "clue": "Return the Elemental Shard, repeat the orange-orb ritual, then purify the Seal again."
     },
     {
       "id": "give-the-seal-to-the-hermit-and-survive-the-lighthouse-lockdown",
       "order": 8,
-      "clue": "Give the Seal to the Hermit and survive the Lighthouse lockdown."
+      "hardClue": "Give the Seal to the man above and survive the lockdown.",
+      "clue": "Give the Seal of Duality to the Hermit and survive the Lighthouse lockdown."
     },
     {
       "id": "charge-the-seal-at-the-four-pack-a-punch-machines-and-purify-it-again",
       "order": 9,
-      "clue": "Charge the Seal at the four Pack-a-Punch machines and purify it again."
+      "hardClue": "Charge the Seal at all four Pack-a-Punch locations, then purify it again.",
+      "clue": "Charge the Seal of Duality at the four Pack-a-Punch machines, then purify it again."
     },
     {
       "id": "charge-the-agarthan-device-at-golden-pack-a-punch-and-escort-it-through-the-collapsing-map",
       "order": 10,
-      "clue": "Charge the Agarthan Device at Golden Pack-a-Punch and escort it through the collapsing map."
+      "hardClue": "Charge the Seal at the golden machine, then stay inside its shield as it crosses the map.",
+      "clue": "Charge the Seal at Golden Pack-a-Punch, then follow its shield through the collapsing map."
     },
     {
       "id": "return-the-agarthan-device-to-the-hermit-then-retrieve-it-at-the-forecastle",
       "order": 11,
-      "clue": "Return the Agarthan Device to the Hermit, then retrieve it at the Forecastle."
+      "hardClue": "Return the Seal, then retrieve the completed device from the ship.",
+      "clue": "Return the Seal of Duality to the Hermit, then retrieve the Agarthan Device at the Forecastle."
     }
   ]
 }

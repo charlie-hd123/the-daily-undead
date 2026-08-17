@@ -8,31 +8,37 @@
     {
       "id": "complete-the-four-character-rituals-and-collect-their-gateworms",
       "order": 1,
+      "hardClue": "Complete the four rituals and collect the creatures they summon.",
       "clue": "Complete the four character rituals and collect their Gateworms."
     },
     {
       "id": "obtain-and-upgrade-the-apothicon-swords",
       "order": 2,
+      "hardClue": "Obtain the melee weapons using the eggs and symbols.",
       "clue": "Obtain and upgrade the Apothicon Swords."
     },
     {
       "id": "defend-the-flag-at-two-locations-in-each-district-then-return-it-to-all-four-ritual-altars",
       "order": 3,
+      "hardClue": "Defend the flag at two locations in each district, then return it to the matching altar.",
       "clue": "Defend the flag at two locations in each district, then return it to all four ritual altars."
     },
     {
       "id": "give-the-keepers-the-upgraded-swords-to-break-the-shadowman-s-shield",
       "order": 4,
+      "hardClue": "Place the four upgraded melee weapons in the pedestals to break the enemy’s shield.",
       "clue": "Give the Keepers the upgraded swords to break the Shadowman’s shield."
     },
     {
       "id": "force-the-shadowman-over-the-altar-and-trap-him-with-the-summoning-key",
       "order": 5,
+      "hardClue": "Shoot the enemy until he reaches the altar, then trap him inside the ritual object.",
       "clue": "Force the Shadowman over the altar and trap him with the Summoning Key."
     },
     {
       "id": "electrify-the-three-tram-rails-hit-the-gateworm-with-the-tram-then-shock-the-three-keepers",
       "order": 6,
+      "hardClue": "Electrify the three rail lines, hit the creature with the tram, then shock the three beings.",
       "clue": "Electrify the three tram rails, hit the Gateworm with the tram, then shock the three Keepers."
     }
   ]

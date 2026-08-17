@@ -8,51 +8,61 @@
     {
       "id": "repair-the-harmonic-oculus-and-defend-it-to-unlock-pack-a-punch",
       "order": 1,
-      "clue": "Repair the Harmonic Oculus and defend it to unlock Pack-a-Punch."
+      "hardClue": "Repair the observatory device with two components and defend it to unlock Pack-a-Punch.",
+      "clue": "Repair the Harmonic Oculus with its two missing components and defend it to unlock Pack-a-Punch."
     },
     {
       "id": "trap-o-s-c-a-r-with-three-contraptions-and-recover-the-lgm-1",
       "order": 2,
-      "clue": "Trap the roaming enemy with three contraptions and recover the LGM-1."
+      "hardClue": "Destroy the roaming robot with three different traps to obtain the Wonder Weapon.",
+      "clue": "Defeat O.S.C.A.R. with three contraptions to obtain the LGM-1."
     },
     {
       "id": "eavesdrop-on-o-s-c-a-r-enter-the-planet-code-and-recover-the-cryo-chamber-key",
       "order": 3,
-      "clue": "Eavesdrop on O.S.C.A.R., enter the planet code, and recover the Cryo Chamber Key."
+      "hardClue": "Eavesdrop on the robot, enter the planet code and recover the chamber key.",
+      "clue": "Eavesdrop on O.S.C.A.R., enter the planet code and recover the Cryo Chamber Key."
     },
     {
       "id": "extract-thurston-s-brain-defend-the-perfusion-machine-and-install-it-in-machina-astralis",
       "order": 4,
-      "clue": "Extract Thurston’s brain, defend the Perfusion Machine, and install it in Machina Astralis."
+      "hardClue": "Extract the scientist’s brain, defend it during a lockdown and install it in the machine.",
+      "clue": "Extract Thurston’s brain, defend the Perfusion Machine and install it in Machina Astralis."
     },
     {
       "id": "enter-mars-s-coordinates-solve-thurston-s-reading-list-and-recover-neptune",
       "order": 5,
-      "clue": "Enter Mars’s coordinates, solve Thurston’s Reading List, and recover Neptune."
+      "hardClue": "Enter the planet’s coordinates, solve the reading-list puzzle and recover the missing planet.",
+      "clue": "Enter Mars’s coordinates, solve Thurston’s Reading List and recover Neptune."
     },
     {
       "id": "install-neptune-and-align-the-three-planets-with-their-indicated-directions",
       "order": 6,
+      "hardClue": "Install the missing planet and align three planets with their indicated directions.",
       "clue": "Install Neptune and align the three planets with their indicated directions."
     },
     {
       "id": "defend-the-portal-from-o-s-c-a-r-s-drones-and-travel-to-mars",
       "order": 7,
+      "hardClue": "Defend the portal from incoming drones, then travel through the portal.",
       "clue": "Defend the portal from O.S.C.A.R.’s drones and travel to Mars."
     },
     {
       "id": "install-the-perfusion-machine-shoot-the-distant-pylons-in-order-and-capture-the-ascendant-eye",
       "order": 8,
-      "clue": "Install the Perfusion Machine, shoot the distant pylons in order, and capture the Ascendant Eye."
+      "hardClue": "Install the machine, shoot five distant pylons in order and capture the flying object.",
+      "clue": "Install the Perfusion Machine, shoot the pylons in order and capture the Ascendant Eye."
     },
     {
       "id": "place-the-ascendant-eye-and-activate-the-five-pillars-with-the-lgm-1",
       "order": 9,
-      "clue": "Place the Ascendant Eye and activate the five pillars with the Wonder Weapon."
+      "hardClue": "Place the captured object and activate five pillars with the Wonder Weapon.",
+      "clue": "Place the Ascendant Eye and activate the five pillars with the LGM-1."
     },
     {
       "id": "interact-with-the-mars-pillars-in-the-harmonic-oculus-sequence-then-defeat-caltheris",
       "order": 10,
+      "hardClue": "Interact with the pillars in the correct sequence, then defeat the boss.",
       "clue": "Interact with the Mars pillars in the Harmonic Oculus sequence, then defeat Caltheris."
     }
   ]
