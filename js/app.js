@@ -55,6 +55,7 @@ const missedDayStorageKey = "the-daily-undead:missed-day";
 const devPreviewStorageKey = "the-daily-undead:dev-preview";
 const currentStateVersion = 10;
 const supportedStateVersions = new Set([2, 3, 4, 5, 6, 7, 8, 9, currentStateVersion]);
+const progressNumberFormatter = new Intl.NumberFormat("en-GB");
 // Saves created before progressive revive pricing did not record the amount paid.
 const legacyReviveCost = 50;
 
@@ -437,6 +438,20 @@ function savePoints() {
   }
 }
 
+function clearTemporaryLocalProgress() {
+  if (!isLocalDevelopment) return;
+  const hasHighNumberPreviewValues =
+    streakCount === 2_300 && totalPoints === 2_000_000_000 && totalRounds === 4_000;
+  if (!hasHighNumberPreviewValues) return;
+
+  streakCount = 0;
+  totalPoints = 0;
+  totalRounds = 0;
+  saveStreak();
+  savePoints();
+  saveTotalRounds();
+}
+
 function loadReviveCount() {
   try {
     const savedCount = Number.parseInt(localStorage.getItem(reviveCountStorageKey), 10);
@@ -548,26 +563,29 @@ function animateStat(label) {
 }
 
 function updateStreakDisplay() {
-  streakLabel.textContent = String(streakCount);
+  const formattedStreak = progressNumberFormatter.format(streakCount);
+  streakLabel.textContent = formattedStreak;
   streakLabel.closest(".stat-display").setAttribute(
     "aria-label",
-    `Current round: ${streakCount}`,
+    `Round: ${formattedStreak}`,
   );
 }
 
 function updateTotalRoundsDisplay() {
-  totalRoundsLabel.textContent = String(totalRounds);
+  const formattedTotalRounds = progressNumberFormatter.format(totalRounds);
+  totalRoundsLabel.textContent = formattedTotalRounds;
   totalRoundsLabel.closest(".stat-display").setAttribute(
     "aria-label",
-    `Total rounds completed: ${totalRounds}`,
+    `Total rounds completed: ${formattedTotalRounds}`,
   );
 }
 
 function updatePointsDisplay() {
-  pointsLabel.textContent = String(totalPoints);
+  const formattedPoints = progressNumberFormatter.format(totalPoints);
+  pointsLabel.textContent = formattedPoints;
   pointsLabel.closest(".stat-display").setAttribute(
     "aria-label",
-    `Points: ${totalPoints}`,
+    `Points: ${formattedPoints}`,
   );
 }
 
@@ -1317,6 +1335,7 @@ async function initialise() {
     state = loadState();
     prepareCommunityStatsDisplay();
     migrateCompletedScore();
+    clearTemporaryLocalProgress();
     if (state.phase === "result" && typeof state.isCorrect === "boolean") {
       recordCommunityAttempt(state.isCorrect);
     }
