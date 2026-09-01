@@ -8,8 +8,8 @@
     {
       "id": "use-brutus-to-open-the-warden-s-ritual-chamber",
       "order": 1,
-      "hardClue": "Lure the boss into destroying a marked wall to reveal a hidden chamber.",
-      "clue": "Use Brutus to break open the Warden’s Ritual Chamber."
+      "hardClue": "Lure the special enemy into destroying a marked wall to reveal a hidden chamber.",
+      "clue": "Use the Warden to break open the Ritual Chamber."
     },
     {
       "id": "activate-the-electric-chair-and-place-the-red-stone-in-richtofen-s-lab-to-release-the-spectral-bird",
