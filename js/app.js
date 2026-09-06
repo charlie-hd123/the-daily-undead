@@ -1004,7 +1004,7 @@ function renderNextRoundScreen() {
       <p class="kicker">Next round</p>
       <h3 id="next-round-screen-title">Next map in</h3>
       <strong id="end-screen-countdown" class="end-screen-countdown" aria-label="Time until the next round">--:--:--</strong>
-      <p class="next-round-motivation">Come back tomorrow to maintain your Current Round and Points.</p>
+      <p class="next-round-motivation">Come back tomorrow to maintain your Round and Points.</p>
     </section>
   `;
 }
@@ -1013,8 +1013,8 @@ function renderMissedDay() {
   const survivedRoundLabel = missedDayState.roundsBeforeLoss === 1 ? "Round" : "Rounds";
   const preLossPointLabel = missedDayState.pointsBeforeLoss === 1 ? "Point" : "Points";
   const missedMapCopy = missedDayState.missedDays === 1
-    ? "You missed yesterday’s map, so your Current Round and Points have been reset."
-    : `You missed ${missedDayState.missedDays} daily maps, so your Current Round and Points have been reset.`;
+    ? "You missed yesterday’s map, so your Round and Points have been reset."
+    : `You missed ${missedDayState.missedDays} daily maps, so your Round and Points have been reset.`;
   const reviveCost = calculateReviveCost(reviveCount);
   const reviveCostPaid = missedDayState.reviveCostPaid || legacyReviveCost;
   const canRevive = missedDayState.pointsBeforeLoss >= reviveCost;
@@ -1025,7 +1025,7 @@ function renderMissedDay() {
         <div class="result-banner revived animate">
           <h2>Revived!</h2>
           <p>You spent ${reviveCostPaid} points and saved your run.</p>
-          <p class="survival-summary">Current Round restored to <strong>${missedDayState.roundsBeforeLoss}</strong> with <strong>${totalPoints}</strong> ${totalPoints === 1 ? "Point" : "Points"}</p>
+          <p class="survival-summary">Round restored to <strong>${missedDayState.roundsBeforeLoss}</strong> with <strong>${totalPoints}</strong> ${totalPoints === 1 ? "Point" : "Points"}</p>
         </div>
         <div class="actions">
           <button id="continue-after-missed-day" class="button primary" type="button">Play today’s map</button>
@@ -1045,8 +1045,8 @@ function renderMissedDay() {
             <h3 id="missed-day-revive-title">Save your run?</h3>
             <p>${
               canRevive
-                ? `Spend ${reviveCost} points to restore Current Round ${missedDayState.roundsBeforeLoss} and keep your remaining points.`
-                : `You need at least ${reviveCost} points to restore Current Round ${missedDayState.roundsBeforeLoss}.`
+                ? `Spend ${reviveCost} points to restore Round ${missedDayState.roundsBeforeLoss} and keep your remaining points.`
+                : `You need at least ${reviveCost} points to restore Round ${missedDayState.roundsBeforeLoss}.`
             }</p>
           </div>
           <button id="revive-missed-day" class="button revive-button" type="button" ${canRevive ? "" : "disabled"}>
@@ -1103,7 +1103,7 @@ function buildScoreSharePayload() {
   const scoreText = [
     `🧟 The Daily Undead · ${formatDate(puzzle.dateKey)}`,
     "",
-    `🔥 Current Round: ${shareRound}`,
+    `🔥 Round: ${shareRound}`,
     `⚡ Points: ${sharePoints}`,
     `🏆 Total Rounds: ${totalRounds}`,
     "",
@@ -1214,7 +1214,7 @@ function renderResult() {
         ${
           !state.isCorrect
             ? state.revived
-              ? `<p class="survival-summary">Current Round restored to <strong>${state.roundsSurvivedBeforeLoss}</strong></p>`
+              ? `<p class="survival-summary">Round restored to <strong>${state.roundsSurvivedBeforeLoss}</strong></p>`
               : `<p class="survival-summary">You survived <strong>${state.roundsSurvivedBeforeLoss}</strong> ${survivedRoundLabel} with <strong>${state.pointsBeforeLoss}</strong> ${preLossPointLabel}</p>`
             : ""
         }
@@ -1226,8 +1226,8 @@ function renderResult() {
                 <h3 id="revive-title">Need a revive?</h3>
                 <p>${
                   canRevive
-                    ? `Spend ${reviveCost} points to restore Current Round ${state.roundsSurvivedBeforeLoss}.`
-                    : `You need at least ${reviveCost} points to restore Current Round ${state.roundsSurvivedBeforeLoss}.`
+                    ? `Spend ${reviveCost} points to restore Round ${state.roundsSurvivedBeforeLoss}.`
+                    : `You need at least ${reviveCost} points to restore Round ${state.roundsSurvivedBeforeLoss}.`
                 }</p>
               </div>
               <button id="revive-player" class="button revive-button" type="button" ${canRevive ? "" : "disabled"}>
