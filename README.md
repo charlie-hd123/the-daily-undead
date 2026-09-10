@@ -18,6 +18,20 @@ The game is a dependency-free static site designed to work on GitHub Pages. The 
 
 Community statistics appear above the footer: unique players today, total games played all-time, and yesterday's map solve percentage. They are served by a Cloudflare Worker and D1 database. A play is counted when a map is confirmed; the bonus order does not affect the count or solve result. A browser-local anonymous ID and a database uniqueness constraint prevent refreshes and repeat submissions from increasing the same daily puzzle more than once. The game remains fully playable if the statistics API is unavailable. See [worker/README.md](worker/README.md) for the live configuration, database queries, deployment, and recovery guide.
 
+## Prepare the daily marketing pack
+
+Open [`/marketing.html`](https://thedailyundead.com/marketing.html) to prepare the current day's manual Reddit and Discord posts. The page is deliberately unlinked from the public game and marked `noindex`, but it is not password-protected.
+
+The marketing page:
+
+1. Uses the same deterministic daily puzzle as the game.
+2. Calculates the Reddit post number from post `#1` on 13 August 2026.
+3. Reads yesterday's answer from the puzzle data and yesterday's solve percentage from the community statistics API.
+4. Replaces only the Clue 1 wording in the supplied square image template and downloads a PNG.
+5. Produces Reddit and Discord copy with blank username placeholders for manual completion.
+
+If the statistics API is temporarily unavailable, the page still generates the image and copy but shows `—%` with a warning. Refresh before posting to obtain the percentage.
+
 ## Run locally
 
 From this folder, start any static file server. Python is already available on most Macs:

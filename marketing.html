@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#070a12">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <meta name="daily-undead-stats-api" content="https://api.thedailyundead.com">
+    <title>Daily Marketing Pack · The Daily Undead</title>
+    <link rel="icon" href="./assets/favicon.png?v=20260817-1" type="image/png" sizes="128x128">
+    <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" sizes="180x180">
+    <link rel="stylesheet" href="./marketing.css?v=20260910-1">
+  </head>
+  <body>
+    <header class="marketing-header">
+      <a class="brand-lockup" href="./" aria-label="Open The Daily Undead game">
+        <img src="./assets/zombie-logo.png" alt="" width="512" height="512">
+        <span>
+          <small>The Daily Undead</small>
+          <strong>Daily Marketing Pack</strong>
+        </span>
+      </a>
+      <p id="pack-date" class="pack-date">Loading today’s pack…</p>
+    </header>
+
+    <main id="marketing-pack" class="marketing-shell" aria-busy="true">
+      <section class="image-panel" aria-labelledby="image-heading">
+        <div class="section-heading">
+          <div>
+            <p class="step-label">Step 1</p>
+            <h1 id="image-heading">Save today’s image</h1>
+          </div>
+          <span id="round-badge" class="round-badge">#—</span>
+        </div>
+
+        <div class="canvas-frame">
+          <canvas
+            id="marketing-image"
+            width="1254"
+            height="1254"
+            role="img"
+            aria-label="Today’s Daily Undead clue image"
+          ></canvas>
+        </div>
+
+        <button id="download-image" class="primary-action" type="button" disabled>
+          Save image
+        </button>
+      </section>
+
+      <div class="copy-column">
+        <section class="copy-panel" aria-labelledby="reddit-heading">
+          <div class="section-heading">
+            <div>
+              <p class="step-label">Step 2</p>
+              <h2 id="reddit-heading">Copy for Reddit</h2>
+            </div>
+            <span class="platform-label reddit-label">Reddit</span>
+          </div>
+
+          <label for="reddit-title">Post title</label>
+          <div class="copy-field title-field">
+            <textarea id="reddit-title" rows="2" readonly></textarea>
+            <button class="copy-button" type="button" data-copy-target="reddit-title">Copy title</button>
+          </div>
+
+          <label for="reddit-body">Post text</label>
+          <div class="copy-field">
+            <textarea id="reddit-body" rows="13" readonly></textarea>
+            <button class="copy-button" type="button" data-copy-target="reddit-body">Copy Reddit text</button>
+          </div>
+        </section>
+
+        <section class="copy-panel" aria-labelledby="discord-heading">
+          <div class="section-heading">
+            <div>
+              <p class="step-label">Step 3</p>
+              <h2 id="discord-heading">Copy for Discord</h2>
+            </div>
+            <span class="platform-label discord-label">Discord</span>
+          </div>
+
+          <label for="discord-body">Message text</label>
+          <div class="copy-field">
+            <textarea id="discord-body" rows="18" readonly></textarea>
+            <button class="copy-button" type="button" data-copy-target="discord-body">Copy Discord text</button>
+          </div>
+        </section>
+      </div>
+
+      <p id="pack-status" class="pack-status" role="status" aria-live="polite"></p>
+    </main>
+
+    <noscript>
+      <p class="noscript">This page needs JavaScript enabled to prepare the daily pack.</p>
+    </noscript>
+
+    <script type="module" src="./js/marketing.js?v=20260910-1"></script>
+  </body>
+</html>
