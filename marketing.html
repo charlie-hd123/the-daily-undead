@@ -10,7 +10,7 @@
     <title>Daily Marketing Pack · The Daily Undead</title>
     <link rel="icon" href="./assets/favicon.png?v=20260817-1" type="image/png" sizes="128x128">
     <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" sizes="180x180">
-    <link rel="stylesheet" href="./marketing.css?v=20260910-1">
+    <link rel="stylesheet" href="./marketing.css?v=20260910-2">
   </head>
   <body>
     <header class="marketing-header">
@@ -96,6 +96,18 @@
       <p class="noscript">This page needs JavaScript enabled to prepare the daily pack.</p>
     </noscript>
 
-    <script type="module" src="./js/marketing.js?v=20260910-1"></script>
+    <dialog id="image-save-help" class="image-save-dialog">
+      <div class="image-save-dialog__content">
+        <p class="step-label">Save to Photos</p>
+        <h2>Press and hold the image</h2>
+        <p>Then choose <strong>Save to Photos</strong> or <strong>Save Image</strong>.</p>
+        <img id="image-save-preview" alt="Today’s Daily Undead clue image ready to save">
+        <form method="dialog">
+          <button class="dialog-close" type="submit">Close</button>
+        </form>
+      </div>
+    </dialog>
+
+    <script type="module" src="./js/marketing.js?v=20260910-2"></script>
   </body>
 </html>

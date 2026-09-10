@@ -6,6 +6,7 @@ import {
   formatDiscordDate,
   getDailyPostNumber,
   getPreviousDateKey,
+  isAppleMobileDevice,
 } from "../js/marketing-core.js";
 
 test("daily Reddit post numbers are anchored to 13 August 2026", () => {
@@ -51,11 +52,19 @@ test("missing statistics are visibly left incomplete", () => {
   assert.match(copy.discordBody, /—%/);
 });
 
+test("Apple mobile devices are detected for the Photos save flow", () => {
+  assert.equal(isAppleMobileDevice({ userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)" }), true);
+  assert.equal(isAppleMobileDevice({ platform: "MacIntel", maxTouchPoints: 5 }), true);
+  assert.equal(isAppleMobileDevice({ userAgent: "Mozilla/5.0 (Macintosh)", platform: "MacIntel", maxTouchPoints: 0 }), false);
+});
+
 test("marketing page keeps its source and controls wired", async () => {
   const html = await readFile(new URL("../marketing.html", import.meta.url), "utf8");
   assert.match(html, /name="robots" content="noindex, nofollow"/);
   assert.match(html, /id="marketing-image"/);
   assert.match(html, /id="download-image"/);
+  assert.match(html, /id="image-save-help"/);
+  assert.match(html, /id="image-save-preview"/);
   assert.match(html, /data-copy-target="reddit-body"/);
   assert.match(html, /data-copy-target="discord-body"/);
   assert.match(html, /\.\/js\/marketing\.js/);

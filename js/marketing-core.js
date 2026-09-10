@@ -2,6 +2,13 @@ import { getUtcDateKey, isValidDateKey } from "./game-core.js?v=20260817-1";
 
 export const firstRedditPostDate = "2026-08-13";
 
+export function isAppleMobileDevice(navigatorObject) {
+  const userAgent = navigatorObject?.userAgent || "";
+  const platform = navigatorObject?.platform || "";
+  const touchPoints = navigatorObject?.maxTouchPoints || 0;
+  return /iPad|iPhone|iPod/.test(userAgent) || (platform === "MacIntel" && touchPoints > 1);
+}
+
 export function getPreviousDateKey(dateKey) {
   if (!isValidDateKey(dateKey)) throw new Error("A valid date is required.");
   const date = new Date(`${dateKey}T00:00:00Z`);

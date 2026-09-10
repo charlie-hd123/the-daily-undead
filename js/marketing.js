@@ -9,7 +9,8 @@ import {
   formatPackDate,
   getDailyPostNumber,
   getPreviousDateKey,
-} from "./marketing-core.js?v=20260910-1";
+  isAppleMobileDevice,
+} from "./marketing-core.js?v=20260910-2";
 
 const pack = document.querySelector("#marketing-pack");
 const packDate = document.querySelector("#pack-date");
@@ -20,6 +21,8 @@ const redditTitle = document.querySelector("#reddit-title");
 const redditBody = document.querySelector("#reddit-body");
 const discordBody = document.querySelector("#discord-body");
 const packStatus = document.querySelector("#pack-status");
+const saveHelpDialog = document.querySelector("#image-save-help");
+const saveHelpPreview = document.querySelector("#image-save-preview");
 
 let downloadFilename = "daily-undead.png";
 
@@ -161,19 +164,85 @@ async function copyText(button, target) {
   }, 1600);
 }
 
+function getImageDataUrl() {
+  return canvas.toDataURL("image/png");
+}
+
+function createImageFile(dataUrl) {
+  const encodedImage = dataUrl.slice(dataUrl.indexOf(",") + 1);
+  const decodedImage = window.atob(encodedImage);
+  const bytes = new Uint8Array(decodedImage.length);
+
+  for (let index = 0; index < decodedImage.length; index += 1) {
+    bytes[index] = decodedImage.charCodeAt(index);
+  }
+
+  return new File([bytes], downloadFilename, { type: "image/png" });
+}
+
+function showImageSaveHelp(dataUrl) {
+  saveHelpPreview.src = dataUrl;
+  if (typeof saveHelpDialog.showModal === "function") {
+    saveHelpDialog.showModal();
+  } else {
+    saveHelpDialog.setAttribute("open", "");
+  }
+  packStatus.textContent = "Press and hold the image, then choose Save to Photos.";
+  packStatus.dataset.tone = "warning";
+}
+
+function downloadImage(dataUrl) {
+  const link = document.createElement("a");
+  link.download = downloadFilename;
+  link.href = dataUrl;
+  link.click();
+}
+
+async function saveImage() {
+  const dataUrl = getImageDataUrl();
+
+  if (!isAppleMobileDevice(navigator)) {
+    downloadImage(dataUrl);
+    packStatus.textContent = "Image downloaded.";
+    packStatus.dataset.tone = "ready";
+    return;
+  }
+
+  try {
+    const file = createImageFile(dataUrl);
+    const shareData = { files: [file], title: "The Daily Undead" };
+
+    if (typeof navigator.share !== "function" ||
+        (typeof navigator.canShare === "function" && !navigator.canShare(shareData))) {
+      showImageSaveHelp(dataUrl);
+      return;
+    }
+
+    packStatus.textContent = "Choose Save Image to add it to Photos.";
+    packStatus.dataset.tone = "ready";
+    await navigator.share(shareData);
+  } catch (error) {
+    if (error?.name === "AbortError") {
+      packStatus.textContent = "Image not saved. Tap the button to try again.";
+      packStatus.dataset.tone = "warning";
+      return;
+    }
+    console.error(error);
+    showImageSaveHelp(dataUrl);
+  }
+}
+
 function enableActions() {
   downloadButton.disabled = false;
+  if (isAppleMobileDevice(navigator)) {
+    downloadButton.textContent = "Save image to Photos";
+  }
   document.querySelectorAll("[data-copy-target]").forEach((button) => {
     const target = document.querySelector(`#${button.dataset.copyTarget}`);
     button.addEventListener("click", () => copyText(button, target));
   });
 
-  downloadButton.addEventListener("click", () => {
-    const link = document.createElement("a");
-    link.download = downloadFilename;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-  });
+  downloadButton.addEventListener("click", saveImage);
 }
 
 async function initialise() {
