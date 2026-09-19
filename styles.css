@@ -315,9 +315,14 @@ h1 {
 
 .header-utility {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-end;
   gap: 0.75rem;
+}
+
+.header-utility:has(.account-button:not([hidden])) .round-timing {
+  padding-left: 0.75rem;
+  border-left: 1px solid rgb(156 181 223 / 18%);
 }
 
 .round-timing {
@@ -359,7 +364,9 @@ h1 {
 }
 
 .account-button {
+  max-width: 12rem;
   min-height: 1.9rem;
+  overflow: hidden;
   padding: 0.35rem 0.75rem;
   border: 1px solid rgb(103 232 255 / 32%);
   border-radius: 999px;
@@ -371,7 +378,9 @@ h1 {
   font-weight: 800;
   letter-spacing: 0.08em;
   line-height: 1;
+  text-overflow: ellipsis;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .account-button.is-signed-in {
@@ -1538,7 +1547,7 @@ h1 {
   }
 
   .account-status {
-    max-width: none;
+    max-width: min(55vw, 16rem);
     text-align: left;
   }
 
@@ -1596,8 +1605,12 @@ h1 {
   }
 
   .account-status {
-    max-width: min(65vw, 16rem);
+    max-width: min(48vw, 12rem);
     text-align: left;
+  }
+
+  .account-button {
+    max-width: min(48vw, 12rem);
   }
 
   .app-shell {
