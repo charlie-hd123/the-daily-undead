@@ -15,9 +15,9 @@
       content="The Daily Undead — your daily Treyarch Zombies challenge. Reveal clues, identify the map, and put the steps in order."
     >
     <title>The Daily Undead</title>
-    <link rel="icon" href="./assets/favicon.png?v=20260919-15" type="image/png" sizes="128x128">
+    <link rel="icon" href="./assets/favicon.png?v=20260919-16" type="image/png" sizes="128x128">
     <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" sizes="180x180">
-    <link rel="stylesheet" href="./styles.css?v=20260919-15">
+    <link rel="stylesheet" href="./styles.css?v=20260919-16">
   </head>
   <body>
     <header class="site-header">
@@ -134,7 +134,31 @@
       </form>
     </dialog>
 
-    <script type="module" src="./js/app.js?v=20260919-15"></script>
+    <dialog id="account-username-dialog" class="account-dialog">
+      <button class="dialog-close" type="button" data-close-account-dialog aria-label="Close">×</button>
+      <p class="kicker">Undead account</p>
+      <h2>Change username</h2>
+      <p>This is the public name shown on leaderboards.</p>
+      <form id="account-username-form">
+        <label class="account-field">
+          <span>Username</span>
+          <input
+            name="username"
+            type="text"
+            minlength="3"
+            maxlength="20"
+            pattern="[A-Za-z0-9_]+"
+            autocomplete="nickname"
+            required
+          >
+          <small>3–20 letters, numbers or underscores.</small>
+        </label>
+        <p id="account-username-feedback" class="account-feedback" role="status"></p>
+        <button class="button primary" type="submit">Save username</button>
+      </form>
+    </dialog>
+
+    <script type="module" src="./js/app.js?v=20260919-16"></script>
 
     <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "4eeb20e1411c4e7baf24969ced969c88"}'></script><!-- End Cloudflare Web Analytics -->
 

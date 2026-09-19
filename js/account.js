@@ -77,10 +77,10 @@ async function requestJson(clerk, apiUrl, path, options = {}) {
   return result;
 }
 
-function createUserProfileOptions(clerk, { apiUrl = null, profile = null, accountButton = null } = {}) {
+function createUserProfileOptions(clerk, { openUsernameEditor = null } = {}) {
   const customPages = [];
 
-  if (apiUrl && profile && accountButton) {
+  if (openUsernameEditor) {
     customPages.push({
       url: "change-username",
       label: "Change username",
@@ -91,71 +91,19 @@ function createUserProfileOptions(clerk, { apiUrl = null, profile = null, accoun
         element.replaceChildren();
       },
       mount: (element) => {
-        const currentUsername = accountButton.textContent.trim();
         const heading = document.createElement("h2");
         const description = document.createElement("p");
-        const form = document.createElement("form");
-        const label = document.createElement("label");
-        const labelText = document.createElement("span");
-        const input = document.createElement("input");
-        const guidance = document.createElement("small");
-        const feedback = document.createElement("p");
         const button = document.createElement("button");
 
         element.classList.add("clerk-username-page");
         heading.textContent = "Change username";
         description.textContent = "This is the public name shown on leaderboards.";
-        form.className = "clerk-username-form";
-        label.className = "account-field";
-        labelText.textContent = "Username";
-        input.name = "username";
-        input.type = "text";
-        input.minLength = 3;
-        input.maxLength = 20;
-        input.pattern = "[A-Za-z0-9_]+";
-        input.autocomplete = "nickname";
-        input.required = true;
-        input.defaultValue = currentUsername;
-        input.value = currentUsername;
-        input.setAttribute("value", currentUsername);
-        guidance.textContent = "3–20 letters, numbers or underscores.";
-        feedback.className = "clerk-account-feedback";
-        feedback.setAttribute("role", "status");
         button.className = "button primary";
-        button.type = "submit";
-        button.textContent = "Save username";
+        button.type = "button";
+        button.textContent = "Edit username";
+        button.addEventListener("click", openUsernameEditor);
 
-        label.append(labelText, input, guidance);
-        form.append(label, feedback, button);
-        element.replaceChildren(heading, description, form);
-        globalThis.setTimeout(() => {
-          if (input.isConnected && !input.value) input.value = accountButton.textContent.trim();
-        }, 0);
-
-        form.addEventListener("submit", async (event) => {
-          event.preventDefault();
-          button.disabled = true;
-          feedback.classList.remove("account-error");
-          feedback.textContent = "";
-          try {
-            const result = await requestJson(clerk, apiUrl, "/api/account/username", {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ username: input.value.trim() }),
-            });
-            profile.username = result.username;
-            accountButton.textContent = result.username;
-            input.defaultValue = result.username;
-            input.value = result.username;
-            input.setAttribute("value", result.username);
-            feedback.textContent = "Username updated.";
-          } catch (error) {
-            feedback.classList.add("account-error");
-            feedback.textContent = error.message;
-          } finally {
-            button.disabled = false;
-          }
-        });
+        element.replaceChildren(heading, description, button);
       },
       unmount: (element) => {
         element.classList.remove("clerk-username-page");
@@ -232,6 +180,9 @@ export async function initialiseAccount({
   const onboardingDialog = documentObject.querySelector("#account-onboarding-dialog");
   const onboardingForm = documentObject.querySelector("#account-onboarding-form");
   const onboardingError = documentObject.querySelector("#account-onboarding-error");
+  const usernameDialog = documentObject.querySelector("#account-username-dialog");
+  const usernameForm = documentObject.querySelector("#account-username-form");
+  const usernameFeedback = documentObject.querySelector("#account-username-feedback");
   const publishableKey = getClerkPublishableKey(documentObject);
   let clerk = null;
   let profile = null;
@@ -368,8 +319,44 @@ export async function initialiseAccount({
   accountButton.disabled = false;
   accountButton.textContent = profile.username;
   setStatus();
+
+  const openUsernameEditor = () => {
+    if (!usernameDialog || !usernameForm || !usernameFeedback) return;
+    clerk.closeUserProfile();
+    usernameForm.elements.username.value = profile.username;
+    usernameFeedback.textContent = "";
+    usernameFeedback.classList.remove("account-error", "is-success");
+    globalThis.setTimeout(() => openDialog(usernameDialog), 0);
+  };
+
+  usernameForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const submitButton = usernameForm.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    usernameFeedback.textContent = "";
+    usernameFeedback.classList.remove("account-error", "is-success");
+
+    try {
+      const result = await requestJson(clerk, apiUrl, "/api/account/username", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: usernameForm.elements.username.value.trim() }),
+      });
+      profile.username = result.username;
+      accountButton.textContent = result.username;
+      usernameForm.elements.username.value = result.username;
+      usernameFeedback.classList.add("is-success");
+      usernameFeedback.textContent = "Username updated.";
+    } catch (error) {
+      usernameFeedback.classList.add("account-error");
+      usernameFeedback.textContent = error.message;
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+
   accountButton.addEventListener("click", () =>
-    clerk.openUserProfile(createUserProfileOptions(clerk, { apiUrl, profile, accountButton })),
+    clerk.openUserProfile(createUserProfileOptions(clerk, { openUsernameEditor })),
   );
 
   async function saveNow() {

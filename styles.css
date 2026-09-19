@@ -429,16 +429,13 @@ h1 {
   margin: 0;
 }
 
-.clerk-username-form {
-  display: grid;
-  gap: 1rem;
-  max-width: 24rem;
+.account-feedback {
+  min-height: 1.2em;
+  font-size: 0.82rem;
 }
 
-.clerk-account-feedback {
-  min-height: 1.2em;
+.account-feedback.is-success {
   color: var(--success);
-  font-size: 0.82rem;
 }
 
 .clerk-sign-out-page h2,
