@@ -414,6 +414,12 @@ h1 {
   text-transform: none;
 }
 
+#account-button:not(.is-signed-in) {
+  border-color: rgb(184 196 216 / 34%);
+  background: rgb(184 196 216 / 10%);
+  color: #b8c4d8;
+}
+
 .clerk-sign-out-page {
   display: grid;
   align-content: start;
@@ -1673,6 +1679,14 @@ h1 {
     flex: 1 1 0;
     max-width: none;
     padding-inline: 0.5rem;
+  }
+
+  #account-button:not(.is-signed-in) {
+    flex-grow: 0.72;
+  }
+
+  #leaderboards-button {
+    flex-grow: 1.28;
   }
 
   .app-shell {

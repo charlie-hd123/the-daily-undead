@@ -70,7 +70,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260919-23"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260919-24"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -84,7 +84,7 @@ test("account controls support optional sign-in without exposing private credent
 
   assert.match(html, /id="account-button"/);
   assert.match(html, /id="leaderboards-button"/);
-  assert.match(html, /id="leaderboards-button"[\s\S]*?id="account-button"/);
+  assert.match(html, /id="account-button"[\s\S]*?id="leaderboards-button"/);
   assert.match(html, /id="leaderboards-dialog"/);
   assert.match(html, /<p class="kicker">Undead Leaderboards<\/p>/);
   assert.match(html, /<h2>Leaderboards<\/h2>/);
@@ -134,8 +134,9 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(account, /event\.target\.closest\("\[data-open-username-editor\]"\)/);
   assert.match(account, /label: "Sign out"/);
   assert.match(account, /clerk\.signOut\(/);
-  assert.doesNotMatch(account, /classList\.add\("is-signed-in"\)/);
-  assert.doesNotMatch(css, /\.account-button\.is-signed-in/);
+  assert.match(account, /accountButton\.classList\.add\("is-signed-in"\)/);
+  assert.match(css, /#account-button:not\(\.is-signed-in\)/);
+  assert.match(css, /#leaderboards-button \{\s*flex-grow: 1\.28;/);
   assert.match(
     css,
     /\.account-button \{[\s\S]*?display: inline-flex;[\s\S]*?align-items: center;[\s\S]*?justify-content: center;/,

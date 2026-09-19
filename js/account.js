@@ -255,6 +255,8 @@ export async function initialiseAccount({
     return createUnavailableController({ clerk, signedIn: false });
   }
 
+  accountButton.classList.add("is-signed-in");
+
   let account;
   try {
     const url = new URL("/api/account", apiUrl);
