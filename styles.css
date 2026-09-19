@@ -380,6 +380,10 @@ h1 {
 }
 
 .account-button {
+  display: inline-flex;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
   max-width: 12rem;
   min-height: 1.9rem;
   overflow: hidden;
@@ -394,8 +398,10 @@ h1 {
   font-weight: 800;
   letter-spacing: 0.08em;
   line-height: 1;
+  text-align: center;
   text-overflow: ellipsis;
   text-transform: uppercase;
+  appearance: none;
   white-space: nowrap;
 }
 
