@@ -224,7 +224,7 @@ export async function initialiseAccount({
   accountButton.disabled = false;
   accountButton.textContent = profile.username;
   accountButton.classList.add("is-signed-in");
-  setStatus("Progress synced");
+  setStatus();
   accountButton.addEventListener("click", () => clerk.openUserProfile({ routing: "hash" }));
 
   async function saveNow() {
@@ -249,7 +249,7 @@ export async function initialiseAccount({
       } catch {
         // The next successful save can still clear the in-memory retry state.
       }
-      setStatus("Progress synced");
+      setStatus();
     } catch {
       setStatus("Saved on this device · sync will retry");
     } finally {
