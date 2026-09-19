@@ -323,7 +323,7 @@ export async function initialiseAccount({
   const openUsernameEditor = () => {
     if (!usernameDialog || !usernameForm || !usernameFeedback) return;
     clerk.closeUserProfile();
-    usernameForm.elements.username.value = profile.username;
+    usernameForm.elements.publicName.value = profile.username;
     usernameFeedback.textContent = "";
     usernameFeedback.classList.remove("account-error", "is-success");
     globalThis.setTimeout(() => openDialog(usernameDialog), 0);
@@ -340,11 +340,11 @@ export async function initialiseAccount({
       const result = await requestJson(clerk, apiUrl, "/api/account/username", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: usernameForm.elements.username.value.trim() }),
+        body: JSON.stringify({ username: usernameForm.elements.publicName.value.trim() }),
       });
       profile.username = result.username;
       accountButton.textContent = result.username;
-      usernameForm.elements.username.value = result.username;
+      usernameForm.elements.publicName.value = result.username;
       usernameFeedback.classList.add("is-success");
       usernameFeedback.textContent = "Username updated.";
     } catch (error) {
