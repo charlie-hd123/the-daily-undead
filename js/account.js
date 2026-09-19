@@ -112,9 +112,11 @@ function createUserProfileOptions(clerk, { apiUrl = null, profile = null, accoun
         input.minLength = 3;
         input.maxLength = 20;
         input.pattern = "[A-Za-z0-9_]+";
-        input.autocomplete = "username";
+        input.autocomplete = "nickname";
         input.required = true;
+        input.defaultValue = profile.username;
         input.value = profile.username;
+        input.setAttribute("value", profile.username);
         guidance.textContent = "3–20 letters, numbers or underscores.";
         feedback.className = "clerk-account-feedback";
         feedback.setAttribute("role", "status");
@@ -139,7 +141,9 @@ function createUserProfileOptions(clerk, { apiUrl = null, profile = null, accoun
             });
             profile.username = result.username;
             accountButton.textContent = result.username;
+            input.defaultValue = result.username;
             input.value = result.username;
+            input.setAttribute("value", result.username);
             feedback.textContent = "Username updated.";
           } catch (error) {
             feedback.classList.add("account-error");
