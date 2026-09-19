@@ -149,7 +149,7 @@ export async function initialiseAccount({
 
   if (!clerk.isSignedIn) {
     accountButton.disabled = false;
-    accountButton.textContent = "Log in (playing as guest)";
+    accountButton.textContent = "Log in";
     setStatus();
     accountButton.addEventListener("click", () => openDialog(accessDialog));
     let wasSignedOut = true;
