@@ -325,6 +325,22 @@ h1 {
   border-left: 1px solid rgb(156 181 223 / 18%);
 }
 
+@media (max-width: 60rem) {
+  .header-utility .round-timing {
+    order: -1;
+  }
+
+  .header-utility:has(.account-button:not([hidden])) .round-timing {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .header-utility:has(.account-button:not([hidden])) .account-controls {
+    padding-left: 0.75rem;
+    border-left: 1px solid rgb(156 181 223 / 18%);
+  }
+}
+
 .round-timing {
   display: grid;
   justify-items: end;
