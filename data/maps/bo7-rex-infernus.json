@@ -1,0 +1,63 @@
+{
+  "id": "bo7-rex-infernus",
+  "gameId": "bo7",
+  "gameTitle": "Black Ops 7",
+  "title": "Rex Infernus",
+  "availableFrom": "2026-09-22",
+  "steps": [
+    {
+      "id": "defeat-both-dread-skulls-return-their-usurped-flames-and-crank-both-wheels",
+      "order": 1,
+      "hardClue": "Defeat two flying enemies and return the flames to the central machine.",
+      "clue": "Defeat both Dread Skulls, return their Usurped Flames to the Nexus Forge, then crank both wheels."
+    },
+    {
+      "id": "use-the-astral-flame-redirect-the-crystal-beam-and-open-nyxara-s-inner-sanctum",
+      "order": 2,
+      "hardClue": "Redirect the beam to open the hidden chamber.",
+      "clue": "Use the Astral Flame, then redirect the crystal beam and open Nyxara's Inner Sanctum."
+    },
+    {
+      "id": "feed-the-vine-eat-its-fruit-and-collect-the-warden-s-blight-parts",
+      "order": 3,
+      "hardClue": "Feed the growth, enter the hidden forest and recover three weapon parts from the bodies.",
+      "clue": "Feed the vine in Nyxara's Inner Sanctum, eat its fruit, then collect all three Warden's Blight parts."
+    },
+    {
+      "id": "solve-the-dravakar-pillar-riddle-open-the-inner-sanctum-and-forge-the-warden-s-blight",
+      "order": 4,
+      "hardClue": "Solve the pillar puzzle, enter the hidden room and assemble the Wonder Weapon.",
+      "clue": "Solve the Dravakar pillar riddle, open the Inner Sanctum and forge the Warden's Blight."
+    },
+    {
+      "id": "exfil-return-to-her-house-and-reveal-the-eye-of-the-forge",
+      "order": 5,
+      "hardClue": "Complete a coded evacuation and return to the starting location.",
+      "clue": "Exfil and return to Her House, then use a charged shot to reveal the Eye of the Forge."
+    },
+    {
+      "id": "place-the-eye-of-the-forge-into-a-grapple-pedestal-to-create-the-void-talon",
+      "order": 6,
+      "hardClue": "Place the eye into a pedestal to upgrade the tactical device.",
+      "clue": "Place the Eye of the Forge into a grapple pedestal to create the Void Talon."
+    },
+    {
+      "id": "remove-the-nexus-seals-clear-the-machinery-and-engage-the-gears",
+      "order": 7,
+      "hardClue": "Use the upgraded tactical device to remove the seals.",
+      "clue": "Remove the Nexus seals, clear the exposed machinery, then Surge the Nexus and engage the gears."
+    },
+    {
+      "id": "align-the-nexus-with-each-temple-and-complete-the-shadowsmith-cleansing-rituals",
+      "order": 8,
+      "hardClue": "Align the machine with each temple and complete all four cleansing rituals.",
+      "clue": "Align the Nexus with each temple and complete all four Shadowsmith cleansing rituals."
+    },
+    {
+      "id": "stand-on-the-circles-beneath-the-nexus-and-descend-into-the-warden-s-arena",
+      "order": 9,
+      "hardClue": "Stand on the circles beneath the central machine and descend.",
+      "clue": "Stand on the circles beneath the Nexus and descend into the Warden's arena."
+    }
+  ]
+}

@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 
-import { isValidDateKey } from "../js/game-core.js";
+import { buildDailyPuzzle, isValidDateKey } from "../js/game-core.js";
 
 const mapsDirectory = new URL("../data/maps/", import.meta.url);
 
@@ -26,7 +26,7 @@ test("the manifest contains the expected games and maps", async () => {
       "Black Ops 7",
     ],
   );
-  assert.equal(catalog.maps.length, 37);
+  assert.equal(catalog.maps.length, 38);
   assert.deepEqual(
     catalog.selectionOnlyMaps.map((map) => map.title),
     [
@@ -88,7 +88,14 @@ test("every selectable map keeps its official spelling and capitalisation", asyn
         "Shattered Veil",
         "Reckoning",
       ],
-      bo7: ["Ashes of the Damned", "Astra Malorum", "Paradox Junction", "Totenreich", "Kowakujō"],
+      bo7: [
+        "Ashes of the Damned",
+        "Astra Malorum",
+        "Paradox Junction",
+        "Totenreich",
+        "Kowakujō",
+        "Rex Infernus",
+      ],
     },
   );
 });
@@ -134,12 +141,20 @@ test("every manifest map is valid and belongs to a selectable game", async () =>
     stepCount += map.steps.length;
   }
 
-  assert.equal(stepCount, 311);
+  assert.equal(stepCount, 320);
 
   const jsonFiles = (await fs.readdir(mapsDirectory))
     .filter((filename) => filename.endsWith(".json") && filename !== "index.json")
     .sort();
   assert.deepEqual(jsonFiles, [...catalog.maps].sort(), "every map JSON should be in the manifest");
+});
+
+test("Rex Infernus enters the UTC rotation on 22 September 2026", async () => {
+  const map = await readJson("bo7-rex-infernus.json");
+
+  assert.equal(map.availableFrom, "2026-09-22");
+  assert.throws(() => buildDailyPuzzle("2026-09-21", [map]), /No eligible maps/);
+  assert.equal(buildDailyPuzzle("2026-09-22", [map]).map.id, "bo7-rex-infernus");
 });
 
 test("selectable-only maps are ordered but excluded from the answer files", async () => {

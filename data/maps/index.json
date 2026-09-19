@@ -78,7 +78,8 @@
     "bo7-astra-malorum.json",
     "bo7-paradox-junction.json",
     "bo7-totenreich.json",
-    "bo7-kowakujo.json"
+    "bo7-kowakujo.json",
+    "bo7-rex-infernus.json"
   ],
   "selectionOnlyMaps": [
     {
@@ -197,7 +198,8 @@
       "bo7-astra-malorum",
       "bo7-paradox-junction",
       "bo7-totenreich",
-      "bo7-kowakujo"
+      "bo7-kowakujo",
+      "bo7-rex-infernus"
     ]
   },
   "answerEquivalents": [
