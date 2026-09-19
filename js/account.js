@@ -326,7 +326,7 @@ export async function initialiseAccount({
     usernameForm.elements.publicName.value = profile.username;
     usernameFeedback.textContent = "";
     usernameFeedback.classList.remove("account-error", "is-success");
-    globalThis.setTimeout(() => openDialog(usernameDialog), 0);
+    globalThis.setTimeout(() => openDialog(usernameDialog), 250);
   };
 
   documentObject.addEventListener("click", (event) => {
