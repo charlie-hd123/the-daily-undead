@@ -91,6 +91,7 @@ function createUserProfileOptions(clerk, { apiUrl = null, profile = null, accoun
         element.replaceChildren();
       },
       mount: (element) => {
+        const currentUsername = accountButton.textContent.trim();
         const heading = document.createElement("h2");
         const description = document.createElement("p");
         const form = document.createElement("form");
@@ -114,9 +115,9 @@ function createUserProfileOptions(clerk, { apiUrl = null, profile = null, accoun
         input.pattern = "[A-Za-z0-9_]+";
         input.autocomplete = "nickname";
         input.required = true;
-        input.defaultValue = profile.username;
-        input.value = profile.username;
-        input.setAttribute("value", profile.username);
+        input.defaultValue = currentUsername;
+        input.value = currentUsername;
+        input.setAttribute("value", currentUsername);
         guidance.textContent = "3–20 letters, numbers or underscores.";
         feedback.className = "clerk-account-feedback";
         feedback.setAttribute("role", "status");
@@ -128,7 +129,7 @@ function createUserProfileOptions(clerk, { apiUrl = null, profile = null, accoun
         form.append(label, feedback, button);
         element.replaceChildren(heading, description, form);
         globalThis.setTimeout(() => {
-          if (input.isConnected && !input.value) input.value = profile.username;
+          if (input.isConnected && !input.value) input.value = accountButton.textContent.trim();
         }, 0);
 
         form.addEventListener("submit", async (event) => {
