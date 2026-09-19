@@ -265,6 +265,43 @@ export async function registerAccount(db, request, userId) {
   return { status: 201, body: { username } };
 }
 
+export async function updateAccountUsername(db, request, userId) {
+  const body = await readJsonBody(request, 1_000);
+  const username = normalizeUsername(body.username);
+  if (!username) {
+    return {
+      status: 400,
+      body: { error: "Use 3–20 letters, numbers or underscores for your username." },
+    };
+  }
+
+  const profile = await db
+    .prepare("SELECT username FROM player_profiles WHERE user_id = ?")
+    .bind(userId)
+    .first();
+  if (!profile) {
+    return { status: 409, body: { error: "Finish setting up your account first." } };
+  }
+
+  try {
+    await db
+      .prepare(
+        `UPDATE player_profiles
+        SET username = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE user_id = ?`,
+      )
+      .bind(username, userId)
+      .run();
+  } catch (error) {
+    if (/unique/i.test(String(error?.message || error))) {
+      return { status: 409, body: { error: "That username is already taken." } };
+    }
+    throw error;
+  }
+
+  return { status: 200, body: { username } };
+}
+
 export async function saveAccount(db, request, userId) {
   const body = await readJsonBody(request);
   const progress = sanitizeProgress(body.progress);

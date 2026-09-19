@@ -25,6 +25,7 @@ The Worker exposes:
 - `POST /api/attempts` for a completed current-day map guess.
 - `GET /api/account?date=YYYY-MM-DD` for a signed-in player's profile and save.
 - `POST /api/account/register` to reserve a username and optionally import local progress.
+- `PUT /api/account/username` to change a signed-in player's unique public username.
 - `PUT /api/account/save` to synchronise personal progress and the current daily state.
 - `POST /api/account/results/map` and `POST /api/account/results/bonus` for server-verified daily results.
 

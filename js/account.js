@@ -77,57 +77,137 @@ async function requestJson(clerk, apiUrl, path, options = {}) {
   return result;
 }
 
-function createUserProfileOptions(clerk) {
+function createUserProfileOptions(clerk, { apiUrl = null, profile = null, accountButton = null } = {}) {
+  const customPages = [];
+
+  if (apiUrl && profile && accountButton) {
+    customPages.push({
+      url: "change-username",
+      label: "Change username",
+      mountIcon: (element) => {
+        element.textContent = "✎";
+      },
+      unmountIcon: (element) => {
+        element.replaceChildren();
+      },
+      mount: (element) => {
+        const heading = document.createElement("h2");
+        const description = document.createElement("p");
+        const form = document.createElement("form");
+        const label = document.createElement("label");
+        const labelText = document.createElement("span");
+        const input = document.createElement("input");
+        const guidance = document.createElement("small");
+        const feedback = document.createElement("p");
+        const button = document.createElement("button");
+
+        element.classList.add("clerk-username-page");
+        heading.textContent = "Change username";
+        description.textContent = "This is the public name shown on leaderboards.";
+        form.className = "clerk-username-form";
+        label.className = "account-field";
+        labelText.textContent = "Username";
+        input.name = "username";
+        input.type = "text";
+        input.minLength = 3;
+        input.maxLength = 20;
+        input.pattern = "[A-Za-z0-9_]+";
+        input.autocomplete = "username";
+        input.required = true;
+        input.value = profile.username;
+        guidance.textContent = "3–20 letters, numbers or underscores.";
+        feedback.className = "clerk-account-feedback";
+        feedback.setAttribute("role", "status");
+        button.className = "button primary";
+        button.type = "submit";
+        button.textContent = "Save username";
+
+        label.append(labelText, input, guidance);
+        form.append(label, feedback, button);
+        element.replaceChildren(heading, description, form);
+
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          button.disabled = true;
+          feedback.classList.remove("account-error");
+          feedback.textContent = "";
+          try {
+            const result = await requestJson(clerk, apiUrl, "/api/account/username", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ username: input.value.trim() }),
+            });
+            profile.username = result.username;
+            accountButton.textContent = result.username;
+            input.value = result.username;
+            feedback.textContent = "Username updated.";
+          } catch (error) {
+            feedback.classList.add("account-error");
+            feedback.textContent = error.message;
+          } finally {
+            button.disabled = false;
+          }
+        });
+      },
+      unmount: (element) => {
+        element.classList.remove("clerk-username-page");
+        element.replaceChildren();
+      },
+    });
+  }
+
+  customPages.push(
+    {
+      url: "sign-out",
+      label: "Sign out",
+      mountIcon: (element) => {
+        element.textContent = "↪";
+      },
+      unmountIcon: (element) => {
+        element.replaceChildren();
+      },
+      mount: (element) => {
+        const heading = document.createElement("h2");
+        const description = document.createElement("p");
+        const button = document.createElement("button");
+        const error = document.createElement("p");
+
+        element.classList.add("clerk-sign-out-page");
+        heading.textContent = "Sign out";
+        description.textContent = "Sign out of The Daily Undead on this device?";
+        button.className = "button clerk-sign-out-button";
+        button.type = "button";
+        button.textContent = "Sign out";
+        error.className = "account-error";
+        error.setAttribute("role", "alert");
+
+        button.addEventListener("click", async () => {
+          button.disabled = true;
+          button.textContent = "Signing out…";
+          error.textContent = "";
+          try {
+            await clerk.signOut({
+              redirectUrl: `${window.location.origin}${window.location.pathname}`,
+            });
+          } catch {
+            button.disabled = false;
+            button.textContent = "Sign out";
+            error.textContent = "Could not sign out. Please try again.";
+          }
+        });
+
+        element.replaceChildren(heading, description, button, error);
+      },
+      unmount: (element) => {
+        element.classList.remove("clerk-sign-out-page");
+        element.replaceChildren();
+      },
+    },
+  );
+
   return {
     routing: "hash",
-    customPages: [
-      {
-        url: "sign-out",
-        label: "Sign out",
-        mountIcon: (element) => {
-          element.textContent = "↪";
-        },
-        unmountIcon: (element) => {
-          element.replaceChildren();
-        },
-        mount: (element) => {
-          const heading = document.createElement("h2");
-          const description = document.createElement("p");
-          const button = document.createElement("button");
-          const error = document.createElement("p");
-
-          element.classList.add("clerk-sign-out-page");
-          heading.textContent = "Sign out";
-          description.textContent = "Sign out of The Daily Undead on this device?";
-          button.className = "button clerk-sign-out-button";
-          button.type = "button";
-          button.textContent = "Sign out";
-          error.className = "account-error";
-          error.setAttribute("role", "alert");
-
-          button.addEventListener("click", async () => {
-            button.disabled = true;
-            button.textContent = "Signing out…";
-            error.textContent = "";
-            try {
-              await clerk.signOut({
-                redirectUrl: `${window.location.origin}${window.location.pathname}`,
-              });
-            } catch {
-              button.disabled = false;
-              button.textContent = "Sign out";
-              error.textContent = "Could not sign out. Please try again.";
-            }
-          });
-
-          element.replaceChildren(heading, description, button, error);
-        },
-        unmount: (element) => {
-          element.classList.remove("clerk-sign-out-page");
-          element.replaceChildren();
-        },
-      },
-    ],
+    customPages,
   };
 }
 
@@ -281,7 +361,7 @@ export async function initialiseAccount({
   accountButton.textContent = profile.username;
   setStatus();
   accountButton.addEventListener("click", () =>
-    clerk.openUserProfile(createUserProfileOptions(clerk)),
+    clerk.openUserProfile(createUserProfileOptions(clerk, { apiUrl, profile, accountButton })),
   );
 
   async function saveNow() {

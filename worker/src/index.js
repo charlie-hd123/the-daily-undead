@@ -5,6 +5,7 @@ import {
   recordVerifiedMapResult,
   registerAccount,
   saveAccount,
+  updateAccountUsername,
 } from "./accounts.js";
 
 const jsonHeaders = {
@@ -201,6 +202,8 @@ async function handleAccountRequest(request, env, url) {
     result = await getAccount(env.DB, identity.userId, url.searchParams.get("date"));
   } else if (url.pathname === "/api/account/register" && request.method === "POST") {
     result = await registerAccount(env.DB, request, identity.userId);
+  } else if (url.pathname === "/api/account/username" && request.method === "PUT") {
+    result = await updateAccountUsername(env.DB, request, identity.userId);
   } else if (url.pathname === "/api/account/save" && request.method === "PUT") {
     result = await saveAccount(env.DB, request, identity.userId);
   } else if (url.pathname === "/api/account/results/map" && request.method === "POST") {

@@ -417,6 +417,30 @@ h1 {
   padding: 1rem;
 }
 
+.clerk-username-page {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.clerk-username-page h2,
+.clerk-username-page p {
+  margin: 0;
+}
+
+.clerk-username-form {
+  display: grid;
+  gap: 1rem;
+  max-width: 24rem;
+}
+
+.clerk-account-feedback {
+  min-height: 1.2em;
+  color: var(--success);
+  font-size: 0.82rem;
+}
+
 .clerk-sign-out-page h2,
 .clerk-sign-out-page p {
   margin: 0;

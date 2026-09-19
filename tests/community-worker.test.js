@@ -12,6 +12,7 @@ import {
   normalizeUsername,
   sanitizeDailyState,
   sanitizeProgress,
+  updateAccountUsername,
 } from "../worker/src/accounts.js";
 import { verifyClerkRequest } from "../worker/src/auth.js";
 import {
@@ -101,6 +102,71 @@ test("account usernames and uploaded local saves are tightly validated", () => {
     "clues",
   );
   assert.equal(sanitizeDailyState({ phase: "cheat", puzzleKey: `${today}:x` }, today), null);
+});
+
+test("a signed-in player can change only their own unique D1 username", async () => {
+  let updateBindings = null;
+  const db = {
+    prepare(sql) {
+      return {
+        bind(...bindings) {
+          if (sql.startsWith("SELECT username")) {
+            return { first: async () => ({ username: "OldName" }) };
+          }
+          return {
+            run: async () => {
+              updateBindings = bindings;
+            },
+          };
+        },
+      };
+    },
+  };
+  const response = await updateAccountUsername(
+    db,
+    new Request("https://api.example.test/api/account/username", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: " Richtofen_93 " }),
+    }),
+    "user_123",
+  );
+
+  assert.deepEqual(response, { status: 200, body: { username: "Richtofen_93" } });
+  assert.deepEqual(updateBindings, ["Richtofen_93", "user_123"]);
+});
+
+test("username changes preserve D1 uniqueness errors", async () => {
+  const db = {
+    prepare(sql) {
+      return {
+        bind() {
+          if (sql.startsWith("SELECT username")) {
+            return { first: async () => ({ username: "OldName" }) };
+          }
+          return {
+            run: async () => {
+              throw new Error("UNIQUE constraint failed: player_profiles.username");
+            },
+          };
+        },
+      };
+    },
+  };
+  const response = await updateAccountUsername(
+    db,
+    new Request("https://api.example.test/api/account/username", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username: "TakenName" }),
+    }),
+    "user_123",
+  );
+
+  assert.deepEqual(response, {
+    status: 409,
+    body: { error: "That username is already taken." },
+  });
 });
 
 test("account routes reject requests without a Clerk bearer token before any network call", async () => {
