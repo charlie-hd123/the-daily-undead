@@ -70,7 +70,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260919-20"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260919-21"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -107,6 +107,8 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(account, /accountButton\.textContent = "Log in";/);
   assert.doesNotMatch(account, /setStatus\("Playing as guest"\)/);
   assert.match(account, /accountButton\.textContent = profile\.username;/);
+  assert.match(account, /accountButton\.classList\.add\("has-username"\)/);
+  assert.match(css, /\.account-button\.has-username \{\s*text-transform: none;/);
   assert.match(account, /customPages/);
   assert.match(account, /label: "Change username"/);
   assert.match(account, /"\/api\/account\/username"/);

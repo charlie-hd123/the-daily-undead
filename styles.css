@@ -410,6 +410,10 @@ h1 {
   cursor: wait;
 }
 
+.account-button.has-username {
+  text-transform: none;
+}
+
 .clerk-sign-out-page {
   display: grid;
   align-content: start;

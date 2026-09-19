@@ -318,6 +318,7 @@ export async function initialiseAccount({
   if (!hasPendingLocalSave) applyRemoteAccount(account);
   accountButton.disabled = false;
   accountButton.textContent = profile.username;
+  accountButton.classList.add("has-username");
   setStatus();
 
   const openUsernameEditor = () => {
