@@ -13,7 +13,7 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20260919-19";
+} from "./game-core.js?v=20260919-20";
 import {
   calculateReviveCost,
   canUseRequestedPreviewDate,
@@ -23,15 +23,15 @@ import {
   purchaseMissedDayRevive,
   resetReviveCount,
   shouldResetReviveCycle,
-} from "./progression.js?v=20260919-19";
-import { initialiseAccount } from "./account.js?v=20260919-19";
+} from "./progression.js?v=20260919-20";
+import { initialiseAccount } from "./account.js?v=20260919-20";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20260919-19";
+} from "./community-stats.js?v=20260919-20";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");

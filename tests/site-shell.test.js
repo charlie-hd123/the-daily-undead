@@ -70,7 +70,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260919-19"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260919-20"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -111,9 +111,14 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(account, /label: "Change username"/);
   assert.match(account, /"\/api\/account\/username"/);
   assert.match(html, /id="account-username-dialog"/);
-  assert.match(html, /id="account-username-form"/);
-  assert.match(html, /name="publicName"/);
-  assert.match(html, /autocomplete="off"/);
+  assert.match(
+    html,
+    /id="account-onboarding-form"[\s\S]*?name="username"[\s\S]*?id="account-username-form"/,
+  );
+  assert.match(
+    html,
+    /id="account-username-form"[\s\S]*?name="publicName"[\s\S]*?autocomplete="off"/,
+  );
   assert.match(account, /usernameForm\.elements\.publicName\.value = profile\.username/);
   assert.match(account, /button\.dataset\.openUsernameEditor = ""/);
   assert.match(account, /event\.target\.closest\("\[data-open-username-editor\]"\)/);
