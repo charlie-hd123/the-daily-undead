@@ -101,7 +101,7 @@ function createUserProfileOptions(clerk, { openUsernameEditor = null } = {}) {
         button.className = "button primary";
         button.type = "button";
         button.textContent = "Edit username";
-        button.addEventListener("click", openUsernameEditor);
+        button.dataset.openUsernameEditor = "";
 
         element.replaceChildren(heading, description, button);
       },
@@ -328,6 +328,12 @@ export async function initialiseAccount({
     usernameFeedback.classList.remove("account-error", "is-success");
     globalThis.setTimeout(() => openDialog(usernameDialog), 0);
   };
+
+  documentObject.addEventListener("click", (event) => {
+    if (!event.target.closest("[data-open-username-editor]")) return;
+    event.preventDefault();
+    openUsernameEditor();
+  });
 
   usernameForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
