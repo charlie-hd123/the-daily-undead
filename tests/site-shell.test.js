@@ -70,7 +70,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260919-6"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260919-7"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -88,8 +88,9 @@ test("account controls support optional sign-in without exposing private credent
   );
   assert.match(
     html,
-    /class="account-controls"[\s\S]*id="account-button"[\s\S]*id="account-status"[\s\S]*class="round-timing"/,
+    /class="round-timing"[\s\S]*class="next-round"[\s\S]*id="account-status"/,
   );
+  assert.match(html, />Register to keep your rounds and points on every device\./);
   assert.match(
     css,
     /@media \(max-width: 60rem\)[\s\S]*?\.header-utility \.round-timing \{\s*order: -1;/,
@@ -98,6 +99,8 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(html, /name="importLocalProgress"/);
   assert.match(account, /session\?\.getToken\(\)/);
   assert.match(account, /Authorization: `Bearer \$\{token\}`/);
+  assert.match(account, /accountButton\.textContent = "Log in \(playing as guest\)";/);
+  assert.doesNotMatch(account, /setStatus\("Playing as guest"\)/);
   assert.match(account, /accountButton\.textContent = profile\.username;/);
   assert.doesNotMatch(`${html}\n${account}\n${workerConfig}`, /sk_(?:test|live)_/);
 });

@@ -149,8 +149,8 @@ export async function initialiseAccount({
 
   if (!clerk.isSignedIn) {
     accountButton.disabled = false;
-    accountButton.textContent = "Save progress";
-    setStatus("Playing as guest");
+    accountButton.textContent = "Log in (playing as guest)";
+    setStatus();
     accountButton.addEventListener("click", () => openDialog(accessDialog));
     let wasSignedOut = true;
     clerk.addListener(({ user }) => {
