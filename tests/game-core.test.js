@@ -12,6 +12,7 @@ import {
   getUtcDateKey,
   isAcceptedMapSelection,
   isCorrectOrder,
+  isMapAvailableOnDate,
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
@@ -84,6 +85,18 @@ test("future maps are excluded and exactly three clues are selected", () => {
 
   assert.notEqual(puzzle.map.id, "future-map");
   assert.equal(puzzle.displayedSteps.length, 3);
+});
+
+test("future maps are unavailable as answers and selections until their UTC date", () => {
+  assert.equal(isMapAvailableOnDate(maps[2], "2029-12-31"), false);
+  assert.equal(isMapAvailableOnDate(maps[2], "2030-01-01"), true);
+  assert.equal(
+    isMapAvailableOnDate(
+      { selectionOnly: true, releaseDate: "2030-01-01" },
+      "2029-12-31",
+    ),
+    false,
+  );
 });
 
 test("maps without a valid availability date cannot enter the daily rotation", () => {

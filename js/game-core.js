@@ -62,6 +62,16 @@ export function isValidDateKey(value) {
   return !Number.isNaN(date.getTime()) && getUtcDateKey(date) === value;
 }
 
+export function isMapAvailableOnDate(map, dateKey) {
+  const availabilityDate = map?.selectionOnly ? map.releaseDate : map?.availableFrom;
+
+  return (
+    isValidDateKey(dateKey) &&
+    isValidDateKey(availabilityDate) &&
+    availabilityDate <= dateKey
+  );
+}
+
 export function getMillisecondsUntilNextUtcDay(date = new Date()) {
   const nextUtcMidnight = Date.UTC(
     date.getUTCFullYear(),
@@ -86,8 +96,7 @@ export function buildDailyPuzzle(dateKey, maps, rotationIndex = 0) {
       (map) =>
         Array.isArray(map.steps) &&
         map.steps.length >= 3 &&
-        isValidDateKey(map.availableFrom) &&
-        map.availableFrom <= dateKey,
+        isMapAvailableOnDate(map, dateKey),
     )
     .sort((left, right) => left.id.localeCompare(right.id));
 
