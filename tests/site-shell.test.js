@@ -96,6 +96,11 @@ test("account controls support optional sign-in without exposing private credent
     /@media \(max-width: 60rem\)[\s\S]*?\.header-utility \.round-timing \{\s*order: -1;/,
   );
   assert.match(html, /id="account-onboarding-form"/);
+  assert.match(html, /<h2>Choose your name<\/h2>/);
+  assert.match(
+    html,
+    /This public username will identify you on leaderboards\. Your email is never shown\./,
+  );
   assert.match(html, /name="importLocalProgress"/);
   assert.match(account, /session\?\.getToken\(\)/);
   assert.match(account, /Authorization: `Bearer \$\{token\}`/);
