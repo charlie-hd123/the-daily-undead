@@ -2,7 +2,7 @@ import {
   buildDailyPuzzle,
   getAnswerDisplayTitle,
   getUtcDateKey,
-} from "./game-core.js?v=20260919-13";
+} from "./game-core.js?v=20260919-14";
 import { fetchCommunityStats } from "./community-stats.js?v=20260817-1";
 import {
   buildMarketingCopy,

@@ -127,6 +127,9 @@ function createUserProfileOptions(clerk, { apiUrl = null, profile = null, accoun
         label.append(labelText, input, guidance);
         form.append(label, feedback, button);
         element.replaceChildren(heading, description, form);
+        globalThis.setTimeout(() => {
+          if (input.isConnected && !input.value) input.value = profile.username;
+        }, 0);
 
         form.addEventListener("submit", async (event) => {
           event.preventDefault();
