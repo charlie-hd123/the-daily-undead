@@ -313,6 +313,13 @@ h1 {
   gap: 0.45rem;
 }
 
+.header-utility {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
 .round-timing {
   display: grid;
   justify-items: end;
@@ -345,9 +352,10 @@ h1 {
 .account-controls {
   display: flex;
   min-width: 0;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
   justify-content: flex-end;
-  gap: 0.5rem;
+  gap: 0.2rem;
 }
 
 .account-button {
@@ -1477,9 +1485,8 @@ h1 {
   .site-header {
     grid-template-areas:
       "brand"
-      "date"
-      "stats"
-      "account";
+      "utility"
+      "stats";
     grid-template-columns: minmax(0, 1fr);
     align-items: start;
     row-gap: clamp(0.55rem, 1.2vw, 0.75rem);
@@ -1500,8 +1507,13 @@ h1 {
     display: contents;
   }
 
+  .header-utility {
+    grid-area: utility;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
   .round-timing {
-    grid-area: date;
     justify-self: start;
     justify-items: start;
   }
@@ -1521,9 +1533,8 @@ h1 {
   }
 
   .account-controls {
-    grid-area: account;
-    justify-self: start;
     justify-content: flex-start;
+    align-items: flex-start;
   }
 
   .account-status {
@@ -1568,13 +1579,20 @@ h1 {
   }
 
   .brand-lockup,
-  .round-timing,
+  .header-utility,
   .player-stats {
     grid-area: auto;
   }
 
+  .header-utility {
+    width: 100%;
+    justify-content: flex-start;
+    gap: clamp(0.65rem, 3vw, 1rem);
+  }
+
   .account-controls {
     justify-content: flex-start;
+    align-items: flex-start;
   }
 
   .account-status {
