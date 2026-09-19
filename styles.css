@@ -399,15 +399,25 @@ h1 {
   white-space: nowrap;
 }
 
-.account-button.is-signed-in {
-  border-color: rgb(108 231 161 / 36%);
-  background: rgb(108 231 161 / 8%);
-  color: var(--success);
-}
-
 .account-button:disabled {
   opacity: 0.58;
   cursor: wait;
+}
+
+.clerk-sign-out-page {
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.clerk-sign-out-page h2,
+.clerk-sign-out-page p {
+  margin: 0;
+}
+
+.clerk-sign-out-button {
+  justify-self: start;
 }
 
 .account-button:focus-visible,

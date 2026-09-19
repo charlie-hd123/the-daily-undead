@@ -77,6 +77,60 @@ async function requestJson(clerk, apiUrl, path, options = {}) {
   return result;
 }
 
+function createUserProfileOptions(clerk) {
+  return {
+    routing: "hash",
+    customPages: [
+      {
+        url: "sign-out",
+        label: "Sign out",
+        mountIcon: (element) => {
+          element.textContent = "↪";
+        },
+        unmountIcon: (element) => {
+          element.replaceChildren();
+        },
+        mount: (element) => {
+          const heading = document.createElement("h2");
+          const description = document.createElement("p");
+          const button = document.createElement("button");
+          const error = document.createElement("p");
+
+          element.classList.add("clerk-sign-out-page");
+          heading.textContent = "Sign out";
+          description.textContent = "Sign out of The Daily Undead on this device?";
+          button.className = "button clerk-sign-out-button";
+          button.type = "button";
+          button.textContent = "Sign out";
+          error.className = "account-error";
+          error.setAttribute("role", "alert");
+
+          button.addEventListener("click", async () => {
+            button.disabled = true;
+            button.textContent = "Signing out…";
+            error.textContent = "";
+            try {
+              await clerk.signOut({
+                redirectUrl: `${window.location.origin}${window.location.pathname}`,
+              });
+            } catch {
+              button.disabled = false;
+              button.textContent = "Sign out";
+              error.textContent = "Could not sign out. Please try again.";
+            }
+          });
+
+          element.replaceChildren(heading, description, button, error);
+        },
+        unmount: (element) => {
+          element.classList.remove("clerk-sign-out-page");
+          element.replaceChildren();
+        },
+      },
+    ],
+  };
+}
+
 export async function initialiseAccount({
   apiUrl,
   puzzleDate,
@@ -171,7 +225,9 @@ export async function initialiseAccount({
     accountButton.disabled = false;
     accountButton.textContent = "Account sync offline";
     setStatus("Progress is saved on this device for now");
-    accountButton.addEventListener("click", () => clerk.openUserProfile({ routing: "hash" }));
+    accountButton.addEventListener("click", () =>
+      clerk.openUserProfile(createUserProfileOptions(clerk)),
+    );
     return createUnavailableController({ clerk, signedIn: true });
   }
 
@@ -223,9 +279,10 @@ export async function initialiseAccount({
   if (!hasPendingLocalSave) applyRemoteAccount(account);
   accountButton.disabled = false;
   accountButton.textContent = profile.username;
-  accountButton.classList.add("is-signed-in");
   setStatus();
-  accountButton.addEventListener("click", () => clerk.openUserProfile({ routing: "hash" }));
+  accountButton.addEventListener("click", () =>
+    clerk.openUserProfile(createUserProfileOptions(clerk)),
+  );
 
   async function saveNow() {
     if (saveInFlight) {
