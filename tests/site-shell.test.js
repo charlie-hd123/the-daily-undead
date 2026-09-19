@@ -70,18 +70,25 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260919-21"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260919-22"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
-  const [html, css, account, workerConfig] = await Promise.all([
+  const [html, css, account, appScript, workerConfig] = await Promise.all([
     readProjectFile("index.html"),
     readProjectFile("styles.css"),
     readProjectFile("js/account.js"),
+    readProjectFile("js/app.js"),
     readProjectFile("worker/wrangler.jsonc"),
   ]);
 
   assert.match(html, /id="account-button"/);
+  assert.match(html, /id="leaderboards-button"/);
+  assert.match(html, /id="leaderboards-dialog"/);
+  assert.match(html, /<p class="kicker">Undead Leaderboards<\/p>/);
+  assert.match(html, /<h2>Leaderboards<\/h2>/);
+  assert.match(html, /<p>Coming soon\.\.\.<\/p>/);
+  assert.match(appScript, /leaderboardsDialog\.showModal\(\)/);
   assert.match(
     html,
     /class="header-utility"[\s\S]*id="account-button"[\s\S]*class="round-timing"[\s\S]*class="player-stats"/,
