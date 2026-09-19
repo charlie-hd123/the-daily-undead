@@ -70,7 +70,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260919-5"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260919-6"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -88,7 +88,7 @@ test("account controls support optional sign-in without exposing private credent
   );
   assert.match(
     html,
-    /class="round-timing"[\s\S]*class="next-round"[\s\S]*id="account-status"/,
+    /class="account-controls"[\s\S]*id="account-button"[\s\S]*id="account-status"[\s\S]*class="round-timing"/,
   );
   assert.match(
     css,

@@ -317,11 +317,11 @@ h1 {
   display: flex;
   align-items: flex-start;
   justify-content: flex-end;
-  gap: 0.75rem;
+  gap: 0.9rem;
 }
 
 .header-utility:has(.account-button:not([hidden])) .round-timing {
-  padding-left: 0.75rem;
+  padding-left: 0.9rem;
   border-left: 1px solid rgb(156 181 223 / 18%);
 }
 
@@ -336,7 +336,7 @@ h1 {
   }
 
   .header-utility:has(.account-button:not([hidden])) .account-controls {
-    padding-left: 0.75rem;
+    padding-left: 0.9rem;
     border-left: 1px solid rgb(156 181 223 / 18%);
   }
 }
@@ -374,23 +374,23 @@ h1 {
   display: flex;
   min-width: 0;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
   justify-content: flex-end;
-  gap: 0.2rem;
+  gap: 0.35rem;
 }
 
 .account-button {
   max-width: 12rem;
-  min-height: 1.9rem;
+  min-height: 2.15rem;
   overflow: hidden;
-  padding: 0.35rem 0.75rem;
+  padding: 0.45rem 0.9rem;
   border: 1px solid rgb(103 232 255 / 32%);
   border-radius: 999px;
   background: rgb(103 232 255 / 8%);
   color: var(--aether);
   cursor: pointer;
   font-family: var(--font-display);
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   line-height: 1;
@@ -421,9 +421,9 @@ h1 {
   max-width: 14rem;
   overflow: hidden;
   color: rgb(168 178 199 / 70%);
-  font-size: 0.68rem;
-  line-height: 1.2;
-  text-align: right;
+  font-size: 0.7rem;
+  line-height: 1.3;
+  text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -1559,12 +1559,12 @@ h1 {
 
   .account-controls {
     justify-content: flex-start;
-    align-items: flex-start;
+    align-items: center;
   }
 
   .account-status {
     max-width: min(55vw, 16rem);
-    text-align: left;
+    text-align: center;
   }
 
   .stat-display {
@@ -1617,12 +1617,12 @@ h1 {
 
   .account-controls {
     justify-content: flex-start;
-    align-items: flex-start;
+    align-items: center;
   }
 
   .account-status {
     max-width: min(48vw, 12rem);
-    text-align: left;
+    text-align: center;
   }
 
   .account-button {
