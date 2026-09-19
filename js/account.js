@@ -202,7 +202,7 @@ export async function initialiseAccount({
 
   accountButton.hidden = false;
   accountButton.disabled = true;
-  accountButton.textContent = "Loading account…";
+  accountButton.textContent = "Loading...";
 
   try {
     clerk = await withTimeout(

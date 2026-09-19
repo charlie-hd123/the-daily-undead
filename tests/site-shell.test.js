@@ -70,7 +70,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260919-24"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260919-25"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -113,6 +113,7 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(account, /session\?\.getToken\(\)/);
   assert.match(account, /Authorization: `Bearer \$\{token\}`/);
   assert.match(account, /accountButton\.textContent = "Log in";/);
+  assert.match(account, /accountButton\.textContent = "Loading\.\.\.";/);
   assert.doesNotMatch(account, /setStatus\("Playing as guest"\)/);
   assert.match(account, /accountButton\.textContent = profile\.username;/);
   assert.match(account, /accountButton\.classList\.add\("has-username"\)/);
