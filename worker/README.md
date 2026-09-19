@@ -1,6 +1,6 @@
-# Community statistics operations guide
+# Account and community statistics operations guide
 
-The Daily Undead remains a static GitHub Pages site. Community statistics are handled separately by a Cloudflare Worker and D1 database.
+The Daily Undead remains a static GitHub Pages site. Optional accounts, cross-device saves, verified results, and community statistics are handled by a Cloudflare Worker and D1 database. Clerk handles email-code authentication; the Worker verifies Clerk session tokens without storing a Clerk secret.
 
 ## Live production configuration
 
@@ -9,7 +9,9 @@ The Daily Undead remains a static GitHub Pages site. Community statistics are ha
 - D1 database: `daily-undead-stats`
 - D1 binding: `DB`
 - Worker variable: `ALLOWED_ORIGINS`
-- Custom domain: `api.thedailyundead.com`
+- Worker variable: `CLERK_ISSUER`
+- Worker variable: `CLERK_AUTHORIZED_PARTIES`
+- Dashboard-managed custom domain: `api.thedailyundead.com`
 - `workers.dev` URL: disabled; the custom domain is the only production address
 - Observability: invocation logs enabled, traces disabled
 - Cron triggers, queues, routes, build hooks, and secrets: none
@@ -21,6 +23,12 @@ The Worker exposes:
 - `GET /health` for a simple health check.
 - `GET /api/stats?date=YYYY-MM-DD` for players today, total games, and yesterday's result.
 - `POST /api/attempts` for a completed current-day map guess.
+- `GET /api/account?date=YYYY-MM-DD` for a signed-in player's profile and save.
+- `POST /api/account/register` to reserve a username and optionally import local progress.
+- `PUT /api/account/save` to synchronise personal progress and the current daily state.
+- `POST /api/account/results/map` and `POST /api/account/results/bonus` for server-verified daily results.
+
+All `/api/account` routes require a Clerk bearer token. The Worker verifies the RS256 signature against Clerk's published JWKS, then checks the issuer and authorized browser origin (`azp`).
 
 ## What counts and what is stored
 
@@ -28,7 +36,7 @@ A play is recorded only when the player confirms a map. Visiting, refreshing, re
 
 The browser creates a random local identifier. The Worker hashes it with SHA-256 before D1 storage. D1's `UNIQUE (puzzle_date, player_hash)` rule is the final protection against repeat submissions from one browser on one UTC date. Another browser or device can count separately.
 
-The database stores the puzzle/date, answer map, correct/incorrect map result, hashed browser identifier, and submission time. It does not store player accounts, email addresses, the raw browser identifier, or the bonus-step order. Worker invocation logs are a separate Cloudflare operational feature and can contain normal request metadata.
+The anonymous tables store the puzzle/date, answer map, correct/incorrect map result, hashed browser identifier, and submission time. Account tables store an opaque Clerk user ID, public username, game progress, daily save state, and verified daily results. Email addresses, passwords, and verification codes stay with Clerk and are never stored in D1. Worker invocation logs are a separate Cloudflare operational feature and can contain normal request metadata.
 
 The all-time total started with an estimated 100 historical games from before tracking launched. `migrations/0002_seed_historical_total.sql` documents that one-time baseline and cannot reduce a total that has already passed 100.
 
@@ -38,12 +46,17 @@ The schema is versioned in:
 
 - `migrations/0001_create_attempts.sql` — tables, index, and aggregate trigger.
 - `migrations/0002_seed_historical_total.sql` — guarded historical baseline.
+- `migrations/0003_create_player_accounts.sql` — profiles, cross-device saves, daily state and verified results.
 
-D1 contains three application tables:
+D1 contains these application tables:
 
 - `attempts` — one accepted browser/date entry per completed map guess.
 - `daily_stats` — daily attempt and correct-answer aggregates plus the answer map.
 - `community_totals` — the all-time total.
+- `player_profiles` — Clerk user ID plus the case-insensitive public username.
+- `player_saves` — cross-device progression totals and missed-day state.
+- `player_daily_saves` — resumable per-day game state.
+- `player_daily_results` — one independently verified result per player and UTC date.
 
 `sqlite_sequence` is created by SQLite for auto-increment bookkeeping and should be left alone.
 
@@ -121,14 +134,20 @@ The **Advance a day** preview never writes to production. The frontend submits o
 
 To simulate a fresh local browser, remove local-storage keys beginning with `the-daily-undead:community-` plus the current `dead-drop:` key. A completed local guess should count once; refreshing must leave the total unchanged.
 
-## Deploy Worker code from the dashboard
+## Deploy
 
-1. Open **Workers & Pages → daily-undead-stats → Edit code**.
-2. Replace `worker.js` with the complete contents of `worker/src/index.js`.
-3. Check the editor reports no problems.
-4. Click **Deploy**.
-5. Open `https://api.thedailyundead.com/health` and confirm `{"ok":true}`.
-6. Verify a read without inserting data:
+The Worker now uses several ES modules, so use Wrangler from the repository instead of pasting only `src/index.js` into the dashboard editor. The custom domain is intentionally kept as an existing dashboard-managed target, allowing Wrangler access to stay limited to Worker scripts and D1:
+
+```sh
+npx wrangler@latest login
+npx wrangler@latest d1 migrations apply daily-undead-stats --remote --config worker/wrangler.jsonc
+npx wrangler@latest versions upload --config worker/wrangler.jsonc
+npx wrangler@latest versions deploy VERSION_ID@100% --name daily-undead-stats -y
+```
+
+Copy `VERSION_ID` from the upload output. `wrangler deploy` is not used here because this Worker's only public target is maintained in the dashboard and is deliberately absent from the file.
+
+Open `https://api.thedailyundead.com/health` and confirm `{"ok":true,"accountsConfigured":true}`. Then verify a read without inserting data:
 
 ```sh
 curl -i -H 'Origin: https://thedailyundead.com' \
@@ -137,31 +156,23 @@ curl -i -H 'Origin: https://thedailyundead.com' \
 
 The response should be `200` and include `Access-Control-Allow-Origin: https://thedailyundead.com`.
 
-## Deploy with Wrangler
-
-Wrangler can reproduce the configuration in `worker/wrangler.jsonc`:
-
-```sh
-npx wrangler@latest login
-npx wrangler@latest d1 migrations apply daily-undead-stats --remote --config worker/wrangler.jsonc
-npx wrangler@latest deploy --config worker/wrangler.jsonc
-```
-
-Treat `worker/wrangler.jsonc` as the source of truth when deploying with Wrangler. It keeps the `workers.dev` URL disabled and binds production D1 as `DB`.
+Treat `worker/wrangler.jsonc` as the source of truth for code, variables and bindings. It keeps the `workers.dev` URL disabled and binds production D1 as `DB`; the existing `api.thedailyundead.com` custom domain remains the one dashboard-managed setting.
 
 ## Recreate or verify dashboard configuration
 
 If the Worker ever has to be recreated:
 
 1. Create a D1 database named `daily-undead-stats` under **Storage & databases → D1 SQL Database**.
-2. In D1 Studio, apply each complete statement from `0001_create_attempts.sql`, followed by `0002_seed_historical_total.sql`. Run the entire `CREATE TRIGGER ... BEGIN ... END;` block as one statement.
-3. Create a Worker named `daily-undead-stats` and deploy `src/index.js`.
+2. Apply all migrations in filename order with Wrangler. If using D1 Studio for recovery, run every complete statement and keep the `CREATE TRIGGER ... BEGIN ... END;` block together.
+3. Create a Worker named `daily-undead-stats` and deploy the Worker directory with Wrangler.
 4. Under **Bindings**, add D1 database `daily-undead-stats` with variable name `DB`.
 5. Under **Settings → Variables and secrets**, add the text variable:
 
    ```text
    ALLOWED_ORIGINS=https://thedailyundead.com,https://www.thedailyundead.com,http://localhost:8080,http://127.0.0.1:8080
    ```
+
+   Add `CLERK_ISSUER` using the Clerk instance URL and set `CLERK_AUTHORIZED_PARTIES` to the same comma-separated browser origins. These values are configuration, not secrets.
 
 6. Under **Domains**, disable the production `workers.dev` URL.
 7. Add the custom domain `api.thedailyundead.com`.

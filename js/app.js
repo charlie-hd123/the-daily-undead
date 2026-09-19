@@ -24,6 +24,7 @@ import {
   resetReviveCount,
   shouldResetReviveCycle,
 } from "./progression.js?v=20260919-1";
+import { initialiseAccount } from "./account.js?v=20260919-1";
 import {
   fetchCommunityStats,
   formatCommunityCount,
@@ -53,6 +54,7 @@ const pointsStorageKey = "the-daily-undead:total-points";
 const reviveCountStorageKey = "the-daily-undead:revive-count";
 const lastPlayedDateStorageKey = "the-daily-undead:last-played-date";
 const missedDayStorageKey = "the-daily-undead:missed-day";
+const bestRoundStorageKey = "the-daily-undead:best-round";
 const devPreviewStorageKey = "the-daily-undead:dev-preview";
 const currentStateVersion = 10;
 const supportedStateVersions = new Set([2, 3, 4, 5, 6, 7, 8, 9, currentStateVersion]);
@@ -66,6 +68,7 @@ let selectableMaps;
 let puzzle;
 let state;
 let streakCount = 0;
+let bestRound = 0;
 let totalRounds = 0;
 let totalPoints = 0;
 let reviveCount = 0;
@@ -76,6 +79,12 @@ let clockOffset = 0;
 let liveDateKey;
 let activeScreenKey = null;
 let pendingFocusSelector = null;
+let accountController = {
+  canSync: false,
+  scheduleSave() {},
+  async recordMapResult() { return null; },
+  async recordBonusResult() { return null; },
+};
 
 function escapeHtml(value) {
   return String(value)
@@ -397,12 +406,31 @@ function loadStreak() {
   }
 }
 
+function loadBestRound() {
+  try {
+    const savedBestRound = Number.parseInt(localStorage.getItem(bestRoundStorageKey), 10);
+    return Number.isInteger(savedBestRound) && savedBestRound >= 0 ? savedBestRound : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function saveBestRound() {
+  try {
+    localStorage.setItem(bestRoundStorageKey, String(bestRound));
+  } catch {
+    // The best round remains available for the current session when storage is disabled.
+  }
+  accountController.scheduleSave();
+}
+
 function saveStreak() {
   try {
     localStorage.setItem(streakStorageKey, String(streakCount));
   } catch {
     // The streak remains available for the current session when storage is disabled.
   }
+  accountController.scheduleSave();
 }
 
 function loadTotalRounds() {
@@ -420,6 +448,7 @@ function saveTotalRounds() {
   } catch {
     // The lifetime total remains available for the current session when storage is disabled.
   }
+  accountController.scheduleSave();
 }
 
 function loadPoints() {
@@ -437,6 +466,7 @@ function savePoints() {
   } catch {
     // The total remains available for the current session when storage is disabled.
   }
+  accountController.scheduleSave();
 }
 
 function clearTemporaryLocalProgress() {
@@ -468,6 +498,7 @@ function saveReviveCount() {
   } catch {
     // The revive count remains available for the current session when storage is disabled.
   }
+  accountController.scheduleSave();
 }
 
 function recordRevivePurchase() {
@@ -496,6 +527,7 @@ function saveLastPlayedDate() {
   } catch {
     // The date remains available for the current session when storage is disabled.
   }
+  accountController.scheduleSave();
 }
 
 function recordDailyParticipation(dateKey = puzzle.dateKey) {
@@ -532,6 +564,7 @@ function saveMissedDayState() {
   } catch {
     // The missed-day prompt remains available for the current session when storage is disabled.
   }
+  accountController.scheduleSave();
 }
 
 function prepareMissedDayState(dateKey) {
@@ -609,6 +642,10 @@ function recordMapResult(isCorrect) {
   if (state.streakRecorded) return;
 
   streakCount = calculateNextStreak(streakCount, isCorrect);
+  if (streakCount > bestRound) {
+    bestRound = streakCount;
+    saveBestRound();
+  }
   saveStreak();
   updateStreakDisplay();
   if (isCorrect) {
@@ -671,6 +708,81 @@ function saveState() {
     localStorage.setItem(storageKey(), JSON.stringify(state));
   } catch {
     // The game remains playable when storage is disabled.
+  }
+  accountController.scheduleSave();
+}
+
+function getLocalAccountSnapshot() {
+  return {
+    progress: {
+      currentRound: streakCount,
+      bestRound,
+      pointsBalance: totalPoints,
+      totalRounds,
+      reviveCount,
+      lastPlayedDate,
+      missedDayState,
+    },
+    dailyState: state,
+  };
+}
+
+function applyRemoteAccount(account) {
+  const progress = account?.progress;
+  if (progress) {
+    streakCount = progress.currentRound;
+    bestRound = Math.max(progress.bestRound, progress.currentRound);
+    totalPoints = progress.pointsBalance;
+    totalRounds = progress.totalRounds;
+    reviveCount = progress.reviveCount;
+    lastPlayedDate = progress.lastPlayedDate;
+    missedDayState = progress.missedDayState;
+
+    try {
+      localStorage.setItem(streakStorageKey, String(streakCount));
+      localStorage.setItem(bestRoundStorageKey, String(bestRound));
+      localStorage.setItem(pointsStorageKey, String(totalPoints));
+      localStorage.setItem(totalRoundsStorageKey, String(totalRounds));
+      localStorage.setItem(reviveCountStorageKey, String(reviveCount));
+      if (lastPlayedDate) localStorage.setItem(lastPlayedDateStorageKey, lastPlayedDate);
+      else localStorage.removeItem(lastPlayedDateStorageKey);
+      if (missedDayState) localStorage.setItem(missedDayStorageKey, JSON.stringify(missedDayState));
+      else localStorage.removeItem(missedDayStorageKey);
+    } catch {
+      // Remote progress still applies for the current session if local storage is unavailable.
+    }
+  }
+
+  if (
+    account?.dailyState &&
+    supportedStateVersions.has(account.dailyState.stateVersion) &&
+    account.dailyState.puzzleKey === puzzle.key
+  ) {
+    state = { ...createInitialState(), ...account.dailyState, stateVersion: currentStateVersion };
+  } else {
+    state = createInitialState();
+  }
+
+  try {
+    localStorage.setItem(storageKey(), JSON.stringify(state));
+  } catch {
+    // The remote daily state remains available for this session.
+  }
+}
+
+function verifySavedAccountResult() {
+  if (!accountController.canSync || state.phase !== "result" || !state.selectedMapId) return;
+  accountController.recordMapResult({
+    puzzleDate: puzzle.dateKey,
+    puzzleId: puzzle.key,
+    selectedMapId: state.selectedMapId,
+    cluesUsed: state.lockedClues,
+  });
+  if (state.bonusComplete || state.bonusFailed) {
+    accountController.recordBonusResult({
+      puzzleDate: puzzle.dateKey,
+      bonusOrder: state.bonusOrder,
+    });
   }
 }
 
@@ -900,6 +1012,12 @@ function renderMapSelection() {
     if (!state.pointsRecorded) awardPoints(mapPoints);
     if (isCorrect) recordDailyParticipation();
     recordCommunityAttempt(isCorrect);
+    accountController.recordMapResult({
+      puzzleDate: puzzle.dateKey,
+      puzzleId: puzzle.key,
+      selectedMapId: state.selectedMapId,
+      cluesUsed: state.cluesRevealed,
+    });
     setState({
       phase: "result",
       isCorrect,
@@ -1286,6 +1404,10 @@ function renderResult() {
     });
   });
   app.querySelector("#submit-order").addEventListener("click", () => {
+    accountController.recordBonusResult({
+      puzzleDate: puzzle.dateKey,
+      bonusOrder: state.bonusOrder,
+    });
     if (isCorrectOrder(state.bonusOrder, puzzle.chronologicalSteps)) {
       const bonusPoints = calculateBonusPoints(state.mapPoints, true);
       if (!state.bonusPointsRecorded) awardPoints(bonusPoints);
@@ -1328,14 +1450,22 @@ async function initialise() {
     const dateKey = getDateKey();
     liveDateKey = getUtcDateKey(getCurrentTime());
     streakCount = loadStreak();
+    bestRound = Math.max(loadBestRound(), streakCount);
     totalRounds = loadTotalRounds();
     totalPoints = loadPoints();
     reviveCount = loadReviveCount();
     lastPlayedDate = loadLastPlayedDate();
     puzzle = buildDailyPuzzle(dateKey, maps);
     state = loadState();
+    accountController = await initialiseAccount({
+      apiUrl: communityStatsApiUrl,
+      puzzleDate: dateKey,
+      getLocalSnapshot: getLocalAccountSnapshot,
+      applyRemoteAccount,
+    });
     prepareCommunityStatsDisplay();
     migrateCompletedScore();
+    verifySavedAccountResult();
     clearTemporaryLocalProgress();
     if (state.phase === "result" && typeof state.isCorrect === "boolean") {
       recordCommunityAttempt(state.isCorrect);

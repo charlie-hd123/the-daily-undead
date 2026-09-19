@@ -12,9 +12,9 @@ Finished results lead into a dedicated next-round screen with a large live count
 
 Finished results also include a spoiler-free **Share with your squad** action. Supported phones and browsers open the native share sheet; other modern browsers copy the dated result, Current Round, Points, Total Rounds, and canonical game link to the clipboard.
 
-The player also has a browser-local current-round streak. A correct map answer increases it immediately, whether or not the bonus order is correct, while a wrong map answer resets it to zero. Missing a daily map also resets Current Round and Points on the player's next visit. The missed-day screen and Game Over screen offer a revive when the player has enough points. Successful revives cost progressively more during the current run across both loss types: 100, 250, 500, 750, 1,000, 1,500, 2,000, 3,000, 4,000, then 5,000 points. Every later revive in that run remains at the 5,000-point ceiling. If a loss is not revived, the run ends and the revive price resets to 100 points for the next run. A separate Total Rounds count records every correctly identified map and does not reset after a loss. Clearing the site's browser data resets these values.
+The player also has a current-round streak. A correct map answer increases it immediately, whether or not the bonus order is correct, while a wrong map answer resets it to zero. Missing a daily map also resets Current Round and Points on the player's next visit. The missed-day screen and Game Over screen offer a revive when the player has enough points. Successful revives cost progressively more during the current run across both loss types: 100, 250, 500, 750, 1,000, 1,500, 2,000, 3,000, 4,000, then 5,000 points. Every later revive in that run remains at the 5,000-point ceiling. If a loss is not revived, the run ends and the revive price resets to 100 points for the next run. A separate Total Rounds count records every correctly identified map and does not reset after a loss. Guest values live only in the browser; signed-in values can be restored from the account service.
 
-The game is a dependency-free static site designed to work on GitHub Pages. The catalogue contains 320 ordered steps across 38 answer maps from World at War through Black Ops 7. Nine additional maps without full Easter eggs are selectable but excluded from the answer rotation.
+The game is a dependency-free static site designed to work on GitHub Pages. Players can remain guests with browser-local progress, or optionally sign in with a one-time email code to keep progress across devices. The catalogue contains 320 ordered steps across 38 answer maps from World at War through Black Ops 7. Nine additional maps without full Easter eggs are selectable but excluded from the answer rotation.
 
 Community statistics appear above the footer: unique players today, total games played all-time, and yesterday's map solve percentage. They are served by a Cloudflare Worker and D1 database. A play is counted when a map is confirmed; the bonus order does not affect the count or solve result. A browser-local anonymous ID and a database uniqueness constraint prevent refreshes and repeat submissions from increasing the same daily puzzle more than once. The game remains fully playable if the statistics API is unavailable. See [worker/README.md](worker/README.md) for the live configuration, database queries, deployment, and recovery guide.
 
@@ -52,7 +52,7 @@ During local development, the **Dev button – advance a day** control at the bo
 
 Localhost uses a local Worker at `http://localhost:8787`; it never submits attempts to the production community database. If the local Worker is not running, the game still works and the community figures show `—`. Future-date previews are also rejected by the Worker, so **Advance a day** cannot affect live totals.
 
-Progress is saved in the browser separately for each date. Every player receives the next puzzle at 00:00 UTC, and the header countdown shows the time remaining until that worldwide rollover. The site synchronises against its host's clock when possible and falls back to the device clock when offline.
+Guest progress is saved in the browser separately for each date. Signed-in players also synchronise it through the account API. Every player receives the next puzzle at 00:00 UTC, and the header countdown shows the time remaining until that worldwide rollover. The site synchronises against its host's clock when possible and falls back to the device clock when offline.
 
 ## Run the tests
 
@@ -62,7 +62,7 @@ With Node.js installed:
 npm test
 ```
 
-The tests cover deterministic daily selection, map availability dates, clue selection, bonus-order checking, catalogue integrity, missed-day progression, revives, community submission deduplication, Worker validation and CORS, future preview protection, and the published page's assets and privacy-sensitive links.
+The tests cover deterministic daily selection, map availability dates, clue selection, bonus-order checking, catalogue integrity, missed-day progression, revives, community submission deduplication, account validation, Worker validation and CORS, future preview protection, and the published page's assets and privacy-sensitive links.
 
 ## Add or update map data
 
@@ -103,6 +103,7 @@ For each map:
 1. Create or replace its JSON file. Use unique map and step IDs, at least three steps, and unique chronological `order` numbers. Every step needs a hard `hardClue` for the initial guess and a full `clue` for the ordering bonus. Four or more steps are recommended so repeat appearances can use different clues.
 2. Set `gameId` to one of the IDs in `data/maps/index.json`.
 3. Add the filename to the `maps` array in `data/maps/index.json`.
+4. Run `npm run generate:worker-catalog`. This gives the Worker the same minimal puzzle catalogue so it can independently verify results used by future leaderboards. The test suite fails if the generated copy is stale.
 
 Every answer map must include an `availableFrom` field in `YYYY-MM-DD` format. **When adding a new map, set this to a future UTC date, not today.** This prevents a deployment from changing the live puzzle for players who have already started or completed it.
 
@@ -120,9 +121,13 @@ Once this folder is pushed to a GitHub repository:
 
 No build command or GitHub Action is required. The included `CNAME` file connects the Pages site to [thedailyundead.com](https://thedailyundead.com/). Keep that file in the published branch.
 
-## Player data and feedback
+## Player accounts, data and feedback
 
-Game progress is stored in the player's browser using local storage. The site has no player accounts, advertising cookies, or external font requests. Community statistics use a random browser-local identifier; the Worker hashes it before D1 storage and records only the puzzle/date, answer map, and correct/incorrect result. The bonus-step order is not sent. Cloudflare Web Analytics and Worker invocation logs are enabled in the Cloudflare account. Clearing the site's browser data removes saved game progress and creates a new anonymous community identifier on the next completed attempt.
+Accounts are optional. Guests keep using browser local storage. A player who chooses **Save progress** signs up or signs in through Clerk with an email verification code, then chooses a public username. There is no game password to remember or reset. On first setup, the player can import progress already stored on that device.
+
+Clerk stores the email address and authentication/session data. Cloudflare D1 stores only Clerk's opaque user ID, the chosen username, synchronised progress, per-day puzzle state, and a server-verified daily-result ledger. D1 does not store email addresses, passwords, or email codes. Future leaderboards must be calculated from the verified ledger, not the client-uploaded progress or imported local totals. This prevents an edited local-storage value from becoming a trusted leaderboard score.
+
+The existing anonymous community count remains separate. It uses a random browser-local identifier; the Worker hashes it before D1 storage and records only the puzzle/date, answer map, and correct/incorrect result. Cloudflare Web Analytics and Worker invocation logs are enabled in the Cloudflare account. Clearing site data removes guest progress; signed-in progress can be restored after signing in again.
 
 The footer links to the optional [feedback form](https://tally.so/r/q4XeD7). It opens only when a player chooses it, sends no referring page address, and lets players submit without giving an email address. Screenshots and email addresses are optional. Review and delete form submissions in Tally when they are no longer needed; automatic retention controls require a paid Tally plan. If the form address changes, update the footer link in `index.html` and this README.
 
@@ -133,11 +138,13 @@ index.html             App shell
 styles.css             Mobile-first functional styling
 assets/fonts/          Locally hosted Barlow fonts and their OFL licence
 js/app.js              Screens, interactions, saved progress
+js/account.js          Optional Clerk sign-in and cross-device sync
 js/game-core.js        Seeded daily puzzle and order logic
 js/progression.js      Missed-day, revive, and preview rules
 js/community-stats.js  Anonymous attempt submission and aggregate display
 data/maps/index.json   Game list and map-file manifest
 data/maps/*.json       One content file per map
-worker/                Cloudflare Worker, D1 migration, and setup guide
+worker/                Account/statistics Worker, D1 migrations, and setup guide
+scripts/               Generated Worker puzzle-catalogue tooling
 tests/                 Logic tests
 ```

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "python3 -m http.server 8080",
+    "generate:worker-catalog": "node scripts/generate-worker-catalog.js",
     "test": "node --test"
   }
 }

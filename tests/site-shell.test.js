@@ -45,6 +45,7 @@ test("the page's local release assets exist", async () => {
     "assets/fonts/barlow-condensed-900.ttf",
     "styles.css",
     "js/app.js",
+    "js/account.js",
     "js/community-stats.js",
     "js/game-core.js",
     "js/progression.js",
@@ -70,6 +71,21 @@ test("browser-loaded code and styles share the current cache version", async () 
 
   assert.equal(versionTokens.length >= 5, true);
   assert.deepEqual(new Set(versionTokens), new Set(["20260919-1"]));
+});
+
+test("account controls support optional sign-in without exposing private credentials", async () => {
+  const [html, account, workerConfig] = await Promise.all([
+    readProjectFile("index.html"),
+    readProjectFile("js/account.js"),
+    readProjectFile("worker/wrangler.jsonc"),
+  ]);
+
+  assert.match(html, /id="account-button"/);
+  assert.match(html, /id="account-onboarding-form"/);
+  assert.match(html, /name="importLocalProgress"/);
+  assert.match(account, /session\?\.getToken\(\)/);
+  assert.match(account, /Authorization: `Bearer \$\{token\}`/);
+  assert.doesNotMatch(`${html}\n${account}\n${workerConfig}`, /sk_(?:test|live)_/);
 });
 
 test("mobile community statistics center each row and allow long labels to wrap", async () => {

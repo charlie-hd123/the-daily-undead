@@ -1,3 +1,12 @@
+import { verifyClerkRequest } from "./auth.js";
+import {
+  getAccount,
+  recordVerifiedBonusResult,
+  recordVerifiedMapResult,
+  registerAccount,
+  saveAccount,
+} from "./accounts.js";
+
 const jsonHeaders = {
   "Content-Type": "application/json; charset=utf-8",
   "Cache-Control": "no-store",
@@ -36,8 +45,8 @@ function corsHeaders(request, env) {
 
   return {
     "Access-Control-Allow-Origin": origin,
-    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
+    "Access-Control-Allow-Headers": "Authorization, Content-Type",
     "Access-Control-Max-Age": "86400",
     Vary: "Origin",
   };
@@ -179,6 +188,32 @@ async function handleAttempt(request, env) {
   });
 }
 
+async function handleAccountRequest(request, env, url) {
+  let identity;
+  try {
+    identity = await verifyClerkRequest(request, env);
+  } catch (error) {
+    return errorResponse(request, env, error.message || "The account session is invalid.", 401);
+  }
+
+  let result;
+  if (url.pathname === "/api/account" && request.method === "GET") {
+    result = await getAccount(env.DB, identity.userId, url.searchParams.get("date"));
+  } else if (url.pathname === "/api/account/register" && request.method === "POST") {
+    result = await registerAccount(env.DB, request, identity.userId);
+  } else if (url.pathname === "/api/account/save" && request.method === "PUT") {
+    result = await saveAccount(env.DB, request, identity.userId);
+  } else if (url.pathname === "/api/account/results/map" && request.method === "POST") {
+    result = await recordVerifiedMapResult(env.DB, request, identity.userId);
+  } else if (url.pathname === "/api/account/results/bonus" && request.method === "POST") {
+    result = await recordVerifiedBonusResult(env.DB, request, identity.userId);
+  } else {
+    return errorResponse(request, env, "Not found.", 404);
+  }
+
+  return jsonResponse(request, env, result.body, result.status);
+}
+
 export default {
   async fetch(request, env) {
     if (!isAllowedOrigin(request, env)) {
@@ -192,6 +227,9 @@ export default {
     const url = new URL(request.url);
 
     try {
+      if (url.pathname.startsWith("/api/account")) {
+        return await handleAccountRequest(request, env, url);
+      }
       if (url.pathname === "/api/stats" && request.method === "GET") {
         return await handleStats(request, env, url);
       }
@@ -199,7 +237,10 @@ export default {
         return await handleAttempt(request, env);
       }
       if (url.pathname === "/health" && request.method === "GET") {
-        return jsonResponse(request, env, { ok: true });
+        return jsonResponse(request, env, {
+          ok: true,
+          accountsConfigured: Boolean(env.CLERK_ISSUER),
+        });
       }
       return errorResponse(request, env, "Not found.", 404);
     } catch (error) {

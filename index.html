@@ -7,6 +7,8 @@
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <!-- Public API URL only; localhost is isolated to a local Worker on port 8787. -->
     <meta name="daily-undead-stats-api" content="https://api.thedailyundead.com">
+    <!-- Clerk publishable keys identify the public frontend and are safe to expose. -->
+    <meta name="daily-undead-clerk-publishable-key" content="pk_live_Y2xlcmsudGhlZGFpbHl1bmRlYWQuY29tJA">
     <link rel="canonical" href="https://thedailyundead.com/">
     <meta
       name="description"
@@ -41,6 +43,10 @@
           <p class="stat-display total-rounds" aria-live="polite">
             Total Rounds <strong id="total-rounds-count">0</strong>
           </p>
+        </div>
+        <div class="account-controls">
+          <button id="account-button" class="account-button" type="button" hidden>Save progress</button>
+          <span id="account-status" class="account-status" aria-live="polite"></span>
         </div>
       </div>
     </header>
@@ -86,6 +92,45 @@
         <p class="clue-text"></p>
       </article>
     </template>
+
+    <dialog id="account-access-dialog" class="account-dialog">
+      <button class="dialog-close" type="button" data-close-account-dialog aria-label="Close">×</button>
+      <p class="kicker">Undead account</p>
+      <h2>Save your progress</h2>
+      <p>Use an email code to keep your rounds and points on every device. You can still play without an account.</p>
+      <div class="actions account-dialog-actions">
+        <button id="account-create" class="button primary" type="button">Create account</button>
+        <button id="account-sign-in" class="button" type="button">Sign in</button>
+      </div>
+    </dialog>
+
+    <dialog id="account-onboarding-dialog" class="account-dialog">
+      <button class="dialog-close" type="button" data-close-account-dialog aria-label="Close">×</button>
+      <p class="kicker">One last step</p>
+      <h2>Choose your survivor name</h2>
+      <p>This public username will identify you on future leaderboards. Your email is never shown.</p>
+      <form id="account-onboarding-form">
+        <label class="account-field">
+          <span>Username</span>
+          <input
+            name="username"
+            type="text"
+            minlength="3"
+            maxlength="20"
+            pattern="[A-Za-z0-9_]+"
+            autocomplete="username"
+            required
+          >
+          <small>3–20 letters, numbers or underscores.</small>
+        </label>
+        <label class="account-import-choice">
+          <input name="importLocalProgress" type="checkbox" checked>
+          <span>Import the progress already saved on this device</span>
+        </label>
+        <p id="account-onboarding-error" class="account-error" role="alert"></p>
+        <button class="button primary" type="submit">Start syncing</button>
+      </form>
+    </dialog>
 
     <script type="module" src="./js/app.js?v=20260919-1"></script>
 

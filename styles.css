@@ -342,6 +342,59 @@ h1 {
   gap: 0.45rem;
 }
 
+.account-controls {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.account-button {
+  min-height: 1.9rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid rgb(103 232 255 / 32%);
+  border-radius: 999px;
+  background: rgb(103 232 255 / 8%);
+  color: var(--aether);
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.account-button.is-signed-in {
+  border-color: rgb(108 231 161 / 36%);
+  background: rgb(108 231 161 / 8%);
+  color: var(--success);
+}
+
+.account-button:disabled {
+  opacity: 0.58;
+  cursor: wait;
+}
+
+.account-button:focus-visible,
+.dialog-close:focus-visible,
+.account-field input:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+.account-status {
+  max-width: 14rem;
+  overflow: hidden;
+  color: rgb(168 178 199 / 70%);
+  font-size: 0.68rem;
+  line-height: 1.2;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .puzzle-date {
   margin-bottom: 0;
   color: var(--muted-strong);
@@ -686,6 +739,108 @@ h1 {
 .button:disabled:hover {
   border-color: var(--border-strong);
   background: linear-gradient(145deg, rgb(28 36 57 / 94%), rgb(15 20 33 / 96%));
+}
+
+.account-dialog {
+  position: relative;
+  width: min(calc(100% - 2rem), 31rem);
+  padding: clamp(1.25rem, 4vw, 2rem);
+  border: 1px solid var(--border-strong);
+  border-radius: 1rem;
+  background:
+    linear-gradient(145deg, rgb(25 32 51 / 98%), rgb(8 11 20 / 99%) 68%),
+    var(--surface-solid);
+  color: var(--text);
+  box-shadow: var(--shadow), 0 0 3rem rgb(103 232 255 / 10%);
+}
+
+.account-dialog::backdrop {
+  background: rgb(2 4 9 / 78%);
+  backdrop-filter: blur(6px);
+}
+
+.account-dialog h2 {
+  margin-bottom: 0.55rem;
+  font-size: clamp(2rem, 8vw, 2.8rem);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.account-dialog > p:not(.kicker) {
+  color: var(--muted-strong);
+  line-height: 1.5;
+}
+
+.dialog-close {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 5%);
+  color: var(--muted-strong);
+  cursor: pointer;
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.account-dialog-actions {
+  margin-top: 1.4rem;
+}
+
+.account-field {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 1.25rem;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.account-field input {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 0.65rem;
+  background: rgb(5 8 15 / 88%);
+  color: var(--text);
+  font: inherit;
+}
+
+.account-field small,
+.account-import-choice {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.account-import-choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin-block: 1rem;
+  line-height: 1.4;
+}
+
+.account-import-choice input {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: 0 0 auto;
+  margin-top: 0.1rem;
+  accent-color: var(--aether);
+}
+
+.account-error {
+  min-height: 1.25rem;
+  margin-bottom: 0.65rem;
+  color: var(--danger);
+  font-size: 0.86rem;
+}
+
+.account-dialog form > .button {
+  width: 100%;
 }
 
 .card-grid {
@@ -1323,7 +1478,8 @@ h1 {
     grid-template-areas:
       "brand"
       "date"
-      "stats";
+      "stats"
+      "account";
     grid-template-columns: minmax(0, 1fr);
     align-items: start;
     row-gap: clamp(0.55rem, 1.2vw, 0.75rem);
@@ -1362,6 +1518,17 @@ h1 {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: clamp(0.3rem, 0.8vw, 0.42rem);
+  }
+
+  .account-controls {
+    grid-area: account;
+    justify-self: start;
+    justify-content: flex-start;
+  }
+
+  .account-status {
+    max-width: none;
+    text-align: left;
   }
 
   .stat-display {
@@ -1404,6 +1571,15 @@ h1 {
   .round-timing,
   .player-stats {
     grid-area: auto;
+  }
+
+  .account-controls {
+    justify-content: flex-start;
+  }
+
+  .account-status {
+    max-width: min(65vw, 16rem);
+    text-align: left;
   }
 
   .app-shell {
