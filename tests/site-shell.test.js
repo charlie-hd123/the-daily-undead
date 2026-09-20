@@ -70,7 +70,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260920-1"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260920-2"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -139,7 +139,8 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(account, /clerk\.signOut\(/);
   assert.match(account, /accountButton\.classList\.add\("is-signed-in"\)/);
   assert.match(css, /#account-button:not\(\.is-signed-in\)/);
-  assert.match(css, /#leaderboards-button \{\s*flex-grow: 1\.28;/);
+  assert.match(css, /\.account-button \{\s*flex: 1 1 auto;/);
+  assert.match(css, /#account-button\.has-username \{\s*flex-shrink: 0\.35;/);
   assert.match(
     css,
     /\.account-button \{[\s\S]*?display: inline-flex;[\s\S]*?align-items: center;[\s\S]*?justify-content: center;/,

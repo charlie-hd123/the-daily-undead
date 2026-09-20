@@ -1676,17 +1676,14 @@ h1 {
   }
 
   .account-button {
-    flex: 1 1 0;
+    flex: 1 1 auto;
     max-width: none;
-    padding-inline: 0.5rem;
+    padding-inline: 0.35rem;
+    letter-spacing: 0.05em;
   }
 
-  #account-button:not(.is-signed-in) {
-    flex-grow: 0.72;
-  }
-
-  #leaderboards-button {
-    flex-grow: 1.28;
+  #account-button.has-username {
+    flex-shrink: 0.35;
   }
 
   .app-shell {
