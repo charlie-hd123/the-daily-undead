@@ -46,6 +46,223 @@ function loadScript({ src, publishableKey, timeoutMs = 8_000 }) {
   });
 }
 
+function createClerkAppearance() {
+  const bodyFont =
+    '"Barlow", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+  const displayFont = '"Barlow Condensed", "Arial Narrow", Impact, sans-serif';
+  const border = "rgb(160 201 255 / 34%)";
+  const surface = "linear-gradient(145deg, rgb(21 27 43 / 98%), rgb(8 11 20 / 99%) 72%)";
+
+  return {
+    variables: {
+      colorPrimary: "#67e8ff",
+      colorPrimaryForeground: "#061017",
+      colorDanger: "#ff6577",
+      colorSuccess: "#6ce7a1",
+      colorWarning: "#f7c85c",
+      colorNeutral: "#9ca9c0",
+      colorForeground: "#f6f7fb",
+      colorMutedForeground: "#a8b2c7",
+      colorMuted: "#1b2439",
+      colorBackground: "#0d111d",
+      colorInputForeground: "#f6f7fb",
+      colorInput: "#05080f",
+      colorShimmer: "#1b2439",
+      colorRing: "#67e8ff",
+      colorShadow: "#000000",
+      colorBorder: border,
+      colorModalBackdrop: "rgb(2 4 9 / 84%)",
+      fontFamily: bodyFont,
+      fontFamilyButtons: displayFont,
+      fontSize: "0.95rem",
+      fontWeight: {
+        normal: 400,
+        medium: 500,
+        semibold: 600,
+        bold: 800,
+      },
+      borderRadius: "0.7rem",
+      spacing: "1rem",
+    },
+    elements: {
+      modalBackdrop: {
+        backdropFilter: "blur(8px)",
+        WebkitBackdropFilter: "blur(8px)",
+      },
+      modalContent: {
+        border: `1px solid ${border}`,
+        borderRadius: "1rem",
+        background: surface,
+        boxShadow: "0 1.4rem 4rem rgb(0 0 0 / 52%), 0 0 3rem rgb(103 232 255 / 8%)",
+        overflow: "hidden",
+      },
+      modalCloseButton: {
+        width: "2.4rem",
+        height: "2.4rem",
+        border: `1px solid ${border}`,
+        borderRadius: "999px",
+        backgroundColor: "rgb(255 255 255 / 5%)",
+        color: "#c7cfdd",
+        '&:hover, &:focus-visible': {
+          borderColor: "rgb(103 232 255 / 72%)",
+          backgroundColor: "rgb(103 232 255 / 10%)",
+          color: "#ffffff",
+        },
+      },
+      cardBox: {
+        borderRadius: "1rem",
+        boxShadow: "0 1.4rem 4rem rgb(0 0 0 / 46%), 0 0 3rem rgb(103 232 255 / 8%)",
+      },
+      card: {
+        border: `1px solid ${border}`,
+        background: surface,
+      },
+      headerTitle: {
+        fontFamily: displayFont,
+        fontWeight: 900,
+        letterSpacing: "0.025em",
+        textTransform: "uppercase",
+      },
+      formButtonPrimary: {
+        minHeight: "3.2rem",
+        border: "1px solid transparent",
+        borderRadius: "0.7rem",
+        background: "linear-gradient(110deg, #f7c85c 0%, #ffad54 48%, #ff8a48 100%)",
+        color: "#171006",
+        boxShadow: "0 0.8rem 2.2rem rgb(255 138 72 / 16%), inset 0 1px 0 rgb(255 255 255 / 36%)",
+        fontFamily: displayFont,
+        fontSize: "1rem",
+        fontWeight: 800,
+        letterSpacing: "0.045em",
+        textTransform: "uppercase",
+        '&:hover, &:focus-visible, &:active': {
+          background: "linear-gradient(110deg, #ffe08a 0%, #ffc16b 48%, #ff9c63 100%)",
+          color: "#171006",
+          boxShadow: "0 0 0 1px rgb(255 222 137 / 38%), 0 0.9rem 2.5rem rgb(255 138 72 / 25%)",
+        },
+      },
+      formFieldInput: {
+        minHeight: "3rem",
+        border: `1px solid ${border}`,
+        borderRadius: "0.65rem",
+        backgroundColor: "rgb(5 8 15 / 92%)",
+        boxShadow: "none",
+        '&:focus': {
+          borderColor: "#67e8ff",
+          boxShadow: "0 0 0 3px rgb(103 232 255 / 16%)",
+        },
+      },
+      formFieldLabel: {
+        color: "#f6f7fb",
+        fontWeight: 700,
+      },
+      footer: {
+        backgroundColor: "transparent",
+      },
+      footerActionLink: {
+        color: "#67e8ff",
+        fontWeight: 700,
+      },
+      badge: {
+        border: "1px solid rgb(103 232 255 / 24%)",
+        backgroundColor: "rgb(103 232 255 / 8%)",
+        color: "#bdf0fa",
+      },
+    },
+    userProfile: {
+      elements: {
+        cardBox: {
+          width: "min(94vw, 78rem)",
+          maxWidth: "78rem",
+        },
+        card: {
+          background: surface,
+        },
+        navbar: {
+          borderRight: `1px solid ${border}`,
+          background:
+            "radial-gradient(circle at 15% 10%, rgb(103 232 255 / 8%), transparent 17rem), linear-gradient(165deg, rgb(22 28 43 / 99%), rgb(10 13 23 / 99%))",
+        },
+        navbarButton: {
+          minHeight: "3.4rem",
+          border: "1px solid transparent",
+          borderRadius: "0.7rem",
+          color: "#c7cfdd",
+          fontWeight: 700,
+          '&:hover, &:focus-visible': {
+            borderColor: "rgb(103 232 255 / 26%)",
+            backgroundColor: "rgb(103 232 255 / 8%)",
+            color: "#ffffff",
+          },
+        },
+        navbarButton__active: {
+          borderColor: "rgb(103 232 255 / 42%)",
+          backgroundColor: "rgb(103 232 255 / 12%)",
+          color: "#ffffff",
+          boxShadow: "inset 3px 0 0 #67e8ff, 0 0.7rem 1.8rem rgb(0 0 0 / 15%)",
+        },
+        navbarButtonIcon: {
+          color: "#a8b2c7",
+        },
+        navbarButtonIcon__active: {
+          color: "#67e8ff",
+        },
+        navbarButtonText: {
+          fontFamily: bodyFont,
+          fontWeight: 700,
+        },
+        pageScrollBox: {
+          background:
+            "radial-gradient(circle at 90% 4%, rgb(158 119 255 / 8%), transparent 24rem), rgb(13 17 29 / 96%)",
+        },
+        profilePage: {
+          color: "#f6f7fb",
+        },
+        profileSection: {
+          borderColor: "rgb(160 201 255 / 20%)",
+        },
+        profileSectionTitleText: {
+          fontFamily: displayFont,
+          fontSize: "1.05rem",
+          fontWeight: 800,
+          letterSpacing: "0.035em",
+          textTransform: "uppercase",
+        },
+        profileSectionPrimaryButton: {
+          minHeight: "2.65rem",
+          padding: "0.55rem 0.85rem",
+          border: "1px solid rgb(103 232 255 / 34%)",
+          borderRadius: "0.6rem",
+          backgroundColor: "rgb(103 232 255 / 8%)",
+          color: "#bdf0fa",
+          fontFamily: displayFont,
+          fontWeight: 800,
+          letterSpacing: "0.035em",
+          textTransform: "uppercase",
+          '&:hover, &:focus-visible': {
+            borderColor: "rgb(103 232 255 / 72%)",
+            backgroundColor: "rgb(103 232 255 / 14%)",
+            color: "#ffffff",
+          },
+        },
+        avatarBox: {
+          border: "2px solid rgb(103 232 255 / 45%)",
+          boxShadow: "0 0 0 4px rgb(103 232 255 / 8%), 0 0.8rem 2rem rgb(158 119 255 / 18%)",
+        },
+        activeDeviceListItem: {
+          borderRadius: "0.75rem",
+          '&:hover': {
+            backgroundColor: "rgb(103 232 255 / 5%)",
+          },
+        },
+        menuButtonEllipsis: {
+          color: "#a8b2c7",
+        },
+      },
+    },
+  };
+}
+
 async function loadClerk(publishableKey) {
   const domain = getClerkDomain(publishableKey);
   if (!domain) throw new Error("The account service is not configured correctly.");
@@ -56,7 +273,10 @@ async function loadClerk(publishableKey) {
     publishableKey,
   });
   if (!globalThis.Clerk) throw new Error("Account sign-in could not load.");
-  await globalThis.Clerk.load({ ui: { ClerkUI: globalThis.__internal_ClerkUICtor } });
+  await globalThis.Clerk.load({
+    appearance: createClerkAppearance(),
+    ui: { ClerkUI: globalThis.__internal_ClerkUICtor },
+  });
   return globalThis.Clerk;
 }
 

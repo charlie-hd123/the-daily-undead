@@ -70,7 +70,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260920-3"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260920-4"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -122,6 +122,14 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(account, /accountButton\.textContent = profile\.username;/);
   assert.match(account, /accountButton\.classList\.add\("has-username"\)/);
   assert.match(css, /\.account-button\.has-username \{\s*text-transform: none;/);
+  assert.match(account, /function createClerkAppearance\(\)/);
+  assert.match(account, /appearance: createClerkAppearance\(\)/);
+  assert.match(account, /colorPrimary: "#67e8ff"/);
+  assert.match(account, /colorBackground: "#0d111d"/);
+  assert.match(account, /fontFamilyButtons: displayFont/);
+  assert.match(account, /navbarButton__active/);
+  assert.match(account, /profileSectionPrimaryButton/);
+  assert.match(account, /formButtonPrimary/);
   assert.match(account, /customPages/);
   assert.match(account, /label: "Change username"/);
   assert.match(account, /"\/api\/account\/username"/);
@@ -142,6 +150,9 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(account, /label: "Sign out"/);
   assert.match(account, /clerk\.signOut\(/);
   assert.match(account, /accountButton\.classList\.add\("is-signed-in"\)/);
+  assert.match(css, /\.clerk-sign-out-page::before,/);
+  assert.match(css, /\.clerk-username-page::before \{/);
+  assert.match(css, /linear-gradient\(90deg, var\(--aether\), var\(--aether-violet\), var\(--aether-pink\)\)/);
   assert.match(css, /#account-button:not\(\.is-signed-in\)/);
   assert.match(css, /#account-button::before[\s\S]*mask-image:/);
   assert.match(css, /#leaderboards-button::before[\s\S]*mask-image:/);
