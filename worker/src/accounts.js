@@ -18,7 +18,7 @@ function safeCounter(value) {
 
 export function normalizeUsername(value) {
   const username = typeof value === "string" ? value.trim() : "";
-  return /^[A-Za-z0-9_]{3,20}$/.test(username) ? username : null;
+  return /^[A-Za-z0-9_]{3,16}$/.test(username) ? username : null;
 }
 
 export function sanitizeProgress(value = {}) {
@@ -199,7 +199,7 @@ export async function registerAccount(db, request, userId) {
   if (!username) {
     return {
       status: 400,
-      body: { error: "Use 3–20 letters, numbers or underscores for your username." },
+      body: { error: "Use 3–16 letters, numbers or underscores for your username." },
     };
   }
 
@@ -271,7 +271,7 @@ export async function updateAccountUsername(db, request, userId) {
   if (!username) {
     return {
       status: 400,
-      body: { error: "Use 3–20 letters, numbers or underscores for your username." },
+      body: { error: "Use 3–16 letters, numbers or underscores for your username." },
     };
   }
 

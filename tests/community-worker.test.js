@@ -73,6 +73,8 @@ test("account usernames and uploaded local saves are tightly validated", () => {
   assert.equal(normalizeUsername(" Richtofen_93 "), "Richtofen_93");
   assert.equal(normalizeUsername("no spaces allowed"), null);
   assert.equal(normalizeUsername("ab"), null);
+  assert.equal(normalizeUsername("1234567890abcdef"), "1234567890abcdef");
+  assert.equal(normalizeUsername("1234567890abcdefg"), null);
 
   assert.deepEqual(
     sanitizeProgress({
