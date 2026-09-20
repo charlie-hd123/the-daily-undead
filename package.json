@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "python3 -m http.server 8080",
+    "start:leaderboards": "npx wrangler@latest dev --config worker/wrangler.leaderboards-local.jsonc --port 8788",
     "generate:worker-catalog": "node scripts/generate-worker-catalog.js",
     "test": "node --test"
   }

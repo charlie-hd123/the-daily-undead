@@ -10,6 +10,7 @@ import {
 } from "../worker/src/index.js";
 import {
   normalizeUsername,
+  registerAccount,
   sanitizeDailyState,
   sanitizeProgress,
   updateAccountUsername,
@@ -104,6 +105,53 @@ test("account usernames and uploaded local saves are tightly validated", () => {
     "clues",
   );
   assert.equal(sanitizeDailyState({ phase: "cheat", puzzleKey: `${today}:x` }, today), null);
+});
+
+test("account registration imports the browser's highest round into D1", async () => {
+  const statements = [];
+  const db = {
+    prepare(sql) {
+      if (sql.startsWith("SELECT username")) {
+        return { bind: () => ({ first: async () => null }) };
+      }
+
+      return {
+        bind(...bindings) {
+          const statement = { sql, bindings };
+          statements.push(statement);
+          return statement;
+        },
+      };
+    },
+    async batch() {},
+  };
+  const response = await registerAccount(
+    db,
+    new Request("https://api.example.test/api/account/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: "Takeo",
+        importLocalProgress: true,
+        puzzleDate: today,
+        progress: {
+          currentRound: 3,
+          bestRound: 17,
+          pointsBalance: 250,
+          totalRounds: 41,
+          reviveCount: 1,
+          lastPlayedDate: today,
+        },
+      }),
+    }),
+    "user_import_test",
+  );
+
+  const progressInsert = statements.find(({ sql }) => /INSERT INTO player_saves/.test(sql));
+  assert.equal(response.status, 201);
+  assert.ok(progressInsert);
+  assert.equal(progressInsert.bindings[1], 3, "current round should remain independent");
+  assert.equal(progressInsert.bindings[2], 17, "highest round should be imported");
 });
 
 test("a signed-in player can change only their own unique D1 username", async () => {

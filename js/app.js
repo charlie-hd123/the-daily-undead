@@ -13,7 +13,7 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20260920-5";
+} from "./game-core.js?v=20260920-6";
 import {
   calculateReviveCost,
   canUseRequestedPreviewDate,
@@ -23,15 +23,19 @@ import {
   purchaseMissedDayRevive,
   resetReviveCount,
   shouldResetReviveCycle,
-} from "./progression.js?v=20260920-5";
-import { initialiseAccount } from "./account.js?v=20260920-5";
+} from "./progression.js?v=20260920-6";
+import { initialiseAccount } from "./account.js?v=20260920-6";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20260920-5";
+} from "./community-stats.js?v=20260920-6";
+import {
+  initialiseLeaderboards,
+  resolveLeaderboardsApiUrl,
+} from "./leaderboards.js?v=20260920-6";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -50,6 +54,7 @@ const communityYesterdaySolvedLabel = document.querySelector("#community-yesterd
 const communityYesterdayMapLabel = document.querySelector("#community-yesterday-map");
 const isLocalDevelopment = isLocalDevelopmentHostname(window.location.hostname);
 const communityStatsApiUrl = resolveCommunityStatsApiUrl({ isLocalDevelopment });
+const leaderboardsApiUrl = resolveLeaderboardsApiUrl({ isLocalDevelopment });
 const streakStorageKey = "the-daily-undead:streak";
 const totalRoundsStorageKey = "the-daily-undead:total-rounds";
 const pointsStorageKey = "the-daily-undead:total-points";
@@ -64,17 +69,12 @@ const progressNumberFormatter = new Intl.NumberFormat("en-GB");
 // Saves created before progressive revive pricing did not record the amount paid.
 const legacyReviveCost = 50;
 
-leaderboardsButton?.addEventListener("click", () => {
-  if (typeof leaderboardsDialog?.showModal === "function") leaderboardsDialog.showModal();
-  else leaderboardsDialog?.setAttribute("open", "");
-});
-
-leaderboardsDialog
-  ?.querySelector("[data-close-leaderboards-dialog]")
-  ?.addEventListener("click", () => {
-    if (typeof leaderboardsDialog.close === "function") leaderboardsDialog.close();
-    else leaderboardsDialog.removeAttribute("open");
-  });
+function getLeaderboardUsername() {
+  if (accountController.profile?.username) return accountController.profile.username;
+  if (!isLocalDevelopment) return null;
+  const previewUsername = new URLSearchParams(window.location.search).get("leaderboardUser");
+  return /^[A-Za-z0-9_]{3,16}$/.test(previewUsername || "") ? previewUsername : null;
+}
 
 let catalog;
 let maps;
@@ -140,6 +140,14 @@ function getDateKey() {
   );
   return currentDateKey;
 }
+
+initialiseLeaderboards({
+  apiUrl: leaderboardsApiUrl,
+  button: leaderboardsButton,
+  dialog: leaderboardsDialog,
+  getPuzzleDate: getDateKey,
+  getCurrentUsername: getLeaderboardUsername,
+});
 
 function getCurrentTime() {
   return new Date(Date.now() + clockOffset);
@@ -1485,6 +1493,9 @@ async function initialise() {
     liveDateKey = getUtcDateKey(getCurrentTime());
     streakCount = loadStreak();
     bestRound = Math.max(loadBestRound(), streakCount);
+    // Older browser saves only tracked the current round. Persist that value as
+    // the initial best before a later loss can reset the current round.
+    saveBestRound();
     totalRounds = loadTotalRounds();
     totalPoints = loadPoints();
     reviveCount = loadReviveCount();

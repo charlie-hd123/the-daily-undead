@@ -1,0 +1,14 @@
+{
+  // Local-only, read-only leaderboard preview. This file is never used for deployment.
+  "name": "daily-undead-leaderboards-local",
+  "main": "src/leaderboards-local.js",
+  "compatibility_date": "2026-09-20",
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "daily-undead-stats",
+      "database_id": "5393c72c-c0fa-489b-9c98-991032e38646",
+      "remote": true
+    }
+  ]
+}

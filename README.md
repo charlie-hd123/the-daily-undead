@@ -52,7 +52,13 @@ During local development, the **Dev button – advance a day** control at the bo
 
 Localhost uses a local Worker at `http://localhost:8787`; it never submits attempts to the production community database. If the local Worker is not running, the game still works and the community figures show `—`. Future-date previews are also rejected by the Worker, so **Advance a day** cannot affect live totals.
 
+To preview leaderboards against current production account data without deploying the site, run `npm run start:leaderboards` in a second terminal. This starts a separate Worker on `http://localhost:8788` whose only route is the read-only leaderboard query. It accepts requests only from a local site, and uses Cloudflare's remote D1 binding, so Wrangler authentication is required and the displayed usernames, today's verified results, and all-time synced progress stay current. The normal local Worker remains isolated from production writes.
+
+Because local account sync stays isolated from production, append `?leaderboardUser=ExactUsername` to the local page URL to preview that account's blue highlighted row and **Find me** control. The comparison is case-sensitive and this preview parameter is ignored on the public site.
+
 Guest progress is saved in the browser separately for each date. Signed-in players also synchronise it through the account API. Every player receives the next puzzle at 00:00 UTC, and the header countdown shows the time remaining until that worldwide rollover. The site synchronises against its host's clock when possible and falls back to the device clock when offline.
+
+The browser stores the current round and highest round separately. On the first load after highest-round tracking was introduced, an older save's current round is immediately preserved as its initial highest round before future losses can reset the current round.
 
 ## Run the tests
 
@@ -125,7 +131,7 @@ No build command or GitHub Action is required. The included `CNAME` file connect
 
 Accounts are optional. Guests keep using browser local storage. A player who chooses **Save progress** signs up or signs in through Clerk with an email verification code, then chooses a public username. There is no game password to remember or reset. On first setup, the player can import progress already stored on that device.
 
-Clerk stores the email address and authentication/session data. Cloudflare D1 stores only Clerk's opaque user ID, the chosen username, synchronised progress, per-day puzzle state, and a server-verified daily-result ledger. Players can change their unique public username from the Clerk account panel; this updates the same D1 profile without affecting saved progress or results. D1 does not store email addresses, passwords, or email codes. Future leaderboards must be calculated from the verified ledger, not the client-uploaded progress or imported local totals. This prevents an edited local-storage value from becoming a trusted leaderboard score.
+Clerk stores the email address and authentication/session data. Cloudflare D1 stores only Clerk's opaque user ID, the chosen username, synchronised progress, per-day puzzle state, and a server-verified daily-result ledger. Players can change their unique public username from the Clerk account panel; this updates the same D1 profile without affecting saved progress or results. D1 does not store email addresses, passwords, or email codes. The Today leaderboard is calculated from the verified ledger. The All Time leaderboard shows each account's synchronised current round, points, highest round, and total rounds; those values can include progress imported when the account was created.
 
 The existing anonymous community count remains separate. It uses a random browser-local identifier; the Worker hashes it before D1 storage and records only the puzzle/date, answer map, and correct/incorrect result. Cloudflare Web Analytics and Worker invocation logs are enabled in the Cloudflare account. Clearing site data removes guest progress; signed-in progress can be restored after signing in again.
 

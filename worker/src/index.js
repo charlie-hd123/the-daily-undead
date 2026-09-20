@@ -7,6 +7,7 @@ import {
   saveAccount,
   updateAccountUsername,
 } from "./accounts.js";
+import { readLeaderboards } from "./leaderboards.js";
 
 const jsonHeaders = {
   "Content-Type": "application/json; charset=utf-8",
@@ -143,6 +144,20 @@ async function handleStats(request, env, url) {
   return jsonResponse(request, env, await readStats(env.DB, dateKey));
 }
 
+async function handleLeaderboards(request, env, url) {
+  const dateKey = url.searchParams.get("date");
+  if (!isValidDateKey(dateKey)) {
+    return errorResponse(request, env, "A valid date query parameter is required.", 400);
+  }
+
+  const todayDateKey = new Date().toISOString().slice(0, 10);
+  if (dateKey > todayDateKey) {
+    return errorResponse(request, env, "Future leaderboards are not available.", 400);
+  }
+
+  return jsonResponse(request, env, await readLeaderboards(env.DB, dateKey));
+}
+
 async function handleAttempt(request, env) {
   const contentLength = Number(request.headers.get("Content-Length") || 0);
   if (contentLength > 4096) {
@@ -235,6 +250,9 @@ export default {
       }
       if (url.pathname === "/api/stats" && request.method === "GET") {
         return await handleStats(request, env, url);
+      }
+      if (url.pathname === "/api/leaderboards" && request.method === "GET") {
+        return await handleLeaderboards(request, env, url);
       }
       if (url.pathname === "/api/attempts" && request.method === "POST") {
         return await handleAttempt(request, env);

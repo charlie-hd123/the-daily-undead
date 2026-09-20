@@ -15,9 +15,9 @@
       content="The Daily Undead — your daily Treyarch Zombies challenge. Reveal clues, identify the map, and put the steps in order."
     >
     <title>The Daily Undead</title>
-    <link rel="icon" href="./assets/favicon.png?v=20260920-5" type="image/png" sizes="128x128">
+    <link rel="icon" href="./assets/favicon.png?v=20260920-6" type="image/png" sizes="128x128">
     <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" sizes="180x180">
-    <link rel="stylesheet" href="./styles.css?v=20260920-5">
+    <link rel="stylesheet" href="./styles.css?v=20260920-6">
   </head>
   <body>
     <header class="site-header">
@@ -106,11 +106,73 @@
       </div>
     </dialog>
 
-    <dialog id="leaderboards-dialog" class="account-dialog">
+    <dialog id="leaderboards-dialog" class="account-dialog leaderboard-dialog">
       <button class="dialog-close" type="button" data-close-leaderboards-dialog aria-label="Close">×</button>
       <p class="kicker">Undead Leaderboards</p>
       <h2>Leaderboards</h2>
-      <p>Coming soon...</p>
+      <p class="leaderboard-status" data-leaderboard-status aria-live="polite">Loading current scores…</p>
+      <div class="leaderboard-tabs" role="tablist" aria-label="Leaderboard period">
+        <button
+          id="leaderboard-daily-tab"
+          type="button"
+          role="tab"
+          aria-selected="true"
+          aria-controls="leaderboard-daily-panel"
+          data-leaderboard-tab="daily"
+        >Today</button>
+        <button
+          id="leaderboard-all-time-tab"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="leaderboard-all-time-panel"
+          data-leaderboard-tab="all-time"
+          tabindex="-1"
+        >All time</button>
+      </div>
+      <section
+        id="leaderboard-daily-panel"
+        role="tabpanel"
+        aria-labelledby="leaderboard-daily-tab"
+        data-leaderboard-panel="daily"
+      >
+        <div class="leaderboard-panel-tools">
+          <p>Everyone who played today.</p>
+          <button class="leaderboard-find-me" type="button" data-leaderboard-find="daily" hidden>Find me</button>
+        </div>
+        <div class="leaderboard-group">
+          <div class="leaderboard-group-heading">
+            <h3>Got it right</h3>
+            <span>Ranked by points</span>
+          </div>
+          <ol class="leaderboard-list" data-leaderboard-list="daily-correct"></ol>
+        </div>
+        <div class="leaderboard-divider" aria-hidden="true"><span>VS</span></div>
+        <div class="leaderboard-group leaderboard-group-wrong">
+          <div class="leaderboard-group-heading">
+            <h3>Got it wrong</h3>
+            <span>Played today</span>
+          </div>
+          <ul class="leaderboard-list" data-leaderboard-list="daily-incorrect"></ul>
+        </div>
+      </section>
+      <section
+        id="leaderboard-all-time-panel"
+        role="tabpanel"
+        aria-labelledby="leaderboard-all-time-tab"
+        data-leaderboard-panel="all-time"
+        hidden
+      >
+        <div class="leaderboard-panel-tools leaderboard-all-time-tools">
+          <div class="leaderboard-ranking-control" role="group" aria-label="Rank all-time leaderboard by">
+            <span>Rank by</span>
+            <button type="button" aria-pressed="true" data-all-time-ranking="highestRound">Highest round</button>
+            <button type="button" aria-pressed="false" data-all-time-ranking="totalRounds">Total rounds</button>
+          </div>
+          <button class="leaderboard-find-me" type="button" data-leaderboard-find="all-time" hidden>Find me</button>
+        </div>
+        <ol class="leaderboard-list" data-leaderboard-list="all-time"></ol>
+      </section>
     </dialog>
 
     <dialog id="account-onboarding-dialog" class="account-dialog">
@@ -167,7 +229,7 @@
       </form>
     </dialog>
 
-    <script type="module" src="./js/app.js?v=20260920-5"></script>
+    <script type="module" src="./js/app.js?v=20260920-6"></script>
 
     <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "4eeb20e1411c4e7baf24969ced969c88"}'></script><!-- End Cloudflare Web Analytics -->
 

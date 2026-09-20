@@ -48,6 +48,7 @@ test("the page's local release assets exist", async () => {
     "js/account.js",
     "js/community-stats.js",
     "js/game-core.js",
+    "js/leaderboards.js",
     "js/progression.js",
   ];
 
@@ -70,7 +71,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260920-5"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260920-6"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -88,8 +89,28 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(html, /id="leaderboards-dialog"/);
   assert.match(html, /<p class="kicker">Undead Leaderboards<\/p>/);
   assert.match(html, /<h2>Leaderboards<\/h2>/);
-  assert.match(html, /<p>Coming soon\.\.\.<\/p>/);
-  assert.match(appScript, /leaderboardsDialog\.showModal\(\)/);
+  assert.match(html, /data-leaderboard-tab="daily"/);
+  assert.match(html, /data-leaderboard-tab="all-time"/);
+  assert.match(html, /data-leaderboard-list="daily-correct"/);
+  assert.match(html, /data-leaderboard-list="daily-incorrect"/);
+  assert.match(html, /data-leaderboard-list="all-time"/);
+  assert.match(html, /data-all-time-ranking="highestRound"/);
+  assert.match(html, /data-all-time-ranking="totalRounds"/);
+  assert.match(html, /data-leaderboard-find="daily"/);
+  assert.match(html, /data-leaderboard-find="all-time"/);
+  assert.match(appScript, /initialiseLeaderboards\(\{/);
+  assert.match(appScript, /getCurrentUsername: getLeaderboardUsername/);
+  assert.match(appScript, /get\("leaderboardUser"\)/);
+  assert.match(
+    appScript,
+    /bestRound = Math\.max\(loadBestRound\(\), streakCount\);\s*\/\/ Older browser saves[\s\S]*?saveBestRound\(\);/,
+  );
+  assert.match(
+    appScript,
+    /function saveBestRound\(\)[\s\S]*?localStorage\.setItem\(bestRoundStorageKey, String\(bestRound\)\)/,
+  );
+  assert.match(css, /\.leaderboard-entry\.is-current-player/);
+  assert.match(await readProjectFile("js/leaderboards.js"), /scrollIntoView\(\{ block: "center"/);
   assert.match(
     html,
     /class="header-utility"[\s\S]*id="account-button"[\s\S]*class="round-timing"[\s\S]*class="player-stats"/,
