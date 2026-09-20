@@ -175,7 +175,6 @@ export async function initialiseAccount({
   documentObject = document,
 }) {
   const accountButton = documentObject.querySelector("#account-button");
-  const accountStatus = documentObject.querySelector("#account-status");
   const accessDialog = documentObject.querySelector("#account-access-dialog");
   const onboardingDialog = documentObject.querySelector("#account-onboarding-dialog");
   const onboardingForm = documentObject.querySelector("#account-onboarding-form");
@@ -190,10 +189,6 @@ export async function initialiseAccount({
   let saveInFlight = false;
   let saveAgain = false;
   const dirtyStorageKey = "the-daily-undead:account-sync-pending";
-
-  const setStatus = (message = "") => {
-    if (accountStatus) accountStatus.textContent = message;
-  };
 
   if (!accountButton || !publishableKey || !apiUrl) {
     if (accountButton) accountButton.hidden = true;
@@ -210,10 +205,9 @@ export async function initialiseAccount({
       5_000,
       "Account sign-in took too long to load.",
     );
-  } catch (error) {
+  } catch {
     accountButton.disabled = false;
     accountButton.textContent = "Account unavailable";
-    setStatus(error.message);
     return createUnavailableController();
   }
 
@@ -243,7 +237,6 @@ export async function initialiseAccount({
   if (!clerk.isSignedIn) {
     accountButton.disabled = false;
     accountButton.textContent = "Log in";
-    setStatus();
     accountButton.addEventListener("click", () => openDialog(accessDialog));
     let wasSignedOut = true;
     clerk.addListener(({ user }) => {
@@ -265,7 +258,6 @@ export async function initialiseAccount({
   } catch (error) {
     accountButton.disabled = false;
     accountButton.textContent = "Account sync offline";
-    setStatus("Progress is saved on this device for now");
     accountButton.addEventListener("click", () =>
       clerk.openUserProfile(createUserProfileOptions(clerk)),
     );
@@ -275,7 +267,6 @@ export async function initialiseAccount({
   if (account.needsOnboarding) {
     accountButton.disabled = false;
     accountButton.textContent = "Finish account";
-    setStatus("Choose a username to sync progress");
     accountButton.addEventListener("click", () => openDialog(onboardingDialog));
     openDialog(onboardingDialog);
 
@@ -321,7 +312,6 @@ export async function initialiseAccount({
   accountButton.disabled = false;
   accountButton.textContent = profile.username;
   accountButton.classList.add("has-username");
-  setStatus();
 
   const openUsernameEditor = () => {
     if (!usernameDialog || !usernameForm || !usernameFeedback) return;
@@ -390,9 +380,8 @@ export async function initialiseAccount({
       } catch {
         // The next successful save can still clear the in-memory retry state.
       }
-      setStatus();
     } catch {
-      setStatus("Saved on this device · sync will retry");
+      // Progress remains stored locally and the next change will retry the sync.
     } finally {
       saveInFlight = false;
       if (saveAgain) {
@@ -413,7 +402,6 @@ export async function initialiseAccount({
   }
 
   if (hasPendingLocalSave) {
-    setStatus("Finishing progress sync…");
     scheduleSave();
   }
 
@@ -425,7 +413,6 @@ export async function initialiseAccount({
         body: JSON.stringify(payload),
       });
     } catch {
-      setStatus("Result saved locally · verification will retry later");
       return null;
     }
   }
@@ -438,7 +425,6 @@ export async function initialiseAccount({
         body: JSON.stringify(payload),
       });
     } catch {
-      setStatus("Bonus saved locally · verification will retry later");
       return null;
     }
   }

@@ -384,13 +384,14 @@ h1 {
   min-width: 0;
   align-items: center;
   justify-content: center;
+  gap: 0.42rem;
   max-width: 12rem;
-  min-height: 1.9rem;
+  min-height: 2.15rem;
   overflow: hidden;
-  padding: 0.35rem 0.75rem;
-  border: 1px solid rgb(103 232 255 / 32%);
-  border-radius: 999px;
-  background: rgb(103 232 255 / 8%);
+  padding: 0.48rem 0.72rem;
+  border: 1px solid rgb(103 232 255 / 52%);
+  border-radius: 0.58rem;
+  background: linear-gradient(145deg, rgb(103 232 255 / 15%), rgb(103 232 255 / 7%));
   color: var(--aether);
   cursor: pointer;
   font-family: var(--font-display);
@@ -401,13 +402,59 @@ h1 {
   text-align: center;
   text-overflow: ellipsis;
   text-transform: uppercase;
+  box-shadow: 0 0.35rem 1rem rgb(0 0 0 / 18%), inset 0 1px 0 rgb(255 255 255 / 5%);
+  transition: transform 150ms ease, border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+  -webkit-tap-highlight-color: transparent;
   appearance: none;
   white-space: nowrap;
+}
+
+.account-button::before {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex: 0 0 auto;
+  background: currentColor;
+  content: "";
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+#account-button::before {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+#leaderboards-button::before {
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M8 21h8M12 17v4M7 4h10v4a5 5 0 0 1-10 0V4Zm0 2H4v1a4 4 0 0 0 4 4m9-5h3v1a4 4 0 0 1-4 4' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.account-button::after {
+  margin-left: 0.05rem;
+  content: "›";
+  font-family: sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 0.75;
+  opacity: 0.72;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .account-button:not(:disabled):hover {
+    transform: translateY(-2px);
+    border-color: rgb(103 232 255 / 88%);
+    background: linear-gradient(145deg, rgb(103 232 255 / 23%), rgb(103 232 255 / 11%));
+    box-shadow: 0 0 0 1px rgb(103 232 255 / 10%), 0 0.7rem 1.4rem rgb(0 0 0 / 24%);
+  }
+}
+
+.account-button:not(:disabled):active {
+  transform: translateY(1px) scale(0.99);
 }
 
 .account-button:disabled {
   opacity: 0.58;
   cursor: wait;
+  box-shadow: none;
 }
 
 .account-button.has-username {
@@ -415,9 +462,9 @@ h1 {
 }
 
 #account-button:not(.is-signed-in) {
-  border-color: rgb(184 196 216 / 34%);
-  background: rgb(184 196 216 / 10%);
-  color: #b8c4d8;
+  border-color: rgb(103 232 255 / 42%);
+  background: linear-gradient(145deg, rgb(103 232 255 / 11%), rgb(103 232 255 / 5%));
+  color: rgb(189 240 250 / 88%);
 }
 
 .clerk-sign-out-page {
@@ -462,17 +509,6 @@ h1 {
 .account-field input:focus-visible {
   outline: 3px solid #fff;
   outline-offset: 3px;
-}
-
-.account-status {
-  max-width: 14rem;
-  overflow: hidden;
-  color: rgb(168 178 199 / 70%);
-  font-size: 0.68rem;
-  line-height: 1.2;
-  text-align: right;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .puzzle-date {
@@ -1610,11 +1646,6 @@ h1 {
     align-items: flex-start;
   }
 
-  .account-status {
-    max-width: min(55vw, 16rem);
-    text-align: left;
-  }
-
   .stat-display {
     min-width: 0;
     padding: 0 0 0 clamp(0.82rem, 1.2vw, 0.96rem);
@@ -1658,32 +1689,38 @@ h1 {
   }
 
   .header-utility {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
     width: 100%;
     justify-content: flex-start;
-    gap: clamp(0.65rem, 3vw, 1rem);
+    gap: 0.55rem;
   }
 
   .account-controls {
-    flex: 1 1 0;
-    justify-content: flex-start;
-    align-items: flex-start;
-    margin-right: 1rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    align-items: stretch;
+    margin-right: 0;
   }
 
-  .account-status {
-    max-width: min(28vw, 7rem);
-    text-align: left;
+  .header-utility:has(.account-button:not([hidden])) .account-controls {
+    padding-left: 0;
+    border-left: 0;
   }
 
   .account-button {
-    flex: 1 1 auto;
+    width: 100%;
     max-width: none;
+    justify-self: stretch;
     padding-inline: 0.35rem;
+    font-size: 0.72rem;
     letter-spacing: 0.05em;
   }
 
-  #account-button.has-username {
-    flex-shrink: 0.35;
+  .account-button::before {
+    width: 0.82rem;
+    height: 0.82rem;
   }
 
   .app-shell {
@@ -1736,19 +1773,46 @@ h1 {
   }
 
   .round-timing {
+    grid-template-columns: minmax(0, 1fr) 0.45rem minmax(0, 1fr);
+    width: 100%;
+    align-items: center;
     justify-items: start;
+    gap: 0;
+  }
+
+  .round-timing::after {
+    grid-column: 2;
+    grid-row: 1;
+    width: 1px;
+    height: 1.1rem;
+    justify-self: center;
+    background: linear-gradient(180deg, transparent, rgb(156 181 223 / 18%) 20%, rgb(156 181 223 / 18%) 80%, transparent);
+    content: "";
+  }
+
+  .round-timing .puzzle-date {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: center;
+    text-align: center;
+  }
+
+  .round-timing .next-round {
+    grid-column: 3;
+    grid-row: 1;
+    justify-self: center;
+    text-align: center;
   }
 
   .player-stats {
     min-width: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
+    display: grid;
+    grid-template-columns: 0.9fr 0.9fr 1.2fr;
+    gap: 0.3rem;
   }
 
   .stat-display {
-    min-width: max-content;
-    flex: 1 1 auto;
+    min-width: 0;
     padding: 0 0 0 clamp(0.76rem, 1.8vw, 0.88rem);
     font-size: clamp(0.64rem, 2.7vw, 0.78rem);
     letter-spacing: clamp(0.045em, 0.2vw, 0.075em);

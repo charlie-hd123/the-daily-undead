@@ -94,10 +94,10 @@ test("account controls support optional sign-in without exposing private credent
     html,
     /class="header-utility"[\s\S]*id="account-button"[\s\S]*class="round-timing"[\s\S]*class="player-stats"/,
   );
-  assert.match(
-    html,
-    /class="round-timing"[\s\S]*class="next-round"[\s\S]*id="account-status"/,
-  );
+  assert.match(html, /class="round-timing"[\s\S]*class="next-round"/);
+  assert.doesNotMatch(html, /id="account-status"/);
+  assert.doesNotMatch(account, /accountStatus|setStatus/);
+  assert.doesNotMatch(css, /\.account-status/);
   assert.match(html, />Register to keep your rounds and points on every device\./);
   assert.match(
     css,
@@ -139,8 +139,27 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(account, /clerk\.signOut\(/);
   assert.match(account, /accountButton\.classList\.add\("is-signed-in"\)/);
   assert.match(css, /#account-button:not\(\.is-signed-in\)/);
-  assert.match(css, /\.account-button \{\s*flex: 1 1 auto;/);
-  assert.match(css, /#account-button\.has-username \{\s*flex-shrink: 0\.35;/);
+  assert.match(css, /#account-button::before[\s\S]*mask-image:/);
+  assert.match(css, /#leaderboards-button::before[\s\S]*mask-image:/);
+  assert.match(css, /\.account-button::after[\s\S]*content: "›";/);
+  assert.match(css, /\.account-button:not\(:disabled\):hover/);
+  assert.match(css, /@media \(max-width: 35rem\)[\s\S]*?\.account-button \{\s*width: 100%;/);
+  assert.match(css, /@media \(max-width: 35rem\)[\s\S]*?\.account-button \{[\s\S]*?font-size: 0\.72rem;/);
+  assert.match(css, /font-size: clamp\(0\.64rem, 2\.7vw, 0\.78rem\);/);
+  assert.match(
+    css,
+    /@media \(max-width: 35rem\)[\s\S]*?\.account-controls \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/,
+  );
+  assert.match(
+    css,
+    /@media \(max-width: 35rem\)[\s\S]*?\.round-timing \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) 0\.45rem minmax\(0, 1fr\);[\s\S]*?width: 100%;/,
+  );
+  assert.match(css, /\.round-timing::after \{[\s\S]*?height: 1\.1rem;[\s\S]*?rgb\(156 181 223 \/ 18%\)/);
+  assert.match(css, /\.round-timing \.next-round \{[\s\S]*?justify-self: center;/);
+  assert.match(
+    css,
+    /@media \(max-width: 35rem\)[\s\S]*?\.player-stats \{[\s\S]*?grid-template-columns: 0\.9fr 0\.9fr 1\.2fr;/,
+  );
   assert.match(
     css,
     /\.account-button \{[\s\S]*?display: inline-flex;[\s\S]*?align-items: center;[\s\S]*?justify-content: center;/,
