@@ -504,10 +504,10 @@ h1 {
 .clerk-sign-out-page h2,
 .clerk-username-page h2 {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-size: clamp(1.65rem, 4vw, 2.1rem);
   font-weight: 900;
   letter-spacing: 0.015em;
-  line-height: 0.95;
+  line-height: 1;
   text-transform: uppercase;
 }
 
@@ -515,7 +515,7 @@ h1 {
 .clerk-username-page p {
   max-width: 40rem;
   color: var(--muted-strong);
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   line-height: 1.5;
 }
 
@@ -523,6 +523,7 @@ h1 {
 .clerk-username-page .button {
   width: min(100%, 22rem);
   margin-top: 0.35rem;
+  font-size: 0.9rem;
 }
 
 .account-feedback {

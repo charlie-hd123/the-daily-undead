@@ -70,7 +70,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260920-4"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260920-5"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -127,6 +127,9 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(account, /colorPrimary: "#67e8ff"/);
   assert.match(account, /colorBackground: "#0d111d"/);
   assert.match(account, /fontFamilyButtons: displayFont/);
+  assert.match(account, /fontSize: "0\.875rem"/);
+  assert.match(account, /outline: "3px solid #ffffff"/);
+  assert.match(account, /boxShadow:[\s\S]*?!important/);
   assert.match(account, /navbarButton__active/);
   assert.match(account, /profileSectionPrimaryButton/);
   assert.match(account, /formButtonPrimary/);
@@ -153,6 +156,7 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(css, /\.clerk-sign-out-page::before,/);
   assert.match(css, /\.clerk-username-page::before \{/);
   assert.match(css, /linear-gradient\(90deg, var\(--aether\), var\(--aether-violet\), var\(--aether-pink\)\)/);
+  assert.match(css, /font-size: clamp\(1\.65rem, 4vw, 2\.1rem\);/);
   assert.match(css, /#account-button:not\(\.is-signed-in\)/);
   assert.match(css, /#account-button::before[\s\S]*mask-image:/);
   assert.match(css, /#leaderboards-button::before[\s\S]*mask-image:/);

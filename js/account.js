@@ -74,7 +74,7 @@ function createClerkAppearance() {
       colorModalBackdrop: "rgb(2 4 9 / 84%)",
       fontFamily: bodyFont,
       fontFamilyButtons: displayFont,
-      fontSize: "0.95rem",
+      fontSize: "0.875rem",
       fontWeight: {
         normal: 400,
         medium: 500,
@@ -97,8 +97,8 @@ function createClerkAppearance() {
         overflow: "hidden",
       },
       modalCloseButton: {
-        width: "2.4rem",
-        height: "2.4rem",
+        width: "2.25rem",
+        height: "2.25rem",
         border: `1px solid ${border}`,
         borderRadius: "999px",
         backgroundColor: "rgb(255 255 255 / 5%)",
@@ -124,21 +124,29 @@ function createClerkAppearance() {
         textTransform: "uppercase",
       },
       formButtonPrimary: {
-        minHeight: "3.2rem",
-        border: "1px solid transparent",
+        minHeight: "3rem",
+        border: "0",
         borderRadius: "0.7rem",
         background: "linear-gradient(110deg, #f7c85c 0%, #ffad54 48%, #ff8a48 100%)",
         color: "#171006",
-        boxShadow: "0 0.8rem 2.2rem rgb(255 138 72 / 16%), inset 0 1px 0 rgb(255 255 255 / 36%)",
+        boxShadow:
+          "0 0.8rem 2.2rem rgb(255 138 72 / 16%), inset 0 1px 0 rgb(255 255 255 / 36%) !important",
         fontFamily: displayFont,
-        fontSize: "1rem",
+        fontSize: "0.9rem",
         fontWeight: 800,
         letterSpacing: "0.045em",
         textTransform: "uppercase",
-        '&:hover, &:focus-visible, &:active': {
+        '&:hover, &:active': {
           background: "linear-gradient(110deg, #ffe08a 0%, #ffc16b 48%, #ff9c63 100%)",
           color: "#171006",
-          boxShadow: "0 0 0 1px rgb(255 222 137 / 38%), 0 0.9rem 2.5rem rgb(255 138 72 / 25%)",
+          boxShadow:
+            "0 0.9rem 2.5rem rgb(255 138 72 / 25%), inset 0 1px 0 rgb(255 255 255 / 42%) !important",
+        },
+        '&:focus-visible': {
+          outline: "3px solid #ffffff",
+          outlineOffset: "3px",
+          boxShadow:
+            "0 0.8rem 2.2rem rgb(255 138 72 / 16%), inset 0 1px 0 rgb(255 255 255 / 36%) !important",
         },
       },
       formFieldInput: {
@@ -223,7 +231,7 @@ function createClerkAppearance() {
         },
         profileSectionTitleText: {
           fontFamily: displayFont,
-          fontSize: "1.05rem",
+          fontSize: "0.95rem",
           fontWeight: 800,
           letterSpacing: "0.035em",
           textTransform: "uppercase",
@@ -236,6 +244,7 @@ function createClerkAppearance() {
           backgroundColor: "rgb(103 232 255 / 8%)",
           color: "#bdf0fa",
           fontFamily: displayFont,
+          fontSize: "0.875rem",
           fontWeight: 800,
           letterSpacing: "0.035em",
           textTransform: "uppercase",
