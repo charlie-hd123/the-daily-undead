@@ -13,7 +13,7 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20260920-2";
+} from "./game-core.js?v=20260920-3";
 import {
   calculateReviveCost,
   canUseRequestedPreviewDate,
@@ -23,15 +23,15 @@ import {
   purchaseMissedDayRevive,
   resetReviveCount,
   shouldResetReviveCycle,
-} from "./progression.js?v=20260920-2";
-import { initialiseAccount } from "./account.js?v=20260920-2";
+} from "./progression.js?v=20260920-3";
+import { initialiseAccount } from "./account.js?v=20260920-3";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20260920-2";
+} from "./community-stats.js?v=20260920-3";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -197,6 +197,26 @@ function formatDate(dateKey) {
     day: "numeric",
     month: "short",
   }).format(new Date(`${dateKey}T12:00:00`));
+}
+
+function formatLongDate(dateKey) {
+  return new Intl.DateTimeFormat(undefined, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(new Date(`${dateKey}T12:00:00`));
+}
+
+function updatePuzzleDateDisplay(dateKey) {
+  const previewSuffix = new URLSearchParams(window.location.search).has("date") ? " · Preview" : "";
+  const shortDate = document.createElement("span");
+  const longDate = document.createElement("span");
+
+  shortDate.className = "puzzle-date-short";
+  shortDate.textContent = `${formatDate(dateKey)}${previewSuffix}`;
+  longDate.className = "puzzle-date-long";
+  longDate.textContent = `${formatLongDate(dateKey)}${previewSuffix}`;
+  dateLabel.replaceChildren(shortDate, longDate);
 }
 
 function getFollowingDateKey(dateKey) {
@@ -1499,7 +1519,7 @@ async function initialise() {
     })) {
       resetReviveCycle();
     }
-    dateLabel.textContent = `${formatDate(dateKey)}${new URLSearchParams(window.location.search).has("date") ? " · Preview" : ""}`;
+    updatePuzzleDateDisplay(dateKey);
     updateStreakDisplay();
     updateTotalRoundsDisplay();
     updatePointsDisplay();

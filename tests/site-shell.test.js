@@ -70,7 +70,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260920-2"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260920-3"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -98,6 +98,10 @@ test("account controls support optional sign-in without exposing private credent
   assert.doesNotMatch(html, /id="account-status"/);
   assert.doesNotMatch(account, /accountStatus|setStatus/);
   assert.doesNotMatch(css, /\.account-status/);
+  assert.match(appScript, /weekday: "long"/);
+  assert.match(appScript, /className = "puzzle-date-long"/);
+  assert.match(css, /@media \(max-width: 35rem\)[\s\S]*?\.puzzle-date-short \{\s*display: none;/);
+  assert.match(css, /@media \(max-width: 35rem\)[\s\S]*?\.puzzle-date-long \{\s*display: inline;/);
   assert.match(html, />Register to keep your rounds and points on every device\./);
   assert.match(
     css,
@@ -152,10 +156,10 @@ test("account controls support optional sign-in without exposing private credent
   );
   assert.match(
     css,
-    /@media \(max-width: 35rem\)[\s\S]*?\.round-timing \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) 0\.45rem minmax\(0, 1fr\);[\s\S]*?width: 100%;/,
+    /@media \(max-width: 35rem\)[\s\S]*?\.round-timing \{[\s\S]*?grid-template-columns: auto minmax\(1rem, 1fr\) auto;[\s\S]*?width: calc\(100% - 0\.375rem\);/,
   );
-  assert.match(css, /\.round-timing::after \{[\s\S]*?height: 1\.1rem;[\s\S]*?rgb\(156 181 223 \/ 18%\)/);
-  assert.match(css, /\.round-timing \.next-round \{[\s\S]*?justify-self: center;/);
+  assert.match(css, /\.round-timing::after \{[\s\S]*?height: 1px;[\s\S]*?rgb\(156 181 223 \/ 16%\)/);
+  assert.match(css, /\.round-timing \.next-round \{[\s\S]*?justify-self: end;/);
   assert.match(
     css,
     /@media \(max-width: 35rem\)[\s\S]*?\.player-stats \{[\s\S]*?grid-template-columns: 0\.9fr 0\.9fr 1\.2fr;/,
