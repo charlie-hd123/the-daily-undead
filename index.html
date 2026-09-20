@@ -15,9 +15,9 @@
       content="The Daily Undead — your daily Treyarch Zombies challenge. Reveal clues, identify the map, and put the steps in order."
     >
     <title>The Daily Undead</title>
-    <link rel="icon" href="./assets/favicon.png?v=20260920-6" type="image/png" sizes="128x128">
+    <link rel="icon" href="./assets/favicon.png?v=20260920-7" type="image/png" sizes="128x128">
     <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" sizes="180x180">
-    <link rel="stylesheet" href="./styles.css?v=20260920-6">
+    <link rel="stylesheet" href="./styles.css?v=20260920-7">
   </head>
   <body>
     <header class="site-header">
@@ -137,23 +137,18 @@
         data-leaderboard-panel="daily"
       >
         <div class="leaderboard-panel-tools">
-          <p>Everyone who played today.</p>
+          <p class="leaderboard-today-context">
+            <strong data-leaderboard-player-count>—</strong>
+            <span>players today</span>
+          </p>
           <button class="leaderboard-find-me" type="button" data-leaderboard-find="daily" hidden>Find me</button>
         </div>
         <div class="leaderboard-group">
           <div class="leaderboard-group-heading">
-            <h3>Got it right</h3>
-            <span>Ranked by points</span>
+            <h3>Elite players</h3>
+            <span>Map + bonus correct</span>
           </div>
-          <ol class="leaderboard-list" data-leaderboard-list="daily-correct"></ol>
-        </div>
-        <div class="leaderboard-divider" aria-hidden="true"><span>VS</span></div>
-        <div class="leaderboard-group leaderboard-group-wrong">
-          <div class="leaderboard-group-heading">
-            <h3>Got it wrong</h3>
-            <span>Played today</span>
-          </div>
-          <ul class="leaderboard-list" data-leaderboard-list="daily-incorrect"></ul>
+          <ol class="leaderboard-list" data-leaderboard-list="daily-elite"></ol>
         </div>
       </section>
       <section
@@ -229,7 +224,7 @@
       </form>
     </dialog>
 
-    <script type="module" src="./js/app.js?v=20260920-6"></script>
+    <script type="module" src="./js/app.js?v=20260920-7"></script>
 
     <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "4eeb20e1411c4e7baf24969ced969c88"}'></script><!-- End Cloudflare Web Analytics -->
 

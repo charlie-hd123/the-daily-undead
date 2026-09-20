@@ -5,12 +5,11 @@ function nonNegativeInteger(value) {
   return Number.isInteger(number) && number >= 0 ? number : 0;
 }
 
-function rowToDailyEntry(row, index, correct) {
+function rowToDailyEntry(row, index) {
   return {
-    rank: correct ? index + 1 : null,
+    rank: index + 1,
     username: row.username,
     points: nonNegativeInteger(row.points),
-    correct,
   };
 }
 
@@ -27,22 +26,25 @@ function rowToAllTimeEntry(row) {
 export async function readLeaderboards(db, dateKey) {
   if (!isValidDateKey(dateKey)) throw new Error("A valid date is required.");
 
-  const [dailyResult, allTimeResult] = await db.batch([
+  const [dailyResult, todayStatsResult, allTimeResult] = await db.batch([
     db
       .prepare(
         `SELECT
           profiles.username,
-          results.points_earned AS points,
-          results.map_correct
+          results.points_earned AS points
         FROM player_daily_results AS results
         INNER JOIN player_profiles AS profiles ON profiles.user_id = results.user_id
         WHERE results.puzzle_date = ?
           AND profiles.leaderboard_visible = 1
+          AND results.map_correct = 1
+          AND results.bonus_status = 'correct'
         ORDER BY
-          results.map_correct DESC,
           results.points_earned DESC,
           profiles.username COLLATE BINARY ASC`,
       )
+      .bind(dateKey),
+    db
+      .prepare("SELECT attempts FROM daily_stats WHERE puzzle_date = ?")
       .bind(dateKey),
     db.prepare(
       `SELECT
@@ -62,16 +64,12 @@ export async function readLeaderboards(db, dateKey) {
     ),
   ]);
 
-  const dailyRows = dailyResult.results || [];
-  const correctRows = dailyRows.filter((row) => Boolean(row.map_correct));
-  const incorrectRows = dailyRows.filter((row) => !row.map_correct);
-
   return {
     date: dateKey,
     generatedAt: new Date().toISOString(),
     today: {
-      correct: correctRows.map((row, index) => rowToDailyEntry(row, index, true)),
-      incorrect: incorrectRows.map((row, index) => rowToDailyEntry(row, index, false)),
+      playersToday: nonNegativeInteger(todayStatsResult.results?.[0]?.attempts),
+      elite: (dailyResult.results || []).map(rowToDailyEntry),
     },
     allTime: (allTimeResult.results || []).map(rowToAllTimeEntry),
   };

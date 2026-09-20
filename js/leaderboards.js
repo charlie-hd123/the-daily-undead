@@ -64,7 +64,7 @@ function makeRank(documentObject, rank) {
   return element;
 }
 
-function makePlayer(documentObject, username, resultLabel = null) {
+function makePlayer(documentObject, username, resultLabel = null, resultClass = null) {
   const player = documentObject.createElement("span");
   player.className = "leaderboard-player";
   const name = documentObject.createElement("strong");
@@ -73,7 +73,7 @@ function makePlayer(documentObject, username, resultLabel = null) {
 
   if (resultLabel) {
     const result = documentObject.createElement("small");
-    result.className = `leaderboard-result is-${resultLabel.toLowerCase()}`;
+    result.className = `leaderboard-result is-${resultClass || resultLabel.toLowerCase()}`;
     result.textContent = resultLabel;
     player.append(result);
   }
@@ -102,12 +102,12 @@ function markCurrentPlayer(item, username, currentUsername) {
   }
 }
 
-function renderTodayEntries(list, entries, correct, currentUsername, documentObject) {
+function renderTodayEntries(list, entries, currentUsername, documentObject) {
   list.replaceChildren();
   if (!entries.length) {
     const empty = documentObject.createElement("li");
     empty.className = "leaderboard-empty";
-    empty.textContent = correct ? "Nobody has got it right yet." : "Nobody has got it wrong yet.";
+    empty.textContent = "No elite finishes yet today.";
     list.append(empty);
     return;
   }
@@ -117,8 +117,8 @@ function renderTodayEntries(list, entries, correct, currentUsername, documentObj
     item.className = "leaderboard-entry leaderboard-today-entry";
     markCurrentPlayer(item, entry.username, currentUsername);
     item.append(
-      makeRank(documentObject, correct ? index + 1 : null),
-      makePlayer(documentObject, entry.username, correct ? "Right" : "Wrong"),
+      makeRank(documentObject, index + 1),
+      makePlayer(documentObject, entry.username, "Map + Bonus", "elite"),
       makePoints(documentObject, entry.points),
     );
     list.append(item);
@@ -198,8 +198,8 @@ export function initialiseLeaderboards({
   if (!button || !dialog) return;
 
   const status = dialog.querySelector("[data-leaderboard-status]");
-  const correctList = dialog.querySelector("[data-leaderboard-list='daily-correct']");
-  const incorrectList = dialog.querySelector("[data-leaderboard-list='daily-incorrect']");
+  const eliteList = dialog.querySelector("[data-leaderboard-list='daily-elite']");
+  const playerCount = dialog.querySelector("[data-leaderboard-player-count]");
   const allTimeList = dialog.querySelector("[data-leaderboard-list='all-time']");
   const tabs = [...dialog.querySelectorAll("[data-leaderboard-tab]")];
   const panels = [...dialog.querySelectorAll("[data-leaderboard-panel]")];
@@ -286,17 +286,10 @@ export function initialiseLeaderboards({
       });
       currentUsername = getCurrentUsername();
       allTimeEntries = result.allTime || [];
+      playerCount.textContent = numberFormatter.format(result.today?.playersToday || 0);
       renderTodayEntries(
-        correctList,
-        result.today?.correct || [],
-        true,
-        currentUsername,
-        documentObject,
-      );
-      renderTodayEntries(
-        incorrectList,
-        result.today?.incorrect || [],
-        false,
+        eliteList,
+        result.today?.elite || [],
         currentUsername,
         documentObject,
       );
@@ -308,7 +301,7 @@ export function initialiseLeaderboards({
         documentObject,
       );
       updateFindButtons();
-      status.textContent = "Today uses verified results. All time includes imported and synced progress.";
+      status.textContent = "See where you rank today and among the all-time leaders.";
       status.dataset.state = "ready";
     } catch {
       status.textContent = "Live scores couldn’t be loaded. Start the local leaderboard preview and try again.";

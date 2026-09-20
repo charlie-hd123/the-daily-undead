@@ -1077,6 +1077,17 @@ h1 {
   text-transform: uppercase;
 }
 
+.leaderboard-today-context {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.leaderboard-today-context strong {
+  color: var(--aether);
+  font: 800 1.25rem/1 var(--font-display);
+}
+
 .leaderboard-find-me {
   min-height: 2rem;
   padding: 0.4rem 0.7rem;
@@ -1251,6 +1262,11 @@ h1 {
 .leaderboard-result.is-right {
   background: rgb(108 231 161 / 12%);
   color: var(--success);
+}
+
+.leaderboard-result.is-elite {
+  background: rgb(247 200 92 / 13%);
+  color: var(--essence);
 }
 
 .leaderboard-result.is-wrong {

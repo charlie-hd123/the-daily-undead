@@ -22,7 +22,7 @@ The Worker exposes:
 
 - `GET /health` for a simple health check.
 - `GET /api/stats?date=YYYY-MM-DD` for players today, total games, and yesterday's result.
-- `GET /api/leaderboards?date=YYYY-MM-DD` for today's verified results and all-time account progress.
+- `GET /api/leaderboards?date=YYYY-MM-DD` for the day's verified map-and-bonus elite list, community player count, and all-time account progress.
 - `POST /api/attempts` for a completed current-day map guess.
 - `GET /api/account?date=YYYY-MM-DD` for a signed-in player's profile and save.
 - `POST /api/account/register` to reserve a username and optionally import local progress.
