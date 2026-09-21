@@ -71,7 +71,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260921-12"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260921-13"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -147,6 +147,10 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(appScript, /<h3 id="missed-day-revive-title">Restore your run\?<\/h3>/);
   assert.match(appScript, /Your current round is back to/);
   assert.match(appScript, /Return tomorrow to keep your round and points\./);
+  assert.match(
+    appScript,
+    /`🔥 Round: \$\{shareRound\}`,[\s\S]*?`⚡ Points: \$\{sharePoints\}`,[\s\S]*?`📈 Highest Round: \$\{bestRound\}`,[\s\S]*?`🏆 Maps Solved: \$\{totalRounds\}`/,
+  );
   assert.doesNotMatch(appScript, /<h2>Your run has ended<\/h2>/);
   assert.match(
     html,

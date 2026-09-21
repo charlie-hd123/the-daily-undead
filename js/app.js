@@ -13,7 +13,7 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20260921-12";
+} from "./game-core.js?v=20260921-13";
 import {
   calculateReviveCost,
   canUseRequestedPreviewDate,
@@ -23,19 +23,19 @@ import {
   purchaseMissedDayRevive,
   resetReviveCount,
   shouldResetReviveCycle,
-} from "./progression.js?v=20260921-12";
-import { initialiseAccount } from "./account.js?v=20260921-12";
+} from "./progression.js?v=20260921-13";
+import { initialiseAccount } from "./account.js?v=20260921-13";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20260921-12";
+} from "./community-stats.js?v=20260921-13";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20260921-12";
+} from "./leaderboards.js?v=20260921-13";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -1264,8 +1264,8 @@ function buildScoreSharePayload() {
     `🧟 The Daily Undead · ${formatDate(puzzle.dateKey)}`,
     "",
     `🔥 Round: ${shareRound}`,
-    `📈 Highest Round: ${bestRound}`,
     `⚡ Points: ${sharePoints}`,
+    `📈 Highest Round: ${bestRound}`,
     `🏆 Maps Solved: ${totalRounds}`,
     "",
     "Think you can do better?",
