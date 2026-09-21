@@ -5,10 +5,11 @@ function nonNegativeInteger(value) {
   return Number.isInteger(number) && number >= 0 ? number : 0;
 }
 
-function rowToDailyEntry(row, index) {
+function rowToDailyEntry(row) {
   return {
-    rank: index + 1,
     username: row.username,
+    cluesUsed: nonNegativeInteger(row.clues_used),
+    bonusCorrect: row.bonus_status === "correct",
     points: nonNegativeInteger(row.points),
   };
 }
@@ -31,13 +32,14 @@ export async function readLeaderboards(db, dateKey) {
       .prepare(
         `SELECT
           profiles.username,
+          results.clues_used,
+          results.bonus_status,
           results.points_earned AS points
         FROM player_daily_results AS results
         INNER JOIN player_profiles AS profiles ON profiles.user_id = results.user_id
         WHERE results.puzzle_date = ?
           AND profiles.leaderboard_visible = 1
           AND results.map_correct = 1
-          AND results.bonus_status = 'correct'
         ORDER BY
           results.points_earned DESC,
           profiles.username COLLATE BINARY ASC`,
