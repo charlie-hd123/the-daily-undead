@@ -64,7 +64,13 @@ function makeRank(documentObject, rank) {
   return element;
 }
 
-function makePlayer(documentObject, username, resultLabel = null, resultClass = null) {
+function makePlayer(
+  documentObject,
+  username,
+  resultLabel = null,
+  resultClass = null,
+  resultAccent = null,
+) {
   const player = documentObject.createElement("span");
   player.className = "leaderboard-player";
   const name = documentObject.createElement("strong");
@@ -75,6 +81,13 @@ function makePlayer(documentObject, username, resultLabel = null, resultClass = 
     const result = documentObject.createElement("small");
     result.className = `leaderboard-result is-${resultClass || resultLabel.toLowerCase()}`;
     result.textContent = resultLabel;
+    if (resultAccent) {
+      result.append(documentObject.createTextNode(" "));
+      const accent = documentObject.createElement("span");
+      accent.className = "leaderboard-result-accent";
+      accent.textContent = resultAccent;
+      result.append(accent);
+    }
     player.append(result);
   }
 
@@ -107,27 +120,32 @@ function renderTodayEntries(list, entries, currentUsername, documentObject) {
   if (!entries.length) {
     const empty = documentObject.createElement("li");
     empty.className = "leaderboard-empty";
-    empty.textContent = "No elite finishes yet today.";
+    empty.textContent = "No correct answers yet today.";
     list.append(empty);
     return;
   }
 
-  entries.forEach((entry, index) => {
+  entries.forEach((entry) => {
     const item = documentObject.createElement("li");
     item.className = "leaderboard-entry leaderboard-today-entry";
     markCurrentPlayer(item, entry.username, currentUsername);
+    const clueLabel = `${entry.cluesUsed} ${entry.cluesUsed === 1 ? "Clue" : "Clues"}`;
     item.append(
-      makeRank(documentObject, index + 1),
-      makePlayer(documentObject, entry.username, "Map + Bonus", "elite"),
+      makePlayer(
+        documentObject,
+        entry.username,
+        entry.bonusCorrect ? `${clueLabel} +` : clueLabel,
+        "correct",
+        entry.bonusCorrect ? "Bonus" : null,
+      ),
       makePoints(documentObject, entry.points),
     );
     list.append(item);
   });
 }
 
-function makeMetric(documentObject, label, value, emphasized = false) {
+function makeMetric(documentObject, label, value) {
   const metric = documentObject.createElement("div");
-  if (emphasized) metric.className = "is-ranking-metric";
   const term = documentObject.createElement("dt");
   term.textContent = label;
   const description = documentObject.createElement("dd");
@@ -158,29 +176,29 @@ function renderAllTimeEntries(
     item.className = "leaderboard-entry leaderboard-all-time-entry";
     markCurrentPlayer(item, entry.username, currentUsername);
 
-    const metrics = documentObject.createElement("dl");
-    metrics.className = "leaderboard-metrics";
-    metrics.append(
-      makeMetric(documentObject, "Round", entry.currentRound),
-      makeMetric(documentObject, "Points", entry.points),
+    const player = makePlayer(documentObject, entry.username);
+    const supportingMetrics = documentObject.createElement("dl");
+    supportingMetrics.className = "leaderboard-supporting-metrics";
+    supportingMetrics.append(
+      makeMetric(documentObject, "Current round", entry.currentRound),
+      makeMetric(documentObject, "Points balance", entry.points),
+    );
+    player.append(supportingMetrics);
+
+    const rankingMetric = documentObject.createElement("dl");
+    rankingMetric.className = "leaderboard-primary-metric";
+    rankingMetric.append(
       makeMetric(
         documentObject,
-        "Highest",
-        entry.highestRound,
-        ranking === "highestRound",
-      ),
-      makeMetric(
-        documentObject,
-        "Total",
-        entry.totalRounds,
-        ranking === "totalRounds",
+        ranking === "totalRounds" ? "Total rounds" : "Highest round",
+        ranking === "totalRounds" ? entry.totalRounds : entry.highestRound,
       ),
     );
 
     item.append(
       makeRank(documentObject, index + 1),
-      makePlayer(documentObject, entry.username),
-      metrics,
+      player,
+      rankingMetric,
     );
     list.append(item);
   });

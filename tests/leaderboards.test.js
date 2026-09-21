@@ -36,12 +36,20 @@ function createLeaderboardDb(dailyRows, todayStatsRows, allTimeRows) {
   };
 }
 
-test("today lists only verified map and bonus completions with the community play count", async () => {
+test("today lists every verified correct map result with clue and bonus details", async () => {
   const db = createLeaderboardDb(
     [
       {
         username: "Dempsey",
+        clues_used: 1,
+        bonus_status: "correct",
         points: 100,
+      },
+      {
+        username: "Takeo",
+        clues_used: 2,
+        bonus_status: "incorrect",
+        points: 20,
       },
     ],
     [{ attempts: 42 }],
@@ -60,7 +68,10 @@ test("today lists only verified map and bonus completions with the community pla
 
   assert.deepEqual(result.today, {
     playersToday: 42,
-    elite: [{ rank: 1, username: "Dempsey", points: 100 }],
+    elite: [
+      { username: "Dempsey", cluesUsed: 1, bonusCorrect: true, points: 100 },
+      { username: "Takeo", cluesUsed: 2, bonusCorrect: false, points: 20 },
+    ],
   });
   assert.deepEqual(result.allTime, [
     {
@@ -75,7 +86,9 @@ test("today lists only verified map and bonus completions with the community pla
   assert.match(db.statements[0].sql, /player_daily_results/);
   assert.match(db.statements[0].sql, /leaderboard_visible = 1/);
   assert.match(db.statements[0].sql, /map_correct = 1/);
-  assert.match(db.statements[0].sql, /bonus_status = 'correct'/);
+  assert.doesNotMatch(db.statements[0].sql, /bonus_status = 'correct'/);
+  assert.match(db.statements[0].sql, /clues_used/);
+  assert.match(db.statements[0].sql, /points_earned DESC/);
   assert.doesNotMatch(db.statements[0].sql, /player_saves/);
   assert.deepEqual(db.statements[0].bindings, ["2026-09-20"]);
   assert.match(db.statements[1].sql, /SELECT attempts FROM daily_stats/);
