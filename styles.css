@@ -2258,13 +2258,14 @@ h1 {
 
   .player-stats {
     min-width: 0;
-    display: grid;
-    grid-template-columns: 0.9fr 0.9fr 1.2fr;
-    gap: 0.3rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
   }
 
   .stat-display {
-    min-width: 0;
+    min-width: max-content;
+    flex: 1 1 auto;
     padding: 0 0 0 clamp(0.76rem, 1.8vw, 0.88rem);
     font-size: clamp(0.64rem, 2.7vw, 0.78rem);
     letter-spacing: clamp(0.045em, 0.2vw, 0.075em);
