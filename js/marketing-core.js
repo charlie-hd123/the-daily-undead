@@ -70,8 +70,8 @@ export function buildMarketingCopy({
   const redditTitle = `Can you guess the map from the main quest step? #${postNumber}`;
   const redditBody = [
     `Yesterday’s answer: ${cleanAnswer} 🧟`,
-    `Solved on The Daily Undead: ${solved} 🔎`,
-    "First correct on Reddit: u/____, u/____, u/____ 👏",
+    `Yesterday’s solve rate: ${solved} 🔎`,
+    "First correct Redditors: u/____, u/____, u/____ 👏",
     "",
     "Today’s main quest step:",
     `*${cleanClue}*`,
@@ -83,20 +83,20 @@ export function buildMarketingCopy({
     "Drop your guess below.",
   ].join("\n");
   const discordBody = [
-    `🧟 The Daily Undead - ${formatDiscordDate(dateKey)}`,
+    `🧟 The Daily Undead · ${formatDiscordDate(dateKey)}`,
     `Yesterday’s answer: ${cleanAnswer} 🧟`,
-    `Solved on The Daily Undead: ${solved} 🔎`,
-    "First correct here: @____, @____, @____ 👏",
+    `Yesterday’s solve rate: ${solved} 🔎`,
+    "First correct guesses here: @____, @____, @____ 👏",
     "",
     "Today’s main quest step:",
     cleanClue,
     "",
     "**Think you know the map?** Drop your guess below 👇",
     "",
-    "Need another clue, or want to lock in your answer on the official website?",
+    "Need another clue, or want to lock in your answer on The Daily Undead website?",
     "🔗 <https://thedailyundead.com/>",
     "",
-    "📱 Tip: Open the game in your normal browser (Safari/Chrome) rather than an in-app browser so your rounds, points and progress stay saved in the same place.",
+    "📱 Tip: Open the game in Safari or Chrome rather than an in-app browser so your rounds, points and progress stay saved in the same place.",
   ].join("\n");
 
   return { redditTitle, redditBody, discordBody, solved };

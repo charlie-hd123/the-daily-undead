@@ -71,7 +71,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260921-7"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260921-11"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -126,13 +126,26 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(appScript, /className = "puzzle-date-long"/);
   assert.match(css, /@media \(max-width: 35rem\)[\s\S]*?\.puzzle-date-short \{\s*display: none;/);
   assert.match(css, /@media \(max-width: 35rem\)[\s\S]*?\.puzzle-date-long \{\s*display: inline;/);
-  assert.match(html, />Register to keep your rounds and points on every device\./);
+  assert.match(
+    html,
+    />Create an account to keep your current round, points and progress across devices\./,
+  );
   assert.match(
     css,
     /@media \(max-width: 60rem\)[\s\S]*?\.header-utility \.round-timing \{\s*order: -1;/,
   );
   assert.match(html, /id="account-onboarding-form"/);
-  assert.match(html, /<h2>Choose your name<\/h2>/);
+  assert.match(html, /<h2>Choose your username<\/h2>/);
+  assert.match(html, /Maps Solved\s*<strong id="total-rounds-count">0<\/strong>/);
+  assert.match(html, /data-all-time-ranking="totalRounds">Maps solved<\/button>/);
+  assert.match(html, /<button class="button primary" type="submit">Finish setup<\/button>/);
+  assert.match(account, /accountButton\.textContent = "Finish setup";/);
+  assert.match(appScript, /<h2>You missed a round<\/h2>/);
+  assert.match(appScript, /Use a revive to restore your current round and remaining points\./);
+  assert.match(appScript, /<h3 id="missed-day-revive-title">Restore your run\?<\/h3>/);
+  assert.match(appScript, /Your current round is back to/);
+  assert.match(appScript, /Return tomorrow to keep your round and points\./);
+  assert.doesNotMatch(appScript, /<h2>Your run has ended<\/h2>/);
   assert.match(
     html,
     /This public username will identify you on leaderboards\. Your email is never shown\./,

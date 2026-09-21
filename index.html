@@ -15,9 +15,9 @@
       content="The Daily Undead — your daily Treyarch Zombies challenge. Reveal clues, identify the map, and put the steps in order."
     >
     <title>The Daily Undead</title>
-    <link rel="icon" href="./assets/favicon.png?v=20260921-7" type="image/png" sizes="128x128">
+    <link rel="icon" href="./assets/favicon.png?v=20260921-11" type="image/png" sizes="128x128">
     <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" sizes="180x180">
-    <link rel="stylesheet" href="./styles.css?v=20260921-7">
+    <link rel="stylesheet" href="./styles.css?v=20260921-11">
   </head>
   <body>
     <header class="site-header">
@@ -47,7 +47,7 @@
             Points <strong id="points-count">0</strong>
           </p>
           <p class="stat-display total-rounds" aria-live="polite">
-            Total Rounds <strong id="total-rounds-count">0</strong>
+            Maps Solved <strong id="total-rounds-count">0</strong>
           </p>
         </div>
       </div>
@@ -99,7 +99,7 @@
       <button class="dialog-close" type="button" data-close-account-dialog aria-label="Close">×</button>
       <p class="kicker">Undead account</p>
       <h2>Save your progress</h2>
-      <p>Register to keep your rounds and points on every device. You can still play without an account.</p>
+      <p>Create an account to keep your current round, points and progress across devices. You can still play without an account.</p>
       <div class="actions account-dialog-actions">
         <button id="account-create" class="button primary" type="button">Create account</button>
         <button id="account-sign-in" class="button" type="button">Sign in</button>
@@ -161,7 +161,7 @@
           <div class="leaderboard-ranking-control" role="group" aria-label="Rank all-time leaderboard by">
             <span>Rank by</span>
             <button type="button" aria-pressed="true" data-all-time-ranking="highestRound">Highest round</button>
-            <button type="button" aria-pressed="false" data-all-time-ranking="totalRounds">Total rounds</button>
+            <button type="button" aria-pressed="false" data-all-time-ranking="totalRounds">Maps solved</button>
           </div>
           <button class="leaderboard-find-me" type="button" data-leaderboard-find="all-time" hidden>Find me</button>
         </div>
@@ -172,7 +172,7 @@
     <dialog id="account-onboarding-dialog" class="account-dialog">
       <button class="dialog-close" type="button" data-close-account-dialog aria-label="Close">×</button>
       <p class="kicker">One last step</p>
-      <h2>Choose your name</h2>
+      <h2>Choose your username</h2>
       <p>This public username will identify you on leaderboards. Your email is never shown.</p>
       <form id="account-onboarding-form">
         <label class="account-field">
@@ -193,7 +193,7 @@
           <span>Import the progress already saved on this device</span>
         </label>
         <p id="account-onboarding-error" class="account-error" role="alert"></p>
-        <button class="button primary" type="submit">Start syncing</button>
+        <button class="button primary" type="submit">Finish setup</button>
       </form>
     </dialog>
 
@@ -223,7 +223,7 @@
       </form>
     </dialog>
 
-    <script type="module" src="./js/app.js?v=20260921-7"></script>
+    <script type="module" src="./js/app.js?v=20260921-11"></script>
 
     <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "4eeb20e1411c4e7baf24969ced969c88"}'></script><!-- End Cloudflare Web Analytics -->
 

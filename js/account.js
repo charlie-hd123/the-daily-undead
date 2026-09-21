@@ -495,7 +495,7 @@ export async function initialiseAccount({
 
   if (account.needsOnboarding) {
     accountButton.disabled = false;
-    accountButton.textContent = "Finish account";
+    accountButton.textContent = "Finish setup";
     accountButton.addEventListener("click", () => openDialog(onboardingDialog));
     openDialog(onboardingDialog);
 

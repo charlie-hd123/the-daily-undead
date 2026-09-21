@@ -120,7 +120,7 @@ function renderTodayEntries(list, entries, currentUsername, documentObject) {
   if (!entries.length) {
     const empty = documentObject.createElement("li");
     empty.className = "leaderboard-empty";
-    empty.textContent = "No correct answers yet today.";
+    empty.textContent = "No signed-in players have solved today’s map yet.";
     list.append(empty);
     return;
   }
@@ -190,7 +190,7 @@ function renderAllTimeEntries(
     rankingMetric.append(
       makeMetric(
         documentObject,
-        ranking === "totalRounds" ? "Total rounds" : "Highest round",
+        ranking === "totalRounds" ? "Maps solved" : "Highest round",
         ranking === "totalRounds" ? entry.totalRounds : entry.highestRound,
       ),
     );
@@ -291,7 +291,7 @@ export function initialiseLeaderboards({
     status.textContent = "Loading current scores…";
     status.dataset.state = "loading";
     if (!apiUrl) {
-      status.textContent = "Leaderboards are not configured.";
+      status.textContent = "Leaderboards are temporarily unavailable.";
       status.dataset.state = "error";
       return;
     }
@@ -319,10 +319,10 @@ export function initialiseLeaderboards({
         documentObject,
       );
       updateFindButtons();
-      status.textContent = "See where you rank today and among the all-time leaders.";
+      status.textContent = "See today’s correct players and the all-time leaders.";
       status.dataset.state = "ready";
     } catch {
-      status.textContent = "Live scores couldn’t be loaded. Start the local leaderboard preview and try again.";
+      status.textContent = "Leaderboards couldn’t be loaded. Please try again.";
       status.dataset.state = "error";
     }
   });

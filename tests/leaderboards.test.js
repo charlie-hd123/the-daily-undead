@@ -99,7 +99,7 @@ test("today lists every verified correct map result with clue and bonus details"
   assert.deepEqual(db.statements[2].bindings, []);
 });
 
-test("all-time ranking toggles between highest round and total rounds", () => {
+test("all-time ranking toggles between highest round and maps solved", () => {
   const entries = [
     { username: "Alpha", currentRound: 5, points: 80, highestRound: 12, totalRounds: 30 },
     { username: "Bravo", currentRound: 4, points: 60, highestRound: 10, totalRounds: 42 },
@@ -184,6 +184,9 @@ test("the local Wrangler config opts only its D1 binding into remote data", asyn
 test("the leaderboard uses player-facing introductory copy", async () => {
   const browserScript = await fs.readFile(new URL("js/leaderboards.js", projectRoot), "utf8");
 
-  assert.match(browserScript, /See where you rank today and among the all-time leaders\./);
+  assert.match(browserScript, /See today’s correct players and the all-time leaders\./);
+  assert.match(browserScript, /No signed-in players have solved today’s map yet\./);
+  assert.match(browserScript, /Maps solved/);
+  assert.match(browserScript, /Leaderboards couldn’t be loaded\. Please try again\./);
   assert.doesNotMatch(browserScript, /verified results|imported and synced progress/i);
 });

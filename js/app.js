@@ -13,7 +13,7 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20260921-7";
+} from "./game-core.js?v=20260921-11";
 import {
   calculateReviveCost,
   canUseRequestedPreviewDate,
@@ -23,19 +23,19 @@ import {
   purchaseMissedDayRevive,
   resetReviveCount,
   shouldResetReviveCycle,
-} from "./progression.js?v=20260921-7";
-import { initialiseAccount } from "./account.js?v=20260921-7";
+} from "./progression.js?v=20260921-11";
+import { initialiseAccount } from "./account.js?v=20260921-11";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20260921-7";
+} from "./community-stats.js?v=20260921-11";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20260921-7";
+} from "./leaderboards.js?v=20260921-11";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -652,7 +652,7 @@ function updateTotalRoundsDisplay() {
   totalRoundsLabel.textContent = formattedTotalRounds;
   totalRoundsLabel.closest(".stat-display").setAttribute(
     "aria-label",
-    `Total rounds completed: ${formattedTotalRounds}`,
+    `Maps solved: ${formattedTotalRounds}`,
   );
 }
 
@@ -1165,20 +1165,19 @@ function renderNextRoundScreen() {
       <p class="kicker">Next round</p>
       <h3 id="next-round-screen-title">Next map in</h3>
       <strong id="end-screen-countdown" class="end-screen-countdown" aria-label="Time until the next round">--:--:--</strong>
-      <p class="next-round-motivation">Come back tomorrow to maintain your Round and Points.</p>
+      <p class="next-round-motivation">Return tomorrow to keep your round and points.</p>
     </section>
   `;
 }
 
 function renderMissedDay() {
-  const survivedRoundLabel = missedDayState.roundsBeforeLoss === 1 ? "Round" : "Rounds";
-  const preLossPointLabel = missedDayState.pointsBeforeLoss === 1 ? "Point" : "Points";
   const missedMapCopy = missedDayState.missedDays === 1
-    ? "You missed yesterday’s map, so your Round and Points have been reset."
-    : `You missed ${missedDayState.missedDays} daily maps, so your Round and Points have been reset.`;
+    ? "You missed yesterday’s map."
+    : `You missed ${missedDayState.missedDays} daily maps.`;
   const reviveCost = calculateReviveCost(reviveCount);
   const reviveCostPaid = missedDayState.reviveCostPaid || legacyReviveCost;
   const canRevive = missedDayState.pointsBeforeLoss >= reviveCost;
+  const pointsAfterRevive = missedDayState.pointsBeforeLoss - reviveCost;
 
   if (missedDayState.revived) {
     app.innerHTML = `
@@ -1186,7 +1185,7 @@ function renderMissedDay() {
         <div class="result-banner revived animate">
           <h2>Revived!</h2>
           <p>You spent ${reviveCostPaid} points and saved your run.</p>
-          <p class="survival-summary">Round restored to <strong>${missedDayState.roundsBeforeLoss}</strong> with <strong>${totalPoints}</strong> ${totalPoints === 1 ? "Point" : "Points"}</p>
+          <p class="survival-summary">Your current round is back to <strong>${missedDayState.roundsBeforeLoss}</strong>, with <strong>${totalPoints}</strong> ${totalPoints === 1 ? "point" : "points"} remaining.</p>
         </div>
         <div class="actions">
           <button id="continue-after-missed-day" class="button primary" type="button">Play today’s map</button>
@@ -1197,17 +1196,17 @@ function renderMissedDay() {
     app.innerHTML = `
       <section class="panel missed-day-panel">
         <div class="result-banner failed animate">
-          <h2>Your run has ended</h2>
-          <p>${escapeHtml(missedMapCopy)}</p>
-          <p class="survival-summary">You had survived <strong>${missedDayState.roundsBeforeLoss}</strong> ${survivedRoundLabel} with <strong>${missedDayState.pointsBeforeLoss}</strong> ${preLossPointLabel}</p>
+          <h2>You missed a round</h2>
+          <p>${escapeHtml(missedMapCopy)} ${canRevive ? "Use a revive to restore your current round and remaining points." : "You don’t have enough points to revive your run."}</p>
+          <p class="survival-summary">You reached Round <strong>${missedDayState.roundsBeforeLoss}</strong> with <strong>${missedDayState.pointsBeforeLoss}</strong> ${missedDayState.pointsBeforeLoss === 1 ? "point" : "points"}.</p>
         </div>
         <section class="revive-offer" aria-labelledby="missed-day-revive-title">
           <div>
-            <h3 id="missed-day-revive-title">Save your run?</h3>
+            <h3 id="missed-day-revive-title">Restore your run?</h3>
             <p>${
               canRevive
-                ? `Spend ${reviveCost} points to restore Round ${missedDayState.roundsBeforeLoss} and keep your remaining points.`
-                : `You need at least ${reviveCost} points to restore Round ${missedDayState.roundsBeforeLoss}.`
+                ? `Spend ${reviveCost} points to restore your current round to ${missedDayState.roundsBeforeLoss}. You’ll continue with ${pointsAfterRevive} ${pointsAfterRevive === 1 ? "point" : "points"}.`
+                : `You need at least ${reviveCost} points to restore your current round to ${missedDayState.roundsBeforeLoss}.`
             }</p>
           </div>
           <button id="revive-missed-day" class="button revive-button" type="button" ${canRevive ? "" : "disabled"}>
@@ -1265,8 +1264,9 @@ function buildScoreSharePayload() {
     `🧟 The Daily Undead · ${formatDate(puzzle.dateKey)}`,
     "",
     `🔥 Round: ${shareRound}`,
+    `📈 Highest Round: ${bestRound}`,
     `⚡ Points: ${sharePoints}`,
-    `🏆 Total Rounds: ${totalRounds}`,
+    `🏆 Maps Solved: ${totalRounds}`,
     "",
     "Think you can do better?",
     "Give it a try!",
@@ -1345,7 +1345,7 @@ function renderResult() {
       : perfectResult
         ? `You found ${answerTitle} using ${state.lockedClues} ${clueLabel} and got the steps in the correct order. You earned ${state.mapPoints + state.bonusPoints} points this round.`
         : state.isCorrect
-          ? `You identified ${answerTitle} in ${state.lockedClues} ${clueLabel}. You earned ${state.mapPoints} points this round.`
+          ? `You identified ${answerTitle} using ${state.lockedClues} ${clueLabel}. You earned ${state.mapPoints} points this round.`
           : `You chose ${selectedMap?.title ?? "an unknown map"}. Today’s answer was ${answerTitle}.`;
   const resultClass = revivedResult
     ? "revived"
@@ -1376,7 +1376,7 @@ function renderResult() {
           !state.isCorrect
             ? state.revived
               ? `<p class="survival-summary">Round restored to <strong>${state.roundsSurvivedBeforeLoss}</strong></p>`
-              : `<p class="survival-summary">You survived <strong>${state.roundsSurvivedBeforeLoss}</strong> ${survivedRoundLabel} with <strong>${state.pointsBeforeLoss}</strong> ${preLossPointLabel}</p>`
+              : `<p class="survival-summary">You survived <strong>${state.roundsSurvivedBeforeLoss}</strong> ${survivedRoundLabel.toLowerCase()} with <strong>${state.pointsBeforeLoss}</strong> ${preLossPointLabel.toLowerCase()}</p>`
             : ""
         }
       </div>
@@ -1387,8 +1387,8 @@ function renderResult() {
                 <h3 id="revive-title">Need a revive?</h3>
                 <p>${
                   canRevive
-                    ? `Spend ${reviveCost} points to restore Round ${state.roundsSurvivedBeforeLoss}.`
-                    : `You need at least ${reviveCost} points to restore Round ${state.roundsSurvivedBeforeLoss}.`
+                    ? `Spend ${reviveCost} points to restore round ${state.roundsSurvivedBeforeLoss}.`
+                    : `You need at least ${reviveCost} points to restore round ${state.roundsSurvivedBeforeLoss}.`
                 }</p>
               </div>
               <button id="revive-player" class="button revive-button" type="button" ${canRevive ? "" : "disabled"}>
@@ -1545,9 +1545,11 @@ async function initialise() {
     console.error(error);
     app.innerHTML = `
       <section class="panel error-panel">
-        <h2>The puzzle could not load</h2>
-        <p>${escapeHtml(error.message)}</p>
-        <p>If you opened <code>index.html</code> directly, start a local web server and open the supplied local URL instead.</p>
+        <h2>The puzzle couldn’t load</h2>
+        <p>Refresh the page and try again.</p>
+        ${window.location.protocol === "file:"
+          ? "<p>If you opened <code>index.html</code> directly, start a local web server and open the supplied local URL instead.</p>"
+          : ""}
       </section>
     `;
     focusAfterRender("error");
