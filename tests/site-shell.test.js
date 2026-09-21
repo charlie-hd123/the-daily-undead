@@ -71,7 +71,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260921-11"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260921-12"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -113,6 +113,8 @@ test("account controls support optional sign-in without exposing private credent
     /function saveBestRound\(\)[\s\S]*?localStorage\.setItem\(bestRoundStorageKey, String\(bestRound\)\)/,
   );
   assert.match(css, /\.leaderboard-entry\.is-current-player/);
+  assert.match(css, /\.leaderboard-status \{\s*margin: 0 0 0\.85rem;/);
+  assert.doesNotMatch(css, /\.leaderboard-status \{[^}]*min-height:/);
   assert.match(await readProjectFile("js/leaderboards.js"), /scrollIntoView\(\{ block: "center"/);
   assert.match(
     html,
