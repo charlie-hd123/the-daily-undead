@@ -1,3 +1,13 @@
+import {
+  accountMemoryStorageKey,
+  clearPendingProgress,
+  forgetRememberedAccount,
+  readPendingProgress,
+  readRememberedAccount,
+  rememberAccount,
+  writePendingProgress,
+} from "./account-session.js?v=20260927-2";
+
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
     .querySelector('meta[name="daily-undead-clerk-publishable-key"]')
@@ -302,7 +312,12 @@ async function requestJson(clerk, apiUrl, path, options = {}) {
     },
   });
   const result = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(result.error || `Account request failed (${response.status}).`);
+  if (!response.ok) {
+    const error = new Error(result.error || `Account request failed (${response.status}).`);
+    error.status = response.status;
+    error.result = result;
+    throw error;
+  }
   return result;
 }
 
@@ -365,7 +380,12 @@ function makeAvatar(documentObject, avatarId, className = "") {
 
 function createUserProfileOptions(
   clerk,
-  { openUsernameEditor = null, openProfileEditor = null } = {},
+  {
+    openUsernameEditor = null,
+    openProfileEditor = null,
+    beforeSignOut = null,
+    afterSignOutFailure = null,
+  } = {},
 ) {
   const customPages = [];
 
@@ -459,10 +479,12 @@ function createUserProfileOptions(
           button.textContent = "Signing out…";
           error.textContent = "";
           try {
+            beforeSignOut?.();
             await clerk.signOut({
               redirectUrl: `${window.location.origin}${window.location.pathname}`,
             });
           } catch {
+            afterSignOutFailure?.();
             button.disabled = false;
             button.textContent = "Sign out";
             error.textContent = "Could not sign out. Please try again.";
@@ -494,6 +516,11 @@ export async function initialiseAccount({
   const accountButton = documentObject.querySelector("#account-button");
   const accountMenuDialog = documentObject.querySelector("#demo-account-dialog");
   const accessDialog = documentObject.querySelector("#account-access-dialog");
+  const sessionExpiredDialog = documentObject.querySelector("#account-session-expired-dialog");
+  const sessionLoginButton = documentObject.querySelector("#account-session-login");
+  const conflictDialog = documentObject.querySelector("#account-progress-conflict-dialog");
+  const conflictDeviceButton = documentObject.querySelector("#account-conflict-device");
+  const conflictCloudButton = documentObject.querySelector("#account-conflict-cloud");
   const onboardingDialog = documentObject.querySelector("#account-onboarding-dialog");
   const onboardingForm = documentObject.querySelector("#account-onboarding-form");
   const onboardingError = documentObject.querySelector("#account-onboarding-error");
@@ -511,7 +538,9 @@ export async function initialiseAccount({
   let saveTimer = null;
   let saveInFlight = false;
   let saveAgain = false;
-  const dirtyStorageKey = "the-daily-undead:account-sync-pending";
+  let intentionalSignOut = false;
+  let signedOutMemory = null;
+  const legacyDirtyStorageKey = "the-daily-undead:account-sync-pending";
 
   async function openPlayerProfile(username) {
     if (!apiUrl || !publicProfileDialog || !publicProfileContent) return;
@@ -619,6 +648,53 @@ export async function initialiseAccount({
     else dialog.removeAttribute("open");
   };
 
+  const rememberedAccount = () => readRememberedAccount(globalThis.localStorage);
+  const persistPendingProgress = (userId, revision) => writePendingProgress(
+    globalThis.localStorage,
+    {
+      userId,
+      revision,
+      puzzleDate,
+      snapshot: getLocalSnapshot(),
+    },
+  );
+  const beginSignIn = () => {
+    closeDialog(sessionExpiredDialog);
+    clerk.openSignIn({ routing: "hash" });
+  };
+  const showExpiredSession = () => {
+    accountButton.classList.remove("is-signed-in", "has-username");
+    accountButton.classList.add("has-expired-session");
+    accountButton.disabled = false;
+    accountButton.textContent = "Session expired";
+    openDialog(sessionExpiredDialog);
+  };
+  const beforeSignOut = () => {
+    intentionalSignOut = true;
+    signedOutMemory = rememberedAccount();
+    forgetRememberedAccount(globalThis.localStorage);
+  };
+  const afterSignOutFailure = () => {
+    intentionalSignOut = false;
+    if (signedOutMemory) rememberAccount(globalThis.localStorage, signedOutMemory);
+    signedOutMemory = null;
+  };
+  const waitForConflictChoice = () => new Promise((resolve) => {
+    const choose = (choice) => {
+      closeDialog(conflictDialog);
+      resolve(choice);
+    };
+    conflictDeviceButton?.addEventListener("click", () => choose("device"), { once: true });
+    conflictCloudButton?.addEventListener("click", () => choose("cloud"), { once: true });
+    openDialog(conflictDialog);
+  });
+
+  sessionLoginButton?.addEventListener("click", beginSignIn);
+  documentObject.querySelector("[data-close-session-expired]")?.addEventListener(
+    "click",
+    () => closeDialog(sessionExpiredDialog),
+  );
+
   documentObject.querySelectorAll("[data-close-account-dialog]").forEach((button) => {
     button.addEventListener("click", () => closeDialog(button.closest("dialog")));
   });
@@ -632,9 +708,15 @@ export async function initialiseAccount({
   });
 
   if (!clerk.isSignedIn) {
-    accountButton.disabled = false;
-    accountButton.textContent = "Log in";
-    accountButton.addEventListener("click", () => openDialog(accessDialog));
+    const remembered = rememberedAccount();
+    if (remembered) {
+      showExpiredSession();
+      accountButton.addEventListener("click", () => openDialog(sessionExpiredDialog));
+    } else {
+      accountButton.disabled = false;
+      accountButton.textContent = "Log in";
+      accountButton.addEventListener("click", () => openDialog(accessDialog));
+    }
     let wasSignedOut = true;
     clerk.addListener(({ user }) => {
       if (wasSignedOut && user) {
@@ -642,7 +724,20 @@ export async function initialiseAccount({
         window.location.reload();
       }
     });
-    return createUnavailableController({ clerk, signedIn: false, openPlayerProfile });
+    globalThis.addEventListener?.("storage", (event) => {
+      if (event.key !== accountMemoryStorageKey || readRememberedAccount(globalThis.localStorage)) return;
+      closeDialog(sessionExpiredDialog);
+      accountButton.classList.remove("has-expired-session");
+      accountButton.textContent = "Log in";
+    });
+    return createUnavailableController({
+      clerk,
+      signedIn: false,
+      openPlayerProfile,
+      scheduleSave: remembered
+        ? () => persistPendingProgress(remembered.userId, remembered.revision)
+        : () => {},
+    });
   }
 
   accountButton.classList.add("is-signed-in");
@@ -653,12 +748,20 @@ export async function initialiseAccount({
     url.searchParams.set("date", puzzleDate);
     account = await requestJson(clerk, apiUrl, `${url.pathname}${url.search}`);
   } catch (error) {
+    const remembered = rememberedAccount();
     accountButton.disabled = false;
     accountButton.textContent = "Account sync offline";
     accountButton.addEventListener("click", () =>
-      clerk.openUserProfile(createUserProfileOptions(clerk)),
+      clerk.openUserProfile(createUserProfileOptions(clerk, { beforeSignOut, afterSignOutFailure })),
     );
-    return createUnavailableController({ clerk, signedIn: true, openPlayerProfile });
+    return createUnavailableController({
+      clerk,
+      signedIn: true,
+      openPlayerProfile,
+      scheduleSave: remembered
+        ? () => persistPendingProgress(remembered.userId, remembered.revision)
+        : () => {},
+    });
   }
 
   if (account.needsOnboarding) {
@@ -699,13 +802,74 @@ export async function initialiseAccount({
   }
 
   profile = account.profile;
-  let hasPendingLocalSave = false;
-  try {
-    hasPendingLocalSave = localStorage.getItem(dirtyStorageKey) === clerk.user?.id;
-  } catch {
-    hasPendingLocalSave = false;
+  const userId = clerk.user.id;
+  let pendingProgress = readPendingProgress(globalThis.localStorage, userId);
+  if (!pendingProgress) {
+    try {
+      if (globalThis.localStorage.getItem(legacyDirtyStorageKey) === userId) {
+        writePendingProgress(globalThis.localStorage, {
+          userId,
+          revision: null,
+          puzzleDate,
+          snapshot: getLocalSnapshot(),
+        });
+        globalThis.localStorage.removeItem(legacyDirtyStorageKey);
+        pendingProgress = readPendingProgress(globalThis.localStorage, userId);
+      }
+    } catch {
+      // Legacy pending progress remains local if storage is unavailable.
+    }
   }
-  if (!hasPendingLocalSave) applyRemoteAccount(account);
+
+  if (pendingProgress) {
+    const cloudRevision = Number(account.progress?.revision || 0);
+    const revisionsMatch =
+      pendingProgress.revision != null && pendingProgress.revision === cloudRevision;
+    let useDeviceProgress = revisionsMatch;
+    if (!revisionsMatch) {
+      useDeviceProgress = await waitForConflictChoice() === "device";
+    }
+
+    if (useDeviceProgress) {
+      try {
+        const saveResult = await requestJson(clerk, apiUrl, "/api/account/save", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            puzzleDate: pendingProgress.puzzleDate,
+            progress: pendingProgress.snapshot.progress,
+            dailyState: pendingProgress.snapshot.dailyState,
+            baseRevision: revisionsMatch ? pendingProgress.revision : null,
+          }),
+        });
+        account.progress = saveResult.progress;
+        if (pendingProgress.puzzleDate === puzzleDate) {
+          account.dailyState = pendingProgress.snapshot.dailyState;
+        }
+        clearPendingProgress(globalThis.localStorage, userId);
+        pendingProgress = null;
+      } catch {
+        accountButton.disabled = false;
+        accountButton.textContent = "Progress waiting to sync";
+        rememberAccount(globalThis.localStorage, { userId, revision: cloudRevision });
+        return createUnavailableController({
+          clerk,
+          signedIn: true,
+          openPlayerProfile,
+          scheduleSave: () => persistPendingProgress(userId, cloudRevision),
+        });
+      }
+    } else {
+      clearPendingProgress(globalThis.localStorage, userId);
+      pendingProgress = null;
+    }
+  }
+
+  applyRemoteAccount(account);
+  rememberAccount(globalThis.localStorage, {
+    userId,
+    revision: account.progress?.revision,
+  });
   accountButton.disabled = false;
   accountButton.textContent = profile.username;
   accountButton.classList.add("has-username");
@@ -887,6 +1051,8 @@ export async function initialiseAccount({
   const clerkProfileOptions = () => createUserProfileOptions(clerk, {
     openUsernameEditor,
     openProfileEditor,
+    beforeSignOut,
+    afterSignOutFailure,
   });
 
   accountMenuDialog?.addEventListener("click", (event) => {
@@ -905,7 +1071,13 @@ export async function initialiseAccount({
     }
   });
 
-  accountButton.addEventListener("click", () => openDialog(accountMenuDialog));
+  accountButton.addEventListener("click", () => {
+    openDialog(accountButton.classList.contains("has-expired-session")
+      ? sessionExpiredDialog
+      : accountMenuDialog);
+  });
+
+  let currentRevision = Number(account.progress?.revision || 1);
 
   async function saveNow() {
     if (saveInFlight) {
@@ -915,22 +1087,22 @@ export async function initialiseAccount({
     saveInFlight = true;
     try {
       const snapshot = getLocalSnapshot();
-      await requestJson(clerk, apiUrl, "/api/account/save", {
+      const saveResult = await requestJson(clerk, apiUrl, "/api/account/save", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           puzzleDate,
           progress: snapshot.progress,
           dailyState: snapshot.dailyState,
+          baseRevision: currentRevision,
         }),
       });
-      try {
-        localStorage.removeItem(dirtyStorageKey);
-      } catch {
-        // The next successful save can still clear the in-memory retry state.
-      }
-    } catch {
+      currentRevision = Number(saveResult.progress?.revision || currentRevision + 1);
+      rememberAccount(globalThis.localStorage, { userId, revision: currentRevision });
+      clearPendingProgress(globalThis.localStorage, userId);
+    } catch (error) {
       // Progress remains stored locally and the next change will retry the sync.
+      if (error.status === 409) accountButton.textContent = "Progress waiting to sync";
     } finally {
       saveInFlight = false;
       if (saveAgain) {
@@ -941,17 +1113,9 @@ export async function initialiseAccount({
   }
 
   function scheduleSave() {
-    try {
-      localStorage.setItem(dirtyStorageKey, clerk.user.id);
-    } catch {
-      // Saving still proceeds when local storage is unavailable.
-    }
+    persistPendingProgress(userId, currentRevision);
     globalThis.clearTimeout(saveTimer);
     saveTimer = globalThis.setTimeout(saveNow, 350);
-  }
-
-  if (hasPendingLocalSave) {
-    scheduleSave();
   }
 
   async function recordMapResult(payload) {
@@ -978,7 +1142,7 @@ export async function initialiseAccount({
     }
   }
 
-  return {
+  const controller = {
     available: true,
     signedIn: true,
     canSync: true,
@@ -988,15 +1152,33 @@ export async function initialiseAccount({
     recordBonusResult,
     openPlayerProfile,
   };
+
+  let wasSignedIn = true;
+  clerk.addListener(({ user }) => {
+    if (!wasSignedIn || user) return;
+    wasSignedIn = false;
+    controller.canSync = false;
+    if (!intentionalSignOut && readRememberedAccount(globalThis.localStorage)) {
+      persistPendingProgress(userId, currentRevision);
+      showExpiredSession();
+    }
+  });
+
+  return controller;
 }
 
-function createUnavailableController({ clerk = null, signedIn = false, openPlayerProfile = async () => {} } = {}) {
+function createUnavailableController({
+  clerk = null,
+  signedIn = false,
+  openPlayerProfile = async () => {},
+  scheduleSave = () => {},
+} = {}) {
   return {
     available: Boolean(clerk),
     signedIn,
     canSync: false,
     profile: null,
-    scheduleSave() {},
+    scheduleSave,
     async recordMapResult() { return null; },
     async recordBonusResult() { return null; },
     openPlayerProfile,

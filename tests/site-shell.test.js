@@ -69,6 +69,7 @@ test("the page's local release assets exist", async () => {
     "styles.css",
     "js/app.js",
     "js/account.js",
+    "js/account-session.js",
     "js/community-stats.js",
     "js/game-core.js",
     "js/leaderboards.js",
@@ -95,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260927-1"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260927-2"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -190,6 +191,16 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(account, /session\?\.getToken\(\)/);
   assert.match(account, /Authorization: `Bearer \$\{token\}`/);
   assert.match(account, /accountButton\.textContent = "Log in";/);
+  assert.match(html, /id="account-session-expired-dialog"/);
+  assert.match(html, /<h2>Session has expired<\/h2>/);
+  assert.match(html, /id="account-session-login"[^>]*>Log in<\/button>/);
+  assert.match(html, /Your existing cloud save is safe\./);
+  assert.match(html, /id="account-progress-conflict-dialog"/);
+  assert.match(account, /accountButton\.textContent = "Session expired";/);
+  assert.match(account, /readRememberedAccount/);
+  assert.match(account, /readPendingProgress/);
+  assert.match(account, /baseRevision/);
+  assert.match(css, /#account-button\.has-expired-session/);
   assert.match(account, /accountButton\.textContent = "Loading\.\.\.";/);
   assert.doesNotMatch(account, /setStatus\("Playing as guest"\)/);
   assert.match(account, /accountButton\.textContent = profile\.username;/);

@@ -464,6 +464,9 @@ export async function getPublicProfile(db, username) {
 export async function saveAccount(db, request, userId) {
   const body = await readJsonBody(request);
   const progress = sanitizeProgress(body.progress);
+  const baseRevision = Number.isInteger(body.baseRevision) && body.baseRevision > 0
+    ? body.baseRevision
+    : null;
   const puzzleDate = isValidDateKey(body.puzzleDate) ? body.puzzleDate : null;
   const dailyState = puzzleDate ? sanitizeDailyState(body.dailyState, puzzleDate) : null;
   const profile = await db
@@ -472,10 +475,7 @@ export async function saveAccount(db, request, userId) {
     .first();
   if (!profile) return { status: 409, body: { error: "Finish setting up your account first." } };
 
-  const statements = [
-    db
-      .prepare(
-        `UPDATE player_saves SET
+  const updateSql = `UPDATE player_saves SET
           current_round = ?,
           best_round = MAX(best_round, ?),
           points_balance = ?,
@@ -485,19 +485,19 @@ export async function saveAccount(db, request, userId) {
           missed_day_json = ?,
           revision = revision + 1,
           updated_at = CURRENT_TIMESTAMP
-        WHERE user_id = ?`,
-      )
-      .bind(
-        progress.currentRound,
-        progress.bestRound,
-        progress.pointsBalance,
-        progress.totalRounds,
-        progress.reviveCount,
-        progress.lastPlayedDate,
-        progress.missedDayState ? JSON.stringify(progress.missedDayState) : null,
-        userId,
-      ),
+        WHERE user_id = ?${baseRevision == null ? "" : " AND revision = ?"}`;
+  const updateBindings = [
+    progress.currentRound,
+    progress.bestRound,
+    progress.pointsBalance,
+    progress.totalRounds,
+    progress.reviveCount,
+    progress.lastPlayedDate,
+    progress.missedDayState ? JSON.stringify(progress.missedDayState) : null,
+    userId,
   ];
+  if (baseRevision != null) updateBindings.push(baseRevision);
+  const statements = [db.prepare(updateSql).bind(...updateBindings)];
 
   if (puzzleDate && dailyState) {
     statements.push(
@@ -513,7 +513,20 @@ export async function saveAccount(db, request, userId) {
     );
   }
 
-  await db.batch(statements);
+  const results = await db.batch(statements);
+  if (baseRevision != null && Number(results?.[0]?.meta?.changes || 0) === 0) {
+    const current = await db
+      .prepare("SELECT * FROM player_saves WHERE user_id = ?")
+      .bind(userId)
+      .first();
+    return {
+      status: 409,
+      body: {
+        error: "This account changed on another device.",
+        progress: rowToProgress(current),
+      },
+    };
+  }
   const saved = await db
     .prepare("SELECT * FROM player_saves WHERE user_id = ?")
     .bind(userId)

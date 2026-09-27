@@ -32,6 +32,8 @@ The Worker exposes:
 
 All `/api/account` routes require a Clerk bearer token. The Worker verifies the RS256 signature against Clerk's published JWKS, then checks the issuer and authorized browser origin (`azp`).
 
+Account saves may include the last cloud revision seen by the browser. D1 increments the revision on every successful save and rejects stale revisions with `409`, preventing pending progress from one device from silently replacing newer progress saved on another device. A player can explicitly resolve that conflict in the browser before retrying.
+
 ## What counts and what is stored
 
 A play is recorded only when the player confirms a map. Visiting, refreshing, revealing clues, choosing a game, or completing the bonus order does not create a new attempt.

@@ -15,9 +15,9 @@
       content="The Daily Undead — your daily Treyarch Zombies challenge. Reveal clues, identify the map, and put the steps in order."
     >
     <title>The Daily Undead</title>
-    <link rel="icon" href="./assets/favicon.png?v=20260927-1" type="image/png" sizes="128x128">
+    <link rel="icon" href="./assets/favicon.png?v=20260927-2" type="image/png" sizes="128x128">
     <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" sizes="180x180">
-    <link rel="stylesheet" href="./styles.css?v=20260927-1">
+    <link rel="stylesheet" href="./styles.css?v=20260927-2">
   </head>
   <body>
     <header class="site-header">
@@ -94,6 +94,26 @@
         <p class="clue-text"></p>
       </article>
     </template>
+
+    <dialog id="account-session-expired-dialog" class="account-dialog session-expired-dialog">
+      <button class="dialog-close" type="button" data-close-session-expired aria-label="Close session message">×</button>
+      <span class="session-expired-icon" aria-hidden="true">!</span>
+      <p class="kicker">Account connection lost</p>
+      <h2>Session has expired</h2>
+      <p>Log in again to continue syncing your streak, points and daily progress.</p>
+      <button id="account-session-login" class="button primary" type="button">Log in</button>
+      <p class="session-expired-note">Your existing cloud save is safe.</p>
+    </dialog>
+
+    <dialog id="account-progress-conflict-dialog" class="account-dialog account-conflict-dialog">
+      <p class="kicker">Progress found on two devices</p>
+      <h2>Choose which save to keep</h2>
+      <p>This device and your cloud account both changed since they last synced. Nothing will be overwritten until you choose.</p>
+      <div class="actions account-conflict-actions">
+        <button id="account-conflict-device" class="button primary" type="button">Use this device</button>
+        <button id="account-conflict-cloud" class="button" type="button">Use cloud save</button>
+      </div>
+    </dialog>
 
     <dialog id="account-access-dialog" class="account-dialog">
       <button class="dialog-close" type="button" data-close-account-dialog aria-label="Close">×</button>
@@ -269,7 +289,7 @@
       <div data-public-profile-content></div>
     </dialog>
 
-    <script type="module" src="./js/app.js?v=20260927-1"></script>
+    <script type="module" src="./js/app.js?v=20260927-2"></script>
 
     <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "4eeb20e1411c4e7baf24969ced969c88"}'></script><!-- End Cloudflare Web Analytics -->
 

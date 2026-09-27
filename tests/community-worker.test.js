@@ -211,6 +211,54 @@ test("account saves cannot roll lifetime maps solved backwards", async () => {
   assert.match(statements[0].sql, /total_rounds = MAX\(total_rounds, \?\)/);
 });
 
+test("account saves reject a stale browser revision before replacing cloud progress", async () => {
+  const db = {
+    prepare(sql) {
+      return {
+        bind(...bindings) {
+          if (sql.startsWith("SELECT user_id")) {
+            return { first: async () => ({ user_id: "user_1" }) };
+          }
+          if (sql.startsWith("SELECT * FROM player_saves")) {
+            return {
+              first: async () => ({
+                current_round: 20,
+                best_round: 20,
+                points_balance: 900,
+                total_rounds: 40,
+                revision: 9,
+              }),
+            };
+          }
+          return { sql, bindings };
+        },
+      };
+    },
+    async batch(statements) {
+      assert.match(statements[0].sql, /AND revision = \?/);
+      assert.equal(statements[0].bindings.at(-1), 8);
+      return [{ meta: { changes: 0 } }];
+    },
+  };
+
+  const response = await saveAccount(
+    db,
+    new Request("https://api.example.test/api/account/save", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        baseRevision: 8,
+        progress: { currentRound: 21, pointsBalance: 950, totalRounds: 41 },
+      }),
+    }),
+    "user_1",
+  );
+
+  assert.equal(response.status, 409);
+  assert.equal(response.body.progress.revision, 9);
+  assert.match(response.body.error, /another device/);
+});
+
 test("avatar unlocks use imported highest-round and maps-solved progress", async () => {
   const request = (avatarId) => new Request("https://worker.example/api/account/profile", {
     method: "PUT",

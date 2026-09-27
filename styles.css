@@ -951,6 +951,60 @@ h1 {
   line-height: 1.5;
 }
 
+.session-expired-dialog {
+  text-align: center;
+}
+
+.session-expired-dialog .kicker {
+  color: var(--danger);
+}
+
+.session-expired-icon {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  margin: 0 auto 1rem;
+  border: 1px solid rgb(255 101 119 / 68%);
+  border-radius: 50%;
+  background: rgb(255 101 119 / 12%);
+  color: var(--danger);
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 900;
+}
+
+.session-expired-dialog > .button {
+  width: 100%;
+  margin-top: 0.45rem;
+}
+
+.session-expired-dialog .session-expired-note {
+  margin: 0.8rem 0 0;
+  font-size: 0.82rem;
+}
+
+#account-button.has-expired-session {
+  border-color: rgb(255 101 119 / 68%);
+  background: rgb(255 101 119 / 12%);
+  color: #ffd8dd;
+}
+
+#account-button.has-expired-session::before {
+  background: var(--danger);
+}
+
+.account-conflict-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+@media (max-width: 30rem) {
+  .account-conflict-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
 .dialog-close {
   position: absolute;
   top: 0.7rem;
