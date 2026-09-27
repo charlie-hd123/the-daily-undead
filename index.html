@@ -15,9 +15,9 @@
       content="The Daily Undead — your daily Treyarch Zombies challenge. Reveal clues, identify the map, and put the steps in order."
     >
     <title>The Daily Undead</title>
-    <link rel="icon" href="./assets/favicon.png?v=20260927-3" type="image/png" sizes="128x128">
+    <link rel="icon" href="./assets/favicon.png?v=20260927-4" type="image/png" sizes="128x128">
     <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" sizes="180x180">
-    <link rel="stylesheet" href="./styles.css?v=20260927-3">
+    <link rel="stylesheet" href="./styles.css?v=20260927-4">
   </head>
   <body>
     <header class="site-header">
@@ -257,6 +257,44 @@
       </div>
     </dialog>
 
+    <dialog id="account-details-dialog" class="account-dialog account-details-dialog">
+      <button class="dialog-close" type="button" data-close-account-dialog aria-label="Close">×</button>
+      <p class="kicker">The Daily Undead Account</p>
+      <h2>Profile</h2>
+      <p>Your private sign-in details and public survivor name.</p>
+      <dl class="account-detail-list">
+        <div><dt>Username</dt><dd data-account-profile-username>—</dd></div>
+        <div><dt>Email</dt><dd data-account-profile-email>—</dd></div>
+        <div><dt>Joined</dt><dd data-account-profile-joined>—</dd></div>
+      </dl>
+      <p class="account-privacy-note">Your email is used for signing in and is never shown to other players.</p>
+      <button class="button" type="button" data-open-clerk-profile>Manage sign-in details</button>
+    </dialog>
+
+    <dialog id="account-security-dialog" class="account-dialog account-security-dialog">
+      <button class="dialog-close" type="button" data-close-account-dialog aria-label="Close">×</button>
+      <p class="kicker">Account protection</p>
+      <h2>Security</h2>
+      <p>Your login is protected by Clerk. The Daily Undead never sees or stores your password.</p>
+      <div class="account-security-status">
+        <span aria-hidden="true">✓</span>
+        <div><strong>Signed in securely</strong><small data-account-security-email>Current device</small></div>
+      </div>
+      <button class="button" type="button" data-open-clerk-security>Manage password &amp; devices</button>
+    </dialog>
+
+    <dialog id="account-sign-out-dialog" class="account-dialog account-sign-out-dialog">
+      <button class="dialog-close" type="button" data-close-account-dialog aria-label="Close">×</button>
+      <p class="kicker">The Daily Undead Account</p>
+      <h2>Sign out?</h2>
+      <p>Your cloud save will remain safe. Progress made afterward on this device will not sync until you log in again.</p>
+      <p class="account-error" data-sign-out-error role="alert"></p>
+      <div class="actions account-dialog-actions">
+        <button class="button danger" type="button" data-confirm-sign-out>Sign out</button>
+        <button class="button" type="button" data-cancel-sign-out>Cancel</button>
+      </div>
+    </dialog>
+
     <dialog id="profile-editor-dialog" class="account-dialog profile-editor-dialog">
       <button class="dialog-close" type="button" data-close-account-dialog aria-label="Close">×</button>
       <p class="kicker">Survivor identity</p>
@@ -289,7 +327,7 @@
       <div data-public-profile-content></div>
     </dialog>
 
-    <script type="module" src="./js/app.js?v=20260927-3"></script>
+    <script type="module" src="./js/app.js?v=20260927-4"></script>
 
     <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "4eeb20e1411c4e7baf24969ced969c88"}'></script><!-- End Cloudflare Web Analytics -->
 

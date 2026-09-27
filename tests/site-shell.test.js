@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260927-3"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260927-4"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -236,6 +236,13 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(account, /event\.target\.closest\("\[data-open-username-editor\]"\)/);
   assert.match(account, /label: "Sign out"/);
   assert.match(account, /clerk\.signOut\(/);
+  assert.match(html, /id="account-details-dialog"/);
+  assert.match(html, /id="account-security-dialog"/);
+  assert.match(html, /id="account-sign-out-dialog"/);
+  assert.match(account, /action === "profile"[\s\S]*?openDialog\(accountDetailsDialog\)/);
+  assert.match(account, /action === "security"[\s\S]*?openDialog\(accountSecurityDialog\)/);
+  assert.match(account, /action === "sign-out"[\s\S]*?openDialog\(accountSignOutDialog\)/);
+  assert.match(account, /\[data-confirm-sign-out\][\s\S]*?beforeSignOut\(\)[\s\S]*?clerk\.signOut\(/);
   assert.match(account, /accountButton\.classList\.add\("is-signed-in"\)/);
   assert.match(css, /\.clerk-sign-out-page::before,/);
   assert.match(css, /\.clerk-username-page::before \{/);

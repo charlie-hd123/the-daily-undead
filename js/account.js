@@ -6,7 +6,7 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20260927-3";
+} from "./account-session.js?v=20260927-4";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -515,6 +515,11 @@ export async function initialiseAccount({
 }) {
   const accountButton = documentObject.querySelector("#account-button");
   const accountMenuDialog = documentObject.querySelector("#demo-account-dialog");
+  const accountDetailsDialog = documentObject.querySelector("#account-details-dialog");
+  const accountSecurityDialog = documentObject.querySelector("#account-security-dialog");
+  const accountSignOutDialog = documentObject.querySelector("#account-sign-out-dialog");
+  const signOutButton = documentObject.querySelector("[data-confirm-sign-out]");
+  const signOutError = documentObject.querySelector("[data-sign-out-error]");
   const accessDialog = documentObject.querySelector("#account-access-dialog");
   const sessionExpiredDialog = documentObject.querySelector("#account-session-expired-dialog");
   const sessionLoginButton = documentObject.querySelector("#account-session-login");
@@ -1054,6 +1059,47 @@ export async function initialiseAccount({
     afterSignOutFailure,
   });
 
+  const primaryEmail = () => clerk.user?.primaryEmailAddress?.emailAddress
+    || clerk.user?.emailAddresses?.[0]?.emailAddress
+    || "Not available";
+  const openClerkPage = (initialPage) => {
+    closeDialog(accountDetailsDialog);
+    closeDialog(accountSecurityDialog);
+    clerk.openUserProfile({
+      ...clerkProfileOptions(),
+      initialPage,
+    });
+  };
+
+  documentObject.querySelector("[data-open-clerk-profile]")?.addEventListener(
+    "click",
+    () => openClerkPage("account"),
+  );
+  documentObject.querySelector("[data-open-clerk-security]")?.addEventListener(
+    "click",
+    () => openClerkPage("security"),
+  );
+  documentObject.querySelector("[data-cancel-sign-out]")?.addEventListener(
+    "click",
+    () => closeDialog(accountSignOutDialog),
+  );
+  signOutButton?.addEventListener("click", async () => {
+    signOutButton.disabled = true;
+    signOutButton.textContent = "Signing out…";
+    if (signOutError) signOutError.textContent = "";
+    try {
+      beforeSignOut();
+      await clerk.signOut({
+        redirectUrl: `${window.location.origin}${window.location.pathname}`,
+      });
+    } catch {
+      afterSignOutFailure();
+      signOutButton.disabled = false;
+      signOutButton.textContent = "Sign out";
+      if (signOutError) signOutError.textContent = "Could not sign out. Please try again.";
+    }
+  });
+
   accountMenuDialog?.addEventListener("click", (event) => {
     const action = event.target.closest("[data-account-action]")?.dataset.accountAction;
     if (!action) return;
@@ -1062,11 +1108,25 @@ export async function initialiseAccount({
       openProfileEditor();
     } else if (action === "username") {
       openUsernameEditor();
-    } else if (["profile", "security", "sign-out"].includes(action)) {
-      clerk.openUserProfile({
-        ...clerkProfileOptions(),
-        initialPage: action === "profile" ? "account" : action,
-      });
+    } else if (action === "profile") {
+      const username = accountDetailsDialog?.querySelector("[data-account-profile-username]");
+      const email = accountDetailsDialog?.querySelector("[data-account-profile-email]");
+      const joined = accountDetailsDialog?.querySelector("[data-account-profile-joined]");
+      if (username) username.textContent = profile.username;
+      if (email) email.textContent = primaryEmail();
+      if (joined) joined.textContent = formatJoinedDate(profile.createdAt);
+      openDialog(accountDetailsDialog);
+    } else if (action === "security") {
+      const email = accountSecurityDialog?.querySelector("[data-account-security-email]");
+      if (email) email.textContent = primaryEmail();
+      openDialog(accountSecurityDialog);
+    } else if (action === "sign-out") {
+      if (signOutError) signOutError.textContent = "";
+      if (signOutButton) {
+        signOutButton.disabled = false;
+        signOutButton.textContent = "Sign out";
+      }
+      openDialog(accountSignOutDialog);
     }
   });
 

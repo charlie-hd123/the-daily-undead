@@ -1388,6 +1388,82 @@ h1 {
 .demo-account-menu strong { font: 800 0.9rem/1 var(--font-display); letter-spacing: 0.035em; text-transform: uppercase; }
 .demo-account-menu span { color: var(--muted); font-size: 0.75rem; }
 
+.account-detail-list {
+  display: grid;
+  gap: 0.55rem;
+  margin: 1.25rem 0;
+}
+
+.account-detail-list > div {
+  display: grid;
+  grid-template-columns: 6rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 0.7rem;
+  background: rgb(3 7 14 / 48%);
+}
+
+.account-detail-list dt {
+  color: var(--muted);
+  font: 700 0.66rem/1 var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.account-detail-list dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: #fff;
+  font-weight: 700;
+}
+
+.account-dialog .account-privacy-note {
+  margin: 0 0 1rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.account-security-status {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin: 1.25rem 0;
+  padding: 0.9rem;
+  border: 1px solid rgb(141 234 98 / 38%);
+  border-radius: 0.7rem;
+  background: rgb(141 234 98 / 8%);
+}
+
+.account-security-status > span {
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: rgb(141 234 98 / 15%);
+  color: #8dea62;
+  font-weight: 900;
+}
+
+.account-security-status div { display: grid; gap: 0.2rem; }
+.account-security-status strong { color: #fff; }
+.account-security-status small { color: var(--muted); overflow-wrap: anywhere; }
+
+.account-dialog .button.danger {
+  border-color: rgb(255 101 119 / 58%);
+  background: linear-gradient(145deg, rgb(180 40 58 / 86%), rgb(112 20 34 / 92%));
+  color: #fff;
+}
+
+.account-dialog .button.danger:not(:disabled):hover {
+  border-color: rgb(255 166 177 / 82%);
+  background: linear-gradient(145deg, rgb(205 48 69 / 92%), rgb(137 23 40 / 96%));
+}
+
 .leaderboard-player-identity { display: flex; align-items: center; gap: 0.55rem; min-width: 0; }
 .zombie-avatar-small { width: 2.25rem; height: 2.25rem; flex: 0 0 auto; }
 .leaderboard-player-name { overflow: hidden; padding: 0; border: 0; background: none; color: var(--text); cursor: pointer; font: 800 1.04rem/1 var(--font-display); text-align: left; text-overflow: ellipsis; white-space: nowrap; }
