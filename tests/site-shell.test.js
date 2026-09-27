@@ -33,6 +33,29 @@ test("the page's local release assets exist", async () => {
     "assets/favicon.png",
     "assets/apple-touch-icon.png",
     "assets/zombie-logo.png",
+    "assets/avatars/richtofen.png",
+    "assets/avatars/dempsey.png",
+    "assets/avatars/takeo.png",
+    "assets/avatars/nikolai.png",
+    "assets/avatars/samantha.png",
+    "assets/avatars/dr-maxis.png",
+    "assets/avatars/dr-monty.png",
+    "assets/avatars/warden.png",
+    "assets/avatars/misty.png",
+    "assets/avatars/stuhlinger.png",
+    "assets/avatars/marlton.png",
+    "assets/avatars/russman.png",
+    "assets/avatars/scarlett.png",
+    "assets/avatars/diego.png",
+    "assets/avatars/bruno.png",
+    "assets/avatars/stanton.png",
+    "assets/avatars/weaver.png",
+    "assets/avatars/grey.png",
+    "assets/avatars/carver.png",
+    "assets/avatars/maya.png",
+    "assets/avatars/shadowman.png",
+    "assets/avatars/tedd.png",
+    "assets/avatars/brutus.png",
     "assets/fonts/OFL.txt",
     "assets/fonts/barlow-400.ttf",
     "assets/fonts/barlow-500.ttf",
@@ -50,6 +73,7 @@ test("the page's local release assets exist", async () => {
     "js/game-core.js",
     "js/leaderboards.js",
     "js/progression.js",
+    "js/social-demo.js",
   ];
 
   await Promise.all(
@@ -71,7 +95,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260921-14"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260927-1"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -87,7 +111,7 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(html, /id="leaderboards-button"/);
   assert.match(html, /id="account-button"[\s\S]*?id="leaderboards-button"/);
   assert.match(html, /id="leaderboards-dialog"/);
-  assert.match(html, /<p class="kicker">Undead Leaderboards<\/p>/);
+  assert.match(html, /<p class="kicker">The Daily Undead Leaderboards<\/p>/);
   assert.match(html, /<h2>Leaderboards<\/h2>/);
   assert.match(html, /data-leaderboard-tab="daily"/);
   assert.match(html, /data-leaderboard-tab="all-time"/);
@@ -101,6 +125,12 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(html, /data-all-time-ranking="totalRounds"/);
   assert.match(html, /data-leaderboard-find="daily"/);
   assert.match(html, /data-leaderboard-find="all-time"/);
+  assert.match(html, /placeholder="Tell us something about you or a Zombies memory\.\.\."/);
+  assert.match(account, /label: "Toxic", requiredMaps: 50/);
+  assert.match(account, /label: "Cryo", requiredMaps: 100/);
+  assert.match(account, /label: "Napalm", requiredMaps: 250/);
+  assert.match(account, /label: "Blood", requiredMaps: 500/);
+  assert.match(account, /label: "Aether", requiredMaps: 1000/);
   assert.match(appScript, /initialiseLeaderboards\(\{/);
   assert.match(appScript, /getCurrentUsername: getLeaderboardUsername/);
   assert.match(appScript, /get\("leaderboardUser"\)/);
@@ -258,6 +288,37 @@ test("hover highlights are limited to precise pointers", async () => {
     css,
     /@media \(hover: hover\) and \(pointer: fine\) \{\s*\.button:hover,\s*\.card-button:hover,\s*\.order-choice:hover/,
   );
+});
+
+test("avatar portraits stay clipped behind an opaque circular border", async () => {
+  const css = await readProjectFile("styles.css");
+
+  assert.match(
+    css,
+    /\.zombie-avatar \{[\s\S]*?overflow: hidden;[\s\S]*?border: 2px solid #[0-9a-f]{6};[\s\S]*?border-radius: 50%;[\s\S]*?background-clip: padding-box;/i,
+  );
+});
+
+test("profile customisation keeps horizontal pickers inside narrow mobile dialogs", async () => {
+  const css = await readProjectFile("styles.css");
+
+  assert.match(css, /\.profile-editor-dialog form \{[\s\S]*?min-width: 0;[\s\S]*?overflow-x: hidden;/);
+  assert.match(css, /\.profile-choice-field \{[\s\S]*?min-width: 0;/);
+  assert.match(css, /\.avatar-picker \{[\s\S]*?width: 100%;[\s\S]*?min-width: 0;/);
+  assert.match(css, /\.theme-picker \{[\s\S]*?width: 100%;[\s\S]*?min-width: 0;/);
+  assert.match(css, /@media \(max-width: 35rem\)[\s\S]*?\.public-profile-header \{[\s\S]*?minmax\(0, 1fr\)/);
+});
+
+test("survivor profiles always expose a labelled bio section", async () => {
+  const [account, demo, css] = await Promise.all([
+    readProjectFile("js/account.js"),
+    readProjectFile("js/social-demo.js"),
+    readProjectFile("styles.css"),
+  ]);
+
+  assert.match(account, /No bio shared yet\./);
+  assert.match(demo, /No bio shared yet\./);
+  assert.match(css, /\.public-profile-bio::before[\s\S]*?content: "BIO"/);
 });
 
 test("the clue count stays editable until a map is confirmed", async () => {

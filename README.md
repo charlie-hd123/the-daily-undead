@@ -42,6 +42,14 @@ python3 -m http.server 8080
 
 Then open [http://localhost:8080](http://localhost:8080). Opening `index.html` directly will not work because browsers block local JSON requests.
 
+For an instant account/profile preview with no Clerk sign-in or Worker, open:
+
+```text
+http://localhost:8080/?socialDemo=1
+```
+
+This localhost-only demo seeds leaderboard players, public profiles, favourites and themes. Click the demo username to open the account menu, choose **Game profile** to edit it, or click any leaderboard name to view that player. Demo changes stay in browser local storage and the flag is ignored outside localhost.
+
 To preview another daily puzzle without waiting for tomorrow, add a date:
 
 ```text
@@ -52,7 +60,16 @@ During local development, the **Dev button – advance a day** control at the bo
 
 Localhost uses a local Worker at `http://localhost:8787`; it never submits attempts to the production community database. If the local Worker is not running, the game still works and the community figures show `—`. Future-date previews are also rejected by the Worker, so **Advance a day** cannot affect live totals.
 
-To preview leaderboards against current production account data without deploying the site, run `npm run start:leaderboards` in a second terminal. This starts a separate Worker on `http://localhost:8788` whose only route is the read-only leaderboard query. It accepts requests only from a local site, and uses Cloudflare's remote D1 binding, so Wrangler authentication is required and the displayed usernames, today's verified results, and all-time synced progress stay current. The normal local Worker remains isolated from production writes.
+To build and test profiles and leaderboards without deploying or touching production data, initialise the separate local profile database and start its Worker in another terminal:
+
+```sh
+npm run db:profiles
+npm run start:profiles
+```
+
+This Worker runs at `http://localhost:8788` and uses local-only D1 storage. The site never points these local profile writes at the production database.
+
+If you only need a read-only preview of existing production leaderboard data, use `npm run start:leaderboards` instead. Do not run both commands at once because they share port `8788`.
 
 Because local account sync stays isolated from production, append `?leaderboardUser=ExactUsername` to the local page URL to preview that account's blue highlighted row and **Find me** control. The comparison is case-sensitive and this preview parameter is ignored on the public site.
 

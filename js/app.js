@@ -13,7 +13,7 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20260921-14";
+} from "./game-core.js?v=20260927-1";
 import {
   calculateReviveCost,
   canUseRequestedPreviewDate,
@@ -23,19 +23,20 @@ import {
   purchaseMissedDayRevive,
   resetReviveCount,
   shouldResetReviveCycle,
-} from "./progression.js?v=20260921-14";
-import { initialiseAccount } from "./account.js?v=20260921-14";
+} from "./progression.js?v=20260927-1";
+import { initialiseAccount } from "./account.js?v=20260927-1";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20260921-14";
+} from "./community-stats.js?v=20260927-1";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20260921-14";
+} from "./leaderboards.js?v=20260927-1";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20260927-1";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -53,6 +54,7 @@ const communityGamesTotalLabel = document.querySelector("#community-games-total"
 const communityYesterdaySolvedLabel = document.querySelector("#community-yesterday-solved");
 const communityYesterdayMapLabel = document.querySelector("#community-yesterday-map");
 const isLocalDevelopment = isLocalDevelopmentHostname(window.location.hostname);
+const socialDemoEnabled = isLocalDevelopment && new URLSearchParams(window.location.search).get("socialDemo") === "1";
 const communityStatsApiUrl = resolveCommunityStatsApiUrl({ isLocalDevelopment });
 const leaderboardsApiUrl = resolveLeaderboardsApiUrl({ isLocalDevelopment });
 const streakStorageKey = "the-daily-undead:streak";
@@ -147,6 +149,8 @@ initialiseLeaderboards({
   dialog: leaderboardsDialog,
   getPuzzleDate: getDateKey,
   getCurrentUsername: getLeaderboardUsername,
+  onSelectPlayer: (username) => accountController.openPlayerProfile?.(username),
+  fetchImpl: socialDemoEnabled ? createSocialDemoFetch() : globalThis.fetch,
 });
 
 function getCurrentTime() {
@@ -406,6 +410,48 @@ async function loadData() {
     throw new Error("The selectable map catalogue contains a duplicate map id.");
   }
   selectableMaps = [...maps, ...selectionOnlyMaps];
+}
+
+function populateProfileDropdowns() {
+  const form = document.querySelector("#profile-editor-form");
+  const gameSelect = form?.elements.favouriteGame;
+  const mapSelect = form?.elements.favouriteMap;
+  if (!gameSelect || !mapSelect) return;
+
+  const gamePlaceholder = document.createElement("option");
+  gamePlaceholder.value = "";
+  gamePlaceholder.hidden = true;
+  gameSelect.replaceChildren(gamePlaceholder);
+  catalog.games
+    .slice()
+    .sort((left, right) => left.releaseOrder - right.releaseOrder)
+    .forEach((game) => {
+      const option = document.createElement("option");
+      option.value = game.title;
+      option.textContent = game.title;
+      gameSelect.append(option);
+    });
+
+  const mapPlaceholder = document.createElement("option");
+  mapPlaceholder.value = "";
+  mapPlaceholder.hidden = true;
+  mapSelect.replaceChildren(mapPlaceholder);
+  catalog.games
+    .slice()
+    .sort((left, right) => left.releaseOrder - right.releaseOrder)
+    .forEach((game) => {
+      const groupMaps = selectableMaps.filter((map) => map.gameId === game.id);
+      if (!groupMaps.length) return;
+      const group = document.createElement("optgroup");
+      group.label = game.title;
+      groupMaps.forEach((map) => {
+        const option = document.createElement("option");
+        option.value = map.title;
+        option.textContent = map.title;
+        group.append(option);
+      });
+      mapSelect.append(group);
+    });
 }
 
 function createInitialState() {
@@ -1489,6 +1535,7 @@ async function initialise() {
   try {
     await synchroniseClock();
     await loadData();
+    populateProfileDropdowns();
     const dateKey = getDateKey();
     liveDateKey = getUtcDateKey(getCurrentTime());
     streakCount = loadStreak();
@@ -1502,12 +1549,14 @@ async function initialise() {
     lastPlayedDate = loadLastPlayedDate();
     puzzle = buildDailyPuzzle(dateKey, maps);
     state = loadState();
-    accountController = await initialiseAccount({
-      apiUrl: communityStatsApiUrl,
-      puzzleDate: dateKey,
-      getLocalSnapshot: getLocalAccountSnapshot,
-      applyRemoteAccount,
-    });
+    accountController = socialDemoEnabled
+      ? initialiseSocialDemo()
+      : await initialiseAccount({
+          apiUrl: leaderboardsApiUrl,
+          puzzleDate: dateKey,
+          getLocalSnapshot: getLocalAccountSnapshot,
+          applyRemoteAccount,
+        });
     prepareCommunityStatsDisplay();
     migrateCompletedScore();
     verifySavedAccountResult();

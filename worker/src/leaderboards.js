@@ -8,6 +8,8 @@ function nonNegativeInteger(value) {
 function rowToDailyEntry(row) {
   return {
     username: row.username,
+    ...(row.avatar_id ? { avatarId: row.avatar_id } : {}),
+    ...(row.theme_id ? { themeId: row.theme_id } : {}),
     cluesUsed: nonNegativeInteger(row.clues_used),
     bonusCorrect: row.bonus_status === "correct",
     points: nonNegativeInteger(row.points),
@@ -17,6 +19,8 @@ function rowToDailyEntry(row) {
 function rowToAllTimeEntry(row) {
   return {
     username: row.username,
+    ...(row.avatar_id ? { avatarId: row.avatar_id } : {}),
+    ...(row.theme_id ? { themeId: row.theme_id } : {}),
     currentRound: nonNegativeInteger(row.current_round),
     points: nonNegativeInteger(row.points_balance),
     highestRound: nonNegativeInteger(row.best_round),
@@ -32,6 +36,8 @@ export async function readLeaderboards(db, dateKey) {
       .prepare(
         `SELECT
           profiles.username,
+          profiles.avatar_id,
+          profiles.theme_id,
           results.clues_used,
           results.bonus_status,
           results.points_earned AS points
@@ -51,6 +57,8 @@ export async function readLeaderboards(db, dateKey) {
     db.prepare(
       `SELECT
         profiles.username,
+        profiles.avatar_id,
+        profiles.theme_id,
         COALESCE(saves.current_round, 0) AS current_round,
         COALESCE(saves.points_balance, 0) AS points_balance,
         COALESCE(saves.best_round, 0) AS best_round,

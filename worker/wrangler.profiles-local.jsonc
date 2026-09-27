@@ -1,0 +1,19 @@
+{
+  // Full social-profile preview using a local-only D1 database.
+  "name": "daily-undead-profiles-local",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-20",
+  "vars": {
+    "ALLOWED_ORIGINS": "http://localhost:8080,http://127.0.0.1:8080",
+    "CLERK_ISSUER": "https://clerk.thedailyundead.com",
+    "CLERK_AUTHORIZED_PARTIES": "http://localhost:8080,http://127.0.0.1:8080"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "daily-undead-profiles-local",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ]
+}

@@ -49,6 +49,8 @@ The schema is versioned in:
 - `migrations/0001_create_attempts.sql` — tables, index, and aggregate trigger.
 - `migrations/0002_seed_historical_total.sql` — guarded historical baseline.
 - `migrations/0003_create_player_accounts.sql` — profiles, cross-device saves, daily state and verified results.
+- `migrations/0004_create_social_profiles.sql` — avatar, theme, favourite map and bio fields.
+- `migrations/0005_add_favourite_game.sql` — favourite game field.
 
 D1 contains these application tables:
 
@@ -132,6 +134,15 @@ python3 -m http.server 8080
 
 Open [http://localhost:8080](http://localhost:8080). Localhost always uses `http://localhost:8787`, regardless of the production API URL in `index.html`. If the local Worker is unavailable, the game continues normally and community figures show `—`.
 
+Profiles use a second, local-only D1 database on port `8788`:
+
+```sh
+npm run db:profiles
+npm run start:profiles
+```
+
+The profile configuration authorises only local browser origins and does not declare a remote D1 binding. It is safe for avatar, favourite, theme, bio and public-profile testing without changing the live site.
+
 The **Advance a day** preview never writes to production. The frontend submits only when the puzzle date equals the real current UTC date, and the Worker independently rejects non-current dates.
 
 To simulate a fresh local browser, remove local-storage keys beginning with `the-daily-undead:community-` plus the current `dead-drop:` key. A completed local guess should count once; refreshing must leave the total unchanged.
@@ -171,10 +182,10 @@ If the Worker ever has to be recreated:
 5. Under **Settings → Variables and secrets**, add the text variable:
 
    ```text
-   ALLOWED_ORIGINS=https://thedailyundead.com,https://www.thedailyundead.com,http://localhost:8080,http://127.0.0.1:8080
+   ALLOWED_ORIGINS=https://thedailyundead.com,https://www.thedailyundead.com
    ```
 
-   Add `CLERK_ISSUER` using the Clerk instance URL and set `CLERK_AUTHORIZED_PARTIES` to the same comma-separated browser origins. These values are configuration, not secrets.
+   Add `CLERK_ISSUER` using the Clerk instance URL and set `CLERK_AUTHORIZED_PARTIES` to the same comma-separated production browser origins. These values are configuration, not secrets. Use the separate local Wrangler configs for localhost development.
 
 6. Under **Domains**, disable the production `workers.dev` URL.
 7. Add the custom domain `api.thedailyundead.com`.

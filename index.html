@@ -15,9 +15,9 @@
       content="The Daily Undead — your daily Treyarch Zombies challenge. Reveal clues, identify the map, and put the steps in order."
     >
     <title>The Daily Undead</title>
-    <link rel="icon" href="./assets/favicon.png?v=20260921-14" type="image/png" sizes="128x128">
+    <link rel="icon" href="./assets/favicon.png?v=20260927-1" type="image/png" sizes="128x128">
     <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" sizes="180x180">
-    <link rel="stylesheet" href="./styles.css?v=20260921-14">
+    <link rel="stylesheet" href="./styles.css?v=20260927-1">
   </head>
   <body>
     <header class="site-header">
@@ -97,7 +97,7 @@
 
     <dialog id="account-access-dialog" class="account-dialog">
       <button class="dialog-close" type="button" data-close-account-dialog aria-label="Close">×</button>
-      <p class="kicker">Undead account</p>
+      <p class="kicker">The Daily Undead Account</p>
       <h2>Save your progress</h2>
       <p>Create an account to keep your current round, points and progress across devices. You can still play without an account.</p>
       <div class="actions account-dialog-actions">
@@ -108,7 +108,7 @@
 
     <dialog id="leaderboards-dialog" class="account-dialog leaderboard-dialog">
       <button class="dialog-close" type="button" data-close-leaderboards-dialog aria-label="Close">×</button>
-      <p class="kicker">Undead Leaderboards</p>
+      <p class="kicker">The Daily Undead Leaderboards</p>
       <h2>Leaderboards</h2>
       <p class="leaderboard-status" data-leaderboard-status aria-live="polite">Loading current scores…</p>
       <div class="leaderboard-tabs" role="tablist" aria-label="Leaderboard period">
@@ -199,7 +199,7 @@
 
     <dialog id="account-username-dialog" class="account-dialog">
       <button class="dialog-close" type="button" data-close-account-dialog aria-label="Close">×</button>
-      <p class="kicker">Undead account</p>
+      <p class="kicker">The Daily Undead Account</p>
       <h2>Change username</h2>
       <p>This is the public name shown on leaderboards.</p>
       <form id="account-username-form">
@@ -223,7 +223,53 @@
       </form>
     </dialog>
 
-    <script type="module" src="./js/app.js?v=20260921-14"></script>
+    <dialog id="demo-account-dialog" class="account-dialog demo-account-dialog">
+      <button class="dialog-close" type="button" data-close-account-dialog aria-label="Close">×</button>
+      <p class="kicker">The Daily Undead Account</p>
+      <h2>Account</h2>
+      <p class="demo-account-note" data-account-menu-note>Manage your account and public game profile.</p>
+      <div class="demo-account-menu">
+        <button type="button" data-account-action="profile"><strong>Profile</strong><span data-account-description="profile">Email and account details</span></button>
+        <button type="button" data-account-action="security"><strong>Security</strong><span data-account-description="security">Password and active devices</span></button>
+        <button type="button" data-account-action="game-profile"><strong>Game profile</strong><span>Avatar, theme and favourites</span></button>
+        <button type="button" data-account-action="username"><strong>Change username</strong><span>Public leaderboard name</span></button>
+        <button type="button" data-account-action="sign-out"><strong>Sign out</strong><span data-account-description="sign-out">Sign out of this device</span></button>
+      </div>
+    </dialog>
+
+    <dialog id="profile-editor-dialog" class="account-dialog profile-editor-dialog">
+      <button class="dialog-close" type="button" data-close-account-dialog aria-label="Close">×</button>
+      <p class="kicker">Survivor identity</p>
+      <h2>Edit profile</h2>
+      <form id="profile-editor-form">
+        <fieldset class="profile-choice-field">
+          <legend>Avatar</legend>
+          <div class="avatar-picker" data-avatar-picker></div>
+        </fieldset>
+        <fieldset class="profile-choice-field">
+          <legend>Profile theme</legend>
+          <div class="theme-picker" data-theme-picker></div>
+        </fieldset>
+        <div class="profile-field-grid">
+          <label class="account-field"><span>Favourite game</span><select name="favouriteGame"><option value="" selected hidden></option></select></label>
+          <label class="account-field"><span>Favourite map</span><select name="favouriteMap"><option value="" selected hidden></option></select></label>
+        </div>
+        <label class="account-field">
+          <span>Bio</span>
+          <textarea name="bio" maxlength="180" rows="4" placeholder="Tell us something about you or a Zombies memory..."></textarea>
+          <small>Up to 180 characters.</small>
+        </label>
+        <p id="profile-editor-feedback" class="account-feedback" role="status"></p>
+        <button class="button primary" type="submit">Save profile</button>
+      </form>
+    </dialog>
+
+    <dialog id="player-profile-dialog" class="account-dialog player-profile-dialog" data-theme="default">
+      <button class="dialog-close" type="button" data-close-account-dialog aria-label="Close">×</button>
+      <div data-public-profile-content></div>
+    </dialog>
+
+    <script type="module" src="./js/app.js?v=20260927-1"></script>
 
     <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "4eeb20e1411c4e7baf24969ced969c88"}'></script><!-- End Cloudflare Web Analytics -->
 

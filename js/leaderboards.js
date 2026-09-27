@@ -70,12 +70,23 @@ function makePlayer(
   resultLabel = null,
   resultClass = null,
   resultAccent = null,
+  avatarId = "unselected",
 ) {
   const player = documentObject.createElement("span");
   player.className = "leaderboard-player";
-  const name = documentObject.createElement("strong");
+  const identity = documentObject.createElement("span");
+  identity.className = "leaderboard-player-identity";
+  const avatar = documentObject.createElement("span");
+  avatar.className = "zombie-avatar zombie-avatar-small";
+  avatar.dataset.avatar = avatarId;
+  avatar.setAttribute("aria-hidden", "true");
+  const name = documentObject.createElement("button");
+  name.type = "button";
+  name.className = "leaderboard-player-name";
+  name.dataset.viewProfile = username;
   name.textContent = username;
-  player.append(name);
+  identity.append(avatar, name);
+  player.append(identity);
 
   if (resultLabel) {
     const result = documentObject.createElement("small");
@@ -137,6 +148,7 @@ function renderTodayEntries(list, entries, currentUsername, documentObject) {
         entry.bonusCorrect ? `${clueLabel} +` : clueLabel,
         "correct",
         entry.bonusCorrect ? "Bonus" : null,
+        entry.avatarId,
       ),
       makePoints(documentObject, entry.points),
     );
@@ -176,7 +188,7 @@ function renderAllTimeEntries(
     item.className = "leaderboard-entry leaderboard-all-time-entry";
     markCurrentPlayer(item, entry.username, currentUsername);
 
-    const player = makePlayer(documentObject, entry.username);
+    const player = makePlayer(documentObject, entry.username, null, null, null, entry.avatarId);
     const supportingMetrics = documentObject.createElement("dl");
     supportingMetrics.className = "leaderboard-supporting-metrics";
     supportingMetrics.append(
@@ -212,6 +224,7 @@ export function initialiseLeaderboards({
   getCurrentUsername = () => null,
   documentObject = globalThis.document,
   fetchImpl = globalThis.fetch,
+  onSelectPlayer = () => {},
 }) {
   if (!button || !dialog) return;
 
@@ -282,6 +295,11 @@ export function initialiseLeaderboards({
   dialog.querySelector("[data-close-leaderboards-dialog]")?.addEventListener("click", () => {
     if (typeof dialog.close === "function") dialog.close();
     else dialog.removeAttribute("open");
+  });
+
+  dialog.addEventListener("click", (event) => {
+    const trigger = event.target.closest("[data-view-profile]");
+    if (trigger) onSelectPlayer(trigger.dataset.viewProfile);
   });
 
   button.addEventListener("click", async () => {

@@ -306,9 +306,97 @@ async function requestJson(clerk, apiUrl, path, options = {}) {
   return result;
 }
 
-function createUserProfileOptions(clerk, { openUsernameEditor = null } = {}) {
+const avatarOptions = [
+  ["richtofen", "Edward Richtofen"], ["dempsey", "Tank Dempsey"],
+  ["takeo", "Takeo Masaki"], ["nikolai", "Nikolai Belinski"],
+  ["samantha", "Samantha Maxis", { type: "round", value: 5 }],
+  ["dr-maxis", "Dr. Ludwig Maxis", { type: "round", value: 5 }],
+  ["misty", "Misty", { type: "round", value: 10 }],
+  ["stuhlinger", "Samuel Stuhlinger", { type: "round", value: 10 }],
+  ["marlton", "Marlton Johnson", { type: "round", value: 10 }],
+  ["russman", "Russman", { type: "round", value: 10 }],
+  ["tedd", "T.E.D.D.", { type: "maps", value: 20 }],
+  ["brutus", "Brutus", { type: "maps", value: 50 }],
+  ["dr-monty", "Dr. Monty", { type: "maps", value: 100 }],
+  ["shadowman", "The Shadowman", { type: "round", value: 50 }],
+  ["scarlett", "Scarlett Rhodes", { type: "maps", value: 25 }],
+  ["diego", "Diego Necalli", { type: "maps", value: 25 }],
+  ["bruno", "Bruno Delacroix", { type: "maps", value: 25 }],
+  ["stanton", "Stanton Shaw", { type: "maps", value: 25 }],
+  ["weaver", "Grigori Weaver", { type: "round", value: 15 }],
+  ["grey", "Dr. Elizabeth Grey", { type: "round", value: 15 }],
+  ["carver", "Mac Carver", { type: "round", value: 15 }],
+  ["maya", "Maya Aguinaldo", { type: "round", value: 15 }],
+  ["warden", "The Warden", { type: "round", value: 50 }],
+];
+const themeOptions = [
+  { id: "default", label: "Default", requiredMaps: 0 },
+  { id: "afterlife", label: "Toxic", requiredMaps: 50 },
+  { id: "outbreak", label: "Cryo", requiredMaps: 100 },
+  { id: "hellfire", label: "Napalm", requiredMaps: 250 },
+  { id: "blood-moon", label: "Blood", requiredMaps: 500 },
+  { id: "dark-aether", label: "Aether", requiredMaps: 1000 },
+];
+
+function avatarUnlockLabel(unlock) {
+  if (!unlock) return "Available at signup";
+  return unlock.type === "round" ? `Reach Round ${unlock.value}` : `Solve ${unlock.value} maps`;
+}
+
+function avatarIsUnlocked(unlock, highestRound, mapsSolved) {
+  if (!unlock) return true;
+  return unlock.type === "round" ? highestRound >= unlock.value : mapsSolved >= unlock.value;
+}
+
+function formatJoinedDate(value) {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime())
+    ? "Unknown"
+    : new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(date);
+}
+
+function makeAvatar(documentObject, avatarId, className = "") {
+  const avatar = documentObject.createElement("span");
+  avatar.className = `zombie-avatar ${className}`.trim();
+  avatar.dataset.avatar = avatarId || "unselected";
+  avatar.setAttribute("aria-hidden", "true");
+  return avatar;
+}
+
+function createUserProfileOptions(
+  clerk,
+  { openUsernameEditor = null, openProfileEditor = null } = {},
+) {
   const customPages = [];
 
+  const addLaunchPage = (url, label, icon, descriptionText, buttonText, handler) => {
+    if (!handler) return;
+    customPages.push({
+      url,
+      label,
+      mountIcon: (element) => { element.textContent = icon; },
+      unmountIcon: (element) => { element.replaceChildren(); },
+      mount: (element) => {
+        const heading = document.createElement("h2");
+        const description = document.createElement("p");
+        const button = document.createElement("button");
+        heading.textContent = label;
+        description.textContent = descriptionText;
+        button.className = "button primary";
+        button.type = "button";
+        button.textContent = buttonText;
+        button.addEventListener("click", handler);
+        element.replaceChildren(heading, description, button);
+      },
+      unmount: (element) => element.replaceChildren(),
+    });
+  };
+
+  addLaunchPage(
+    "game-profile", "Game profile", "☣",
+    "Choose your zombie identity, favourites, profile theme and survival motto.",
+    "Edit game profile", openProfileEditor,
+  );
   if (openUsernameEditor) {
     customPages.push({
       url: "change-username",
@@ -404,6 +492,7 @@ export async function initialiseAccount({
   documentObject = document,
 }) {
   const accountButton = documentObject.querySelector("#account-button");
+  const accountMenuDialog = documentObject.querySelector("#demo-account-dialog");
   const accessDialog = documentObject.querySelector("#account-access-dialog");
   const onboardingDialog = documentObject.querySelector("#account-onboarding-dialog");
   const onboardingForm = documentObject.querySelector("#account-onboarding-form");
@@ -411,6 +500,11 @@ export async function initialiseAccount({
   const usernameDialog = documentObject.querySelector("#account-username-dialog");
   const usernameForm = documentObject.querySelector("#account-username-form");
   const usernameFeedback = documentObject.querySelector("#account-username-feedback");
+  const profileEditorDialog = documentObject.querySelector("#profile-editor-dialog");
+  const profileEditorForm = documentObject.querySelector("#profile-editor-form");
+  const profileEditorFeedback = documentObject.querySelector("#profile-editor-feedback");
+  const publicProfileDialog = documentObject.querySelector("#player-profile-dialog");
+  const publicProfileContent = documentObject.querySelector("[data-public-profile-content]");
   const publishableKey = getClerkPublishableKey(documentObject);
   let clerk = null;
   let profile = null;
@@ -419,9 +513,83 @@ export async function initialiseAccount({
   let saveAgain = false;
   const dirtyStorageKey = "the-daily-undead:account-sync-pending";
 
+  async function openPlayerProfile(username) {
+    if (!apiUrl || !publicProfileDialog || !publicProfileContent) return;
+    publicProfileContent.textContent = "Loading survivor profile…";
+    if (typeof publicProfileDialog.showModal === "function" && !publicProfileDialog.open) {
+      publicProfileDialog.showModal();
+    } else {
+      publicProfileDialog.setAttribute("open", "");
+    }
+    try {
+      const response = await fetch(new URL(`/api/profiles/${encodeURIComponent(username)}`, apiUrl), {
+        headers: { Accept: "application/json" },
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || "Could not load this profile.");
+      const viewed = result.profile;
+      publicProfileDialog.dataset.theme = viewed.themeId;
+      const header = documentObject.createElement("header");
+      header.className = "public-profile-header";
+      const copy = documentObject.createElement("div");
+      const kicker = documentObject.createElement("p");
+      const heading = documentObject.createElement("h2");
+      const joined = documentObject.createElement("p");
+      kicker.className = "kicker";
+      kicker.textContent = "Survivor profile";
+      heading.textContent = viewed.username;
+      const identityLine = documentObject.createElement("div");
+      identityLine.className = "public-profile-identity-line";
+      [["Round", result.stats.currentRound], ["Points", result.stats.pointsBalance]].forEach(([label, value]) => {
+        const indicator = documentObject.createElement("span");
+        indicator.className = "public-profile-indicator";
+        indicator.innerHTML = `${label} <strong>${new Intl.NumberFormat("en-GB").format(value)}</strong>`;
+        identityLine.append(indicator);
+      });
+      identityLine.prepend(heading);
+      joined.className = "public-profile-joined";
+      joined.textContent = `Joined ${formatJoinedDate(viewed.createdAt)}`;
+      copy.append(kicker, identityLine, joined);
+      header.append(makeAvatar(documentObject, viewed.avatarId), copy);
+
+      const bio = documentObject.createElement("p");
+      bio.className = "public-profile-bio";
+      bio.textContent = viewed.bio || "No bio shared yet.";
+      bio.classList.toggle("is-empty", !viewed.bio);
+      const stats = documentObject.createElement("dl");
+      stats.className = "public-profile-stats";
+      [["Maps solved", result.stats.mapsSolved], ["Highest round", result.stats.highestRound]].forEach(([label, value]) => {
+        const box = documentObject.createElement("div");
+        box.className = "public-profile-stat";
+        const dt = documentObject.createElement("dt");
+        const dd = documentObject.createElement("dd");
+        dt.textContent = label;
+        dd.textContent = new Intl.NumberFormat("en-GB").format(value);
+        box.append(dt, dd);
+        stats.append(box);
+      });
+      const favourites = documentObject.createElement("dl");
+      favourites.className = "public-profile-favourites";
+      [["Favourite game", viewed.favouriteGame], ["Favourite map", viewed.favouriteMap]].forEach(([label, value]) => {
+        if (!value) return;
+        const box = documentObject.createElement("div");
+        box.className = "public-profile-stat";
+        const dt = documentObject.createElement("dt");
+        const dd = documentObject.createElement("dd");
+        dt.textContent = label;
+        dd.textContent = value;
+        box.append(dt, dd);
+        favourites.append(box);
+      });
+      publicProfileContent.replaceChildren(header, bio, stats, favourites);
+    } catch (error) {
+      publicProfileContent.textContent = error.message;
+    }
+  }
+
   if (!accountButton || !publishableKey || !apiUrl) {
     if (accountButton) accountButton.hidden = true;
-    return createUnavailableController();
+    return createUnavailableController({ openPlayerProfile });
   }
 
   accountButton.hidden = false;
@@ -437,7 +605,7 @@ export async function initialiseAccount({
   } catch {
     accountButton.disabled = false;
     accountButton.textContent = "Account unavailable";
-    return createUnavailableController();
+    return createUnavailableController({ openPlayerProfile });
   }
 
   const openDialog = (dialog) => {
@@ -474,7 +642,7 @@ export async function initialiseAccount({
         window.location.reload();
       }
     });
-    return createUnavailableController({ clerk, signedIn: false });
+    return createUnavailableController({ clerk, signedIn: false, openPlayerProfile });
   }
 
   accountButton.classList.add("is-signed-in");
@@ -490,7 +658,7 @@ export async function initialiseAccount({
     accountButton.addEventListener("click", () =>
       clerk.openUserProfile(createUserProfileOptions(clerk)),
     );
-    return createUnavailableController({ clerk, signedIn: true });
+    return createUnavailableController({ clerk, signedIn: true, openPlayerProfile });
   }
 
   if (account.needsOnboarding) {
@@ -527,7 +695,7 @@ export async function initialiseAccount({
       }
     });
 
-    return createUnavailableController({ clerk, signedIn: true });
+    return createUnavailableController({ clerk, signedIn: true, openPlayerProfile });
   }
 
   profile = account.profile;
@@ -541,6 +709,139 @@ export async function initialiseAccount({
   accountButton.disabled = false;
   accountButton.textContent = profile.username;
   accountButton.classList.add("has-username");
+  const mapsSolved = Number(account.progress?.totalRounds || 0);
+  const highestRound = Number(account.progress?.bestRound || 0);
+
+  if (profileEditorForm) {
+    const avatarPicker = profileEditorForm.querySelector("[data-avatar-picker]");
+    const themePicker = profileEditorForm.querySelector("[data-theme-picker]");
+    avatarPicker?.replaceChildren(...avatarOptions.map(([id, label, unlock]) => {
+      const choice = documentObject.createElement("label");
+      choice.className = "avatar-choice";
+      const locked = !avatarIsUnlocked(unlock, highestRound, mapsSolved);
+      const requirement = avatarUnlockLabel(unlock);
+      choice.classList.toggle("is-locked", locked);
+      choice.dataset.unlockLabel = locked ? requirement : "Unlocked";
+      choice.title = locked ? `${label} — ${requirement}` : `${label} — Unlocked`;
+      const input = documentObject.createElement("input");
+      input.type = "radio";
+      input.name = "avatarId";
+      input.value = id;
+      input.dataset.unlockType = unlock?.type || "signup";
+      input.dataset.unlockValue = unlock?.value || 0;
+      input.setAttribute("aria-label", locked ? `${label}, locked, ${requirement}, available to preview` : `${label}, unlocked`);
+      choice.append(input, makeAvatar(documentObject, id));
+      return choice;
+    }));
+    themePicker?.replaceChildren(...themeOptions.map(({ id, label, requiredMaps }) => {
+      const choice = documentObject.createElement("label");
+      choice.className = "theme-choice";
+      choice.dataset.theme = id;
+      const locked = mapsSolved < requiredMaps;
+      choice.classList.toggle("is-locked", locked);
+      const input = documentObject.createElement("input");
+      input.type = "radio";
+      input.name = "themeId";
+      input.value = id;
+      input.dataset.requiredMaps = requiredMaps;
+      input.setAttribute("aria-label", locked ? `${label}, unlocks at ${requiredMaps} solves, available to preview` : label);
+      const text = documentObject.createElement("span");
+      const name = documentObject.createElement("strong");
+      const unlock = documentObject.createElement("small");
+      unlock.className = "theme-unlock";
+      name.textContent = label;
+      unlock.textContent = locked ? `🔒 ${requiredMaps} solves` : "";
+      unlock.hidden = !locked;
+      text.append(name, unlock);
+      choice.append(input, text);
+      return choice;
+    }));
+  }
+
+  const updateLockedPreviewState = () => {
+    if (!profileEditorForm || !profileEditorFeedback) return;
+    const requirements = [];
+    const selectedAvatarId = profileEditorForm.querySelector('[name="avatarId"]:checked')?.value;
+    const selectedAvatar = avatarOptions.find(([id]) => id === selectedAvatarId);
+    if (selectedAvatar && !avatarIsUnlocked(selectedAvatar[2], highestRound, mapsSolved)) {
+      requirements.push(`${selectedAvatar[1]}: ${avatarUnlockLabel(selectedAvatar[2])}`);
+    }
+    const selectedThemeId = profileEditorForm.querySelector('[name="themeId"]:checked')?.value;
+    const selectedTheme = themeOptions.find(({ id }) => id === selectedThemeId);
+    if (selectedTheme && mapsSolved < selectedTheme.requiredMaps) {
+      requirements.push(`${selectedTheme.label}: ${selectedTheme.requiredMaps} solves`);
+    }
+    const saveButton = profileEditorForm.querySelector('button[type="submit"]');
+    if (requirements.length) {
+      profileEditorFeedback.classList.remove("account-error", "is-success");
+      profileEditorFeedback.classList.add("is-preview-warning");
+      profileEditorFeedback.textContent = `Previewing locked content — ${requirements.join(" · ")}. Unlock it before saving.`;
+      if (saveButton) saveButton.disabled = true;
+      return;
+    }
+    profileEditorFeedback.classList.remove("account-error", "is-success", "is-preview-warning");
+    profileEditorFeedback.textContent = "";
+    if (saveButton) saveButton.disabled = false;
+  };
+
+  const openProfileEditor = () => {
+    clerk.closeUserProfile();
+    if (!profileEditorForm || !profileEditorDialog) return;
+    ["favouriteGame", "favouriteMap", "bio"].forEach((field) => {
+      profileEditorForm.elements[field].value = profile[field] || "";
+    });
+    const avatarInput = profileEditorForm.querySelector(`[name="avatarId"][value="${profile.avatarId || "unselected"}"]`);
+    const themeInput = profileEditorForm.querySelector(`[name="themeId"][value="${profile.themeId || "default"}"]`);
+    if (avatarInput) avatarInput.checked = true;
+    if (themeInput) themeInput.checked = true;
+    profileEditorDialog.dataset.previewTheme = profile.themeId || "default";
+    profileEditorFeedback.textContent = "";
+    updateLockedPreviewState();
+    globalThis.setTimeout(() => openDialog(profileEditorDialog), 250);
+  };
+
+  profileEditorForm?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const submitButton = profileEditorForm.querySelector('button[type="submit"]');
+    submitButton.disabled = true;
+    profileEditorFeedback.textContent = "";
+    try {
+      const payload = Object.fromEntries(new FormData(profileEditorForm));
+      const selectedAvatar = avatarOptions.find(([id]) => id === payload.avatarId);
+      if (selectedAvatar && !avatarIsUnlocked(selectedAvatar[2], highestRound, mapsSolved)) {
+        throw new Error(`${selectedAvatar[1]} unlocks when you ${avatarUnlockLabel(selectedAvatar[2]).toLowerCase()}. Preview only for now.`);
+      }
+      const selectedTheme = themeOptions.find((theme) => theme.id === payload.themeId);
+      if (selectedTheme && mapsSolved < selectedTheme.requiredMaps) {
+        throw new Error(`${selectedTheme.label} unlocks at ${selectedTheme.requiredMaps} solves. Preview only for now.`);
+      }
+      const result = await requestJson(clerk, apiUrl, "/api/account/profile", {
+        method: "PUT", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      Object.assign(profile, result.profile);
+      profileEditorFeedback.classList.remove("account-error", "is-preview-warning");
+      profileEditorFeedback.classList.add("is-success");
+      profileEditorFeedback.textContent = "Profile saved.";
+    } catch (error) {
+      profileEditorFeedback.classList.remove("is-success", "is-preview-warning");
+      profileEditorFeedback.classList.add("account-error");
+      profileEditorFeedback.textContent = error.message;
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+
+  profileEditorForm?.addEventListener("change", (event) => {
+    if (event.target.name === "avatarId") {
+      updateLockedPreviewState();
+      return;
+    }
+    if (event.target.name === "themeId") {
+      profileEditorDialog.dataset.previewTheme = event.target.value;
+      updateLockedPreviewState();
+    }
+  });
 
   const openUsernameEditor = () => {
     if (!usernameDialog || !usernameForm || !usernameFeedback) return;
@@ -583,9 +884,28 @@ export async function initialiseAccount({
     }
   });
 
-  accountButton.addEventListener("click", () =>
-    clerk.openUserProfile(createUserProfileOptions(clerk, { openUsernameEditor })),
-  );
+  const clerkProfileOptions = () => createUserProfileOptions(clerk, {
+    openUsernameEditor,
+    openProfileEditor,
+  });
+
+  accountMenuDialog?.addEventListener("click", (event) => {
+    const action = event.target.closest("[data-account-action]")?.dataset.accountAction;
+    if (!action) return;
+    closeDialog(accountMenuDialog);
+    if (action === "game-profile") {
+      openProfileEditor();
+    } else if (action === "username") {
+      openUsernameEditor();
+    } else if (["profile", "security", "sign-out"].includes(action)) {
+      clerk.openUserProfile({
+        ...clerkProfileOptions(),
+        initialPage: action === "profile" ? "account" : action,
+      });
+    }
+  });
+
+  accountButton.addEventListener("click", () => openDialog(accountMenuDialog));
 
   async function saveNow() {
     if (saveInFlight) {
@@ -666,10 +986,11 @@ export async function initialiseAccount({
     scheduleSave,
     recordMapResult,
     recordBonusResult,
+    openPlayerProfile,
   };
 }
 
-function createUnavailableController({ clerk = null, signedIn = false } = {}) {
+function createUnavailableController({ clerk = null, signedIn = false, openPlayerProfile = async () => {} } = {}) {
   return {
     available: Boolean(clerk),
     signedIn,
@@ -678,5 +999,6 @@ function createUnavailableController({ clerk = null, signedIn = false } = {}) {
     scheduleSave() {},
     async recordMapResult() { return null; },
     async recordBonusResult() { return null; },
+    openPlayerProfile,
   };
 }

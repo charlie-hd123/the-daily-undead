@@ -10,14 +10,21 @@ import {
 } from "../worker/src/index.js";
 import {
   normalizeUsername,
+  getPublicProfile,
+  readJsonBody,
   registerAccount,
+  saveAccount,
   sanitizeDailyState,
   sanitizeProgress,
+  sanitizeSocialProfile,
   updateAccountUsername,
+  updateSocialProfile,
 } from "../worker/src/accounts.js";
 import { verifyClerkRequest } from "../worker/src/auth.js";
 import {
   answerEquivalents as workerAnswerEquivalents,
+  profileGames,
+  profileMaps,
   workerMaps,
 } from "../worker/src/generated-map-catalog.js";
 
@@ -70,6 +77,13 @@ test("Worker CORS only allows configured browser origins", () => {
   assert.equal(isAllowedOrigin(request(null), env), true);
 });
 
+test("production Worker origins stay isolated from localhost preview origins", async () => {
+  const productionConfig = JSON.parse(await readProjectFile("worker/wrangler.jsonc"));
+  assert.match(productionConfig.vars.ALLOWED_ORIGINS, /https:\/\/thedailyundead\.com/);
+  assert.doesNotMatch(productionConfig.vars.ALLOWED_ORIGINS, /localhost|127\.0\.0\.1/);
+  assert.doesNotMatch(productionConfig.vars.CLERK_AUTHORIZED_PARTIES, /localhost|127\.0\.0\.1/);
+});
+
 test("account usernames and uploaded local saves are tightly validated", () => {
   assert.equal(normalizeUsername(" Richtofen_93 "), "Richtofen_93");
   assert.equal(normalizeUsername("no spaces allowed"), null);
@@ -105,6 +119,147 @@ test("account usernames and uploaded local saves are tightly validated", () => {
     "clues",
   );
   assert.equal(sanitizeDailyState({ phase: "cheat", puzzleKey: `${today}:x` }, today), null);
+});
+
+test("account request bodies report malformed and oversized JSON as client errors", async () => {
+  await assert.rejects(
+    readJsonBody(new Request("https://api.example.test", { method: "POST", body: "{" })),
+    (error) => error.status === 400 && /valid JSON/.test(error.message),
+  );
+  await assert.rejects(
+    readJsonBody(new Request("https://api.example.test", {
+      method: "POST",
+      headers: { "Content-Length": "5000" },
+      body: "{}",
+    }), 100),
+    (error) => error.status === 413,
+  );
+});
+
+test("public profile fields are restricted to approved cosmetics and safe lengths", () => {
+  assert.deepEqual(
+    sanitizeSocialProfile({
+      avatarId: "carver",
+      themeId: "void",
+      favouriteGame: "  Black   Ops 2  ",
+      favouriteMap: "  Mob   of the Dead  ",
+      bio: "  No one   survives alone.  ",
+    }),
+    {
+      avatarId: "carver",
+      themeId: "default",
+      favouriteGame: "Black Ops 2",
+      favouriteMap: "Mob of the Dead",
+      bio: "No one survives alone.",
+    },
+  );
+  assert.equal(sanitizeSocialProfile({ avatarId: "../../evil" }).avatarId, "unselected");
+  assert.equal(sanitizeSocialProfile({ themeId: "outbreak" }).themeId, "outbreak");
+  assert.equal(sanitizeSocialProfile({ themeId: "hellfire" }).themeId, "hellfire");
+  assert.equal(sanitizeSocialProfile({ themeId: "blood-moon" }).themeId, "blood-moon");
+  assert.equal(sanitizeSocialProfile({ themeId: "dark-aether" }).themeId, "dark-aether");
+  assert.equal(sanitizeSocialProfile({ favouriteGame: "Not a real game" }).favouriteGame, "");
+  assert.equal(sanitizeSocialProfile({ favouriteMap: "Not a real map" }).favouriteMap, "");
+});
+
+test("public profile lookups exclude profiles hidden from leaderboards", async () => {
+  let query = "";
+  const db = {
+    prepare(sql) {
+      query = sql;
+      return { bind: () => ({ first: async () => null }) };
+    },
+  };
+
+  const response = await getPublicProfile(db, "Takeo");
+  assert.equal(response.status, 404);
+  assert.match(query, /leaderboard_visible = 1/);
+});
+
+test("account saves cannot roll lifetime maps solved backwards", async () => {
+  const statements = [];
+  const db = {
+    prepare(sql) {
+      return {
+        bind(...bindings) {
+          if (sql.startsWith("SELECT user_id")) {
+            return { first: async () => ({ user_id: "user_1" }) };
+          }
+          if (sql.startsWith("SELECT * FROM player_saves")) {
+            return { first: async () => ({ total_rounds: 42 }) };
+          }
+          const statement = { sql, bindings };
+          statements.push(statement);
+          return statement;
+        },
+      };
+    },
+    async batch() {},
+  };
+
+  const response = await saveAccount(
+    db,
+    new Request("https://api.example.test/api/account/save", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ progress: { totalRounds: 10 } }),
+    }),
+    "user_1",
+  );
+
+  assert.equal(response.status, 200);
+  assert.match(statements[0].sql, /total_rounds = MAX\(total_rounds, \?\)/);
+});
+
+test("avatar unlocks use imported highest-round and maps-solved progress", async () => {
+  const request = (avatarId) => new Request("https://worker.example/api/account/profile", {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ avatarId, themeId: "default" }),
+  });
+  const progressOnlyDb = (progress) => ({
+    prepare(sql) {
+      assert.match(sql, /best_round, saves\.total_rounds/);
+      return { bind: () => ({ first: async () => progress }) };
+    },
+  });
+
+  const roundLocked = await updateSocialProfile(
+    progressOnlyDb({ best_round: 49, total_rounds: 500 }),
+    request("shadowman"),
+    "user_1",
+  );
+  assert.equal(roundLocked.status, 403);
+  assert.match(roundLocked.body.error, /Round 50/);
+
+  const mapsLocked = await updateSocialProfile(
+    progressOnlyDb({ best_round: 100, total_rounds: 19 }),
+    request("tedd"),
+    "user_1",
+  );
+  assert.equal(mapsLocked.status, 403);
+  assert.match(mapsLocked.body.error, /20 maps/);
+});
+
+test("the placeholder avatar cannot be selected again after choosing a character", async () => {
+  const db = {
+    prepare() {
+      return {
+        bind: () => ({ first: async () => ({ avatar_id: "richtofen", best_round: 100, total_rounds: 1000 }) }),
+      };
+    },
+  };
+  const response = await updateSocialProfile(
+    db,
+    new Request("https://worker.example/api/account/profile", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ avatarId: "unselected", themeId: "default" }),
+    }),
+    "user_1",
+  );
+  assert.equal(response.status, 400);
+  assert.match(response.body.error, /character avatars/);
 });
 
 test("account registration imports the browser's highest round into D1", async () => {
@@ -263,6 +418,20 @@ test("the account migration separates private profiles, cross-device saves and v
   assert.doesNotMatch(schema, /password|email_address/i);
 });
 
+test("the social migration stores curated public profile fields", async () => {
+  const schema = await Promise.all([
+    fs.readFile(new URL("../worker/migrations/0004_create_social_profiles.sql", import.meta.url), "utf8"),
+    fs.readFile(new URL("../worker/migrations/0005_add_favourite_game.sql", import.meta.url), "utf8"),
+  ]).then((parts) => parts.join("\n"));
+  assert.match(schema, /ADD COLUMN avatar_id/);
+  assert.match(schema, /avatar_id TEXT NOT NULL DEFAULT 'unselected'/);
+  assert.match(schema, /ADD COLUMN theme_id/);
+  assert.match(schema, /ADD COLUMN favourite_map/);
+  assert.match(schema, /ADD COLUMN favourite_game/);
+  assert.match(schema, /ADD COLUMN bio/);
+  assert.doesNotMatch(schema, /friend/i);
+});
+
 test("the Worker's verification catalogue matches the browser puzzle catalogue", async () => {
   const index = JSON.parse(await readProjectFile("data/maps/index.json"));
   const expectedMaps = await Promise.all(
@@ -279,4 +448,9 @@ test("the Worker's verification catalogue matches the browser puzzle catalogue",
 
   assert.deepEqual(workerMaps, expectedMaps);
   assert.deepEqual(workerAnswerEquivalents, index.answerEquivalents || []);
+  assert.deepEqual(profileGames, index.games.map(({ title }) => title));
+  assert.deepEqual(profileMaps, [
+    ...expectedMaps.map(({ title }) => title),
+    ...(index.selectionOnlyMaps || []).map(({ title }) => title),
+  ]);
 });

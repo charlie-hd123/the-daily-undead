@@ -7,7 +7,12 @@ import {
   isCorrectOrder,
   isValidDateKey,
 } from "../../js/game-core.js";
-import { answerEquivalents, workerMaps } from "./generated-map-catalog.js";
+import {
+  answerEquivalents,
+  profileGames,
+  profileMaps,
+  workerMaps,
+} from "./generated-map-catalog.js";
 
 const maximumCounter = 1_000_000_000;
 const allowedPhases = new Set(["clues", "game", "map", "result"]);
@@ -103,9 +108,69 @@ function rowToProfile(row) {
     ? {
         username: row.username,
         leaderboardVisible: Boolean(row.leaderboard_visible),
+        avatarId: normalizeAvatarId(row.avatar_id),
+        themeId: row.theme_id && row.theme_id !== "aether" ? row.theme_id : "default",
+        favouriteGame: row.favourite_game || "",
+        favouriteMap: row.favourite_map || "",
+        bio: row.bio || "",
         createdAt: row.created_at,
       }
     : null;
+}
+
+const avatarIds = new Set([
+  "unselected",
+  "richtofen", "dempsey", "takeo", "nikolai", "samantha", "dr-maxis", "dr-monty", "warden",
+  "misty", "stuhlinger", "marlton", "russman", "scarlett", "diego", "bruno", "stanton",
+  "weaver", "grey", "carver", "maya", "shadowman", "tedd", "brutus",
+]);
+const legacyAvatarIds = new Map([
+  ["scientist", "richtofen"], ["soldier", "dempsey"], ["warrior", "takeo"],
+  ["explorer", "nikolai"], ["punk", "misty"], ["hazmat", "carver"],
+]);
+const avatarUnlocks = new Map([
+  ["samantha", { type: "round", value: 5 }], ["dr-maxis", { type: "round", value: 5 }],
+  ["misty", { type: "round", value: 10 }], ["stuhlinger", { type: "round", value: 10 }],
+  ["marlton", { type: "round", value: 10 }], ["russman", { type: "round", value: 10 }],
+  ["tedd", { type: "maps", value: 20 }], ["brutus", { type: "maps", value: 50 }],
+  ["shadowman", { type: "round", value: 50 }], ["dr-monty", { type: "maps", value: 100 }],
+  ["scarlett", { type: "maps", value: 25 }], ["diego", { type: "maps", value: 25 }],
+  ["bruno", { type: "maps", value: 25 }], ["stanton", { type: "maps", value: 25 }],
+  ["weaver", { type: "round", value: 15 }], ["grey", { type: "round", value: 15 }],
+  ["carver", { type: "round", value: 15 }], ["maya", { type: "round", value: 15 }],
+  ["warden", { type: "round", value: 50 }],
+]);
+
+function normalizeAvatarId(value) {
+  if (avatarIds.has(value)) return value;
+  return legacyAvatarIds.get(value) || "unselected";
+}
+const themeUnlocks = new Map([
+  ["default", 0],
+  ["afterlife", 50],
+  ["outbreak", 100],
+  ["hellfire", 250],
+  ["blood-moon", 500],
+  ["dark-aether", 1000],
+]);
+const allowedFavouriteGames = new Set(profileGames);
+const allowedFavouriteMaps = new Set(profileMaps);
+
+function cleanProfileText(value, maximumLength) {
+  if (typeof value !== "string") return "";
+  return value.trim().replace(/\s+/g, " ").slice(0, maximumLength);
+}
+
+export function sanitizeSocialProfile(value = {}) {
+  const favouriteGame = cleanProfileText(value.favouriteGame, 50);
+  const favouriteMap = cleanProfileText(value.favouriteMap, 50);
+  return {
+    avatarId: normalizeAvatarId(value.avatarId),
+    themeId: themeUnlocks.has(value.themeId) ? value.themeId : "default",
+    favouriteGame: allowedFavouriteGames.has(favouriteGame) ? favouriteGame : "",
+    favouriteMap: allowedFavouriteMaps.has(favouriteMap) ? favouriteMap : "",
+    bio: cleanProfileText(value.bio, 180),
+  };
 }
 
 function rowToProgress(row) {
@@ -146,12 +211,19 @@ function rowToResult(row) {
     : null;
 }
 
-async function readJsonBody(request, maximumBytes = 20_000) {
+export async function readJsonBody(request, maximumBytes = 20_000) {
   const contentLength = Number(request.headers.get("Content-Length") || 0);
-  if (contentLength > maximumBytes) throw new Error("The request body is too large.");
-  const body = await request.json();
+  if (contentLength > maximumBytes) {
+    throw Object.assign(new Error("The request body is too large."), { status: 413 });
+  }
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    throw Object.assign(new Error("The request body must be valid JSON."), { status: 400 });
+  }
   if (!body || typeof body !== "object" || Array.isArray(body)) {
-    throw new Error("A JSON object is required.");
+    throw Object.assign(new Error("A JSON object is required."), { status: 400 });
   }
   return body;
 }
@@ -302,6 +374,93 @@ export async function updateAccountUsername(db, request, userId) {
   return { status: 200, body: { username } };
 }
 
+export async function updateSocialProfile(db, request, userId) {
+  const body = await readJsonBody(request, 4_000);
+  const progress = await db.prepare(
+    `SELECT profiles.avatar_id, saves.best_round, saves.total_rounds
+    FROM player_profiles AS profiles
+    LEFT JOIN player_saves AS saves ON saves.user_id = profiles.user_id
+    WHERE profiles.user_id = ?`,
+  )
+    .bind(userId).first();
+  if (!progress) {
+    return { status: 404, body: { error: "Finish setting up your account first." } };
+  }
+  if (body.avatarId != null && (!avatarIds.has(body.avatarId) || body.avatarId === "unselected")) {
+    return { status: 400, body: { error: "Choose one of the available character avatars." } };
+  }
+  const profile = sanitizeSocialProfile({
+    ...body,
+    avatarId: body.avatarId ?? normalizeAvatarId(progress.avatar_id),
+  });
+  const highestRound = Number(progress?.best_round || 0);
+  const mapsSolved = Number(progress?.total_rounds || 0);
+  const avatarUnlock = avatarUnlocks.get(profile.avatarId);
+  const avatarLocked = avatarUnlock?.type === "round"
+    ? highestRound < avatarUnlock.value
+    : avatarUnlock?.type === "maps" && mapsSolved < avatarUnlock.value;
+  if (avatarLocked) {
+    const requirement = avatarUnlock.type === "round"
+      ? `reach Round ${avatarUnlock.value}`
+      : `solve ${avatarUnlock.value} maps`;
+    return { status: 403, body: { error: `${profile.avatarId} unlocks when you ${requirement}.` } };
+  }
+  const requiredMaps = themeUnlocks.get(profile.themeId) || 0;
+  if (mapsSolved < requiredMaps) {
+    return {
+      status: 403,
+      body: { error: `${profile.themeId} unlocks at ${requiredMaps} solves.` },
+    };
+  }
+  const result = await db.prepare(
+    `UPDATE player_profiles SET
+      avatar_id = ?, theme_id = ?, favourite_game = ?, favourite_map = ?, bio = ?,
+      updated_at = CURRENT_TIMESTAMP
+    WHERE user_id = ?`,
+  ).bind(
+    profile.avatarId,
+    profile.themeId,
+    profile.favouriteGame,
+    profile.favouriteMap,
+    profile.bio,
+    userId,
+  ).run();
+  if (!Number(result.meta?.changes || 0)) {
+    return { status: 404, body: { error: "Finish setting up your account first." } };
+  }
+  return { status: 200, body: { profile } };
+}
+
+export async function getPublicProfile(db, username) {
+  const normalized = normalizeUsername(username);
+  if (!normalized) return { status: 400, body: { error: "That player name is invalid." } };
+  const row = await db.prepare(
+    `SELECT
+      profiles.*,
+      COALESCE(saves.current_round, 0) AS current_round,
+      COALESCE(saves.best_round, 0) AS best_round,
+      COALESCE(saves.points_balance, 0) AS points_balance,
+      COALESCE(saves.total_rounds, 0) AS total_rounds
+    FROM player_profiles AS profiles
+    LEFT JOIN player_saves AS saves ON saves.user_id = profiles.user_id
+    WHERE profiles.username = ? COLLATE NOCASE
+      AND profiles.leaderboard_visible = 1`,
+  ).bind(normalized).first();
+  if (!row) return { status: 404, body: { error: "Player not found." } };
+  return {
+    status: 200,
+    body: {
+      profile: rowToProfile(row),
+      stats: {
+        mapsSolved: Number(row.total_rounds || 0),
+        highestRound: Number(row.best_round || 0),
+        currentRound: Number(row.current_round || 0),
+        pointsBalance: Number(row.points_balance || 0),
+      },
+    },
+  };
+}
+
 export async function saveAccount(db, request, userId) {
   const body = await readJsonBody(request);
   const progress = sanitizeProgress(body.progress);
@@ -320,7 +479,7 @@ export async function saveAccount(db, request, userId) {
           current_round = ?,
           best_round = MAX(best_round, ?),
           points_balance = ?,
-          total_rounds = ?,
+          total_rounds = MAX(total_rounds, ?),
           revive_count = ?,
           last_played_date = ?,
           missed_day_json = ?,

@@ -1,10 +1,12 @@
 import { verifyClerkRequest } from "./auth.js";
 import {
   getAccount,
+  getPublicProfile,
   recordVerifiedBonusResult,
   recordVerifiedMapResult,
   registerAccount,
   saveAccount,
+  updateSocialProfile,
   updateAccountUsername,
 } from "./accounts.js";
 import { readLeaderboards } from "./leaderboards.js";
@@ -219,6 +221,8 @@ async function handleAccountRequest(request, env, url) {
     result = await registerAccount(env.DB, request, identity.userId);
   } else if (url.pathname === "/api/account/username" && request.method === "PUT") {
     result = await updateAccountUsername(env.DB, request, identity.userId);
+  } else if (url.pathname === "/api/account/profile" && request.method === "PUT") {
+    result = await updateSocialProfile(env.DB, request, identity.userId);
   } else if (url.pathname === "/api/account/save" && request.method === "PUT") {
     result = await saveAccount(env.DB, request, identity.userId);
   } else if (url.pathname === "/api/account/results/map" && request.method === "POST") {
@@ -245,6 +249,11 @@ export default {
     const url = new URL(request.url);
 
     try {
+      if (url.pathname.startsWith("/api/profiles/") && request.method === "GET") {
+        const username = decodeURIComponent(url.pathname.slice("/api/profiles/".length));
+        const result = await getPublicProfile(env.DB, username);
+        return jsonResponse(request, env, result.body, result.status);
+      }
       if (url.pathname.startsWith("/api/account")) {
         return await handleAccountRequest(request, env, url);
       }
@@ -265,6 +274,9 @@ export default {
       }
       return errorResponse(request, env, "Not found.", 404);
     } catch (error) {
+      if (error?.status === 400 || error?.status === 413) {
+        return errorResponse(request, env, error.message, error.status);
+      }
       console.error("Community statistics request failed", error);
       return errorResponse(request, env, "Statistics are temporarily unavailable.", 503);
     }
