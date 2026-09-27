@@ -1358,9 +1358,8 @@ h1 {
 }
 
 .public-profile-header .zombie-avatar { width: 6.5rem; height: 6.5rem; border-color: var(--profile-accent); box-shadow: 0 0 0 4px rgb(255 255 255 / 5%), 0 0 2rem color-mix(in srgb, var(--profile-accent) 28%, transparent); }
-.public-profile-header h2 { margin: 0.2rem 0 0.25rem; color: #fff; }
-.public-profile-identity-line { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; margin: 0.2rem 0 0.35rem; }
-.public-profile-identity-line h2 { margin: 0 0.3rem 0 0; }
+.public-profile-header h2 { margin: 0.2rem 0 0.4rem; color: #fff; }
+.public-profile-identity-line { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; margin: 0 0 0.4rem; }
 .public-profile-indicator { padding: 0.3rem 0.5rem; border: 1px solid color-mix(in srgb, var(--profile-accent) 35%, var(--border)); border-radius: 999px; background: rgb(3 7 14 / 48%); color: var(--muted); font: 700 0.62rem/1 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; }
 .public-profile-indicator strong { margin-left: 0.18rem; color: #fff; }
 .public-profile-joined { margin: 0; color: var(--muted); font-size: 0.8rem; }

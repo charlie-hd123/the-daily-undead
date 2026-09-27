@@ -268,10 +268,9 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
       indicator.innerHTML = `${label} <strong>${new Intl.NumberFormat("en-GB").format(value)}</strong>`;
       identityLine.append(indicator);
     });
-    identityLine.prepend(heading);
     const joined = documentObject.createElement("p"); joined.className = "public-profile-joined";
     joined.textContent = `Joined ${new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(new Date(viewed.createdAt))}`;
-    copy.append(kicker, identityLine, joined); header.append(avatar(documentObject, viewed.avatarId), copy);
+    copy.append(kicker, heading, identityLine, joined); header.append(avatar(documentObject, viewed.avatarId), copy);
     const bio = documentObject.createElement("p");
     bio.className = "public-profile-bio";
     bio.textContent = viewed.bio || "No bio shared yet.";

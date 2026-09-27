@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260927-2"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260927-3"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {

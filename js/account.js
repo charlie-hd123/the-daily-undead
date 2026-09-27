@@ -6,7 +6,7 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20260927-2";
+} from "./account-session.js?v=20260927-3";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -575,10 +575,9 @@ export async function initialiseAccount({
         indicator.innerHTML = `${label} <strong>${new Intl.NumberFormat("en-GB").format(value)}</strong>`;
         identityLine.append(indicator);
       });
-      identityLine.prepend(heading);
       joined.className = "public-profile-joined";
       joined.textContent = `Joined ${formatJoinedDate(viewed.createdAt)}`;
-      copy.append(kicker, identityLine, joined);
+      copy.append(kicker, heading, identityLine, joined);
       header.append(makeAvatar(documentObject, viewed.avatarId), copy);
 
       const bio = documentObject.createElement("p");
