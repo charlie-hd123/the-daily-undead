@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260928-3"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260928-4"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -348,6 +348,24 @@ test("profile customisation keeps its scrollbars present", async () => {
   assert.equal((html.match(/data-profile-scrollbar/g) || []).length, 2);
   assert.match(css, /\.profile-scrollbar span \{[\s\S]*?background: rgb\(103 232 255 \/ 60%\);/);
   assert.match(app, /function initialiseProfileScrollbars\(\)[\s\S]*?picker\.addEventListener\("scroll", update/);
+});
+
+test("player stat pills expose dismissible explainers", async () => {
+  const [html, css, app] = await Promise.all([
+    readProjectFile("index.html"),
+    readProjectFile("styles.css"),
+    readProjectFile("js/app.js"),
+  ]);
+
+  assert.equal((html.match(/data-stat-explainer="/g) || []).length, 3);
+  assert.match(html, /id="player-stat-explainer"[^>]*role="status"[^>]*hidden/);
+  assert.match(app, /Maps solved in your current run\./);
+  assert.match(app, /Spend them on Revives to protect your run/);
+  assert.match(app, /The total number of maps you’ve correctly identified\./);
+  assert.match(app, /if \(wasOpen\) return;/);
+  assert.match(app, /if \(!playerStats\.contains\(event\.target\)\) closeStatExplainer\(\)/);
+  assert.match(app, /event\.key === "Escape"/);
+  assert.match(css, /\.player-stat-explainer \{[\s\S]*?position: absolute;[\s\S]*?width: 100%;/);
 });
 
 test("survivor profiles always expose a labelled favourite memory section", async () => {

@@ -13,7 +13,7 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20260928-3";
+} from "./game-core.js?v=20260928-4";
 import {
   calculateReviveCost,
   canUseRequestedPreviewDate,
@@ -23,20 +23,20 @@ import {
   purchaseMissedDayRevive,
   resetReviveCount,
   shouldResetReviveCycle,
-} from "./progression.js?v=20260928-3";
-import { initialiseAccount } from "./account.js?v=20260928-3";
+} from "./progression.js?v=20260928-4";
+import { initialiseAccount } from "./account.js?v=20260928-4";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20260928-3";
+} from "./community-stats.js?v=20260928-4";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20260928-3";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20260928-3";
+} from "./leaderboards.js?v=20260928-4";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20260928-4";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -44,6 +44,8 @@ const streakLabel = document.querySelector("#streak-count");
 const totalRoundsLabel = document.querySelector("#total-rounds-count");
 const pointsLabel = document.querySelector("#points-count");
 const countdownLabel = document.querySelector("#next-round-countdown");
+const playerStats = document.querySelector(".player-stats");
+const statExplainer = document.querySelector("#player-stat-explainer");
 const advanceDevDayButton = document.querySelector("#advance-dev-day");
 const leaderboardsButton = document.querySelector("#leaderboards-button");
 const leaderboardsDialog = document.querySelector("#leaderboards-dialog");
@@ -59,6 +61,20 @@ const communityStatsApiUrl = resolveCommunityStatsApiUrl({ isLocalDevelopment })
 const leaderboardsApiUrl = resolveLeaderboardsApiUrl({ isLocalDevelopment });
 const streakStorageKey = "the-daily-undead:streak";
 const totalRoundsStorageKey = "the-daily-undead:total-rounds";
+const statExplainers = {
+  round: {
+    title: "Round",
+    copy: "Maps solved in your current run. It increases with each correct daily answer and resets if you miss a day or answer incorrectly—unless you use a Revive.",
+  },
+  points: {
+    title: "Points",
+    copy: "Earned from correct answers. Spend them on Revives to protect your run after a missed day or incorrect answer.",
+  },
+  maps: {
+    title: "Maps solved",
+    copy: "The total number of maps you’ve correctly identified.",
+  },
+};
 const pointsStorageKey = "the-daily-undead:total-points";
 const reviveCountStorageKey = "the-daily-undead:revive-count";
 const lastPlayedDateStorageKey = "the-daily-undead:last-played-date";
@@ -715,12 +731,54 @@ function animateStat(label) {
   window.setTimeout(() => display.classList.remove("is-earned"), 850);
 }
 
+function closeStatExplainer() {
+  if (!statExplainer) return;
+  statExplainer.hidden = true;
+  playerStats?.querySelectorAll("[data-stat-explainer]").forEach((button) => {
+    button.setAttribute("aria-expanded", "false");
+  });
+}
+
+function initialiseStatExplainers() {
+  if (!playerStats || !statExplainer) return;
+  const title = statExplainer.querySelector("[data-stat-explainer-title]");
+  const copy = statExplainer.querySelector("[data-stat-explainer-copy]");
+
+  playerStats.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-stat-explainer]");
+    if (!button) return;
+    const wasOpen = button.getAttribute("aria-expanded") === "true";
+    closeStatExplainer();
+    if (wasOpen) return;
+
+    const content = statExplainers[button.dataset.statExplainer];
+    title.textContent = content.title;
+    copy.textContent = content.copy;
+    button.setAttribute("aria-expanded", "true");
+    statExplainer.hidden = false;
+
+    const statsBox = playerStats.getBoundingClientRect();
+    const buttonBox = button.getBoundingClientRect();
+    statExplainer.style.setProperty(
+      "--stat-arrow-x",
+      `${buttonBox.left + (buttonBox.width / 2) - statsBox.left}px`,
+    );
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!playerStats.contains(event.target)) closeStatExplainer();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closeStatExplainer();
+  });
+}
+
 function updateStreakDisplay() {
   const formattedStreak = progressNumberFormatter.format(streakCount);
   streakLabel.textContent = formattedStreak;
   streakLabel.closest(".stat-display").setAttribute(
     "aria-label",
-    `Round: ${formattedStreak}`,
+    `Round: ${formattedStreak}. Learn more.`,
   );
 }
 
@@ -729,7 +787,7 @@ function updateTotalRoundsDisplay() {
   totalRoundsLabel.textContent = formattedTotalRounds;
   totalRoundsLabel.closest(".stat-display").setAttribute(
     "aria-label",
-    `Maps solved: ${formattedTotalRounds}`,
+    `Maps solved: ${formattedTotalRounds}. Learn more.`,
   );
 }
 
@@ -738,7 +796,7 @@ function updatePointsDisplay() {
   pointsLabel.textContent = formattedPoints;
   pointsLabel.closest(".stat-display").setAttribute(
     "aria-label",
-    `Points: ${formattedPoints}`,
+    `Points: ${formattedPoints}. Learn more.`,
   );
 }
 
@@ -1564,6 +1622,7 @@ function render() {
 
 async function initialise() {
   try {
+    initialiseStatExplainers();
     await synchroniseClock();
     await loadData();
     populateProfileDropdowns();
