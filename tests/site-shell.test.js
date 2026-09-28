@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260928-6"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260928-7"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -360,6 +360,7 @@ test("player stat pills expose dismissible explainers", async () => {
   assert.equal((html.match(/data-stat-explainer="/g) || []).length, 3);
   assert.match(html, /id="player-stat-explainer"[^>]*role="status"[^>]*hidden/);
   assert.match(app, /The number of maps solved in your current streak\./);
+  assert.doesNotMatch(app, /unless you use a Revive/);
   assert.match(app, /Spend them on Revives to protect your run/);
   assert.match(app, /The total number of maps you’ve correctly identified\./);
   assert.match(app, /if \(wasOpen\) return;/);
