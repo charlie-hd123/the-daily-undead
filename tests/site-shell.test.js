@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260928-2"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260928-3"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -246,7 +246,7 @@ test("account controls support optional sign-in without exposing private credent
     html,
     /data-account-action="game-profile"[\s\S]*?data-account-action="username"[\s\S]*?data-account-action="profile"[\s\S]*?data-account-action="security"[\s\S]*?data-account-action="sign-out"/,
   );
-  assert.match(appScript, /groupMaps[\s\S]*?sort\(\(left, right\) => left\.releaseDate\.localeCompare\(right\.releaseDate\)/);
+  assert.match(appScript, /catalog\.mapOrder\?\.\[game\.id\][\s\S]*?mapOrder\.get\(left\.id\)/);
   assert.match(account, /textContent = "Edit your profile →"[\s\S]*?openProfileEditor\(\)/);
   assert.match(account, /textContent = "Profile saved\.";[\s\S]*?closeDialog\(profileEditorDialog\)/);
   assert.match(css, /\.public-profile-header h2 \{[^}]*text-transform: none;/);
