@@ -6,7 +6,7 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20260928-1";
+} from "./account-session.js?v=20260928-2";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -413,9 +413,9 @@ function createUserProfileOptions(
   };
 
   addLaunchPage(
-    "game-profile", "Game profile", "☣",
-    "Choose your zombie identity, favourites, profile theme and survival motto.",
-    "Edit game profile", openProfileEditor,
+    "game-profile", "Profile", "☣",
+    "Choose your zombie identity, favourites, profile theme and favourite memory.",
+    "Edit profile", openProfileEditor,
   );
   if (openUsernameEditor) {
     customPages.push({
@@ -587,7 +587,7 @@ export async function initialiseAccount({
 
       const bio = documentObject.createElement("p");
       bio.className = "public-profile-bio";
-      bio.textContent = viewed.bio || "No bio shared yet.";
+      bio.textContent = viewed.bio || "No favourite memory shared yet.";
       bio.classList.toggle("is-empty", !viewed.bio);
       const stats = documentObject.createElement("dl");
       stats.className = "public-profile-stats";
@@ -614,7 +614,19 @@ export async function initialiseAccount({
         box.append(dt, dd);
         favourites.append(box);
       });
-      publicProfileContent.replaceChildren(header, bio, stats, favourites);
+      const content = [header, bio, stats, favourites];
+      if (profile && viewed.username === profile.username) {
+        const editLink = documentObject.createElement("button");
+        editLink.className = "public-profile-edit-link";
+        editLink.type = "button";
+        editLink.textContent = "Edit your profile →";
+        editLink.addEventListener("click", () => {
+          closeDialog(publicProfileDialog);
+          openProfileEditor();
+        });
+        content.push(editLink);
+      }
+      publicProfileContent.replaceChildren(...content);
     } catch (error) {
       publicProfileContent.textContent = error.message;
     }
@@ -991,6 +1003,7 @@ export async function initialiseAccount({
       profileEditorFeedback.classList.remove("account-error", "is-preview-warning");
       profileEditorFeedback.classList.add("is-success");
       profileEditorFeedback.textContent = "Profile saved.";
+      closeDialog(profileEditorDialog);
     } catch (error) {
       profileEditorFeedback.classList.remove("is-success", "is-preview-warning");
       profileEditorFeedback.classList.add("account-error");

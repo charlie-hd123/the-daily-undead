@@ -273,14 +273,27 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
     copy.append(kicker, heading, identityLine, joined); header.append(avatar(documentObject, viewed.avatarId), copy);
     const bio = documentObject.createElement("p");
     bio.className = "public-profile-bio";
-    bio.textContent = viewed.bio || "No bio shared yet.";
+    bio.textContent = viewed.bio || "No favourite memory shared yet.";
     bio.classList.toggle("is-empty", !viewed.bio);
     const stats = documentObject.createElement("dl"); stats.className = "public-profile-stats";
     stats.append(makeFact("Maps solved", viewed.totalRounds), makeFact("Highest round", viewed.highestRound));
     const favourites = documentObject.createElement("dl"); favourites.className = "public-profile-favourites";
     [["Favourite game", viewed.favouriteGame], ["Favourite map", viewed.favouriteMap]].forEach(([label, value]) => favourites.append(makeFact(label, value)));
+    const content = [header, bio, stats, favourites];
+    if (viewed.username === state.profile.username) {
+      const editLink = documentObject.createElement("button");
+      editLink.className = "public-profile-edit-link";
+      editLink.type = "button";
+      editLink.textContent = "Edit your profile →";
+      editLink.addEventListener("click", () => {
+        closeDialog(publicDialog);
+        openEditor();
+      });
+      content.push(editLink);
+    }
     const note = documentObject.createElement("p"); note.className = "demo-mode-note"; note.textContent = "Local demo profile";
-    publicContent.replaceChildren(header, bio, stats, favourites, note);
+    content.push(note);
+    publicContent.replaceChildren(...content);
     openDialog(publicDialog);
   }
 
@@ -307,6 +320,7 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
     editorFeedback.classList.remove("account-error", "is-preview-warning");
     editorFeedback.classList.add("is-success");
     editorFeedback.textContent = "Demo profile saved locally.";
+    closeDialog(editorDialog);
   });
 
   editorForm.addEventListener("change", (event) => {

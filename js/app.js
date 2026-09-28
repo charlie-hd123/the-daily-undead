@@ -13,7 +13,7 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20260928-1";
+} from "./game-core.js?v=20260928-2";
 import {
   calculateReviveCost,
   canUseRequestedPreviewDate,
@@ -23,20 +23,20 @@ import {
   purchaseMissedDayRevive,
   resetReviveCount,
   shouldResetReviveCycle,
-} from "./progression.js?v=20260928-1";
-import { initialiseAccount } from "./account.js?v=20260928-1";
+} from "./progression.js?v=20260928-2";
+import { initialiseAccount } from "./account.js?v=20260928-2";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20260928-1";
+} from "./community-stats.js?v=20260928-2";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20260928-1";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20260928-1";
+} from "./leaderboards.js?v=20260928-2";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20260928-2";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -440,7 +440,10 @@ function populateProfileDropdowns() {
     .slice()
     .sort((left, right) => left.releaseOrder - right.releaseOrder)
     .forEach((game) => {
-      const groupMaps = selectableMaps.filter((map) => map.gameId === game.id);
+      const groupMaps = selectableMaps
+        .filter((map) => map.gameId === game.id)
+        .sort((left, right) => left.releaseDate.localeCompare(right.releaseDate)
+          || left.title.localeCompare(right.title));
       if (!groupMaps.length) return;
       const group = document.createElement("optgroup");
       group.label = game.title;

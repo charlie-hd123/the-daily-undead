@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260928-1"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260928-2"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -126,7 +126,7 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(html, /data-all-time-ranking="totalRounds"/);
   assert.match(html, /data-leaderboard-find="daily"/);
   assert.match(html, /data-leaderboard-find="all-time"/);
-  assert.match(html, /placeholder="Tell us something about you or a Zombies memory\.\.\."/);
+  assert.match(html, /placeholder="Tell us your favourite Zombies memory\.\.\."/);
   assert.match(account, /label: "Toxic", requiredMaps: 50/);
   assert.match(account, /label: "Cryo", requiredMaps: 100/);
   assert.match(account, /label: "Napalm", requiredMaps: 250/);
@@ -161,7 +161,7 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(css, /@media \(max-width: 35rem\)[\s\S]*?\.puzzle-date-long \{\s*display: inline;/);
   assert.match(
     html,
-    />Create an account to keep your current round, points and progress across devices\./,
+    />Create an account to keep your score across devices\./,
   );
   assert.match(
     css,
@@ -242,6 +242,14 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(account, /action === "profile"[\s\S]*?openDialog\(accountDetailsDialog\)/);
   assert.match(account, /action === "security"[\s\S]*?openDialog\(accountSecurityDialog\)/);
   assert.match(account, /action === "sign-out"[\s\S]*?openDialog\(accountSignOutDialog\)/);
+  assert.match(
+    html,
+    /data-account-action="game-profile"[\s\S]*?data-account-action="username"[\s\S]*?data-account-action="profile"[\s\S]*?data-account-action="security"[\s\S]*?data-account-action="sign-out"/,
+  );
+  assert.match(appScript, /groupMaps[\s\S]*?sort\(\(left, right\) => left\.releaseDate\.localeCompare\(right\.releaseDate\)/);
+  assert.match(account, /textContent = "Edit your profile →"[\s\S]*?openProfileEditor\(\)/);
+  assert.match(account, /textContent = "Profile saved\.";[\s\S]*?closeDialog\(profileEditorDialog\)/);
+  assert.match(css, /\.public-profile-header h2 \{[^}]*text-transform: none;/);
   assert.match(account, /\[data-confirm-sign-out\][\s\S]*?beforeSignOut\(\)[\s\S]*?clerk\.signOut\(/);
   assert.match(account, /accountButton\.classList\.add\("is-signed-in"\)/);
   assert.match(css, /\.clerk-sign-out-page::before,/);
@@ -342,16 +350,16 @@ test("profile customisation keeps its scrollbars present", async () => {
   assert.match(app, /function initialiseProfileScrollbars\(\)[\s\S]*?picker\.addEventListener\("scroll", update/);
 });
 
-test("survivor profiles always expose a labelled bio section", async () => {
+test("survivor profiles always expose a labelled favourite memory section", async () => {
   const [account, demo, css] = await Promise.all([
     readProjectFile("js/account.js"),
     readProjectFile("js/social-demo.js"),
     readProjectFile("styles.css"),
   ]);
 
-  assert.match(account, /No bio shared yet\./);
-  assert.match(demo, /No bio shared yet\./);
-  assert.match(css, /\.public-profile-bio::before[\s\S]*?content: "BIO"/);
+  assert.match(account, /No favourite memory shared yet\./);
+  assert.match(demo, /No favourite memory shared yet\./);
+  assert.match(css, /\.public-profile-bio::before[\s\S]*?content: "FAVOURITE MEMORY"/);
 });
 
 test("the clue count stays editable until a map is confirmed", async () => {
