@@ -641,8 +641,8 @@ h1 {
 }
 
 .stat-display.total-rounds[aria-expanded="true"] {
-  border-color: rgb(255 226 141 / 82%);
-  box-shadow: 0 0 0 1px rgb(255 226 141 / 22%), 0 0 1rem rgb(247 200 92 / 14%);
+  border-color: rgb(214 223 236 / 82%);
+  box-shadow: 0 0 0 1px rgb(214 223 236 / 22%), 0 0 1rem rgb(184 194 211 / 16%);
 }
 
 .stat-display.total-rounds strong {
