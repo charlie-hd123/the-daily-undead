@@ -327,6 +327,14 @@ test("profile customisation keeps horizontal pickers inside narrow mobile dialog
   assert.match(css, /@media \(max-width: 35rem\)[\s\S]*?\.public-profile-header \{[\s\S]*?minmax\(0, 1fr\)/);
 });
 
+test("profile customisation keeps its scrollbars present", async () => {
+  const css = await readProjectFile("styles.css");
+
+  assert.match(css, /\.profile-editor-dialog form \{[\s\S]*?overflow-y: scroll;[\s\S]*?scrollbar-gutter: stable;/);
+  assert.match(css, /\.avatar-picker \{[\s\S]*?overflow-x: scroll;[\s\S]*?scrollbar-gutter: stable;/);
+  assert.match(css, /\.theme-picker \{[\s\S]*?overflow-x: scroll;[\s\S]*?scrollbar-gutter: stable;/);
+});
+
 test("survivor profiles always expose a labelled bio section", async () => {
   const [account, demo, css] = await Promise.all([
     readProjectFile("js/account.js"),

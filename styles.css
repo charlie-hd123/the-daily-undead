@@ -1070,8 +1070,9 @@ h1 {
   min-width: 0;
   max-height: min(39rem, 72vh);
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: scroll;
   padding-right: 0.25rem;
+  scrollbar-gutter: stable;
 }
 
 .profile-choice-field {
@@ -1094,9 +1095,10 @@ h1 {
   grid-auto-columns: clamp(4.75rem, 17%, 6.5rem);
   grid-template-rows: 1fr;
   gap: 0.6rem;
-  overflow-x: auto;
+  overflow-x: scroll;
   overscroll-behavior-inline: contain;
   scroll-snap-type: inline mandatory;
+  scrollbar-gutter: stable;
   scrollbar-color: rgb(103 232 255 / 60%) rgb(255 255 255 / 8%);
   scrollbar-width: thin;
   padding: 0.2rem 0.15rem 0.75rem;
@@ -1243,9 +1245,10 @@ h1 {
   grid-auto-columns: clamp(7rem, 25%, 9rem);
   grid-template-rows: 1fr;
   gap: 0.6rem;
-  overflow-x: auto;
+  overflow-x: scroll;
   overscroll-behavior-inline: contain;
   scroll-snap-type: inline mandatory;
+  scrollbar-gutter: stable;
   scrollbar-color: rgb(103 232 255 / 60%) rgb(255 255 255 / 8%);
   scrollbar-width: thin;
   padding: 0.2rem 0.15rem 0.75rem;
