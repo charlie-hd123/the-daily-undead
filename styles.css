@@ -582,7 +582,7 @@ h1 {
   margin: 0;
   overflow: hidden;
   padding: 0 0 0 1rem;
-  border: 1px solid rgb(247 200 92 / 30%);
+  border: 1px solid transparent;
   border-radius: 999px;
   background: linear-gradient(90deg, rgb(247 200 92 / 11%), rgb(255 138 72 / 7%));
   color: var(--essence);
@@ -597,10 +597,14 @@ h1 {
   text-align: left;
 }
 
-.stat-display:hover,
-.stat-display[aria-expanded="true"] {
-  border-color: rgb(255 226 141 / 72%);
+.stat-display:hover {
   background: linear-gradient(90deg, rgb(247 200 92 / 20%), rgb(255 138 72 / 13%));
+}
+
+.stat-display[aria-expanded="true"] {
+  border-color: rgb(255 226 141 / 82%);
+  background: linear-gradient(90deg, rgb(247 200 92 / 20%), rgb(255 138 72 / 13%));
+  box-shadow: 0 0 0 1px rgb(255 226 141 / 22%), 0 0 1rem rgb(247 200 92 / 14%);
 }
 
 .stat-display:focus-visible {
@@ -630,10 +634,15 @@ h1 {
 }
 
 .stat-display.total-rounds {
-  border-color: rgb(184 194 211 / 28%);
+  border-color: transparent;
   background: linear-gradient(90deg, rgb(184 194 211 / 10%), rgb(95 105 122 / 7%));
   color: rgb(199 207 221 / 78%);
   box-shadow: 0 0 1rem rgb(184 194 211 / 5%);
+}
+
+.stat-display.total-rounds[aria-expanded="true"] {
+  border-color: rgb(255 226 141 / 82%);
+  box-shadow: 0 0 0 1px rgb(255 226 141 / 22%), 0 0 1rem rgb(247 200 92 / 14%);
 }
 
 .stat-display.total-rounds strong {

@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260928-4"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260928-5"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -359,13 +359,15 @@ test("player stat pills expose dismissible explainers", async () => {
 
   assert.equal((html.match(/data-stat-explainer="/g) || []).length, 3);
   assert.match(html, /id="player-stat-explainer"[^>]*role="status"[^>]*hidden/);
-  assert.match(app, /Maps solved in your current run\./);
+  assert.match(app, /The number of maps solved in your current streak\./);
   assert.match(app, /Spend them on Revives to protect your run/);
   assert.match(app, /The total number of maps you’ve correctly identified\./);
   assert.match(app, /if \(wasOpen\) return;/);
   assert.match(app, /if \(!playerStats\.contains\(event\.target\)\) closeStatExplainer\(\)/);
   assert.match(app, /event\.key === "Escape"/);
   assert.match(css, /\.player-stat-explainer \{[\s\S]*?position: absolute;[\s\S]*?width: 100%;/);
+  assert.match(css, /\.stat-display \{[\s\S]*?border: 1px solid transparent;/);
+  assert.match(css, /\.stat-display\.total-rounds\[aria-expanded="true"\] \{[\s\S]*?border-color: rgb\(255 226 141 \/ 82%\);/);
 });
 
 test("survivor profiles always expose a labelled favourite memory section", async () => {
