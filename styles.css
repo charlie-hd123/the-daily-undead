@@ -582,7 +582,7 @@ h1 {
   margin: 0;
   overflow: hidden;
   padding: 0 0 0 1rem;
-  border: 1px solid transparent;
+  border: 1px solid rgb(247 200 92 / 30%);
   border-radius: 999px;
   background: linear-gradient(90deg, rgb(247 200 92 / 11%), rgb(255 138 72 / 7%));
   color: var(--essence);
@@ -634,7 +634,7 @@ h1 {
 }
 
 .stat-display.total-rounds {
-  border-color: transparent;
+  border-color: rgb(184 194 211 / 28%);
   background: linear-gradient(90deg, rgb(184 194 211 / 10%), rgb(95 105 122 / 7%));
   color: rgb(199 207 221 / 78%);
   box-shadow: 0 0 1rem rgb(184 194 211 / 5%);

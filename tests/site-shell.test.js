@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260928-5"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20260928-6"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -366,7 +366,8 @@ test("player stat pills expose dismissible explainers", async () => {
   assert.match(app, /if \(!playerStats\.contains\(event\.target\)\) closeStatExplainer\(\)/);
   assert.match(app, /event\.key === "Escape"/);
   assert.match(css, /\.player-stat-explainer \{[\s\S]*?position: absolute;[\s\S]*?width: 100%;/);
-  assert.match(css, /\.stat-display \{[\s\S]*?border: 1px solid transparent;/);
+  assert.match(css, /\.stat-display \{[\s\S]*?border: 1px solid rgb\(247 200 92 \/ 30%\);/);
+  assert.match(css, /\.stat-display\.total-rounds \{[\s\S]*?border-color: rgb\(184 194 211 \/ 28%\);/);
   assert.match(css, /\.stat-display\.total-rounds\[aria-expanded="true"\] \{[\s\S]*?border-color: rgb\(255 226 141 \/ 82%\);/);
 });
 
