@@ -13,7 +13,7 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20260927-4";
+} from "./game-core.js?v=20260928-1";
 import {
   calculateReviveCost,
   canUseRequestedPreviewDate,
@@ -23,20 +23,20 @@ import {
   purchaseMissedDayRevive,
   resetReviveCount,
   shouldResetReviveCycle,
-} from "./progression.js?v=20260927-4";
-import { initialiseAccount } from "./account.js?v=20260927-4";
+} from "./progression.js?v=20260928-1";
+import { initialiseAccount } from "./account.js?v=20260928-1";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20260927-4";
+} from "./community-stats.js?v=20260928-1";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20260927-4";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20260927-4";
+} from "./leaderboards.js?v=20260928-1";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20260928-1";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -452,6 +452,31 @@ function populateProfileDropdowns() {
       });
       mapSelect.append(group);
     });
+}
+
+function initialiseProfileScrollbars() {
+  document.querySelectorAll("[data-profile-scrollbar]").forEach((track) => {
+    const picker = track.previousElementSibling;
+    const thumb = track.firstElementChild;
+    if (!picker || !thumb) return;
+
+    const update = () => {
+      const trackWidth = track.clientWidth;
+      const maxScroll = Math.max(0, picker.scrollWidth - picker.clientWidth);
+      const thumbWidth = maxScroll
+        ? Math.max(36, trackWidth * (picker.clientWidth / picker.scrollWidth))
+        : trackWidth;
+      const maxOffset = Math.max(0, trackWidth - thumbWidth);
+      const offset = maxScroll ? (picker.scrollLeft / maxScroll) * maxOffset : 0;
+      thumb.style.width = `${thumbWidth}px`;
+      thumb.style.transform = `translateX(${offset}px)`;
+    };
+
+    picker.addEventListener("scroll", update, { passive: true });
+    new ResizeObserver(update).observe(picker);
+    new MutationObserver(update).observe(picker, { childList: true });
+    update();
+  });
 }
 
 function createInitialState() {
@@ -1536,6 +1561,7 @@ async function initialise() {
     await synchroniseClock();
     await loadData();
     populateProfileDropdowns();
+    initialiseProfileScrollbars();
     const dateKey = getDateKey();
     liveDateKey = getUtcDateKey(getCurrentTime());
     streakCount = loadStreak();

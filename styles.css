@@ -1099,26 +1099,32 @@ h1 {
   overscroll-behavior-inline: contain;
   scroll-snap-type: inline mandatory;
   scrollbar-gutter: stable;
-  scrollbar-color: rgb(103 232 255 / 60%) rgb(255 255 255 / 8%);
-  scrollbar-width: thin;
-  padding: 0.2rem 0.15rem 0.75rem;
+  scrollbar-width: none;
+  padding: 0.2rem 0.15rem 0.3rem;
 }
 
 .avatar-picker::-webkit-scrollbar,
 .theme-picker::-webkit-scrollbar {
-  height: 0.45rem;
+  display: none;
 }
 
-.avatar-picker::-webkit-scrollbar-track,
-.theme-picker::-webkit-scrollbar-track {
+.profile-scrollbar {
+  position: relative;
+  height: 0.45rem;
+  margin: 0.45rem 0.15rem 0;
+  overflow: hidden;
   background: rgb(255 255 255 / 8%);
   border-radius: 999px;
 }
 
-.avatar-picker::-webkit-scrollbar-thumb,
-.theme-picker::-webkit-scrollbar-thumb {
+.profile-scrollbar span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 100%;
   background: rgb(103 232 255 / 60%);
   border-radius: 999px;
+  transform: translateX(0);
+  will-change: width, transform;
 }
 
 .avatar-choice,
@@ -1249,9 +1255,8 @@ h1 {
   overscroll-behavior-inline: contain;
   scroll-snap-type: inline mandatory;
   scrollbar-gutter: stable;
-  scrollbar-color: rgb(103 232 255 / 60%) rgb(255 255 255 / 8%);
-  scrollbar-width: thin;
-  padding: 0.2rem 0.15rem 0.75rem;
+  scrollbar-width: none;
+  padding: 0.2rem 0.15rem 0.3rem;
 }
 
 .theme-choice { scroll-snap-align: start; }
