@@ -12,25 +12,25 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261001-11";
+} from "./game-core.js?v=20261001-12";
 import {
   canUseRequestedPreviewDate,
   isLocalDevelopmentHostname,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261001-11";
-import { initialiseAccount } from "./account.js?v=20261001-11";
+} from "./progression.js?v=20261001-12";
+import { initialiseAccount } from "./account.js?v=20261001-12";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261001-11";
+} from "./community-stats.js?v=20261001-12";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261001-11";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-11";
+} from "./leaderboards.js?v=20261001-12";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-12";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -40,6 +40,9 @@ const scoreLabel = document.querySelector("#score-count");
 const countdownLabel = document.querySelector("#next-round-countdown");
 const playerStats = document.querySelector(".player-stats");
 const statExplainer = document.querySelector("#player-stat-explainer");
+const rewardHud = document.querySelector("#reward-hud");
+const progressionUpdateButton = document.querySelector("#progression-update-button");
+const progressionUpdateDialog = document.querySelector("#progression-update-dialog");
 const advanceDevDayButton = document.querySelector("#advance-dev-day");
 const leaderboardsButton = document.querySelector("#leaderboards-button");
 const leaderboardsDialog = document.querySelector("#leaderboards-dialog");
@@ -57,10 +60,12 @@ const streakStorageKey = "the-daily-undead:streak";
 const solvesStorageKey = "the-daily-undead:total-rounds";
 const scoreStorageKey = "the-daily-undead:score";
 const legacyPointsStorageKey = "the-daily-undead:total-points";
+const progressionUpdateStorageKey = "the-daily-undead:progression-update-v1";
+const progressionUpdateWindowMs = 7 * 24 * 60 * 60 * 1000;
 const statExplainers = {
   round: {
     title: "Round",
-    copy: "Your current survival round. It advances after each solve and ends if you miss a day or choose the wrong map.",
+    copy: "Your current survival run. It advances after each solve and ends if you miss a day or choose the wrong map.",
   },
   score: {
     title: "Score",
@@ -701,6 +706,25 @@ async function loadProtectedDates(fromDateKey, toDateKey) {
   }
 }
 
+function showViewportReward(display, amount, theme) {
+  if (!rewardHud || !window.matchMedia("(max-width: 35rem)").matches) return;
+  const displayBox = display.getBoundingClientRect();
+  const displayIsVisible = displayBox.bottom > 0 && displayBox.top < window.innerHeight;
+  if (displayIsVisible) return;
+
+  const reward = document.createElement("span");
+  const value = document.createElement("strong");
+  const name = document.createElement("span");
+  reward.className = `reward-hud-item is-${theme}`;
+  value.textContent = `+${progressNumberFormatter.format(amount)}`;
+  name.textContent = display.dataset.statExplainer;
+  reward.append(value, name);
+  rewardHud.append(reward);
+  const finish = () => reward.remove();
+  reward.addEventListener("animationend", finish, { once: true });
+  window.setTimeout(finish, 2000);
+}
+
 function animateStat(label, amount, theme) {
   if (!Number.isInteger(amount) || amount <= 0) return;
   const display = label.closest(".stat-display");
@@ -714,6 +738,7 @@ function animateStat(label, amount, theme) {
   display.classList.remove("is-earned");
   void display.offsetWidth;
   display.classList.add("is-earned");
+  showViewportReward(display, amount, theme);
   const finish = () => {
     reward.remove();
     if (!display.querySelector(".stat-reward-pop")) {
@@ -721,8 +746,59 @@ function animateStat(label, amount, theme) {
     }
   };
   reward.addEventListener("animationend", finish, { once: true });
-  window.setTimeout(finish, 1400);
+  window.setTimeout(finish, 2000);
   window.setTimeout(() => display.classList.remove("is-earned"), 850);
+}
+
+function hasEstablishedProgress() {
+  return score > 0 || solves > 0 || bestRound > 0 || Boolean(lastPlayedDate) || state.phase === "result";
+}
+
+function readProgressionUpdateState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(progressionUpdateStorageKey));
+    return Number.isFinite(saved?.firstSeenAt) && saved.firstSeenAt > 0 ? saved : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeProgressionUpdateState(updateState) {
+  try {
+    localStorage.setItem(progressionUpdateStorageKey, JSON.stringify(updateState));
+  } catch {
+    // The explanation remains available for this visit when storage is disabled.
+  }
+}
+
+function openProgressionUpdate() {
+  if (!progressionUpdateDialog || progressionUpdateDialog.open) return;
+  if (typeof progressionUpdateDialog.showModal === "function") {
+    progressionUpdateDialog.showModal();
+  }
+}
+
+function initialiseProgressionUpdate() {
+  if (!progressionUpdateButton || !progressionUpdateDialog || !hasEstablishedProgress()) return;
+
+  const now = Date.now();
+  const saved = readProgressionUpdateState();
+  const updateState = saved || { firstSeenAt: now, autoShown: false };
+  if (now - updateState.firstSeenAt >= progressionUpdateWindowMs) return;
+
+  progressionUpdateButton.hidden = false;
+  progressionUpdateButton.addEventListener("click", openProgressionUpdate);
+  progressionUpdateDialog.querySelectorAll("[data-close-progression-update]").forEach((button) => {
+    button.addEventListener("click", () => progressionUpdateDialog.close());
+  });
+
+  if (!updateState.autoShown && !document.querySelector("dialog[open]")) {
+    updateState.autoShown = true;
+    writeProgressionUpdateState(updateState);
+    openProgressionUpdate();
+  } else if (!saved) {
+    writeProgressionUpdateState(updateState);
+  }
 }
 
 function closeStatExplainer() {
@@ -1570,6 +1646,7 @@ async function initialise() {
     updateStreakDisplay();
     updateSolvesDisplay();
     updateScoreDisplay();
+    initialiseProgressionUpdate();
     updateNextRoundCountdown();
     window.setInterval(updateNextRoundCountdown, 1000);
     if (missedDayState && !missedDayState.resolved) {

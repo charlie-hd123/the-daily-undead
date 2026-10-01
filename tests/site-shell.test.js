@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261001-11"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261001-12"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -366,7 +366,7 @@ test("player stat pills expose dismissible explainers", async () => {
   assert.match(html, /id="player-stat-explainer"[^>]*role="status"[^>]*hidden/);
   assert.match(
     app,
-    /Your current survival round\. It advances after each solve and ends if you miss a day or choose the wrong map\./,
+    /Your current survival run\. It advances after each solve and ends if you miss a day or choose the wrong map\./,
   );
   assert.match(app, /recordNotice\.textContent = "This is your highest round!"/);
   assert.doesNotMatch(app, /unless you use a Revive/);
@@ -399,10 +399,45 @@ test("player stat pills show Zombies-style floating progression rewards", async 
   assert.match(app, /animateStat\(scoreLabel, points, "reward"\)/);
   assert.match(app, /animateStat\(solvesLabel, 1, "aether"\)/);
   assert.match(app, /const roundTheme = streakCount > previousBestRound \? "record" : "aether"/);
-  assert.match(css, /\.stat-reward-pop \{[\s\S]*?animation: stat-reward-float 1\.15s/);
+  assert.match(css, /\.stat-reward-pop \{[\s\S]*?animation: stat-reward-float 1\.7s/);
   assert.match(css, /\.stat-reward-pop\.is-record::before \{[\s\S]*?content: "✦";/);
   assert.match(css, /@keyframes stat-reward-float \{/);
   assert.match(css, /\.stat-display\.subdued-stat\.is-earned \{\s*animation-name: stat-earned-aether;/);
+});
+
+test("off-screen mobile stat rewards use a fixed viewport HUD", async () => {
+  const [html, css, app] = await Promise.all([
+    readProjectFile("index.html"),
+    readProjectFile("styles.css"),
+    readProjectFile("js/app.js"),
+  ]);
+
+  assert.match(html, /id="reward-hud"[^>]*aria-hidden="true"/);
+  assert.match(app, /window\.matchMedia\("\(max-width: 35rem\)"\)\.matches/);
+  assert.match(app, /displayBox\.bottom > 0 && displayBox\.top < window\.innerHeight/);
+  assert.match(app, /reward\.className = `reward-hud-item is-\$\{theme\}`/);
+  assert.match(css, /\.reward-hud \{[\s\S]*?position: fixed;[\s\S]*?z-index: 9000;/);
+  assert.match(css, /\.reward-hud-item \{[\s\S]*?animation: reward-hud-arrival 1\.7s/);
+});
+
+test("established players can reopen the progression explanation for seven days", async () => {
+  const [html, css, app] = await Promise.all([
+    readProjectFile("index.html"),
+    readProjectFile("styles.css"),
+    readProjectFile("js/app.js"),
+  ]);
+
+  assert.match(html, /id="progression-update-button"[^>]*hidden/);
+  assert.match(html, /id="progression-update-dialog"/);
+  assert.match(html, /Points have become <strong>Score<\/strong>: your permanent lifetime total\./);
+  assert.match(html, /Your existing Score is our best estimate from the progress history available\./);
+  assert.match(html, /nobody’s Score has been reset\./);
+  assert.match(app, /const progressionUpdateWindowMs = 7 \* 24 \* 60 \* 60 \* 1000;/);
+  assert.match(app, /function hasEstablishedProgress\(\)/);
+  assert.match(app, /updateState\.autoShown = true;/);
+  assert.match(app, /progressionUpdateButton\.addEventListener\("click", openProgressionUpdate\)/);
+  assert.match(css, /\.progression-update-button \{/);
+  assert.match(css, /\.progression-estimate-note \{/);
 });
 
 test("survivor profiles always expose a labelled favourite memory section", async () => {

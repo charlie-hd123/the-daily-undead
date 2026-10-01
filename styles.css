@@ -371,6 +371,35 @@ h1 {
   gap: 0.45rem;
 }
 
+.progression-update-button {
+  justify-self: end;
+  padding: 0.1rem 0;
+  border: 0;
+  border-bottom: 1px solid rgb(103 232 255 / 28%);
+  background: transparent;
+  color: rgb(199 216 233 / 72%);
+  cursor: pointer;
+  font: 700 0.66rem/1.2 var(--font-display);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.progression-update-button::before {
+  margin-right: 0.35rem;
+  color: var(--aether);
+  content: "●";
+  font-size: 0.58em;
+  text-shadow: 0 0 0.65rem rgb(103 232 255 / 70%);
+  vertical-align: 0.12em;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .progression-update-button:hover {
+    border-bottom-color: rgb(103 232 255 / 62%);
+    color: var(--aether);
+  }
+}
+
 .account-controls {
   display: flex;
   min-width: 0;
@@ -781,7 +810,61 @@ h1 {
   pointer-events: none;
   text-shadow: 0 0 0.35rem rgb(103 232 255 / 75%), 0 0 1rem rgb(103 232 255 / 45%);
   white-space: nowrap;
-  animation: stat-reward-float 1.15s cubic-bezier(0.18, 0.72, 0.25, 1) both;
+  animation: stat-reward-float 1.7s cubic-bezier(0.18, 0.72, 0.25, 1) both;
+}
+
+.reward-hud {
+  position: fixed;
+  z-index: 9000;
+  top: max(0.9rem, env(safe-area-inset-top));
+  right: 0.85rem;
+  display: grid;
+  justify-items: end;
+  gap: 0.35rem;
+  pointer-events: none;
+}
+
+.reward-hud-item {
+  display: grid;
+  justify-items: end;
+  color: var(--aether);
+  filter: drop-shadow(0 0 0.65rem rgb(103 232 255 / 55%));
+  animation: reward-hud-arrival 1.7s cubic-bezier(0.18, 0.72, 0.25, 1) both;
+}
+
+.reward-hud-item strong {
+  font: 900 1.15rem/0.95 var(--font-display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.025em;
+}
+
+.reward-hud-item > span {
+  margin-top: 0.18rem;
+  color: currentColor;
+  font: 800 0.58rem/1 var(--font-display);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+.reward-hud-item.is-reward,
+.reward-hud-item.is-record {
+  color: var(--essence);
+  filter: drop-shadow(0 0 0.7rem rgb(255 138 72 / 58%));
+}
+
+.reward-hud-item.is-record strong::before {
+  margin-right: 0.22rem;
+  content: "✦";
+  font-family: sans-serif;
+  font-size: 0.65em;
+}
+
+@keyframes reward-hud-arrival {
+  0% { transform: translate(0.5rem, 0.5rem) scale(0.84); opacity: 0; }
+  14% { transform: translate(0, 0) scale(1.06); opacity: 1; }
+  76% { transform: translateY(-0.35rem) scale(1); opacity: 1; }
+  100% { transform: translateY(-1rem) scale(0.97); opacity: 0; }
 }
 
 .stat-reward-pop.is-reward,
@@ -1140,6 +1223,43 @@ h1 {
 .account-dialog > p:not(.kicker) {
   color: var(--muted-strong);
   line-height: 1.5;
+}
+
+.progression-update-dialog .kicker {
+  color: var(--aether);
+}
+
+.progression-update-list {
+  display: grid;
+  gap: 0.55rem;
+  margin: 1.15rem 0;
+  padding-left: 1.2rem;
+  color: var(--muted-strong);
+  line-height: 1.4;
+}
+
+.progression-update-list strong,
+.progression-estimate-note > strong {
+  color: var(--text);
+}
+
+.progression-estimate-note {
+  padding: 0.85rem 0.9rem;
+  border: 1px solid rgb(103 232 255 / 22%);
+  border-radius: 0.7rem;
+  background: rgb(103 232 255 / 6%);
+  color: var(--muted-strong);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.progression-estimate-note p {
+  margin: 0.35rem 0 0;
+}
+
+.progression-update-dismiss {
+  width: 100%;
+  margin-top: 1rem;
 }
 
 .session-expired-dialog {
@@ -2771,7 +2891,8 @@ h1 {
     grid-template-areas:
       "brand"
       "utility"
-      "stats";
+      "stats"
+      "update";
     grid-template-columns: minmax(0, 1fr);
     align-items: start;
     row-gap: clamp(0.55rem, 1.2vw, 0.75rem);
@@ -2815,6 +2936,14 @@ h1 {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: clamp(0.3rem, 0.8vw, 0.42rem);
+  }
+
+  .progression-update-button {
+    grid-area: update;
+  }
+
+  .progression-update-button {
+    justify-self: end;
   }
 
   .account-controls {
