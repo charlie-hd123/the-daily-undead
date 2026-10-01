@@ -12,25 +12,25 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261001-7";
+} from "./game-core.js?v=20261001-8";
 import {
   canUseRequestedPreviewDate,
   isLocalDevelopmentHostname,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261001-7";
-import { initialiseAccount } from "./account.js?v=20261001-7";
+} from "./progression.js?v=20261001-8";
+import { initialiseAccount } from "./account.js?v=20261001-8";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261001-7";
+} from "./community-stats.js?v=20261001-8";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261001-7";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-7";
+} from "./leaderboards.js?v=20261001-8";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-8";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -735,7 +735,7 @@ function initialiseStatExplainers() {
     if (button.classList.contains("is-highest-round")) {
       const recordNotice = document.createElement("span");
       recordNotice.className = "stat-explainer-record";
-      recordNotice.textContent = " This is your highest round!";
+      recordNotice.textContent = "This is your highest round!";
       copy.append(recordNotice);
     }
     button.setAttribute("aria-expanded", "true");

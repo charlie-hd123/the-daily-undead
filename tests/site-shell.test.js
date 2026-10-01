@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261001-7"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261001-8"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -368,7 +368,7 @@ test("player stat pills expose dismissible explainers", async () => {
     app,
     /Your current survival run\. It advances after each solve and ends if you miss a required day or choose the wrong map\./,
   );
-  assert.match(app, /recordNotice\.textContent = " This is your highest round!"/);
+  assert.match(app, /recordNotice\.textContent = "This is your highest round!"/);
   assert.doesNotMatch(app, /unless you use a Revive/);
   assert.match(app, /Score, which never decreases or resets\./);
   assert.match(app, /permanent number of official Daily Undead puzzles/);
@@ -382,6 +382,7 @@ test("player stat pills expose dismissible explainers", async () => {
   assert.match(css, /\.stat-display\.subdued-stat\[aria-expanded="true"\] \{[\s\S]*?border-color: rgb\(103 232 255 \/ 62%\);/);
   assert.match(css, /\.stat-display\.subdued-stat\.is-highest-round\[aria-expanded="true"\] \{[\s\S]*?border-color: rgb\(247 200 92 \/ 78%\);/);
   assert.match(css, /\.stat-explainer-record \{[\s\S]*?color: var\(--essence\);/);
+  assert.match(css, /\.stat-explainer-record::before \{[\s\S]*?content: "✦";/);
 });
 
 test("survivor profiles always expose a labelled favourite memory section", async () => {
@@ -394,11 +395,14 @@ test("survivor profiles always expose a labelled favourite memory section", asyn
   assert.match(account, /No favourite memory shared yet\./);
   assert.match(demo, /No favourite memory shared yet\./);
   assert.match(css, /\.public-profile-bio::before[\s\S]*?content: "FAVOURITE MEMORY"/);
-  assert.match(account, /makeStatGroup\("Career"[\s\S]*?"Score"[\s\S]*?"Puzzle Solves"/);
-  assert.match(account, /makeStatGroup\("Survival"[\s\S]*?"Current Round"[\s\S]*?"Highest Round"/);
+  assert.match(account, /stats\.append\([\s\S]*?makeProfileStat\("Score"[\s\S]*?makeProfileStat\("Puzzle Solves"[\s\S]*?makeProfileStat\("Current Round"[\s\S]*?makeProfileStat\("Highest Round"/);
+  assert.match(account, /const content = \[header, bio, stats, favourites\]/);
+  assert.doesNotMatch(account, /makeStatGroup|"Career"|"Survival"/);
   assert.doesNotMatch(account, /public-profile-identity-line/);
-  assert.match(css, /\.public-profile-stat-row \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
+  assert.match(css, /\.public-profile-overview \{[\s\S]*?grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);/);
+  assert.match(css, /@media \(max-width: 35rem\)[\s\S]*?\.public-profile-overview \{ grid-template-columns: repeat\(2, minmax\(0, 1fr\)\); \}/);
   assert.match(css, /\.public-profile-stat\.is-primary \{/);
+  assert.match(css, /\.public-profile-favourite \{/);
 });
 
 test("the clue count stays editable until a map is confirmed", async () => {

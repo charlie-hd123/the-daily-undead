@@ -6,7 +6,7 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261001-7";
+} from "./account-session.js?v=20261001-8";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -587,30 +587,13 @@ export async function initialiseAccount({
         box.append(dt, dd);
         return box;
       };
-      const makeStatGroup = (label, entries) => {
-        const section = documentObject.createElement("section");
-        section.className = "public-profile-stat-group";
-        const title = documentObject.createElement("h3");
-        title.textContent = label;
-        const list = documentObject.createElement("dl");
-        list.className = "public-profile-stat-row";
-        entries.forEach(([statLabel, value, primary]) => {
-          list.append(makeProfileStat(statLabel, value, primary));
-        });
-        section.append(title, list);
-        return section;
-      };
-      const stats = documentObject.createElement("div");
+      const stats = documentObject.createElement("dl");
       stats.className = "public-profile-overview";
       stats.append(
-        makeStatGroup("Career", [
-          ["Score", result.stats.score, true],
-          ["Puzzle Solves", result.stats.solves, false],
-        ]),
-        makeStatGroup("Survival", [
-          ["Current Round", Math.max(1, result.stats.currentRound), false],
-          ["Highest Round", result.stats.bestRound, false],
-        ]),
+        makeProfileStat("Score", result.stats.score, true),
+        makeProfileStat("Puzzle Solves", result.stats.solves),
+        makeProfileStat("Current Round", Math.max(1, result.stats.currentRound)),
+        makeProfileStat("Highest Round", result.stats.bestRound),
       );
       const bio = documentObject.createElement("p");
       bio.className = "public-profile-bio";
@@ -621,7 +604,7 @@ export async function initialiseAccount({
       [["Favourite game", viewed.favouriteGame], ["Favourite map", viewed.favouriteMap]].forEach(([label, value]) => {
         if (!value) return;
         const box = documentObject.createElement("div");
-        box.className = "public-profile-stat";
+        box.className = "public-profile-favourite";
         const dt = documentObject.createElement("dt");
         const dd = documentObject.createElement("dd");
         dt.textContent = label;
@@ -629,7 +612,7 @@ export async function initialiseAccount({
         box.append(dt, dd);
         favourites.append(box);
       });
-      const content = [header, stats, bio, favourites];
+      const content = [header, bio, stats, favourites];
       if (profile && viewed.username === profile.username) {
         const editLink = documentObject.createElement("button");
         editLink.className = "public-profile-edit-link";

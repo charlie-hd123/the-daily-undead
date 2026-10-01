@@ -662,7 +662,7 @@ h1 {
 .stat-display.subdued-stat {
   border-color: rgb(74 142 181 / 30%);
   background: linear-gradient(90deg, rgb(18 31 54 / 92%), rgb(13 23 41 / 88%));
-  color: rgb(221 232 244 / 92%);
+  color: rgb(199 216 233 / 84%);
   box-shadow: 0 0.35rem 1rem rgb(0 0 0 / 12%);
 }
 
@@ -675,7 +675,7 @@ h1 {
 .stat-display.subdued-stat strong {
   border-left-color: rgb(74 142 181 / 28%);
   background: linear-gradient(145deg, #233a59, #172841);
-  color: #f0f5fb;
+  color: #e2ebf5;
   box-shadow: inset 1px 0 rgb(255 255 255 / 5%);
 }
 
@@ -727,8 +727,17 @@ h1 {
 .player-stat-explainer p { margin: 0; }
 
 .stat-explainer-record {
+  display: block;
+  margin-top: 0.38rem;
   color: var(--essence);
   font-weight: 800;
+}
+
+.stat-explainer-record::before {
+  margin-right: 0.35rem;
+  content: "✦";
+  font-family: sans-serif;
+  text-shadow: 0 0 0.7rem rgb(247 200 92 / 55%);
 }
 
 .stat-display.is-earned {
@@ -1490,31 +1499,22 @@ h1 {
 
 .public-profile-overview {
   display: grid;
-  gap: 0.8rem;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  overflow: hidden;
   margin: 0 0 1.2rem;
-}
-
-.public-profile-stat-group h3 {
-  margin: 0 0 0.42rem;
-  color: color-mix(in srgb, var(--profile-accent) 72%, var(--muted));
-  font: 800 0.62rem/1 var(--font-display);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.public-profile-stat-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.55rem;
-  margin: 0;
+  border: 1px solid color-mix(in srgb, var(--profile-accent) 24%, var(--border));
+  border-radius: 0.72rem;
+  background: linear-gradient(145deg, rgb(11 23 40 / 82%), rgb(4 10 20 / 78%));
 }
 
 .public-profile-stat {
   min-width: 0;
-  padding: 0.72rem 0.78rem;
-  border: 1px solid color-mix(in srgb, var(--profile-accent) 18%, var(--border));
-  border-radius: 0.65rem;
-  background: linear-gradient(145deg, rgb(12 24 42 / 78%), rgb(4 10 20 / 72%));
+  padding: 0.8rem 0.75rem;
+  background: transparent;
+}
+
+.public-profile-stat + .public-profile-stat {
+  border-left: 1px solid color-mix(in srgb, var(--profile-accent) 18%, var(--border));
 }
 
 .public-profile-stat dt {
@@ -1535,9 +1535,8 @@ h1 {
 }
 
 .public-profile-stat.is-primary {
-  border-color: rgb(247 200 92 / 38%);
-  background: linear-gradient(145deg, rgb(61 43 14 / 72%), rgb(24 20 11 / 76%));
-  box-shadow: inset 2px 0 0 rgb(247 200 92 / 64%), 0 0 1.25rem rgb(247 200 92 / 7%);
+  background: linear-gradient(145deg, rgb(61 43 14 / 62%), rgb(24 20 11 / 66%));
+  box-shadow: inset 2px 0 0 rgb(247 200 92 / 68%);
 }
 
 .public-profile-stat.is-primary dt,
@@ -1547,6 +1546,27 @@ h1 {
 
 .public-profile-stat.is-primary dd {
   font-size: 1.3rem;
+}
+
+.public-profile-favourite {
+  min-width: 0;
+  padding: 0.72rem 0.78rem;
+  border: 1px solid color-mix(in srgb, var(--profile-accent) 18%, var(--border));
+  border-radius: 0.65rem;
+  background: rgb(3 7 14 / 55%);
+}
+
+.public-profile-favourite dt {
+  color: var(--muted);
+  font: 700 0.62rem/1 var(--font-display);
+  letter-spacing: 0.065em;
+  text-transform: uppercase;
+}
+
+.public-profile-favourite dd {
+  margin: 0.34rem 0 0;
+  color: #e3edf9;
+  font-weight: 700;
 }
 
 .demo-account-note { margin-bottom: 1rem; }
@@ -2064,6 +2084,11 @@ h1 {
   .public-profile-identity-line { gap: 0.3rem; }
   .profile-field-grid,
   .public-profile-favourites { grid-template-columns: 1fr; }
+  .public-profile-overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .public-profile-stat:nth-child(3) { border-left: 0; }
+  .public-profile-stat:nth-child(n + 3) {
+    border-top: 1px solid color-mix(in srgb, var(--profile-accent) 18%, var(--border));
+  }
   .leaderboard-dialog {
     width: min(calc(100% - 1rem), 44rem);
     padding-inline: 1rem;
