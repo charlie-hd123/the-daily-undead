@@ -276,7 +276,7 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
     bio.textContent = viewed.bio || "No favourite memory shared yet.";
     bio.classList.toggle("is-empty", !viewed.bio);
     const stats = documentObject.createElement("dl"); stats.className = "public-profile-stats";
-    stats.append(makeFact("Solves", viewed.solves), makeFact("Best round", viewed.bestRound));
+    stats.append(makeFact("Puzzle Solves", viewed.solves), makeFact("Highest Round", viewed.bestRound));
     const favourites = documentObject.createElement("dl"); favourites.className = "public-profile-favourites";
     [["Favourite game", viewed.favouriteGame], ["Favourite map", viewed.favouriteMap]].forEach(([label, value]) => favourites.append(makeFact(label, value)));
     const content = [header, bio, stats, favourites];

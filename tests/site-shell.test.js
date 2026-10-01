@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261001-4"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261001-5"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -176,11 +176,11 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(account, /accountButton\.textContent = "Finish setup";/);
   assert.match(appScript, /<h2>Run ended<\/h2>/);
   assert.doesNotMatch(appScript, /revive-player|revive-missed-day|Revive unavailable/);
-  assert.match(appScript, /Your Score, Solves and Best Round are safe\./);
+  assert.match(appScript, /Your Score, Solves and Highest Round are safe\./);
   assert.match(appScript, /Return tomorrow to keep your Round alive\./);
   assert.match(
     appScript,
-    /`🔥 Round: \$\{shareRound\}`,[\s\S]*?`⚡ Score: \$\{score\}`,[\s\S]*?`🏆 Solves: \$\{solves\}`,[\s\S]*?`📈 Best Round: \$\{bestRound\}`/,
+    /`🔥 Round: \$\{shareRound\}`,[\s\S]*?`⚡ Score: \$\{score\}`,[\s\S]*?`🏆 Solves: \$\{solves\}`,[\s\S]*?`📈 Highest Round: \$\{bestRound\}`/,
   );
   assert.doesNotMatch(appScript, /<h2>Your run has ended<\/h2>/);
   assert.match(
@@ -259,9 +259,9 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(css, /#account-button:not\(\.is-signed-in\)/);
   assert.match(css, /#account-button::before[\s\S]*mask-image:/);
   assert.match(css, /#leaderboards-button::before[\s\S]*mask-image:/);
-  assert.match(appScript, /<\/div>\s*\$\{\s*state\.newBestRound[\s\S]*?result-milestone-banner/);
-  assert.doesNotMatch(css, /\.result-banner \.result-milestone/);
-  assert.match(css, /\.result-milestone-banner \{/);
+  assert.match(appScript, /state\?\.phase === "result" && Boolean\(state\.newBestRound\)/);
+  assert.match(css, /\.stat-display\.is-highest-round::after/);
+  assert.doesNotMatch(appScript, /result-milestone-banner/);
   assert.match(css, /\.account-button::after[\s\S]*content: "›";/);
   assert.match(css, /\.account-button:not\(:disabled\):hover/);
   assert.match(css, /@media \(max-width: 35rem\)[\s\S]*?\.account-button \{\s*width: 100%;/);

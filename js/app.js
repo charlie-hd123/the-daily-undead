@@ -12,25 +12,25 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261001-4";
+} from "./game-core.js?v=20261001-5";
 import {
   canUseRequestedPreviewDate,
   isLocalDevelopmentHostname,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261001-4";
-import { initialiseAccount } from "./account.js?v=20261001-4";
+} from "./progression.js?v=20261001-5";
+import { initialiseAccount } from "./account.js?v=20261001-5";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261001-4";
+} from "./community-stats.js?v=20261001-5";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261001-4";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-4";
+} from "./leaderboards.js?v=20261001-5";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-5";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -760,6 +760,18 @@ function updateStreakDisplay() {
   );
 }
 
+function updateRoundMilestoneDisplay() {
+  const display = streakLabel.closest(".stat-display");
+  const isHighestRound = state?.phase === "result" && Boolean(state.newBestRound);
+  display.classList.toggle("is-highest-round", isHighestRound);
+  if (isHighestRound) {
+    display.setAttribute(
+      "aria-label",
+      `Round: ${progressNumberFormatter.format(Math.max(1, streakCount))}. New highest round. Learn more.`,
+    );
+  }
+}
+
 function updateSolvesDisplay() {
   const formattedSolves = progressNumberFormatter.format(solves);
   solvesLabel.textContent = formattedSolves;
@@ -1279,7 +1291,7 @@ function renderMissedDay() {
     <section class="panel missed-day-panel">
       <div class="result-banner failed animate">
         <h2>Run ended</h2>
-        <p>${escapeHtml(missedMapCopy)} Your Score, Solves and Best Round are safe.</p>
+        <p>${escapeHtml(missedMapCopy)} Your Score, Solves and Highest Round are safe.</p>
         <p class="survival-summary">Your run ended at <strong>Round ${missedDayState.roundsBeforeLoss}</strong>. Today starts a new run at <strong>Round 1</strong>.</p>
       </div>
       <div class="actions">
@@ -1310,7 +1322,7 @@ function buildScoreSharePayload() {
     `🔥 Round: ${shareRound}`,
     `⚡ Score: ${score}`,
     `🏆 Solves: ${solves}`,
-    `📈 Best Round: ${bestRound}`,
+    `📈 Highest Round: ${bestRound}`,
     "",
     "Think you can do better?",
     "Give it a try!",
@@ -1407,11 +1419,6 @@ function renderResult() {
             : ""
         }
       </div>
-      ${
-        state.newBestRound
-          ? `<p class="result-milestone-banner" role="status"><span>New Best Round</span><strong>${bestRound}</strong></p>`
-          : ""
-      }
       ${state.isCorrect ? renderBonus() : '<h3>Today’s three clues</h3><div id="clue-list" class="clue-list"></div>'}
       ${
         isFinished
@@ -1469,6 +1476,7 @@ function render() {
   if (state.phase !== "result") {
     lastResultClass = null;
   }
+  updateRoundMilestoneDisplay();
 
   switch (state.phase) {
     case "game":

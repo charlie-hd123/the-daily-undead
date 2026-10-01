@@ -5,17 +5,22 @@
 INSERT INTO player_profiles (
   user_id, username, leaderboard_visible, avatar_id, theme_id, favourite_map, bio, favourite_game
 ) VALUES
-  ('stage_demo_01', 'DemoRichtofen', 1, 'unselected', 'default', '', '', ''),
-  ('stage_demo_02', 'DemoDempsey', 1, 'unselected', 'default', '', '', ''),
-  ('stage_demo_03', 'DemoTakeo', 1, 'unselected', 'default', '', '', ''),
-  ('stage_demo_04', 'DemoNikolai', 1, 'unselected', 'default', '', '', ''),
-  ('stage_demo_05', 'DemoSamantha', 1, 'unselected', 'default', '', '', ''),
-  ('stage_demo_06', 'DemoMisty', 1, 'unselected', 'default', '', '', ''),
-  ('stage_demo_07', 'DemoMarlton', 1, 'unselected', 'default', '', '', ''),
-  ('stage_demo_08', 'DemoRussman', 1, 'unselected', 'default', '', '', '')
+  ('stage_demo_01', 'DemoRichtofen', 1, 'richtofen', 'outbreak', 'Der Riese', 'The loop continues, but the leaderboard remembers.', 'World at War'),
+  ('stage_demo_02', 'DemoDempsey', 1, 'dempsey', 'afterlife', 'Moon', 'One more round and one more terrible plan.', 'Black Ops'),
+  ('stage_demo_03', 'DemoTakeo', 1, 'takeo', 'outbreak', 'Zetsubou No Shima', 'Honour survives beyond death.', 'Black Ops 3'),
+  ('stage_demo_04', 'DemoNikolai', 1, 'nikolai', 'afterlife', 'Ascension', 'Still standing. Somehow.', 'Black Ops'),
+  ('stage_demo_05', 'DemoSamantha', 1, 'samantha', 'outbreak', 'Origins', 'Every mystery has another layer.', 'Black Ops 2'),
+  ('stage_demo_06', 'DemoMisty', 1, 'misty', 'afterlife', 'Buried', 'Nothing stays buried forever.', 'Black Ops 2'),
+  ('stage_demo_07', 'DemoMarlton', 1, 'marlton', 'outbreak', 'TranZit', 'Statistically speaking, this should work.', 'Black Ops 2'),
+  ('stage_demo_08', 'DemoRussman', 1, 'russman', 'afterlife', 'Die Rise', 'Been around longer than most of these corpses.', 'Black Ops 2')
 ON CONFLICT(user_id) DO UPDATE SET
   username = excluded.username,
-  leaderboard_visible = excluded.leaderboard_visible;
+  leaderboard_visible = excluded.leaderboard_visible,
+  avatar_id = excluded.avatar_id,
+  theme_id = excluded.theme_id,
+  favourite_map = excluded.favourite_map,
+  bio = excluded.bio,
+  favourite_game = excluded.favourite_game;
 
 INSERT INTO player_saves (
   user_id, current_round, best_round, points_balance, total_rounds, revive_count,

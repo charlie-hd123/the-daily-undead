@@ -574,6 +574,7 @@ h1 {
 }
 
 .stat-display {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -595,6 +596,37 @@ h1 {
   box-shadow: 0 0 1rem rgb(247 200 92 / 8%);
   cursor: pointer;
   text-align: left;
+}
+
+.stat-display.is-highest-round {
+  overflow: visible;
+  border-color: rgb(247 200 92 / 52%);
+  box-shadow: 0 0 1.15rem rgb(247 200 92 / 13%);
+}
+
+.stat-display.is-highest-round::after {
+  position: absolute;
+  z-index: 2;
+  top: -0.58rem;
+  right: 0.65rem;
+  padding: 0.18rem 0.38rem;
+  border: 1px solid rgb(247 200 92 / 42%);
+  border-radius: 999px;
+  background: #211b0c;
+  color: var(--essence);
+  content: "New high";
+  font: 800 0.46rem/1 var(--font-display);
+  letter-spacing: 0.07em;
+  pointer-events: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: highest-round-pop 520ms ease-out both;
+}
+
+@keyframes highest-round-pop {
+  0% { transform: translateY(0.35rem) scale(0.75); opacity: 0; }
+  65% { transform: translateY(-0.08rem) scale(1.06); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
 .stat-display:hover {
@@ -2120,10 +2152,10 @@ h1 {
 }
 
 .result-banner.correct {
-  border-color: rgb(108 231 161 / 56%);
-  background: linear-gradient(135deg, rgb(18 56 44 / 96%), rgb(11 25 26 / 96%));
-  color: var(--success);
-  box-shadow: 0 0 0 1px rgb(108 231 161 / 8%), 0 0 2rem rgb(46 206 139 / 12%);
+  border-color: rgb(103 232 255 / 54%);
+  background: linear-gradient(135deg, rgb(16 52 72 / 96%), rgb(10 22 36 / 96%));
+  color: var(--aether);
+  box-shadow: 0 0 0 1px rgb(103 232 255 / 8%), 0 0 2rem rgb(103 232 255 / 12%);
 }
 
 .result-banner.failed {
@@ -2176,31 +2208,6 @@ h1 {
   font-size: clamp(0.92rem, 3vw, 1.02rem);
   font-weight: 500;
   letter-spacing: 0;
-}
-
-.result-milestone-banner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  margin: -0.25rem 0 1rem;
-  padding: 0.7rem 1rem;
-  border: 1px solid rgb(247 200 92 / 42%);
-  border-radius: 0.65rem;
-  background: linear-gradient(135deg, rgb(70 51 14 / 84%), rgb(29 24 13 / 94%));
-  box-shadow: 0 0 1.5rem rgb(247 200 92 / 8%);
-  color: var(--essence);
-  font-family: var(--font-display);
-  font-size: clamp(0.82rem, 2.8vw, 0.95rem);
-  font-weight: 900;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-}
-
-.result-milestone-banner strong {
-  color: #fff3c7;
-  font-size: 1.3em;
-  line-height: 1;
 }
 
 .survival-summary strong {

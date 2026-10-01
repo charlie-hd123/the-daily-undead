@@ -187,8 +187,8 @@ function renderAllTimeEntries(
     const supportingMetrics = documentObject.createElement("dl");
     supportingMetrics.className = "leaderboard-supporting-metrics";
     supportingMetrics.append(
-      makeMetric(documentObject, "Solves", entry.solves),
-      makeMetric(documentObject, "Best round", entry.bestRound),
+      makeMetric(documentObject, "Puzzle Solves", entry.solves),
+      makeMetric(documentObject, "Highest Round", entry.bestRound),
     );
     player.append(supportingMetrics);
 

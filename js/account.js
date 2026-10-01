@@ -6,7 +6,7 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261001-4";
+} from "./account-session.js?v=20261001-5";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -591,7 +591,7 @@ export async function initialiseAccount({
       bio.classList.toggle("is-empty", !viewed.bio);
       const stats = documentObject.createElement("dl");
       stats.className = "public-profile-stats";
-      [["Solves", result.stats.solves], ["Best round", result.stats.bestRound]].forEach(([label, value]) => {
+      [["Puzzle Solves", result.stats.solves], ["Highest Round", result.stats.bestRound]].forEach(([label, value]) => {
         const box = documentObject.createElement("div");
         box.className = "public-profile-stat";
         const dt = documentObject.createElement("dt");

@@ -182,7 +182,8 @@ test("the leaderboard uses player-facing introductory copy", async () => {
 
   assert.match(browserScript, /See today’s correct players and the all-time leaders\./);
   assert.match(browserScript, /No signed-in players have solved today’s map yet\./);
-  assert.match(browserScript, /Best round/);
+  assert.match(browserScript, /Puzzle Solves/);
+  assert.match(browserScript, /Highest Round/);
   assert.match(browserScript, /Your Rank:/);
   assert.match(browserScript, /Leaderboards couldn’t be loaded\. Please try again\./);
   assert.doesNotMatch(browserScript, /verified results|imported and synced progress/i);
