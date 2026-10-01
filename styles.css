@@ -601,32 +601,26 @@ h1 {
 .stat-display.is-highest-round {
   overflow: visible;
   border-color: rgb(247 200 92 / 52%);
-  box-shadow: 0 0 1.15rem rgb(247 200 92 / 13%);
+  box-shadow: 0 0 0 1px rgb(247 200 92 / 10%), 0 0 1.15rem rgb(247 200 92 / 12%);
 }
 
 .stat-display.is-highest-round::after {
   position: absolute;
   z-index: 2;
-  top: -0.58rem;
-  right: 0.65rem;
-  padding: 0.18rem 0.38rem;
-  border: 1px solid rgb(247 200 92 / 42%);
-  border-radius: 999px;
-  background: #211b0c;
+  top: -0.42rem;
+  right: 0.35rem;
   color: var(--essence);
-  content: "New high";
-  font: 800 0.46rem/1 var(--font-display);
-  letter-spacing: 0.07em;
+  content: "✦";
+  font: 700 0.8rem/1 sans-serif;
   pointer-events: none;
-  text-transform: uppercase;
-  white-space: nowrap;
-  animation: highest-round-pop 520ms ease-out both;
+  text-shadow: 0 0 0.7rem rgb(247 200 92 / 65%);
+  animation: highest-round-spark 620ms ease-out both;
 }
 
-@keyframes highest-round-pop {
-  0% { transform: translateY(0.35rem) scale(0.75); opacity: 0; }
-  65% { transform: translateY(-0.08rem) scale(1.06); opacity: 1; }
-  100% { transform: translateY(0) scale(1); opacity: 1; }
+@keyframes highest-round-spark {
+  0% { transform: rotate(-35deg) scale(0.2); opacity: 0; }
+  65% { transform: rotate(8deg) scale(1.25); opacity: 1; }
+  100% { transform: rotate(0) scale(1); opacity: 0.9; }
 }
 
 .stat-display:hover {
@@ -666,22 +660,23 @@ h1 {
 }
 
 .stat-display.subdued-stat {
-  border-color: rgb(184 194 211 / 28%);
-  background: linear-gradient(90deg, rgb(184 194 211 / 10%), rgb(95 105 122 / 7%));
-  color: rgb(199 207 221 / 78%);
-  box-shadow: 0 0 1rem rgb(184 194 211 / 5%);
+  border-color: rgb(74 142 181 / 30%);
+  background: linear-gradient(90deg, rgb(18 31 54 / 92%), rgb(13 23 41 / 88%));
+  color: rgb(175 197 219 / 76%);
+  box-shadow: 0 0.35rem 1rem rgb(0 0 0 / 12%);
 }
 
 .stat-display.subdued-stat[aria-expanded="true"] {
-  border-color: rgb(214 223 236 / 82%);
-  box-shadow: 0 0 0 1px rgb(214 223 236 / 22%), 0 0 1rem rgb(184 194 211 / 16%);
+  border-color: rgb(103 232 255 / 62%);
+  background: linear-gradient(90deg, rgb(19 42 68 / 96%), rgb(13 28 49 / 94%));
+  box-shadow: 0 0 0 1px rgb(103 232 255 / 10%), 0 0 1rem rgb(103 232 255 / 12%);
 }
 
 .stat-display.subdued-stat strong {
-  border-left-color: rgb(184 194 211 / 42%);
-  background: linear-gradient(145deg, #c6ceda, #7d8796);
-  color: #111722;
-  box-shadow: inset 1px 0 rgb(255 255 255 / 16%), 0 0 1rem rgb(184 194 211 / 13%);
+  border-left-color: rgb(74 142 181 / 28%);
+  background: linear-gradient(145deg, #233a59, #172841);
+  color: #d5e3f3;
+  box-shadow: inset 1px 0 rgb(255 255 255 / 5%);
 }
 
 .player-stat-explainer {
@@ -1476,7 +1471,6 @@ h1 {
 .public-profile-edit-link:focus-visible { border-radius: 0.35rem; outline: 2px solid #fff; outline-offset: 2px; }
 .demo-mode-note { margin: 0.75rem 0 0; color: #8dea62; font: 700 0.68rem/1 var(--font-display); letter-spacing: 0.08em; text-transform: uppercase; }
 
-.public-profile-stats,
 .public-profile-favourites {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1484,9 +1478,66 @@ h1 {
   margin: 0 0 1rem;
 }
 
-.public-profile-stat { padding: 0.7rem; border: 1px solid var(--border); border-radius: 0.65rem; background: rgb(3 7 14 / 55%); }
-.public-profile-stat dt { color: var(--muted); font: 700 0.65rem/1 var(--font-display); letter-spacing: 0.07em; text-transform: uppercase; }
-.public-profile-stat dd { margin: 0.28rem 0 0; color: #fff; font-weight: 700; }
+.public-profile-overview {
+  display: grid;
+  gap: 0.8rem;
+  margin: 0 0 1.2rem;
+}
+
+.public-profile-stat-group h3 {
+  margin: 0 0 0.42rem;
+  color: color-mix(in srgb, var(--profile-accent) 72%, var(--muted));
+  font: 800 0.62rem/1 var(--font-display);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.public-profile-stat-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 0;
+}
+
+.public-profile-stat {
+  min-width: 0;
+  padding: 0.72rem 0.78rem;
+  border: 1px solid color-mix(in srgb, var(--profile-accent) 18%, var(--border));
+  border-radius: 0.65rem;
+  background: linear-gradient(145deg, rgb(12 24 42 / 78%), rgb(4 10 20 / 72%));
+}
+
+.public-profile-stat dt {
+  overflow: hidden;
+  color: var(--muted);
+  font: 700 0.62rem/1 var(--font-display);
+  letter-spacing: 0.065em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.public-profile-stat dd {
+  margin: 0.34rem 0 0;
+  color: #e3edf9;
+  font: 800 1.1rem/1 var(--font-display);
+  font-variant-numeric: tabular-nums;
+}
+
+.public-profile-stat.is-primary {
+  border-color: rgb(247 200 92 / 38%);
+  background: linear-gradient(145deg, rgb(61 43 14 / 72%), rgb(24 20 11 / 76%));
+  box-shadow: inset 2px 0 0 rgb(247 200 92 / 64%), 0 0 1.25rem rgb(247 200 92 / 7%);
+}
+
+.public-profile-stat.is-primary dt,
+.public-profile-stat.is-primary dd {
+  color: var(--essence);
+}
+
+.public-profile-stat.is-primary dd {
+  font-size: 1.3rem;
+}
 
 .demo-account-note { margin-bottom: 1rem; }
 .demo-account-menu { display: grid; gap: 0.5rem; }

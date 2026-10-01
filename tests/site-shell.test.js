@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261001-5"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261001-6"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -261,6 +261,8 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(css, /#leaderboards-button::before[\s\S]*mask-image:/);
   assert.match(appScript, /state\?\.phase === "result" && Boolean\(state\.newBestRound\)/);
   assert.match(css, /\.stat-display\.is-highest-round::after/);
+  assert.match(css, /content: "✦";/);
+  assert.doesNotMatch(css, /content: "New high";/);
   assert.doesNotMatch(appScript, /result-milestone-banner/);
   assert.match(css, /\.account-button::after[\s\S]*content: "›";/);
   assert.match(css, /\.account-button:not\(:disabled\):hover/);
@@ -371,8 +373,9 @@ test("player stat pills expose dismissible explainers", async () => {
   assert.match(app, /event\.key === "Escape"/);
   assert.match(css, /\.player-stat-explainer \{[\s\S]*?position: absolute;[\s\S]*?width: 100%;/);
   assert.match(css, /\.stat-display \{[\s\S]*?border: 1px solid rgb\(247 200 92 \/ 30%\);/);
-  assert.match(css, /\.stat-display\.subdued-stat \{[\s\S]*?border-color: rgb\(184 194 211 \/ 28%\);/);
-  assert.match(css, /\.stat-display\.subdued-stat\[aria-expanded="true"\] \{[\s\S]*?border-color: rgb\(214 223 236 \/ 82%\);/);
+  assert.match(css, /\.stat-display\.subdued-stat \{[\s\S]*?border-color: rgb\(74 142 181 \/ 30%\);/);
+  assert.match(css, /\.stat-display\.subdued-stat strong \{[\s\S]*?background: linear-gradient\(145deg, #233a59, #172841\);/);
+  assert.match(css, /\.stat-display\.subdued-stat\[aria-expanded="true"\] \{[\s\S]*?border-color: rgb\(103 232 255 \/ 62%\);/);
 });
 
 test("survivor profiles always expose a labelled favourite memory section", async () => {
@@ -385,6 +388,11 @@ test("survivor profiles always expose a labelled favourite memory section", asyn
   assert.match(account, /No favourite memory shared yet\./);
   assert.match(demo, /No favourite memory shared yet\./);
   assert.match(css, /\.public-profile-bio::before[\s\S]*?content: "FAVOURITE MEMORY"/);
+  assert.match(account, /makeStatGroup\("Career"[\s\S]*?"Score"[\s\S]*?"Puzzle Solves"/);
+  assert.match(account, /makeStatGroup\("Survival"[\s\S]*?"Current Round"[\s\S]*?"Highest Round"/);
+  assert.doesNotMatch(account, /public-profile-identity-line/);
+  assert.match(css, /\.public-profile-stat-row \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/);
+  assert.match(css, /\.public-profile-stat\.is-primary \{/);
 });
 
 test("the clue count stays editable until a map is confirmed", async () => {

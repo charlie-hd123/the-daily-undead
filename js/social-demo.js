@@ -243,9 +243,9 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
     openDialog(editorDialog);
   }
 
-  function makeFact(label, value) {
+  function makeFact(label, value, primary = false) {
     const item = documentObject.createElement("div");
-    item.className = "public-profile-stat";
+    item.className = `public-profile-stat${primary ? " is-primary" : ""}`;
     const term = documentObject.createElement("dt");
     const description = documentObject.createElement("dd");
     term.textContent = label; description.textContent = value || "—";
@@ -262,24 +262,32 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
     const copy = documentObject.createElement("div");
     const kicker = documentObject.createElement("p"); kicker.className = "kicker"; kicker.textContent = "Survivor profile";
     const heading = documentObject.createElement("h2"); heading.textContent = viewed.username;
-    const identityLine = documentObject.createElement("div"); identityLine.className = "public-profile-identity-line";
-    [["Score", viewed.score ?? 0], ["Round", Math.max(1, viewed.currentRound ?? viewed.bestRound - 3)]].forEach(([label, value]) => {
-      const indicator = documentObject.createElement("span"); indicator.className = "public-profile-indicator";
-      indicator.innerHTML = `${label} <strong>${new Intl.NumberFormat("en-GB").format(value)}</strong>`;
-      identityLine.append(indicator);
-    });
     const joined = documentObject.createElement("p"); joined.className = "public-profile-joined";
     joined.textContent = `Joined ${new Intl.DateTimeFormat("en-GB", { month: "long", year: "numeric" }).format(new Date(viewed.createdAt))}`;
-    copy.append(kicker, heading, identityLine, joined); header.append(avatar(documentObject, viewed.avatarId), copy);
+    copy.append(kicker, heading, joined); header.append(avatar(documentObject, viewed.avatarId), copy);
+    const makeStatGroup = (label, entries) => {
+      const section = documentObject.createElement("section"); section.className = "public-profile-stat-group";
+      const title = documentObject.createElement("h3"); title.textContent = label;
+      const list = documentObject.createElement("dl"); list.className = "public-profile-stat-row";
+      entries.forEach(([statLabel, value, primary]) => list.append(makeFact(statLabel, value, primary)));
+      section.append(title, list);
+      return section;
+    };
+    const stats = documentObject.createElement("div"); stats.className = "public-profile-overview";
+    stats.append(
+      makeStatGroup("Career", [["Score", viewed.score ?? 0, true], ["Puzzle Solves", viewed.solves, false]]),
+      makeStatGroup("Survival", [
+        ["Current Round", Math.max(1, viewed.currentRound ?? viewed.bestRound - 3), false],
+        ["Highest Round", viewed.bestRound, false],
+      ]),
+    );
     const bio = documentObject.createElement("p");
     bio.className = "public-profile-bio";
     bio.textContent = viewed.bio || "No favourite memory shared yet.";
     bio.classList.toggle("is-empty", !viewed.bio);
-    const stats = documentObject.createElement("dl"); stats.className = "public-profile-stats";
-    stats.append(makeFact("Puzzle Solves", viewed.solves), makeFact("Highest Round", viewed.bestRound));
     const favourites = documentObject.createElement("dl"); favourites.className = "public-profile-favourites";
     [["Favourite game", viewed.favouriteGame], ["Favourite map", viewed.favouriteMap]].forEach(([label, value]) => favourites.append(makeFact(label, value)));
-    const content = [header, bio, stats, favourites];
+    const content = [header, stats, bio, favourites];
     if (viewed.username === state.profile.username) {
       const editLink = documentObject.createElement("button");
       editLink.className = "public-profile-edit-link";

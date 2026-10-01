@@ -6,7 +6,7 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261001-5";
+} from "./account-session.js?v=20261001-6";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -572,35 +572,50 @@ export async function initialiseAccount({
       kicker.className = "kicker";
       kicker.textContent = "Survivor profile";
       heading.textContent = viewed.username;
-      const identityLine = documentObject.createElement("div");
-      identityLine.className = "public-profile-identity-line";
-      [["Score", result.stats.score], ["Round", Math.max(1, result.stats.currentRound)]].forEach(([label, value]) => {
-        const indicator = documentObject.createElement("span");
-        indicator.className = "public-profile-indicator";
-        indicator.innerHTML = `${label} <strong>${new Intl.NumberFormat("en-GB").format(value)}</strong>`;
-        identityLine.append(indicator);
-      });
       joined.className = "public-profile-joined";
       joined.textContent = `Joined ${formatJoinedDate(viewed.createdAt)}`;
-      copy.append(kicker, heading, identityLine, joined);
+      copy.append(kicker, heading, joined);
       header.append(makeAvatar(documentObject, viewed.avatarId), copy);
 
-      const bio = documentObject.createElement("p");
-      bio.className = "public-profile-bio";
-      bio.textContent = viewed.bio || "No favourite memory shared yet.";
-      bio.classList.toggle("is-empty", !viewed.bio);
-      const stats = documentObject.createElement("dl");
-      stats.className = "public-profile-stats";
-      [["Puzzle Solves", result.stats.solves], ["Highest Round", result.stats.bestRound]].forEach(([label, value]) => {
+      const makeProfileStat = (label, value, primary = false) => {
         const box = documentObject.createElement("div");
-        box.className = "public-profile-stat";
+        box.className = `public-profile-stat${primary ? " is-primary" : ""}`;
         const dt = documentObject.createElement("dt");
         const dd = documentObject.createElement("dd");
         dt.textContent = label;
         dd.textContent = new Intl.NumberFormat("en-GB").format(value);
         box.append(dt, dd);
-        stats.append(box);
-      });
+        return box;
+      };
+      const makeStatGroup = (label, entries) => {
+        const section = documentObject.createElement("section");
+        section.className = "public-profile-stat-group";
+        const title = documentObject.createElement("h3");
+        title.textContent = label;
+        const list = documentObject.createElement("dl");
+        list.className = "public-profile-stat-row";
+        entries.forEach(([statLabel, value, primary]) => {
+          list.append(makeProfileStat(statLabel, value, primary));
+        });
+        section.append(title, list);
+        return section;
+      };
+      const stats = documentObject.createElement("div");
+      stats.className = "public-profile-overview";
+      stats.append(
+        makeStatGroup("Career", [
+          ["Score", result.stats.score, true],
+          ["Puzzle Solves", result.stats.solves, false],
+        ]),
+        makeStatGroup("Survival", [
+          ["Current Round", Math.max(1, result.stats.currentRound), false],
+          ["Highest Round", result.stats.bestRound, false],
+        ]),
+      );
+      const bio = documentObject.createElement("p");
+      bio.className = "public-profile-bio";
+      bio.textContent = viewed.bio || "No favourite memory shared yet.";
+      bio.classList.toggle("is-empty", !viewed.bio);
       const favourites = documentObject.createElement("dl");
       favourites.className = "public-profile-favourites";
       [["Favourite game", viewed.favouriteGame], ["Favourite map", viewed.favouriteMap]].forEach(([label, value]) => {
@@ -614,7 +629,7 @@ export async function initialiseAccount({
         box.append(dt, dd);
         favourites.append(box);
       });
-      const content = [header, bio, stats, favourites];
+      const content = [header, stats, bio, favourites];
       if (profile && viewed.username === profile.username) {
         const editLink = documentObject.createElement("button");
         editLink.className = "public-profile-edit-link";

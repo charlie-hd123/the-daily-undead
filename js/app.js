@@ -12,25 +12,25 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261001-5";
+} from "./game-core.js?v=20261001-6";
 import {
   canUseRequestedPreviewDate,
   isLocalDevelopmentHostname,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261001-5";
-import { initialiseAccount } from "./account.js?v=20261001-5";
+} from "./progression.js?v=20261001-6";
+import { initialiseAccount } from "./account.js?v=20261001-6";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261001-5";
+} from "./community-stats.js?v=20261001-6";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261001-5";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-5";
+} from "./leaderboards.js?v=20261001-6";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-6";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -731,7 +731,9 @@ function initialiseStatExplainers() {
 
     const content = statExplainers[button.dataset.statExplainer];
     title.textContent = content.title;
-    copy.textContent = content.copy;
+    copy.textContent = button.classList.contains("is-highest-round")
+      ? "This is your highest Round yet. Keep the run alive tomorrow."
+      : content.copy;
     button.setAttribute("aria-expanded", "true");
     statExplainer.hidden = false;
 
@@ -769,6 +771,9 @@ function updateRoundMilestoneDisplay() {
       "aria-label",
       `Round: ${progressNumberFormatter.format(Math.max(1, streakCount))}. New highest round. Learn more.`,
     );
+    display.title = "Highest Round yet";
+  } else {
+    display.removeAttribute("title");
   }
 }
 
