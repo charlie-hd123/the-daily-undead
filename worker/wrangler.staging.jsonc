@@ -1,0 +1,20 @@
+{
+  "name": "daily-undead-staging-api",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-12",
+  "workers_dev": true,
+  "preview_urls": true,
+  "vars": {
+    "ALLOWED_ORIGINS": "https://daily-undead-staging.pages.dev",
+    "CLERK_ISSUER": "https://rapid-pigeon-846.clerk.accounts.dev",
+    "CLERK_AUTHORIZED_PARTIES": "https://daily-undead-staging.pages.dev"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "daily-undead-staging",
+      "database_id": "f664fd9b-7adc-4d60-87dd-aaacb0fb5547",
+      "migrations_dir": "migrations"
+    }
+  ]
+}

@@ -8,27 +8,27 @@ const profiles = [
   {
     username: "Richtofen93", avatarId: "unselected", themeId: "default",
     favouriteGame: "", favouriteMap: "", bio: "",
-    createdAt: "2026-08-13T00:00:00Z", currentRound: 44, pointsBalance: 720, highestRound: 47, totalRounds: 4,
+    createdAt: "2026-08-13T00:00:00Z", currentRound: 44, score: 4720, bestRound: 47, solves: 64,
   },
   {
     username: "Dempsey", avatarId: "dempsey", themeId: "afterlife",
     favouriteGame: "World at War", favouriteMap: "Der Riese", bio: "Kick undead ass. Ask questions later.",
-    createdAt: "2026-08-18T00:00:00Z", currentRound: 35, pointsBalance: 635, highestRound: 38, totalRounds: 55,
+    createdAt: "2026-08-18T00:00:00Z", currentRound: 35, score: 3635, bestRound: 38, solves: 55,
   },
   {
     username: "Takeo", avatarId: "takeo", themeId: "outbreak",
     favouriteGame: "Black Ops 3", favouriteMap: "Zetsubou No Shima", bio: "Honour survives beyond death.",
-    createdAt: "2026-08-21T00:00:00Z", currentRound: 32, pointsBalance: 550, highestRound: 35, totalRounds: 120,
+    createdAt: "2026-08-21T00:00:00Z", currentRound: 32, score: 7550, bestRound: 35, solves: 120,
   },
   {
     username: "Misty", avatarId: "misty", themeId: "hellfire",
     favouriteGame: "Black Ops 2", favouriteMap: "Buried", bio: "Still standing. Still shooting.",
-    createdAt: "2026-09-02T00:00:00Z", currentRound: 28, pointsBalance: 465, highestRound: 31, totalRounds: 280,
+    createdAt: "2026-09-02T00:00:00Z", currentRound: 28, score: 18465, bestRound: 31, solves: 280,
   },
   {
     username: "Nikolai", avatarId: "nikolai", themeId: "default",
     favouriteGame: "Black Ops", favouriteMap: "Ascension", bio: "One more round. Then perhaps one more.",
-    createdAt: "2026-09-08T00:00:00Z", currentRound: 25, pointsBalance: 380, highestRound: 28, totalRounds: 18,
+    createdAt: "2026-09-08T00:00:00Z", currentRound: 25, score: 1380, bestRound: 28, solves: 18,
   },
 ];
 
@@ -85,9 +85,9 @@ export function createSocialDemoFetch() {
       avatarId: profile.avatarId,
       themeId: profile.themeId,
       currentRound: profile.currentRound,
-      highestRound: profile.highestRound,
-      totalRounds: profile.totalRounds,
-      points: profile.pointsBalance,
+      bestRound: profile.bestRound,
+      solves: profile.solves,
+      score: profile.score,
     }));
     return Response.json({
       date: url.searchParams.get("date"),
@@ -169,7 +169,7 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
     ? "Available at signup"
     : unlock.type === "round" ? `Reach Round ${unlock.value}` : `Solve ${unlock.value} maps`;
   const avatarIsUnlocked = (unlock) => !unlock
-    || (unlock.type === "round" ? state.profile.highestRound >= unlock.value : state.profile.totalRounds >= unlock.value);
+    || (unlock.type === "round" ? state.profile.bestRound >= unlock.value : state.profile.solves >= unlock.value);
 
   editorForm.querySelector("[data-avatar-picker]")?.replaceChildren(...avatarOptions.map(([id, name, unlock]) => {
     const label = documentObject.createElement("label");
@@ -188,7 +188,7 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
   editorForm.querySelector("[data-theme-picker]")?.replaceChildren(...themeOptions.map(({ id, label: themeLabel, requiredMaps }) => {
     const label = documentObject.createElement("label");
     label.className = "theme-choice"; label.dataset.theme = id;
-    const locked = state.profile.totalRounds < requiredMaps;
+    const locked = state.profile.solves < requiredMaps;
     label.classList.toggle("is-locked", locked);
     const input = documentObject.createElement("input");
     input.type = "radio"; input.name = "themeId"; input.value = id;
@@ -215,7 +215,7 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
     }
     const selectedThemeId = editorForm.querySelector('[name="themeId"]:checked')?.value;
     const selectedTheme = themeOptions.find(({ id }) => id === selectedThemeId);
-    if (selectedTheme && state.profile.totalRounds < selectedTheme.requiredMaps) {
+    if (selectedTheme && state.profile.solves < selectedTheme.requiredMaps) {
       requirements.push(`${selectedTheme.label}: ${selectedTheme.requiredMaps} solves`);
     }
     const saveButton = editorForm.querySelector('button[type="submit"]');
@@ -263,7 +263,7 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
     const kicker = documentObject.createElement("p"); kicker.className = "kicker"; kicker.textContent = "Survivor profile";
     const heading = documentObject.createElement("h2"); heading.textContent = viewed.username;
     const identityLine = documentObject.createElement("div"); identityLine.className = "public-profile-identity-line";
-    [["Round", viewed.currentRound ?? Math.max(1, viewed.highestRound - 3)], ["Points", viewed.pointsBalance ?? 0]].forEach(([label, value]) => {
+    [["Score", viewed.score ?? 0], ["Round", Math.max(1, viewed.currentRound ?? viewed.bestRound - 3)]].forEach(([label, value]) => {
       const indicator = documentObject.createElement("span"); indicator.className = "public-profile-indicator";
       indicator.innerHTML = `${label} <strong>${new Intl.NumberFormat("en-GB").format(value)}</strong>`;
       identityLine.append(indicator);
@@ -276,7 +276,7 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
     bio.textContent = viewed.bio || "No favourite memory shared yet.";
     bio.classList.toggle("is-empty", !viewed.bio);
     const stats = documentObject.createElement("dl"); stats.className = "public-profile-stats";
-    stats.append(makeFact("Maps solved", viewed.totalRounds), makeFact("Highest round", viewed.highestRound));
+    stats.append(makeFact("Solves", viewed.solves), makeFact("Best round", viewed.bestRound));
     const favourites = documentObject.createElement("dl"); favourites.className = "public-profile-favourites";
     [["Favourite game", viewed.favouriteGame], ["Favourite map", viewed.favouriteMap]].forEach(([label, value]) => favourites.append(makeFact(label, value)));
     const content = [header, bio, stats, favourites];
@@ -308,7 +308,7 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
       return;
     }
     const selectedTheme = themeOptions.find((theme) => theme.id === payload.themeId);
-    if (selectedTheme && state.profile.totalRounds < selectedTheme.requiredMaps) {
+    if (selectedTheme && state.profile.solves < selectedTheme.requiredMaps) {
       editorFeedback.classList.remove("is-success", "is-preview-warning");
       editorFeedback.classList.add("account-error");
       editorFeedback.textContent = `${selectedTheme.label} unlocks at ${selectedTheme.requiredMaps} solves. Preview only for now.`;

@@ -23,6 +23,7 @@ The Worker exposes:
 - `GET /health` for a simple health check.
 - `GET /api/stats?date=YYYY-MM-DD` for players today, total games, and yesterday's result.
 - `GET /api/leaderboards?date=YYYY-MM-DD` for the day's verified map-and-bonus elite list, community player count, and all-time account progress.
+- `GET /api/game-dates?from=YYYY-MM-DD&to=YYYY-MM-DD` for protected Round dates.
 - `POST /api/attempts` for a completed current-day map guess.
 - `GET /api/account?date=YYYY-MM-DD` for a signed-in player's profile and save.
 - `POST /api/account/register` to reserve a username and optionally import local progress.
@@ -40,7 +41,7 @@ A play is recorded only when the player confirms a map. Visiting, refreshing, re
 
 The browser creates a random local identifier. The Worker hashes it with SHA-256 before D1 storage. D1's `UNIQUE (puzzle_date, player_hash)` rule is the final protection against repeat submissions from one browser on one UTC date. Another browser or device can count separately.
 
-The anonymous tables store the puzzle/date, answer map, correct/incorrect map result, hashed browser identifier, and submission time. Account tables store an opaque Clerk user ID, public username, game progress, daily save state, and verified daily results. Email addresses, passwords, and verification codes stay with Clerk and are never stored in D1. Worker invocation logs are a separate Cloudflare operational feature and can contain normal request metadata.
+The anonymous tables store the puzzle/date, answer map, correct/incorrect map result, hashed browser identifier, and submission time. Account tables store an opaque Clerk user ID, public username, permanent Score and Solves, Round and Best Round, daily save state, and verified daily results. Verified result awards are idempotent, so a retried request cannot add Score twice. Email addresses, passwords, and verification codes stay with Clerk and are never stored in D1. Worker invocation logs are a separate Cloudflare operational feature and can contain normal request metadata.
 
 The all-time total started with an estimated 100 historical games from before tracking launched. `migrations/0002_seed_historical_total.sql` documents that one-time baseline and cannot reduce a total that has already passed 100.
 
@@ -53,6 +54,9 @@ The schema is versioned in:
 - `migrations/0003_create_player_accounts.sql` — profiles, cross-device saves, daily state and verified results.
 - `migrations/0004_create_social_profiles.sql` — avatar, theme, favourite map and bio fields.
 - `migrations/0005_add_favourite_game.sql` — favourite game field.
+- `migrations/0006_scoring_progression_redesign.sql` — permanent Score, idempotent awards and protected game dates.
+- `migrations/0007_add_round_reconstruction_anchor.sql` — pre-redesign Round anchor for later reconstruction.
+- `migrations/0008_make_result_awards_atomic.sql` — atomic, retry-safe application of verified progression.
 
 D1 contains these application tables:
 
@@ -63,6 +67,13 @@ D1 contains these application tables:
 - `player_saves` — cross-device progression totals and missed-day state.
 - `player_daily_saves` — resumable per-day game state.
 - `player_daily_results` — one independently verified result per player and UTC date.
+- `game_dates` — canonical UTC dates that are protected from Round continuity when `counts_for_round = 0`.
+
+The legacy `points_balance` and `revive_count` columns remain private and unused
+for audit/rollback safety. They are not player-facing progression. Before the
+production redesign is migrated, run the read-only anonymised query in
+`analysis/score-migration-preview.sql` and review its effects; do not fabricate
+or automatically overwrite historical Score.
 
 `sqlite_sequence` is created by SQLite for auto-increment bookkeeping and should be left alone.
 

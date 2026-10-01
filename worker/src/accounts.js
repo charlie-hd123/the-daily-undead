@@ -41,21 +41,19 @@ export function sanitizeProgress(value = {}) {
         dateKey: candidate.dateKey,
         missedDays: Math.min(candidate.missedDays, 100_000),
         roundsBeforeLoss: safeCounter(candidate.roundsBeforeLoss),
-        pointsBeforeLoss: safeCounter(candidate.pointsBeforeLoss),
-        revived: Boolean(candidate.revived),
         resolved: Boolean(candidate.resolved),
-        reviveCostPaid: safeCounter(candidate.reviveCostPaid),
       };
     }
   }
 
   const currentRound = safeCounter(value.currentRound);
+  const score = safeCounter(value.score ?? value.pointsBalance);
+  const solves = safeCounter(value.solves ?? value.totalRounds);
   return {
     currentRound,
     bestRound: Math.max(currentRound, safeCounter(value.bestRound)),
-    pointsBalance: safeCounter(value.pointsBalance),
-    totalRounds: safeCounter(value.totalRounds),
-    reviveCount: safeCounter(value.reviveCount),
+    score,
+    solves,
     lastPlayedDate,
     missedDayState,
   };
@@ -89,13 +87,10 @@ export function sanitizeDailyState(value, puzzleDate) {
     bonusOrder: idList(value.bonusOrder),
     bonusComplete: Boolean(value.bonusComplete),
     bonusFailed: Boolean(value.bonusFailed),
+    newBestRound: Boolean(value.newBestRound),
     streakRecorded: Boolean(value.streakRecorded),
     totalRoundsRecorded: Boolean(value.totalRoundsRecorded),
     roundsSurvivedBeforeLoss: safeCounter(value.roundsSurvivedBeforeLoss),
-    pointsBeforeLoss: safeCounter(value.pointsBeforeLoss),
-    revived: Boolean(value.revived),
-    reviveCostPaid: safeCounter(value.reviveCostPaid),
-    reviveCostOffered: safeCounter(value.reviveCostOffered),
     mapPoints: safeCounter(value.mapPoints),
     bonusPoints: safeCounter(value.bonusPoints),
     pointsRecorded: Boolean(value.pointsRecorded),
@@ -184,9 +179,8 @@ function rowToProgress(row) {
   return {
     currentRound: Number(row.current_round || 0),
     bestRound: Number(row.best_round || 0),
-    pointsBalance: Number(row.points_balance || 0),
-    totalRounds: Number(row.total_rounds || 0),
-    reviveCount: Number(row.revive_count || 0),
+    score: Number(row.score || 0),
+    solves: Number(row.total_rounds || 0),
     lastPlayedDate: row.last_played_date || null,
     missedDayState,
     revision: Number(row.revision || 1),
@@ -209,6 +203,65 @@ function rowToResult(row) {
         completedAt: row.completed_at || null,
       }
     : null;
+}
+
+function followingDateKey(dateKey) {
+  const date = new Date(`${dateKey}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + 1);
+  return date.toISOString().slice(0, 10);
+}
+
+export async function reconstructRound(db, userId, progressRow, todayDateKey) {
+  const anchorDate = progressRow?.round_anchor_date;
+  if (!isValidDateKey(anchorDate) || anchorDate >= todayDateKey) return progressRow;
+
+  const [resultsQuery, protectedQuery] = await db.batch([
+    db.prepare(
+      `SELECT puzzle_date, map_correct
+      FROM player_daily_results
+      WHERE user_id = ? AND puzzle_date > ? AND puzzle_date <= ?
+      ORDER BY puzzle_date`,
+    ).bind(userId, anchorDate, todayDateKey),
+    db.prepare(
+      `SELECT game_date
+      FROM game_dates
+      WHERE game_date > ? AND game_date < ? AND counts_for_round = 0`,
+    ).bind(anchorDate, todayDateKey),
+  ]);
+
+  const results = new Map(
+    (resultsQuery.results || []).map((row) => [row.puzzle_date, Boolean(row.map_correct)]),
+  );
+  const protectedDates = new Set(
+    (protectedQuery.results || []).map((row) => row.game_date),
+  );
+  let currentRound = Number(progressRow.round_anchor_value || 0);
+  let bestRound = Math.max(Number(progressRow.best_round || 0), currentRound);
+
+  for (let date = followingDateKey(anchorDate); date <= todayDateKey; date = followingDateKey(date)) {
+    if (protectedDates.has(date)) continue;
+    if (results.has(date)) {
+      currentRound = results.get(date) ? currentRound + 1 : 0;
+      bestRound = Math.max(bestRound, currentRound);
+    } else if (date < todayDateKey) {
+      currentRound = 0;
+    }
+  }
+
+  if (
+    currentRound === Number(progressRow.current_round || 0) &&
+    bestRound === Number(progressRow.best_round || 0)
+  ) return progressRow;
+
+  await db.prepare(
+    `UPDATE player_saves SET
+      current_round = ?,
+      best_round = MAX(best_round, ?),
+      revision = revision + 1,
+      updated_at = CURRENT_TIMESTAMP
+    WHERE user_id = ?`,
+  ).bind(currentRound, bestRound, userId).run();
+  return db.prepare("SELECT * FROM player_saves WHERE user_id = ?").bind(userId).first();
 }
 
 export async function readJsonBody(request, maximumBytes = 20_000) {
@@ -253,12 +306,19 @@ export async function getAccount(db, userId, dateKey) {
     dailyState = null;
   }
 
+  const reconstructedProgress = await reconstructRound(
+    db,
+    userId,
+    progressResult.results?.[0],
+    dateKey,
+  );
+
   return {
     status: 200,
     body: {
       needsOnboarding: false,
       profile,
-      progress: rowToProgress(progressResult.results?.[0]),
+      progress: rowToProgress(reconstructedProgress),
       dailyState,
       verifiedResult: rowToResult(verifiedResult.results?.[0]),
     },
@@ -298,20 +358,26 @@ export async function registerAccount(db, request, userId) {
       .prepare(
         `INSERT INTO player_saves (
           user_id, current_round, best_round, points_balance, total_rounds,
-          revive_count, last_played_date, missed_day_json
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          last_played_date, missed_day_json, score,
+          score_migration_method, score_migrated_at, round_anchor_date,
+          round_anchor_value
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .bind(
         userId,
         body.importLocalProgress ? progress.currentRound : 0,
         body.importLocalProgress ? progress.bestRound : 0,
-        body.importLocalProgress ? progress.pointsBalance : 0,
-        body.importLocalProgress ? progress.totalRounds : 0,
-        body.importLocalProgress ? progress.reviveCount : 0,
+        body.importLocalProgress ? progress.score : 0,
+        body.importLocalProgress ? progress.solves : 0,
         body.importLocalProgress ? progress.lastPlayedDate : null,
         body.importLocalProgress && progress.missedDayState
           ? JSON.stringify(progress.missedDayState)
           : null,
+        body.importLocalProgress ? progress.score : 0,
+        body.importLocalProgress ? "guest-local-import" : "new-account",
+        new Date().toISOString(),
+        body.importLocalProgress ? progress.lastPlayedDate : puzzleDate,
+        body.importLocalProgress ? progress.currentRound : 0,
       ),
   ];
 
@@ -439,7 +505,7 @@ export async function getPublicProfile(db, username) {
       profiles.*,
       COALESCE(saves.current_round, 0) AS current_round,
       COALESCE(saves.best_round, 0) AS best_round,
-      COALESCE(saves.points_balance, 0) AS points_balance,
+      COALESCE(saves.score, 0) AS score,
       COALESCE(saves.total_rounds, 0) AS total_rounds
     FROM player_profiles AS profiles
     LEFT JOIN player_saves AS saves ON saves.user_id = profiles.user_id
@@ -452,10 +518,10 @@ export async function getPublicProfile(db, username) {
     body: {
       profile: rowToProfile(row),
       stats: {
-        mapsSolved: Number(row.total_rounds || 0),
-        highestRound: Number(row.best_round || 0),
+        solves: Number(row.total_rounds || 0),
+        bestRound: Number(row.best_round || 0),
         currentRound: Number(row.current_round || 0),
-        pointsBalance: Number(row.points_balance || 0),
+        score: Number(row.score || 0),
       },
     },
   };
@@ -478,9 +544,6 @@ export async function saveAccount(db, request, userId) {
   const updateSql = `UPDATE player_saves SET
           current_round = ?,
           best_round = MAX(best_round, ?),
-          points_balance = ?,
-          total_rounds = MAX(total_rounds, ?),
-          revive_count = ?,
           last_played_date = ?,
           missed_day_json = ?,
           revision = revision + 1,
@@ -489,9 +552,6 @@ export async function saveAccount(db, request, userId) {
   const updateBindings = [
     progress.currentRound,
     progress.bestRound,
-    progress.pointsBalance,
-    progress.totalRounds,
-    progress.reviveCount,
     progress.lastPlayedDate,
     progress.missedDayState ? JSON.stringify(progress.missedDayState) : null,
     userId,
@@ -562,12 +622,13 @@ export async function recordVerifiedMapResult(db, request, userId) {
   const mapPoints = mapCorrect ? calculateMapPoints(body.cluesUsed) : 0;
   const bonusStatus = mapCorrect ? "pending" : "unavailable";
 
-  await db
-    .prepare(
+  await db.batch([
+    db.prepare(
       `INSERT OR IGNORE INTO player_daily_results (
         user_id, puzzle_date, puzzle_id, selected_map_id, clues_used,
-        map_correct, map_points, bonus_status, points_earned, completed_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        map_correct, map_points, bonus_status, points_earned, completed_at,
+        score_awarded, progression_applied
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0)`,
     )
     .bind(
       userId,
@@ -581,13 +642,56 @@ export async function recordVerifiedMapResult(db, request, userId) {
       mapPoints,
       mapCorrect ? null : new Date().toISOString(),
     )
-    .run();
+    ,
+    db.prepare(
+      `UPDATE player_saves SET
+        score = score + COALESCE((
+          SELECT points_earned - score_awarded
+          FROM player_daily_results
+          WHERE user_id = ? AND puzzle_date = ? AND progression_applied = 0
+        ), 0),
+        total_rounds = total_rounds + COALESCE((
+          SELECT map_correct
+          FROM player_daily_results
+          WHERE user_id = ? AND puzzle_date = ? AND progression_applied = 0
+        ), 0),
+        current_round = CASE
+          WHEN COALESCE((
+            SELECT map_correct
+            FROM player_daily_results
+            WHERE user_id = ? AND puzzle_date = ? AND progression_applied = 0
+          ), 1) = 1 THEN current_round
+          ELSE 0
+        END,
+        revision = revision + 1,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE user_id = ? AND EXISTS (
+        SELECT 1 FROM player_daily_results
+        WHERE user_id = ? AND puzzle_date = ? AND progression_applied = 0
+      )`,
+    ).bind(
+      userId, body.puzzleDate,
+      userId, body.puzzleDate,
+      userId, body.puzzleDate,
+      userId,
+      userId, body.puzzleDate,
+    ),
+    db.prepare(
+      `UPDATE player_daily_results SET
+        score_awarded = points_earned,
+        progression_applied = 1,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE user_id = ? AND puzzle_date = ? AND progression_applied = 0`,
+    ).bind(userId, body.puzzleDate),
+  ]);
 
   const result = await db
     .prepare("SELECT * FROM player_daily_results WHERE user_id = ? AND puzzle_date = ?")
     .bind(userId, body.puzzleDate)
     .first();
-  return { status: 200, body: { result: rowToResult(result) } };
+  const progress = await db.prepare("SELECT * FROM player_saves WHERE user_id = ?")
+    .bind(userId).first();
+  return { status: 200, body: { result: rowToResult(result), progress: rowToProgress(progress) } };
 }
 
 export async function recordVerifiedBonusResult(db, request, userId) {
@@ -616,8 +720,8 @@ export async function recordVerifiedBonusResult(db, request, userId) {
   const bonusPoints = calculateBonusPoints(Number(result.map_points), bonusCorrect);
   const bonusStatus = bonusCorrect ? "correct" : "incorrect";
 
-  await db
-    .prepare(
+  await db.batch([
+    db.prepare(
       `UPDATE player_daily_results SET
         bonus_status = ?,
         bonus_points = ?,
@@ -634,11 +738,34 @@ export async function recordVerifiedBonusResult(db, request, userId) {
       userId,
       body.puzzleDate,
     )
-    .run();
+    ,
+    db.prepare(
+      `UPDATE player_saves SET
+        score = score + COALESCE((
+          SELECT points_earned - score_awarded
+          FROM player_daily_results
+          WHERE user_id = ? AND puzzle_date = ? AND points_earned > score_awarded
+        ), 0),
+        revision = revision + 1,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE user_id = ? AND EXISTS (
+        SELECT 1 FROM player_daily_results
+        WHERE user_id = ? AND puzzle_date = ? AND points_earned > score_awarded
+      )`,
+    ).bind(userId, body.puzzleDate, userId, userId, body.puzzleDate),
+    db.prepare(
+      `UPDATE player_daily_results SET
+        score_awarded = points_earned,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE user_id = ? AND puzzle_date = ? AND points_earned > score_awarded`,
+    ).bind(userId, body.puzzleDate),
+  ]);
 
   const savedResult = await db
     .prepare("SELECT * FROM player_daily_results WHERE user_id = ? AND puzzle_date = ?")
     .bind(userId, body.puzzleDate)
     .first();
-  return { status: 200, body: { result: rowToResult(savedResult) } };
+  const progress = await db.prepare("SELECT * FROM player_saves WHERE user_id = ?")
+    .bind(userId).first();
+  return { status: 200, body: { result: rowToResult(savedResult), progress: rowToProgress(progress) } };
 }

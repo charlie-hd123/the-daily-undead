@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20260928-8"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261001-3"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -122,8 +122,8 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(html, /data-leaderboard-list="daily-elite"/);
   assert.doesNotMatch(html, /data-leaderboard-list="daily-incorrect"/);
   assert.match(html, /data-leaderboard-list="all-time"/);
-  assert.match(html, /data-all-time-ranking="highestRound"/);
-  assert.match(html, /data-all-time-ranking="totalRounds"/);
+  assert.doesNotMatch(html, /data-all-time-ranking/);
+  assert.match(html, /data-leaderboard-your-rank/);
   assert.match(html, /data-leaderboard-find="daily"/);
   assert.match(html, /data-leaderboard-find="all-time"/);
   assert.match(html, /placeholder="Tell us your favourite Zombies memory\.\.\."/);
@@ -169,18 +169,18 @@ test("account controls support optional sign-in without exposing private credent
   );
   assert.match(html, /id="account-onboarding-form"/);
   assert.match(html, /<h2>Choose your username<\/h2>/);
-  assert.match(html, /Maps Solved\s*<strong id="total-rounds-count">0<\/strong>/);
-  assert.match(html, /data-all-time-ranking="totalRounds">Maps solved<\/button>/);
+  assert.match(html, /Score\s*<strong id="score-count">0<\/strong>/);
+  assert.match(html, /Solves\s*<strong id="solves-count">0<\/strong>/);
+  assert.match(html, /Round\s*<strong id="streak-count">1<\/strong>/);
   assert.match(html, /<button class="button primary" type="submit">Finish setup<\/button>/);
   assert.match(account, /accountButton\.textContent = "Finish setup";/);
-  assert.match(appScript, /<h2>You missed a round<\/h2>/);
-  assert.match(appScript, /Use a revive to restore your current round and remaining points\./);
-  assert.match(appScript, /<h3 id="missed-day-revive-title">Restore your run\?<\/h3>/);
-  assert.match(appScript, /Your current round is back to/);
-  assert.match(appScript, /Return tomorrow to keep your round and points\./);
+  assert.match(appScript, /<h2>Run ended<\/h2>/);
+  assert.doesNotMatch(appScript, /revive-player|revive-missed-day|Revive unavailable/);
+  assert.match(appScript, /Your Score, Solves and Best Round are safe\./);
+  assert.match(appScript, /Return tomorrow to keep your Round alive\./);
   assert.match(
     appScript,
-    /`🔥 Round: \$\{shareRound\}`,[\s\S]*?`⚡ Points: \$\{sharePoints\}`,[\s\S]*?`📈 Highest Round: \$\{bestRound\}`,[\s\S]*?`🏆 Maps Solved: \$\{totalRounds\}`/,
+    /`🔥 Round: \$\{shareRound\}`,[\s\S]*?`⚡ Score: \$\{score\}`,[\s\S]*?`🏆 Solves: \$\{solves\}`,[\s\S]*?`📈 Best Round: \$\{bestRound\}`/,
   );
   assert.doesNotMatch(appScript, /<h2>Your run has ended<\/h2>/);
   assert.match(
@@ -359,17 +359,17 @@ test("player stat pills expose dismissible explainers", async () => {
 
   assert.equal((html.match(/data-stat-explainer="/g) || []).length, 3);
   assert.match(html, /id="player-stat-explainer"[^>]*role="status"[^>]*hidden/);
-  assert.match(app, /The number of maps solved in your current streak\./);
+  assert.match(app, /Your current survival run\./);
   assert.doesNotMatch(app, /unless you use a Revive/);
-  assert.match(app, /Spend them on Revives to protect your run/);
-  assert.match(app, /The total number of maps you’ve correctly identified\./);
+  assert.match(app, /Score, which never decreases or resets\./);
+  assert.match(app, /permanent number of official Daily Undead puzzles/);
   assert.match(app, /if \(wasOpen\) return;/);
   assert.match(app, /if \(!playerStats\.contains\(event\.target\)\) closeStatExplainer\(\)/);
   assert.match(app, /event\.key === "Escape"/);
   assert.match(css, /\.player-stat-explainer \{[\s\S]*?position: absolute;[\s\S]*?width: 100%;/);
   assert.match(css, /\.stat-display \{[\s\S]*?border: 1px solid rgb\(247 200 92 \/ 30%\);/);
-  assert.match(css, /\.stat-display\.total-rounds \{[\s\S]*?border-color: rgb\(184 194 211 \/ 28%\);/);
-  assert.match(css, /\.stat-display\.total-rounds\[aria-expanded="true"\] \{[\s\S]*?border-color: rgb\(214 223 236 \/ 82%\);/);
+  assert.match(css, /\.stat-display\.subdued-stat \{[\s\S]*?border-color: rgb\(184 194 211 \/ 28%\);/);
+  assert.match(css, /\.stat-display\.subdued-stat\[aria-expanded="true"\] \{[\s\S]*?border-color: rgb\(214 223 236 \/ 82%\);/);
 });
 
 test("survivor profiles always expose a labelled favourite memory section", async () => {

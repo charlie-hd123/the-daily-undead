@@ -1,33 +1,5 @@
-const reviveCosts = [100, 250, 500, 750, 1000, 1500, 2000, 3000, 4000, 5000];
-
-function getSafeReviveCount(value) {
-  return Number.isInteger(value) && value >= 0 ? value : 0;
-}
-
-export function calculateReviveCost(revivesUsed) {
-  const safeRevivesUsed = getSafeReviveCount(revivesUsed);
-  return reviveCosts[Math.min(safeRevivesUsed, reviveCosts.length - 1)];
-}
-
-export function incrementReviveCount(revivesUsed) {
-  return getSafeReviveCount(revivesUsed) + 1;
-}
-
-export function resetReviveCount() {
-  return 0;
-}
-
 export function isLocalDevelopmentHostname(hostname) {
   return ["localhost", "127.0.0.1", "::1", "[::1]"].includes(hostname);
-}
-
-export function shouldResetReviveCycle({
-  missedDayState,
-  phase,
-  currentRound,
-  points,
-}) {
-  return !missedDayState && phase !== "result" && currentRound === 0 && points === 0;
 }
 
 export function getElapsedUtcDays(fromDateKey, toDateKey) {
@@ -40,79 +12,66 @@ export function getElapsedUtcDays(fromDateKey, toDateKey) {
   return Math.floor((toTime - fromTime) / 86400000);
 }
 
+export function getRequiredMissedDates(fromDateKey, toDateKey, protectedDates = []) {
+  const elapsedDays = getElapsedUtcDays(fromDateKey, toDateKey);
+  if (elapsedDays <= 1) return [];
+
+  const protectedSet = new Set(protectedDates);
+  const dates = [];
+  const cursor = new Date(`${fromDateKey}T00:00:00Z`);
+  for (let offset = 1; offset < elapsedDays; offset += 1) {
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+    const dateKey = cursor.toISOString().slice(0, 10);
+    if (!protectedSet.has(dateKey)) dates.push(dateKey);
+  }
+  return dates;
+}
+
 export function prepareMissedDayProgress({
   savedState,
   lastPlayedDate,
   dateKey,
   currentRound,
-  points,
+  score,
+  protectedDates = [],
 }) {
   const unchanged = {
     currentRound,
-    points,
+    score,
     shouldSaveState: false,
     progressReset: false,
   };
 
+  const requiredMissedDates = getRequiredMissedDates(lastPlayedDate, dateKey, protectedDates);
   if (savedState?.dateKey === dateKey) {
+    if (!requiredMissedDates.length && !savedState.resolved) {
+      return {
+        ...unchanged,
+        currentRound: Math.max(currentRound, savedState.roundsBeforeLoss || 0),
+        missedDayState: null,
+        shouldSaveState: true,
+        progressReset: true,
+      };
+    }
     return { ...unchanged, missedDayState: savedState };
   }
 
-  const elapsedDays = getElapsedUtcDays(lastPlayedDate, dateKey);
-
-  if (savedState && !savedState.resolved && elapsedDays > 1) {
-    return {
-      ...unchanged,
-      missedDayState: {
-        ...savedState,
-        dateKey,
-        missedDays: elapsedDays - 1,
-      },
-      shouldSaveState: true,
-    };
-  }
-
-  if (elapsedDays <= 1 || (currentRound === 0 && points === 0)) {
+  if (!requiredMissedDates.length || currentRound === 0) {
     return { ...unchanged, missedDayState: null };
   }
 
   return {
     missedDayState: {
       dateKey,
-      missedDays: elapsedDays - 1,
+      missedDays: requiredMissedDates.length,
+      missedDates: requiredMissedDates,
       roundsBeforeLoss: currentRound,
-      pointsBeforeLoss: points,
-      revived: false,
       resolved: false,
     },
     currentRound: 0,
-    points: 0,
+    score,
     shouldSaveState: true,
     progressReset: true,
-  };
-}
-
-export function purchaseMissedDayRevive(missedDayState, reviveCost) {
-  if (
-    !missedDayState ||
-    missedDayState.revived ||
-    missedDayState.resolved ||
-    !Number.isInteger(reviveCost) ||
-    reviveCost <= 0 ||
-    missedDayState.pointsBeforeLoss < reviveCost
-  ) {
-    return null;
-  }
-
-  return {
-    missedDayState: {
-      ...missedDayState,
-      revived: true,
-      resolved: true,
-      reviveCostPaid: reviveCost,
-    },
-    currentRound: missedDayState.roundsBeforeLoss,
-    points: missedDayState.pointsBeforeLoss - reviveCost,
   };
 }
 

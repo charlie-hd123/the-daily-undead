@@ -8,11 +8,11 @@ The bonus ordering round uses tap-to-rank cards: tapping steps assigns 1, 2, and
 
 A correct map awards 50 points with one clue, 20 with two clues, or 10 with three clues. A correct step order doubles that map score and produces a gold **Double Points!** result banner with the map, clue count, and correct chronological order summarized on one screen.
 
-Finished results lead into a dedicated next-round screen with a large live countdown to the next UTC puzzle and a progress-aware reminder to return and keep building the player's current round and points.
+Finished results lead into a dedicated next-round screen with a large live countdown to the next UTC puzzle and a reminder to return and keep the player's current Round alive.
 
-Finished results also include a spoiler-free **Share with your squad** action. Supported phones and browsers open the native share sheet; other modern browsers copy the dated result, current round, highest round, points, maps solved, and canonical game link to the clipboard.
+Finished results also include a spoiler-free **Share with your squad** action. Supported phones and browsers open the native share sheet; other modern browsers copy the dated result, Score, Solves, Round, Best Round, and canonical game link to the clipboard.
 
-The player also has a current-round streak. A correct map answer increases it immediately, whether or not the bonus order is correct, while a wrong map answer resets it to zero. Missing a daily map creates a recoverable loss on the player's next visit. The missed-day screen and Game Over screen offer a revive when the player has enough points; reviving restores the previous current round and deducts the revive cost from the saved points balance. Successful revives cost progressively more during the current run across both loss types: 100, 250, 500, 750, 1,000, 1,500, 2,000, 3,000, 4,000, then 5,000 points. Every later revive in that run remains at the 5,000-point ceiling. If a loss is not revived, the run ends and the revive price resets to 100 points for the next run. A separate Maps Solved count records every correctly identified map and does not reset after a loss. Guest values live only in the browser; signed-in values can be restored from the account service.
+The permanent player stats are **Score** and **Solves**. Puzzle rewards are still described as points, and every earned point is added to Score. Score never decreases, resets, or acts as currency. Each successful official daily puzzle adds one Solve, which is also permanent. **Round** is the temporary survival run: a correct official result advances it, while a wrong answer or missed required date ends only the run. **Best Round** is a permanent career achievement. Protected maintenance or broken-puzzle dates are skipped without granting a free Round, and signed-in Round continuity can be reconstructed from its migration anchor, verified daily results, and protected-date calendar.
 
 The game is a dependency-free static site designed to work on GitHub Pages. Players can remain guests with browser-local progress, or optionally sign in with a one-time email code to keep progress across devices. The catalogue contains 320 ordered steps across 38 answer maps from World at War through Black Ops 7. Nine additional maps without full Easter eggs are selectable but excluded from the answer rotation.
 
@@ -75,7 +75,7 @@ Because local account sync stays isolated from production, append `?leaderboardU
 
 Guest progress is saved in the browser separately for each date. Signed-in players also synchronise it through the account API. Every player receives the next puzzle at 00:00 UTC, and the header countdown shows the time remaining until that worldwide rollover. The site synchronises against its host's clock when possible and falls back to the device clock when offline.
 
-The browser stores the current round and highest round separately. On the first load after highest-round tracking was introduced, an older save's current round is immediately preserved as its initial highest round before future losses can reset the current round.
+The browser stores current Round and Best Round separately. On the first load after Best Round tracking was introduced, an older save's current Round is immediately preserved as its initial Best Round before a later loss can reset the current run.
 
 ## Run the tests
 
@@ -85,7 +85,7 @@ With Node.js installed:
 npm test
 ```
 
-The tests cover deterministic daily selection, map availability dates, clue selection, bonus-order checking, catalogue integrity, missed-day progression, revives, community submission deduplication, account validation, Worker validation and CORS, future preview protection, and the published page's assets and privacy-sensitive links.
+The tests cover deterministic daily selection, map availability dates, clue selection, bonus-order checking, permanent Score, protected-date Round continuity, catalogue integrity, community submission deduplication, account validation, Worker validation and CORS, future preview protection, and the published page's assets and privacy-sensitive links.
 
 ## Add or update map data
 
@@ -148,7 +148,7 @@ No build command or GitHub Action is required. The included `CNAME` file connect
 
 Accounts are optional. Guests keep using browser local storage. A player who chooses **Save progress** signs up or signs in through Clerk with an email verification code, then chooses a public username. There is no game password to remember or reset. On first setup, the player can import progress already stored on that device.
 
-Clerk stores the email address and authentication/session data. Cloudflare D1 stores only Clerk's opaque user ID, the chosen username, synchronised progress, per-day puzzle state, and a server-verified daily-result ledger. Players can change their unique public username from the Clerk account panel; this updates the same D1 profile without affecting saved progress or results. D1 does not store email addresses, passwords, or email codes. The Today leaderboard uses the verified ledger to show signed-in players who correctly identified the map, ranked by points earned that day, alongside the anonymous community count for everyone who played. The All Time leaderboard shows each account's synchronised current round, points balance, highest round, and maps solved; those values can include progress imported when the account was created.
+Clerk stores the email address and authentication/session data. Cloudflare D1 stores only Clerk's opaque user ID, the chosen username, synchronised progress, per-day puzzle state, and a server-verified daily-result ledger. Players can change their unique public username from the Clerk account panel; this updates the same D1 profile without affecting saved progress or results. D1 does not store email addresses, passwords, or email codes. The Today leaderboard uses the verified ledger to show signed-in players who correctly identified the map, ranked by points earned that day, alongside the anonymous community count for everyone who played. The All Time leaderboard ranks accounts by permanent Score and shows Solves and Best Round as supporting information.
 
 The free Clerk production plan expires browser sessions after seven days. Once a browser has successfully loaded an account, the site remembers only that opaque Clerk user ID and the latest cloud-save revision. If Clerk later reports no active session, the player sees a prominent session-expired prompt. Progress made after dismissing it is retained in a user-scoped pending snapshot and is uploaded only after the same Clerk user signs back in. A different account can never receive that pending progress. If both the device and cloud changed, the player chooses which save to keep; clearing all browser data removes pending local progress but never deletes or replaces the existing D1 cloud save.
 
@@ -165,7 +165,7 @@ assets/fonts/          Locally hosted Barlow fonts and their OFL licence
 js/app.js              Screens, interactions, saved progress
 js/account.js          Optional Clerk sign-in and cross-device sync
 js/game-core.js        Seeded daily puzzle and order logic
-js/progression.js      Missed-day, revive, and preview rules
+js/progression.js      Missed-day, protected-date, and preview rules
 js/community-stats.js  Anonymous attempt submission and aggregate display
 data/maps/index.json   Game list and map-file manifest
 data/maps/*.json       One content file per map

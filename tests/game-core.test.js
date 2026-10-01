@@ -5,7 +5,7 @@ import {
   buildDailyPuzzle,
   calculateBonusPoints,
   calculateMapPoints,
-  calculateNextPoints,
+  calculateNextScore,
   calculateNextStreak,
   getAnswerDisplayTitle,
   getMillisecondsUntilNextUtcDay,
@@ -197,11 +197,11 @@ test("a correct step order doubles the map points", () => {
   assert.equal(oneCluePoints + calculateBonusPoints(oneCluePoints, true), 100);
 });
 
-test("points accumulate on correct answers and reset after a wrong map", () => {
-  assert.equal(calculateNextPoints(40, 30, true), 70);
-  assert.equal(calculateNextPoints(70, 20, true), 90);
-  assert.equal(calculateNextPoints(90, 0, false), 0);
-  assert.equal(calculateNextPoints(Number.NaN, 20, true), 20);
+test("Score accumulates permanently and zero-point failures never reduce it", () => {
+  assert.equal(calculateNextScore(40, 30), 70);
+  assert.equal(calculateNextScore(70, 20), 90);
+  assert.equal(calculateNextScore(90, 0), 90);
+  assert.equal(calculateNextScore(Number.NaN, 20), 20);
 });
 
 test("date helpers use the worldwide UTC day boundary", () => {

@@ -22,9 +22,9 @@ function rowToAllTimeEntry(row) {
     ...(row.avatar_id ? { avatarId: row.avatar_id } : {}),
     ...(row.theme_id ? { themeId: row.theme_id } : {}),
     currentRound: nonNegativeInteger(row.current_round),
-    points: nonNegativeInteger(row.points_balance),
-    highestRound: nonNegativeInteger(row.best_round),
-    totalRounds: nonNegativeInteger(row.total_rounds),
+    score: nonNegativeInteger(row.score),
+    bestRound: nonNegativeInteger(row.best_round),
+    solves: nonNegativeInteger(row.total_rounds),
   };
 }
 
@@ -60,16 +60,16 @@ export async function readLeaderboards(db, dateKey) {
         profiles.avatar_id,
         profiles.theme_id,
         COALESCE(saves.current_round, 0) AS current_round,
-        COALESCE(saves.points_balance, 0) AS points_balance,
+        COALESCE(saves.score, 0) AS score,
         COALESCE(saves.best_round, 0) AS best_round,
         COALESCE(saves.total_rounds, 0) AS total_rounds
       FROM player_profiles AS profiles
       LEFT JOIN player_saves AS saves ON saves.user_id = profiles.user_id
       WHERE profiles.leaderboard_visible = 1
       ORDER BY
-        best_round DESC,
+        score DESC,
         total_rounds DESC,
-        current_round DESC,
+        best_round DESC,
         profiles.username COLLATE BINARY ASC`,
     ),
   ]);

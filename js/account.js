@@ -6,7 +6,7 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20260928-8";
+} from "./account-session.js?v=20261001-3";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -574,7 +574,7 @@ export async function initialiseAccount({
       heading.textContent = viewed.username;
       const identityLine = documentObject.createElement("div");
       identityLine.className = "public-profile-identity-line";
-      [["Round", result.stats.currentRound], ["Points", result.stats.pointsBalance]].forEach(([label, value]) => {
+      [["Score", result.stats.score], ["Round", Math.max(1, result.stats.currentRound)]].forEach(([label, value]) => {
         const indicator = documentObject.createElement("span");
         indicator.className = "public-profile-indicator";
         indicator.innerHTML = `${label} <strong>${new Intl.NumberFormat("en-GB").format(value)}</strong>`;
@@ -591,7 +591,7 @@ export async function initialiseAccount({
       bio.classList.toggle("is-empty", !viewed.bio);
       const stats = documentObject.createElement("dl");
       stats.className = "public-profile-stats";
-      [["Maps solved", result.stats.mapsSolved], ["Highest round", result.stats.highestRound]].forEach(([label, value]) => {
+      [["Solves", result.stats.solves], ["Best round", result.stats.bestRound]].forEach(([label, value]) => {
         const box = documentObject.createElement("div");
         box.className = "public-profile-stat";
         const dt = documentObject.createElement("dt");
@@ -889,7 +889,7 @@ export async function initialiseAccount({
   accountButton.disabled = false;
   accountButton.textContent = profile.username;
   accountButton.classList.add("has-username");
-  const mapsSolved = Number(account.progress?.totalRounds || 0);
+  const mapsSolved = Number(account.progress?.solves || 0);
   const highestRound = Number(account.progress?.bestRound || 0);
 
   if (profileEditorForm) {
@@ -1192,11 +1192,15 @@ export async function initialiseAccount({
 
   async function recordMapResult(payload) {
     try {
-      return await requestJson(clerk, apiUrl, "/api/account/results/map", {
+      const result = await requestJson(clerk, apiUrl, "/api/account/results/map", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      currentRevision = Math.max(currentRevision, Number(result.progress?.revision || 0));
+      rememberAccount(globalThis.localStorage, { userId, revision: currentRevision });
+      scheduleSave();
+      return result;
     } catch {
       return null;
     }
@@ -1204,11 +1208,15 @@ export async function initialiseAccount({
 
   async function recordBonusResult(payload) {
     try {
-      return await requestJson(clerk, apiUrl, "/api/account/results/bonus", {
+      const result = await requestJson(clerk, apiUrl, "/api/account/results/bonus", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      currentRevision = Math.max(currentRevision, Number(result.progress?.revision || 0));
+      rememberAccount(globalThis.localStorage, { userId, revision: currentRevision });
+      scheduleSave();
+      return result;
     } catch {
       return null;
     }

@@ -10,6 +10,7 @@ import {
 } from "../worker/src/index.js";
 import {
   normalizeUsername,
+  reconstructRound,
   getPublicProfile,
   readJsonBody,
   registerAccount,
@@ -103,9 +104,8 @@ test("account usernames and uploaded local saves are tightly validated", () => {
     {
       currentRound: 12,
       bestRound: 12,
-      pointsBalance: 250,
-      totalRounds: 40,
-      reviveCount: 2,
+      score: 250,
+      solves: 40,
       lastPlayedDate: "2026-08-12",
       missedDayState: null,
     },
@@ -176,7 +176,7 @@ test("public profile lookups exclude profiles hidden from leaderboards", async (
   assert.match(query, /leaderboard_visible = 1/);
 });
 
-test("account saves cannot roll lifetime maps solved backwards", async () => {
+test("ordinary account saves cannot overwrite server-owned Score or Solves", async () => {
   const statements = [];
   const db = {
     prepare(sql) {
@@ -186,7 +186,7 @@ test("account saves cannot roll lifetime maps solved backwards", async () => {
             return { first: async () => ({ user_id: "user_1" }) };
           }
           if (sql.startsWith("SELECT * FROM player_saves")) {
-            return { first: async () => ({ total_rounds: 42 }) };
+            return { first: async () => ({ score: 5000, total_rounds: 42 }) };
           }
           const statement = { sql, bindings };
           statements.push(statement);
@@ -202,13 +202,57 @@ test("account saves cannot roll lifetime maps solved backwards", async () => {
     new Request("https://api.example.test/api/account/save", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ progress: { totalRounds: 10 } }),
+      body: JSON.stringify({ progress: { score: 999999, solves: 10 } }),
     }),
     "user_1",
   );
 
   assert.equal(response.status, 200);
-  assert.match(statements[0].sql, /total_rounds = MAX\(total_rounds, \?\)/);
+  assert.doesNotMatch(statements[0].sql, /score\s*=/);
+  assert.doesNotMatch(statements[0].sql, /total_rounds\s*=/);
+});
+
+test("signed-in Round reconstruction repairs a retrospectively protected date", async () => {
+  let updated = null;
+  const db = {
+    prepare(sql) {
+      return {
+        bind(...bindings) {
+          if (sql.startsWith("UPDATE player_saves")) {
+            return { run: async () => { updated = bindings; } };
+          }
+          if (sql.startsWith("SELECT * FROM player_saves")) {
+            return { first: async () => ({
+              current_round: updated[0],
+              best_round: updated[1],
+              round_anchor_date: "2026-09-27",
+              round_anchor_value: 38,
+            }) };
+          }
+          return { sql, bindings };
+        },
+      };
+    },
+    async batch(statements) {
+      assert.match(statements[0].sql, /player_daily_results/);
+      assert.match(statements[1].sql, /counts_for_round = 0/);
+      return [
+        { results: [{ puzzle_date: "2026-09-29", map_correct: 1 }] },
+        { results: [{ game_date: "2026-09-28" }] },
+      ];
+    },
+  };
+
+  const result = await reconstructRound(db, "user_1", {
+    current_round: 0,
+    best_round: 40,
+    round_anchor_date: "2026-09-27",
+    round_anchor_value: 38,
+  }, "2026-09-30");
+
+  assert.deepEqual(updated, [39, 40, "user_1"]);
+  assert.equal(result.current_round, 39);
+  assert.equal(result.best_round, 40);
 });
 
 test("account saves reject a stale browser revision before replacing cloud progress", async () => {
@@ -224,7 +268,7 @@ test("account saves reject a stale browser revision before replacing cloud progr
               first: async () => ({
                 current_round: 20,
                 best_round: 20,
-                points_balance: 900,
+                score: 900,
                 total_rounds: 40,
                 revision: 9,
               }),
@@ -248,7 +292,7 @@ test("account saves reject a stale browser revision before replacing cloud progr
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         baseRevision: 8,
-        progress: { currentRound: 21, pointsBalance: 950, totalRounds: 41 },
+        progress: { currentRound: 21, score: 950, solves: 41 },
       }),
     }),
     "user_1",
@@ -340,9 +384,8 @@ test("account registration imports the browser's highest round into D1", async (
         progress: {
           currentRound: 3,
           bestRound: 17,
-          pointsBalance: 250,
-          totalRounds: 41,
-          reviveCount: 1,
+          score: 250,
+          solves: 41,
           lastPlayedDate: today,
         },
       }),
@@ -355,6 +398,7 @@ test("account registration imports the browser's highest round into D1", async (
   assert.ok(progressInsert);
   assert.equal(progressInsert.bindings[1], 3, "current round should remain independent");
   assert.equal(progressInsert.bindings[2], 17, "highest round should be imported");
+  assert.equal(progressInsert.bindings[7], 250, "guest Score should become account Score");
 });
 
 test("a signed-in player can change only their own unique D1 username", async () => {
@@ -478,6 +522,23 @@ test("the social migration stores curated public profile fields", async () => {
   assert.match(schema, /ADD COLUMN favourite_game/);
   assert.match(schema, /ADD COLUMN bio/);
   assert.doesNotMatch(schema, /friend/i);
+});
+
+test("the redesign migration preserves old balances and makes results repairable", async () => {
+  const schema = await Promise.all([
+    fs.readFile(new URL("../worker/migrations/0006_scoring_progression_redesign.sql", import.meta.url), "utf8"),
+    fs.readFile(new URL("../worker/migrations/0007_add_round_reconstruction_anchor.sql", import.meta.url), "utf8"),
+    fs.readFile(new URL("../worker/migrations/0008_make_result_awards_atomic.sql", import.meta.url), "utf8"),
+  ]).then((parts) => parts.join("\n"));
+  assert.match(schema, /ADD COLUMN score INTEGER NOT NULL DEFAULT 0/);
+  assert.match(schema, /SET score = MAX\(score, points_balance\)/);
+  assert.match(schema, /ADD COLUMN score_awarded/);
+  assert.match(schema, /CREATE TABLE IF NOT EXISTS game_dates/);
+  assert.match(schema, /counts_for_round/);
+  assert.match(schema, /round_anchor_value = current_round/);
+  assert.match(schema, /ADD COLUMN progression_applied/);
+  assert.match(schema, /SET score_awarded = points_earned/);
+  assert.doesNotMatch(schema, /DROP TABLE|DELETE FROM player_saves/i);
 });
 
 test("the Worker's verification catalogue matches the browser puzzle catalogue", async () => {

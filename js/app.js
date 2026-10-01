@@ -2,7 +2,6 @@ import {
   buildDailyPuzzle,
   calculateBonusPoints,
   calculateMapPoints,
-  calculateNextPoints,
   calculateNextStreak,
   getAnswerDisplayTitle,
   getMillisecondsUntilNextUtcDay,
@@ -13,36 +12,31 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20260928-8";
+} from "./game-core.js?v=20261001-3";
 import {
-  calculateReviveCost,
   canUseRequestedPreviewDate,
-  incrementReviveCount,
   isLocalDevelopmentHostname,
   prepareMissedDayProgress,
-  purchaseMissedDayRevive,
-  resetReviveCount,
-  shouldResetReviveCycle,
-} from "./progression.js?v=20260928-8";
-import { initialiseAccount } from "./account.js?v=20260928-8";
+} from "./progression.js?v=20261001-3";
+import { initialiseAccount } from "./account.js?v=20261001-3";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20260928-8";
+} from "./community-stats.js?v=20261001-3";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20260928-8";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20260928-8";
+} from "./leaderboards.js?v=20261001-3";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-3";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
 const streakLabel = document.querySelector("#streak-count");
-const totalRoundsLabel = document.querySelector("#total-rounds-count");
-const pointsLabel = document.querySelector("#points-count");
+const solvesLabel = document.querySelector("#solves-count");
+const scoreLabel = document.querySelector("#score-count");
 const countdownLabel = document.querySelector("#next-round-countdown");
 const playerStats = document.querySelector(".player-stats");
 const statExplainer = document.querySelector("#player-stat-explainer");
@@ -60,23 +54,23 @@ const socialDemoEnabled = isLocalDevelopment && new URLSearchParams(window.locat
 const communityStatsApiUrl = resolveCommunityStatsApiUrl({ isLocalDevelopment });
 const leaderboardsApiUrl = resolveLeaderboardsApiUrl({ isLocalDevelopment });
 const streakStorageKey = "the-daily-undead:streak";
-const totalRoundsStorageKey = "the-daily-undead:total-rounds";
+const solvesStorageKey = "the-daily-undead:total-rounds";
+const scoreStorageKey = "the-daily-undead:score";
+const legacyPointsStorageKey = "the-daily-undead:total-points";
 const statExplainers = {
   round: {
     title: "Round",
-    copy: "The number of maps solved in your current streak. Your streak ends if you miss a day or choose the wrong map.",
+    copy: "Your current survival run. It advances after each official solve and ends if you miss a required day or choose the wrong map.",
   },
-  points: {
-    title: "Points",
-    copy: "Earned from correct answers. Spend them on Revives to protect your run after a missed day or incorrect answer.",
+  score: {
+    title: "Score",
+    copy: "Your permanent lifetime total. Points earned in each official puzzle are added to Score, which never decreases or resets.",
   },
-  maps: {
-    title: "Maps solved",
-    copy: "The total number of maps you’ve correctly identified.",
+  solves: {
+    title: "Solves",
+    copy: "The permanent number of official Daily Undead puzzles you’ve solved.",
   },
 };
-const pointsStorageKey = "the-daily-undead:total-points";
-const reviveCountStorageKey = "the-daily-undead:revive-count";
 const lastPlayedDateStorageKey = "the-daily-undead:last-played-date";
 const missedDayStorageKey = "the-daily-undead:missed-day";
 const bestRoundStorageKey = "the-daily-undead:best-round";
@@ -84,8 +78,6 @@ const devPreviewStorageKey = "the-daily-undead:dev-preview";
 const currentStateVersion = 10;
 const supportedStateVersions = new Set([2, 3, 4, 5, 6, 7, 8, 9, currentStateVersion]);
 const progressNumberFormatter = new Intl.NumberFormat("en-GB");
-// Saves created before progressive revive pricing did not record the amount paid.
-const legacyReviveCost = 50;
 
 function getLeaderboardUsername() {
   if (accountController.profile?.username) return accountController.profile.username;
@@ -101,9 +93,9 @@ let puzzle;
 let state;
 let streakCount = 0;
 let bestRound = 0;
-let totalRounds = 0;
-let totalPoints = 0;
-let reviveCount = 0;
+let solves = 0;
+let score = 0;
+let protectedDates = [];
 let lastPlayedDate = null;
 let missedDayState = null;
 let lastResultClass = null;
@@ -514,13 +506,10 @@ function createInitialState() {
     bonusOrder: [],
     bonusComplete: false,
     bonusFailed: false,
+    newBestRound: false,
     streakRecorded: false,
     totalRoundsRecorded: false,
     roundsSurvivedBeforeLoss: 0,
-    pointsBeforeLoss: 0,
-    revived: false,
-    reviveCostPaid: 0,
-    reviveCostOffered: 0,
     mapPoints: 0,
     bonusPoints: 0,
     pointsRecorded: false,
@@ -568,36 +557,42 @@ function saveStreak() {
   accountController.scheduleSave();
 }
 
-function loadTotalRounds() {
+function loadSolves() {
   try {
-    const savedTotal = Number.parseInt(localStorage.getItem(totalRoundsStorageKey), 10);
+    const savedTotal = Number.parseInt(localStorage.getItem(solvesStorageKey), 10);
     return Number.isInteger(savedTotal) && savedTotal >= 0 ? savedTotal : 0;
   } catch {
     return 0;
   }
 }
 
-function saveTotalRounds() {
+function saveSolves() {
   try {
-    localStorage.setItem(totalRoundsStorageKey, String(totalRounds));
+    localStorage.setItem(solvesStorageKey, String(solves));
   } catch {
     // The lifetime total remains available for the current session when storage is disabled.
   }
   accountController.scheduleSave();
 }
 
-function loadPoints() {
+function loadScore() {
   try {
-    const savedPoints = Number.parseInt(localStorage.getItem(pointsStorageKey), 10);
-    return Number.isInteger(savedPoints) && savedPoints >= 0 ? savedPoints : 0;
+    const savedScore = Number.parseInt(localStorage.getItem(scoreStorageKey), 10);
+    const legacyBalance = Number.parseInt(localStorage.getItem(legacyPointsStorageKey), 10);
+    const migratedScore = Math.max(
+      Number.isInteger(savedScore) && savedScore >= 0 ? savedScore : 0,
+      Number.isInteger(legacyBalance) && legacyBalance >= 0 ? legacyBalance : 0,
+    );
+    localStorage.setItem(scoreStorageKey, String(migratedScore));
+    return migratedScore;
   } catch {
     return 0;
   }
 }
 
-function savePoints() {
+function saveScore() {
   try {
-    localStorage.setItem(pointsStorageKey, String(totalPoints));
+    localStorage.setItem(scoreStorageKey, String(score));
   } catch {
     // The total remains available for the current session when storage is disabled.
   }
@@ -607,44 +602,15 @@ function savePoints() {
 function clearTemporaryLocalProgress() {
   if (!isLocalDevelopment) return;
   const hasHighNumberPreviewValues =
-    streakCount === 2_300 && totalPoints === 2_000_000_000 && totalRounds === 4_000;
+    streakCount === 2_300 && score === 2_000_000_000 && solves === 4_000;
   if (!hasHighNumberPreviewValues) return;
 
   streakCount = 0;
-  totalPoints = 0;
-  totalRounds = 0;
+  score = 0;
+  solves = 0;
   saveStreak();
-  savePoints();
-  saveTotalRounds();
-}
-
-function loadReviveCount() {
-  try {
-    const savedCount = Number.parseInt(localStorage.getItem(reviveCountStorageKey), 10);
-    return Number.isInteger(savedCount) && savedCount >= 0 ? savedCount : 0;
-  } catch {
-    return 0;
-  }
-}
-
-function saveReviveCount() {
-  try {
-    localStorage.setItem(reviveCountStorageKey, String(reviveCount));
-  } catch {
-    // The revive count remains available for the current session when storage is disabled.
-  }
-  accountController.scheduleSave();
-}
-
-function recordRevivePurchase() {
-  reviveCount = incrementReviveCount(reviveCount);
-  saveReviveCount();
-}
-
-function resetReviveCycle() {
-  if (reviveCount === 0) return;
-  reviveCount = resetReviveCount();
-  saveReviveCount();
+  saveScore();
+  saveSolves();
 }
 
 function loadLastPlayedDate() {
@@ -680,9 +646,7 @@ function loadSavedMissedDayState() {
       Number.isInteger(saved?.missedDays) &&
       saved.missedDays > 0 &&
       Number.isInteger(saved?.roundsBeforeLoss) &&
-      saved.roundsBeforeLoss >= 0 &&
-      Number.isInteger(saved?.pointsBeforeLoss) &&
-      saved.pointsBeforeLoss >= 0
+      saved.roundsBeforeLoss >= 0
     ) {
       return saved;
     }
@@ -709,18 +673,32 @@ function prepareMissedDayState(dateKey) {
     lastPlayedDate,
     dateKey,
     currentRound: streakCount,
-    points: totalPoints,
+    score,
+    protectedDates,
   });
 
   missedDayState = progression.missedDayState;
   streakCount = progression.currentRound;
-  totalPoints = progression.points;
   if (progression.progressReset) {
     saveStreak();
-    savePoints();
   }
   if (progression.shouldSaveState) saveMissedDayState();
   return missedDayState;
+}
+
+async function loadProtectedDates(fromDateKey, toDateKey) {
+  if (!leaderboardsApiUrl || !fromDateKey || fromDateKey >= toDateKey) return [];
+  try {
+    const url = new URL("/api/game-dates", leaderboardsApiUrl);
+    url.searchParams.set("from", fromDateKey);
+    url.searchParams.set("to", toDateKey);
+    const response = await fetch(url, { headers: { Accept: "application/json" } });
+    if (!response.ok) return [];
+    const result = await response.json();
+    return (result.protectedDates || []).map((entry) => entry.date).filter(isValidDateKey);
+  } catch {
+    return [];
+  }
 }
 
 function animateStat(label) {
@@ -774,7 +752,7 @@ function initialiseStatExplainers() {
 }
 
 function updateStreakDisplay() {
-  const formattedStreak = progressNumberFormatter.format(streakCount);
+  const formattedStreak = progressNumberFormatter.format(Math.max(1, streakCount));
   streakLabel.textContent = formattedStreak;
   streakLabel.closest(".stat-display").setAttribute(
     "aria-label",
@@ -782,42 +760,37 @@ function updateStreakDisplay() {
   );
 }
 
-function updateTotalRoundsDisplay() {
-  const formattedTotalRounds = progressNumberFormatter.format(totalRounds);
-  totalRoundsLabel.textContent = formattedTotalRounds;
-  totalRoundsLabel.closest(".stat-display").setAttribute(
+function updateSolvesDisplay() {
+  const formattedSolves = progressNumberFormatter.format(solves);
+  solvesLabel.textContent = formattedSolves;
+  solvesLabel.closest(".stat-display").setAttribute(
     "aria-label",
-    `Maps solved: ${formattedTotalRounds}. Learn more.`,
+    `Solves: ${formattedSolves}. Learn more.`,
   );
 }
 
-function updatePointsDisplay() {
-  const formattedPoints = progressNumberFormatter.format(totalPoints);
-  pointsLabel.textContent = formattedPoints;
-  pointsLabel.closest(".stat-display").setAttribute(
+function updateScoreDisplay() {
+  const formattedScore = progressNumberFormatter.format(score);
+  scoreLabel.textContent = formattedScore;
+  scoreLabel.closest(".stat-display").setAttribute(
     "aria-label",
-    `Points: ${formattedPoints}. Learn more.`,
+    `Score: ${formattedScore}. Learn more.`,
   );
 }
 
 function awardPoints(points, shouldAnimate = true) {
   if (!Number.isInteger(points) || points <= 0) return;
 
-  totalPoints = calculateNextPoints(totalPoints, points, true);
-  savePoints();
-  updatePointsDisplay();
-  if (shouldAnimate) animateStat(pointsLabel);
-}
-
-function resetPoints() {
-  totalPoints = calculateNextPoints(totalPoints, 0, false);
-  savePoints();
-  updatePointsDisplay();
+  score += points;
+  saveScore();
+  updateScoreDisplay();
+  if (shouldAnimate) animateStat(scoreLabel);
 }
 
 function recordMapResult(isCorrect) {
-  if (state.streakRecorded) return;
+  if (state.streakRecorded) return false;
 
+  const previousBestRound = bestRound;
   streakCount = calculateNextStreak(streakCount, isCorrect);
   if (streakCount > bestRound) {
     bestRound = streakCount;
@@ -828,14 +801,13 @@ function recordMapResult(isCorrect) {
   if (isCorrect) {
     animateStat(streakLabel);
     if (!state.totalRoundsRecorded) {
-      totalRounds += 1;
-      saveTotalRounds();
-      updateTotalRoundsDisplay();
-      animateStat(totalRoundsLabel);
+      solves += 1;
+      saveSolves();
+      updateSolvesDisplay();
+      animateStat(solvesLabel);
     }
-  } else {
-    resetPoints();
   }
+  return isCorrect && streakCount > previousBestRound;
 }
 
 function loadState() {
@@ -866,8 +838,8 @@ function loadState() {
           adjustment += bonusPoints - previousBonusPoints;
         }
 
-        totalPoints = Math.max(0, totalPoints + adjustment);
-        savePoints();
+        score = Math.max(0, score + adjustment);
+        saveScore();
         return { ...migrated, mapPoints, bonusPoints };
       }
 
@@ -894,9 +866,8 @@ function getLocalAccountSnapshot() {
     progress: {
       currentRound: streakCount,
       bestRound,
-      pointsBalance: totalPoints,
-      totalRounds,
-      reviveCount,
+      score,
+      solves,
       lastPlayedDate,
       missedDayState,
     },
@@ -909,18 +880,16 @@ function applyRemoteAccount(account) {
   if (progress) {
     streakCount = progress.currentRound;
     bestRound = Math.max(progress.bestRound, progress.currentRound);
-    totalPoints = progress.pointsBalance;
-    totalRounds = progress.totalRounds;
-    reviveCount = progress.reviveCount;
+    score = progress.score;
+    solves = progress.solves;
     lastPlayedDate = progress.lastPlayedDate;
     missedDayState = progress.missedDayState;
 
     try {
       localStorage.setItem(streakStorageKey, String(streakCount));
       localStorage.setItem(bestRoundStorageKey, String(bestRound));
-      localStorage.setItem(pointsStorageKey, String(totalPoints));
-      localStorage.setItem(totalRoundsStorageKey, String(totalRounds));
-      localStorage.setItem(reviveCountStorageKey, String(reviveCount));
+      localStorage.setItem(scoreStorageKey, String(score));
+      localStorage.setItem(solvesStorageKey, String(solves));
       if (lastPlayedDate) localStorage.setItem(lastPlayedDateStorageKey, lastPlayedDate);
       else localStorage.removeItem(lastPlayedDateStorageKey);
       if (missedDayState) localStorage.setItem(missedDayStorageKey, JSON.stringify(missedDayState));
@@ -967,8 +936,8 @@ function migrateCompletedScore() {
   if (state.phase !== "result") return;
 
   if (state.isCorrect && !state.totalRoundsRecorded) {
-    totalRounds += 1;
-    saveTotalRounds();
+    solves += 1;
+    saveSolves();
     state.totalRoundsRecorded = true;
   }
 
@@ -1182,10 +1151,8 @@ function renderMapSelection() {
       catalog.answerEquivalents,
     );
     const mapPoints = isCorrect ? calculateMapPoints(state.cluesRevealed) : 0;
-    const reviveCostOffered = isCorrect ? 0 : calculateReviveCost(reviveCount);
     const roundsSurvivedBeforeLoss = isCorrect ? 0 : streakCount;
-    const pointsBeforeLoss = isCorrect ? 0 : totalPoints;
-    recordMapResult(isCorrect);
+    const newBestRound = recordMapResult(isCorrect);
     if (!state.pointsRecorded) awardPoints(mapPoints);
     if (isCorrect) recordDailyParticipation();
     recordCommunityAttempt(isCorrect);
@@ -1202,9 +1169,8 @@ function renderMapSelection() {
       cluesRevealed: isCorrect ? 3 : state.cluesRevealed,
       streakRecorded: true,
       totalRoundsRecorded: isCorrect || state.totalRoundsRecorded,
+      newBestRound,
       roundsSurvivedBeforeLoss,
-      pointsBeforeLoss,
-      reviveCostOffered,
       mapPoints,
       pointsRecorded: true,
     });
@@ -1300,7 +1266,7 @@ function renderNextRoundScreen() {
       <p class="kicker">Next round</p>
       <h3 id="next-round-screen-title">Next map in</h3>
       <strong id="end-screen-countdown" class="end-screen-countdown" aria-label="Time until the next round">--:--:--</strong>
-      <p class="next-round-motivation">Return tomorrow to keep your round and points.</p>
+      <p class="next-round-motivation">Return tomorrow to keep your Round alive.</p>
     </section>
   `;
 }
@@ -1309,76 +1275,22 @@ function renderMissedDay() {
   const missedMapCopy = missedDayState.missedDays === 1
     ? "You missed yesterday’s map."
     : `You missed ${missedDayState.missedDays} daily maps.`;
-  const reviveCost = calculateReviveCost(reviveCount);
-  const reviveCostPaid = missedDayState.reviveCostPaid || legacyReviveCost;
-  const canRevive = missedDayState.pointsBeforeLoss >= reviveCost;
-  const pointsAfterRevive = missedDayState.pointsBeforeLoss - reviveCost;
+  app.innerHTML = `
+    <section class="panel missed-day-panel">
+      <div class="result-banner failed animate">
+        <h2>Run ended</h2>
+        <p>${escapeHtml(missedMapCopy)} Your Score, Solves and Best Round are safe.</p>
+        <p class="survival-summary">Your run ended at <strong>Round ${missedDayState.roundsBeforeLoss}</strong>. Today starts a new run at <strong>Round 1</strong>.</p>
+      </div>
+      <div class="actions">
+        <button id="continue-after-missed-day" class="button primary" type="button">Play today’s map</button>
+      </div>
+    </section>
+  `;
 
-  if (missedDayState.revived) {
-    app.innerHTML = `
-      <section class="panel missed-day-panel">
-        <div class="result-banner revived animate">
-          <h2>Revived!</h2>
-          <p>You spent ${reviveCostPaid} points and saved your run.</p>
-          <p class="survival-summary">Your current round is back to <strong>${missedDayState.roundsBeforeLoss}</strong>, with <strong>${totalPoints}</strong> ${totalPoints === 1 ? "point" : "points"} remaining.</p>
-        </div>
-        <div class="actions">
-          <button id="continue-after-missed-day" class="button primary" type="button">Play today’s map</button>
-        </div>
-      </section>
-    `;
-  } else {
-    app.innerHTML = `
-      <section class="panel missed-day-panel">
-        <div class="result-banner failed animate">
-          <h2>You missed a round</h2>
-          <p>${escapeHtml(missedMapCopy)} ${canRevive ? "Use a revive to restore your current round and remaining points." : "You don’t have enough points to revive your run."}</p>
-          <p class="survival-summary">You reached Round <strong>${missedDayState.roundsBeforeLoss}</strong> with <strong>${missedDayState.pointsBeforeLoss}</strong> ${missedDayState.pointsBeforeLoss === 1 ? "point" : "points"}.</p>
-        </div>
-        <section class="revive-offer" aria-labelledby="missed-day-revive-title">
-          <div>
-            <h3 id="missed-day-revive-title">Restore your run?</h3>
-            <p>${
-              canRevive
-                ? `Spend ${reviveCost} points to restore your current round to ${missedDayState.roundsBeforeLoss}. You’ll continue with ${pointsAfterRevive} ${pointsAfterRevive === 1 ? "point" : "points"}.`
-                : `You need at least ${reviveCost} points to restore your current round to ${missedDayState.roundsBeforeLoss}.`
-            }</p>
-          </div>
-          <button id="revive-missed-day" class="button revive-button" type="button" ${canRevive ? "" : "disabled"}>
-            ${canRevive ? `Revive · ${reviveCost} Points` : "Revive unavailable"}
-          </button>
-        </section>
-        <div class="actions">
-          <button id="continue-after-missed-day" class="button" type="button">Continue without revive</button>
-        </div>
-      </section>
-    `;
-  }
-
-  focusAfterRender(`missed-day:${missedDayState.revived ? "revived" : "lost"}`);
-  app.querySelector("#revive-missed-day")?.addEventListener("click", () => {
-    if (!canRevive) return;
-
-    const revival = purchaseMissedDayRevive(missedDayState, reviveCost);
-    if (!revival) return;
-
-    totalPoints = revival.points;
-    streakCount = revival.currentRound;
-    missedDayState = revival.missedDayState;
-    recordRevivePurchase();
-    savePoints();
-    saveStreak();
-    recordDailyParticipation(getPreviousDateKey(puzzle.dateKey));
-    saveMissedDayState();
-    updatePointsDisplay();
-    updateStreakDisplay();
-    animateStat(pointsLabel);
-    animateStat(streakLabel);
-    renderMissedDay();
-  });
+  focusAfterRender("missed-day:lost");
 
   app.querySelector("#continue-after-missed-day").addEventListener("click", () => {
-    if (!missedDayState.revived) resetReviveCycle();
     missedDayState = { ...missedDayState, resolved: true };
     saveMissedDayState();
     lastResultClass = null;
@@ -1387,21 +1299,18 @@ function renderMissedDay() {
 }
 
 function buildScoreSharePayload() {
-  const shareRound = !state.isCorrect && !state.revived
-    ? state.roundsSurvivedBeforeLoss
-    : streakCount;
-  const sharePoints = !state.isCorrect && !state.revived
-    ? state.pointsBeforeLoss
-    : totalPoints;
+  const shareRound = !state.isCorrect
+    ? Math.max(1, state.roundsSurvivedBeforeLoss)
+    : Math.max(1, streakCount);
   const shareUrl = document.querySelector('link[rel="canonical"]')?.href || window.location.href;
 
   const scoreText = [
     `🧟 The Daily Undead · ${formatDate(puzzle.dateKey)}`,
     "",
     `🔥 Round: ${shareRound}`,
-    `⚡ Points: ${sharePoints}`,
-    `📈 Highest Round: ${bestRound}`,
-    `🏆 Maps Solved: ${totalRounds}`,
+    `⚡ Score: ${score}`,
+    `🏆 Solves: ${solves}`,
+    `📈 Best Round: ${bestRound}`,
     "",
     "Think you can do better?",
     "Give it a try!",
@@ -1460,31 +1369,23 @@ function renderResult() {
   const answerTitle = getPuzzleAnswerTitle();
   const failedBonus = state.isCorrect && state.bonusFailed;
   const perfectResult = state.isCorrect && state.bonusComplete;
-  const revivedResult = !state.isCorrect && state.revived;
-  const reviveCost = state.reviveCostOffered || calculateReviveCost(reviveCount);
-  const reviveCostPaid = state.reviveCostPaid || legacyReviveCost;
   const clueLabel = state.lockedClues === 1 ? "clue" : "clues";
-  const resultTitle = revivedResult
-    ? "Revived!"
-    : failedBonus
+  const endedRound = Math.max(1, state.roundsSurvivedBeforeLoss);
+  const resultTitle = failedBonus
       ? "Not quite"
       : perfectResult
         ? "Double Points!"
         : state.isCorrect
           ? "Round Survived!"
-          : "Game Over";
-  const resultCopy = revivedResult
-    ? `You spent ${reviveCostPaid} points and kept your run alive. Today’s answer was ${answerTitle}.`
-    : failedBonus
+          : "Run ended";
+  const resultCopy = failedBonus
       ? `You identified ${answerTitle}, but the step order was incorrect. You still earned ${state.mapPoints} points this round.`
       : perfectResult
         ? `You found ${answerTitle} using ${state.lockedClues} ${clueLabel} and got the steps in the correct order. You earned ${state.mapPoints + state.bonusPoints} points this round.`
         : state.isCorrect
           ? `You identified ${answerTitle} using ${state.lockedClues} ${clueLabel}. You earned ${state.mapPoints} points this round.`
-          : `You chose ${selectedMap?.title ?? "an unknown map"}. Today’s answer was ${answerTitle}.`;
-  const resultClass = revivedResult
-    ? "revived"
-    : failedBonus
+          : `You chose ${selectedMap?.title ?? "an unknown map"}. Today’s answer was ${answerTitle}. Your permanent Score and Solves are safe.`;
+  const resultClass = failedBonus
       ? "partial"
       : perfectResult
         ? "perfect"
@@ -1494,44 +1395,19 @@ function renderResult() {
   const animateResult = resultClass !== lastResultClass;
   lastResultClass = resultClass;
   const isFinished = !state.isCorrect || state.bonusComplete || state.bonusFailed;
-  const survivedRoundLabel = state.roundsSurvivedBeforeLoss === 1 ? "Round" : "Rounds";
-  const preLossPointLabel = state.pointsBeforeLoss === 1 ? "Point" : "Points";
-  const showReviveOffer = !state.isCorrect && !state.revived;
-  const canRevive =
-    showReviveOffer &&
-    Number.isInteger(state.pointsBeforeLoss) &&
-    state.pointsBeforeLoss >= reviveCost;
 
   app.innerHTML = `
     <section class="panel">
       <div class="result-banner ${resultClass}${animateResult ? " animate" : ""}">
         <h2>${resultTitle}</h2>
         <p>${escapeHtml(resultCopy)}</p>
+        ${state.newBestRound ? `<p class="result-milestone">New Best Round: ${bestRound}</p>` : ""}
         ${
           !state.isCorrect
-            ? state.revived
-              ? `<p class="survival-summary">Round restored to <strong>${state.roundsSurvivedBeforeLoss}</strong></p>`
-              : `<p class="survival-summary">You survived <strong>${state.roundsSurvivedBeforeLoss}</strong> ${survivedRoundLabel.toLowerCase()} with <strong>${state.pointsBeforeLoss}</strong> ${preLossPointLabel.toLowerCase()}</p>`
+            ? `<p class="survival-summary">Your run ended at <strong>Round ${endedRound}</strong>. Your next game starts at <strong>Round 1</strong>.</p>`
             : ""
         }
       </div>
-      ${
-        showReviveOffer
-          ? `<section class="revive-offer" aria-labelledby="revive-title">
-              <div>
-                <h3 id="revive-title">Need a revive?</h3>
-                <p>${
-                  canRevive
-                    ? `Spend ${reviveCost} points to restore round ${state.roundsSurvivedBeforeLoss}.`
-                    : `You need at least ${reviveCost} points to restore round ${state.roundsSurvivedBeforeLoss}.`
-                }</p>
-              </div>
-              <button id="revive-player" class="button revive-button" type="button" ${canRevive ? "" : "disabled"}>
-                ${canRevive ? `Revive · ${reviveCost} Points` : "Revive unavailable"}
-              </button>
-            </section>`
-          : ""
-      }
       ${state.isCorrect ? renderBonus() : '<h3>Today’s three clues</h3><div id="clue-list" class="clue-list"></div>'}
       ${
         isFinished
@@ -1551,21 +1427,6 @@ function renderResult() {
     renderClueCards(app.querySelector("#clue-list"), 3);
   }
   focusAfterRender(`result:${resultClass}:${isFinished ? "finished" : "bonus"}`);
-  app.querySelector("#revive-player")?.addEventListener("click", () => {
-    if (!canRevive || state.revived) return;
-
-    totalPoints = state.pointsBeforeLoss - reviveCost;
-    streakCount = state.roundsSurvivedBeforeLoss;
-    recordRevivePurchase();
-    savePoints();
-    saveStreak();
-    recordDailyParticipation();
-    updatePointsDisplay();
-    updateStreakDisplay();
-    animateStat(pointsLabel);
-    animateStat(streakLabel);
-    setState({ revived: true, reviveCostPaid: reviveCost });
-  });
   app.querySelector("#share-score")?.addEventListener("click", (event) => {
     shareScore(event.currentTarget, app.querySelector("#share-score-status"));
   });
@@ -1634,9 +1495,8 @@ async function initialise() {
     // Older browser saves only tracked the current round. Persist that value as
     // the initial best before a later loss can reset the current round.
     saveBestRound();
-    totalRounds = loadTotalRounds();
-    totalPoints = loadPoints();
-    reviveCount = loadReviveCount();
+    solves = loadSolves();
+    score = loadScore();
     lastPlayedDate = loadLastPlayedDate();
     puzzle = buildDailyPuzzle(dateKey, maps);
     state = loadState();
@@ -1648,6 +1508,7 @@ async function initialise() {
           getLocalSnapshot: getLocalAccountSnapshot,
           applyRemoteAccount,
         });
+    protectedDates = await loadProtectedDates(lastPlayedDate, dateKey);
     prepareCommunityStatsDisplay();
     migrateCompletedScore();
     verifySavedAccountResult();
@@ -1655,25 +1516,17 @@ async function initialise() {
     if (state.phase === "result" && typeof state.isCorrect === "boolean") {
       recordCommunityAttempt(state.isCorrect);
     }
-    if (state.phase === "result" && (state.isCorrect || state.revived)) {
+    if (state.phase === "result" && state.isCorrect) {
       recordDailyParticipation(dateKey);
-    } else if (!lastPlayedDate && (streakCount > 0 || totalPoints > 0)) {
+    } else if (!lastPlayedDate && (streakCount > 0 || score > 0)) {
       // Preserve existing players' progress when missed-day tracking is first introduced.
       recordDailyParticipation(dateKey);
     }
     missedDayState = prepareMissedDayState(dateKey);
-    if (shouldResetReviveCycle({
-      missedDayState,
-      phase: state.phase,
-      currentRound: streakCount,
-      points: totalPoints,
-    })) {
-      resetReviveCycle();
-    }
     updatePuzzleDateDisplay(dateKey);
     updateStreakDisplay();
-    updateTotalRoundsDisplay();
-    updatePointsDisplay();
+    updateSolvesDisplay();
+    updateScoreDisplay();
     updateNextRoundCountdown();
     window.setInterval(updateNextRoundCountdown, 1000);
     if (missedDayState && !missedDayState.resolved) {

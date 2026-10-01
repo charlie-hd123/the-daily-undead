@@ -180,13 +180,13 @@ export function calculateBonusPoints(mapPoints, isCorrectOrder) {
   return isCorrectOrder ? safeMapPoints : 0;
 }
 
-export function calculateNextPoints(currentPoints, pointsEarned, isCorrect) {
-  const safeCurrentPoints =
-    Number.isInteger(currentPoints) && currentPoints >= 0 ? currentPoints : 0;
+export function calculateNextScore(currentScore, pointsEarned) {
+  const safeCurrentScore =
+    Number.isInteger(currentScore) && currentScore >= 0 ? currentScore : 0;
   const safePointsEarned =
     Number.isInteger(pointsEarned) && pointsEarned >= 0 ? pointsEarned : 0;
 
-  return isCorrect ? safeCurrentPoints + safePointsEarned : 0;
+  return safeCurrentScore + safePointsEarned;
 }
 
 export function orderMapsForGame(maps, gameId, orderedIds = []) {

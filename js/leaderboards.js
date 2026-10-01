@@ -43,16 +43,12 @@ function compareUsername(left, right) {
   return left.username < right.username ? -1 : 1;
 }
 
-export function sortAllTimeEntries(entries, ranking = "highestRound") {
-  const primary = ranking === "totalRounds" ? "totalRounds" : "highestRound";
-  const secondary = primary === "highestRound" ? "totalRounds" : "highestRound";
-
+export function sortAllTimeEntries(entries) {
   return [...entries].sort(
     (left, right) =>
-      right[primary] - left[primary] ||
-      right[secondary] - left[secondary] ||
-      right.currentRound - left.currentRound ||
-      right.points - left.points ||
+      right.score - left.score ||
+      right.solves - left.solves ||
+      right.bestRound - left.bestRound ||
       compareUsername(left, right),
   );
 }
@@ -169,12 +165,11 @@ function makeMetric(documentObject, label, value) {
 function renderAllTimeEntries(
   list,
   entries,
-  ranking,
   currentUsername,
   documentObject,
 ) {
   list.replaceChildren();
-  const sortedEntries = sortAllTimeEntries(entries, ranking);
+  const sortedEntries = sortAllTimeEntries(entries);
   if (!sortedEntries.length) {
     const empty = documentObject.createElement("li");
     empty.className = "leaderboard-empty";
@@ -192,19 +187,15 @@ function renderAllTimeEntries(
     const supportingMetrics = documentObject.createElement("dl");
     supportingMetrics.className = "leaderboard-supporting-metrics";
     supportingMetrics.append(
-      makeMetric(documentObject, "Current round", entry.currentRound),
-      makeMetric(documentObject, "Points balance", entry.points),
+      makeMetric(documentObject, "Solves", entry.solves),
+      makeMetric(documentObject, "Best round", entry.bestRound),
     );
     player.append(supportingMetrics);
 
     const rankingMetric = documentObject.createElement("dl");
     rankingMetric.className = "leaderboard-primary-metric";
     rankingMetric.append(
-      makeMetric(
-        documentObject,
-        ranking === "totalRounds" ? "Maps solved" : "Highest round",
-        ranking === "totalRounds" ? entry.totalRounds : entry.highestRound,
-      ),
+      makeMetric(documentObject, "Score", entry.score),
     );
 
     item.append(
@@ -234,11 +225,10 @@ export function initialiseLeaderboards({
   const allTimeList = dialog.querySelector("[data-leaderboard-list='all-time']");
   const tabs = [...dialog.querySelectorAll("[data-leaderboard-tab]")];
   const panels = [...dialog.querySelectorAll("[data-leaderboard-panel]")];
-  const rankingButtons = [...dialog.querySelectorAll("[data-all-time-ranking]")];
   const findButtons = [...dialog.querySelectorAll("[data-leaderboard-find]")];
+  const yourRank = dialog.querySelector("[data-leaderboard-your-rank]");
   let allTimeEntries = [];
   let currentUsername = null;
-  let ranking = "highestRound";
 
   function updateFindButtons() {
     findButtons.forEach((findButton) => {
@@ -262,23 +252,6 @@ export function initialiseLeaderboards({
 
   tabs.forEach((tab) => {
     tab.addEventListener("click", () => selectTab(tab.dataset.leaderboardTab));
-  });
-
-  rankingButtons.forEach((rankingButton) => {
-    rankingButton.addEventListener("click", () => {
-      ranking = rankingButton.dataset.allTimeRanking;
-      rankingButtons.forEach((candidate) => {
-        candidate.setAttribute("aria-pressed", String(candidate === rankingButton));
-      });
-      renderAllTimeEntries(
-        allTimeList,
-        allTimeEntries,
-        ranking,
-        currentUsername,
-        documentObject,
-      );
-      updateFindButtons();
-    });
   });
 
   findButtons.forEach((findButton) => {
@@ -332,10 +305,15 @@ export function initialiseLeaderboards({
       renderAllTimeEntries(
         allTimeList,
         allTimeEntries,
-        ranking,
         currentUsername,
         documentObject,
       );
+      const rankedEntries = sortAllTimeEntries(allTimeEntries);
+      const ownIndex = rankedEntries.findIndex((entry) => entry.username === currentUsername);
+      if (yourRank) {
+        yourRank.hidden = ownIndex < 0;
+        yourRank.textContent = ownIndex < 0 ? "" : `Your Rank: #${ownIndex + 1}`;
+      }
       updateFindButtons();
       status.textContent = "See today’s correct players and the all-time leaders.";
       status.dataset.state = "ready";

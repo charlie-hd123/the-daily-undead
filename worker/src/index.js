@@ -160,6 +160,34 @@ async function handleLeaderboards(request, env, url) {
   return jsonResponse(request, env, await readLeaderboards(env.DB, dateKey));
 }
 
+async function handleGameDates(request, env, url) {
+  const from = url.searchParams.get("from");
+  const to = url.searchParams.get("to");
+  if (!isValidDateKey(from) || !isValidDateKey(to) || from > to) {
+    return errorResponse(request, env, "Valid from and to game dates are required.", 400);
+  }
+  const rangeDays = Math.floor(
+    (Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86400000,
+  );
+  if (rangeDays > 3660) {
+    return errorResponse(request, env, "The requested game-date range is too large.", 400);
+  }
+  const result = await env.DB.prepare(
+    `SELECT game_date, protection_reason
+    FROM game_dates
+    WHERE game_date BETWEEN ? AND ? AND counts_for_round = 0
+    ORDER BY game_date`,
+  ).bind(from, to).all();
+  return jsonResponse(request, env, {
+    from,
+    to,
+    protectedDates: (result.results || []).map((row) => ({
+      date: row.game_date,
+      reason: row.protection_reason || null,
+    })),
+  });
+}
+
 async function handleAttempt(request, env) {
   const contentLength = Number(request.headers.get("Content-Length") || 0);
   if (contentLength > 4096) {
@@ -262,6 +290,9 @@ export default {
       }
       if (url.pathname === "/api/leaderboards" && request.method === "GET") {
         return await handleLeaderboards(request, env, url);
+      }
+      if (url.pathname === "/api/game-dates" && request.method === "GET") {
+        return await handleGameDates(request, env, url);
       }
       if (url.pathname === "/api/attempts" && request.method === "POST") {
         return await handleAttempt(request, env);
