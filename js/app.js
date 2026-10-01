@@ -12,25 +12,25 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261001-9";
+} from "./game-core.js?v=20261001-10";
 import {
   canUseRequestedPreviewDate,
   isLocalDevelopmentHostname,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261001-9";
-import { initialiseAccount } from "./account.js?v=20261001-9";
+} from "./progression.js?v=20261001-10";
+import { initialiseAccount } from "./account.js?v=20261001-10";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261001-9";
+} from "./community-stats.js?v=20261001-10";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261001-9";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-9";
+} from "./leaderboards.js?v=20261001-10";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-10";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -60,15 +60,15 @@ const legacyPointsStorageKey = "the-daily-undead:total-points";
 const statExplainers = {
   round: {
     title: "Round",
-    copy: "Your current survival run. It advances after each solve and ends if you miss a required day or choose the wrong map.",
+    copy: "Your current survival round. It advances after each solve and ends if you miss a day or choose the wrong map.",
   },
   score: {
     title: "Score",
-    copy: "Your permanent lifetime total. Points earned in each official puzzle are added to Score, which never decreases or resets.",
+    copy: "Your permanent lifetime total. Points earned in each puzzle are added to Score, which never decreases or resets.",
   },
   solves: {
     title: "Solves",
-    copy: "The permanent number of official Daily Undead puzzles you’ve solved.",
+    copy: "The total number of Daily Undead puzzles you’ve solved.",
   },
 };
 const lastPlayedDateStorageKey = "the-daily-undead:last-played-date";

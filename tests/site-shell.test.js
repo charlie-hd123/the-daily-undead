@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261001-9"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261001-10"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -366,12 +366,12 @@ test("player stat pills expose dismissible explainers", async () => {
   assert.match(html, /id="player-stat-explainer"[^>]*role="status"[^>]*hidden/);
   assert.match(
     app,
-    /Your current survival run\. It advances after each solve and ends if you miss a required day or choose the wrong map\./,
+    /Your current survival round\. It advances after each solve and ends if you miss a day or choose the wrong map\./,
   );
   assert.match(app, /recordNotice\.textContent = "This is your highest round!"/);
   assert.doesNotMatch(app, /unless you use a Revive/);
-  assert.match(app, /Score, which never decreases or resets\./);
-  assert.match(app, /permanent number of official Daily Undead puzzles/);
+  assert.match(app, /Points earned in each puzzle are added to Score, which never decreases or resets\./);
+  assert.match(app, /The total number of Daily Undead puzzles you’ve solved\./);
   assert.match(app, /if \(wasOpen\) return;/);
   assert.match(app, /if \(!playerStats\.contains\(event\.target\)\) closeStatExplainer\(\)/);
   assert.match(app, /event\.key === "Escape"/);
