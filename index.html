@@ -15,9 +15,9 @@
       content="The Daily Undead — your daily Treyarch Zombies challenge. Reveal clues, identify the map, and put the steps in order."
     >
     <title>The Daily Undead</title>
-    <link rel="icon" href="./assets/favicon.png?v=20261001-13" type="image/png" sizes="128x128">
+    <link rel="icon" href="./assets/favicon.png?v=20261001-14" type="image/png" sizes="128x128">
     <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" sizes="180x180">
-    <link rel="stylesheet" href="./styles.css?v=20261001-13">
+    <link rel="stylesheet" href="./styles.css?v=20261001-14">
   </head>
   <body>
     <header class="site-header">
@@ -95,19 +95,14 @@
     <dialog id="progression-update-dialog" class="account-dialog progression-update-dialog">
       <button class="dialog-close" type="button" data-close-progression-update aria-label="Close progression update">×</button>
       <p class="kicker">Progression update</p>
-      <h2>Your progress is permanent</h2>
+      <h2>A simpler scoring system</h2>
       <p>
-        Points have become <strong>Score</strong>: your permanent lifetime total. Score and Puzzle Solves never decrease, and only your current survival Round ends after a wrong map or missed required day.
+        Points earned in each puzzle now add to one permanent <strong>Score</strong>. It never decreases, resets or gets spent, so every successful puzzle moves you forward.
       </p>
-      <ul class="progression-update-list">
-        <li><strong>Score</strong> grows with every successful puzzle.</li>
-        <li><strong>Puzzle Solves</strong> records every official puzzle you solve.</li>
-        <li><strong>Round</strong> is your current survival run.</li>
-        <li><strong>Highest Round</strong> keeps your best-ever run.</li>
-      </ul>
+      <p class="progression-update-benefit"><strong>Failing ends your current Round—not your career progress.</strong> Puzzle Solves and Highest Round stay permanent too.</p>
       <div class="progression-estimate-note">
         <strong>Why might my Score look different?</strong>
-        <p>Your existing Score is our best estimate from the progress history available. Older Points could be spent or lost and not every change was recorded, but nobody’s Score has been reset.</p>
+        <p>Your Score is our best estimate from the history available. Old Points could be spent or lost, so the exact lifetime total cannot always be rebuilt. Nobody’s Score has been reset.</p>
       </div>
       <button class="button primary progression-update-dismiss" type="button" data-close-progression-update>Got it</button>
     </dialog>
@@ -352,7 +347,7 @@
       <div data-public-profile-content></div>
     </dialog>
 
-    <script type="module" src="./js/app.js?v=20261001-13"></script>
+    <script type="module" src="./js/app.js?v=20261001-14"></script>
 
     <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "4eeb20e1411c4e7baf24969ced969c88"}'></script><!-- End Cloudflare Web Analytics -->
 

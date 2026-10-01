@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261001-13"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261001-14"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -428,14 +428,17 @@ test("established players can reopen the progression explanation from leaderboar
   assert.match(html, /id="leaderboards-dialog"[\s\S]*?id="progression-update-button"/);
   assert.doesNotMatch(html, /class="header-meta"[\s\S]*?id="progression-update-button"[\s\S]*?<\/header>/);
   assert.match(html, /id="progression-update-dialog"/);
-  assert.match(html, /Points have become <strong>Score<\/strong>: your permanent lifetime total\./);
-  assert.match(html, /Your existing Score is our best estimate from the progress history available\./);
-  assert.match(html, /nobody’s Score has been reset\./);
+  assert.match(html, /<h2>A simpler scoring system<\/h2>/);
+  assert.match(html, /It never decreases, resets or gets spent, so every successful puzzle moves you forward\./);
+  assert.match(html, /Failing ends your current Round—not your career progress\./);
+  assert.match(html, /Your Score is our best estimate from the history available\./);
+  assert.match(html, /Nobody’s Score has been reset\./);
   assert.match(app, /const progressionUpdateWindowMs = 5 \* 24 \* 60 \* 60 \* 1000;/);
   assert.match(app, /function hasEstablishedProgress\(\)/);
   assert.match(app, /updateState\.autoShown = true;/);
   assert.match(app, /progressionUpdateButton\.addEventListener\("click", openProgressionUpdate\)/);
   assert.match(css, /\.progression-update-button \{/);
+  assert.match(css, /\.progression-update-dialog \.progression-update-benefit \{/);
   assert.match(css, /\.progression-estimate-note \{/);
 });
 
