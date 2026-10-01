@@ -12,25 +12,25 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261001-12";
+} from "./game-core.js?v=20261001-13";
 import {
   canUseRequestedPreviewDate,
   isLocalDevelopmentHostname,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261001-12";
-import { initialiseAccount } from "./account.js?v=20261001-12";
+} from "./progression.js?v=20261001-13";
+import { initialiseAccount } from "./account.js?v=20261001-13";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261001-12";
+} from "./community-stats.js?v=20261001-13";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261001-12";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-12";
+} from "./leaderboards.js?v=20261001-13";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-13";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -40,7 +40,6 @@ const scoreLabel = document.querySelector("#score-count");
 const countdownLabel = document.querySelector("#next-round-countdown");
 const playerStats = document.querySelector(".player-stats");
 const statExplainer = document.querySelector("#player-stat-explainer");
-const rewardHud = document.querySelector("#reward-hud");
 const progressionUpdateButton = document.querySelector("#progression-update-button");
 const progressionUpdateDialog = document.querySelector("#progression-update-dialog");
 const advanceDevDayButton = document.querySelector("#advance-dev-day");
@@ -61,7 +60,7 @@ const solvesStorageKey = "the-daily-undead:total-rounds";
 const scoreStorageKey = "the-daily-undead:score";
 const legacyPointsStorageKey = "the-daily-undead:total-points";
 const progressionUpdateStorageKey = "the-daily-undead:progression-update-v1";
-const progressionUpdateWindowMs = 7 * 24 * 60 * 60 * 1000;
+const progressionUpdateWindowMs = 5 * 24 * 60 * 60 * 1000;
 const statExplainers = {
   round: {
     title: "Round",
@@ -706,25 +705,6 @@ async function loadProtectedDates(fromDateKey, toDateKey) {
   }
 }
 
-function showViewportReward(display, amount, theme) {
-  if (!rewardHud || !window.matchMedia("(max-width: 35rem)").matches) return;
-  const displayBox = display.getBoundingClientRect();
-  const displayIsVisible = displayBox.bottom > 0 && displayBox.top < window.innerHeight;
-  if (displayIsVisible) return;
-
-  const reward = document.createElement("span");
-  const value = document.createElement("strong");
-  const name = document.createElement("span");
-  reward.className = `reward-hud-item is-${theme}`;
-  value.textContent = `+${progressNumberFormatter.format(amount)}`;
-  name.textContent = display.dataset.statExplainer;
-  reward.append(value, name);
-  rewardHud.append(reward);
-  const finish = () => reward.remove();
-  reward.addEventListener("animationend", finish, { once: true });
-  window.setTimeout(finish, 2000);
-}
-
 function animateStat(label, amount, theme) {
   if (!Number.isInteger(amount) || amount <= 0) return;
   const display = label.closest(".stat-display");
@@ -738,7 +718,6 @@ function animateStat(label, amount, theme) {
   display.classList.remove("is-earned");
   void display.offsetWidth;
   display.classList.add("is-earned");
-  showViewportReward(display, amount, theme);
   const finish = () => {
     reward.remove();
     if (!display.querySelector(".stat-reward-pop")) {
@@ -746,7 +725,7 @@ function animateStat(label, amount, theme) {
     }
   };
   reward.addEventListener("animationend", finish, { once: true });
-  window.setTimeout(finish, 2000);
+  window.setTimeout(finish, 1800);
   window.setTimeout(() => display.classList.remove("is-earned"), 850);
 }
 
