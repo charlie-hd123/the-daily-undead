@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261001-14"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261001-15"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -399,7 +399,8 @@ test("player stat pills show Zombies-style floating progression rewards", async 
   assert.match(app, /animateStat\(scoreLabel, points, "reward"\)/);
   assert.match(app, /animateStat\(solvesLabel, 1, "aether"\)/);
   assert.match(app, /const roundTheme = streakCount > previousBestRound \? "record" : "aether"/);
-  assert.match(css, /\.stat-reward-pop \{[\s\S]*?animation: stat-reward-float 1\.5s/);
+  assert.match(css, /\.stat-reward-pop \{[\s\S]*?animation: stat-reward-float 1\.15s/);
+  assert.match(app, /window\.setTimeout\(finish, 1400\)/);
   assert.match(css, /\.stat-reward-pop\.is-record::before \{[\s\S]*?content: "✦";/);
   assert.match(css, /@keyframes stat-reward-float \{/);
   assert.match(css, /\.stat-display\.subdued-stat\.is-earned \{\s*animation-name: stat-earned-aether;/);

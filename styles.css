@@ -816,7 +816,7 @@ h1 {
   pointer-events: none;
   text-shadow: 0 0 0.35rem rgb(103 232 255 / 75%), 0 0 1rem rgb(103 232 255 / 45%);
   white-space: nowrap;
-  animation: stat-reward-float 1.5s cubic-bezier(0.18, 0.72, 0.25, 1) both;
+  animation: stat-reward-float 1.15s cubic-bezier(0.18, 0.72, 0.25, 1) both;
 }
 
 .stat-reward-pop.is-reward,

@@ -12,25 +12,25 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261001-14";
+} from "./game-core.js?v=20261001-15";
 import {
   canUseRequestedPreviewDate,
   isLocalDevelopmentHostname,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261001-14";
-import { initialiseAccount } from "./account.js?v=20261001-14";
+} from "./progression.js?v=20261001-15";
+import { initialiseAccount } from "./account.js?v=20261001-15";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261001-14";
+} from "./community-stats.js?v=20261001-15";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261001-14";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-14";
+} from "./leaderboards.js?v=20261001-15";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-15";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -725,7 +725,7 @@ function animateStat(label, amount, theme) {
     }
   };
   reward.addEventListener("animationend", finish, { once: true });
-  window.setTimeout(finish, 1800);
+  window.setTimeout(finish, 1400);
   window.setTimeout(() => display.classList.remove("is-earned"), 850);
 }
 
