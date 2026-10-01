@@ -757,6 +757,53 @@ h1 {
   animation: stat-earned 780ms ease-out both;
 }
 
+.stat-display.subdued-stat.is-earned {
+  animation-name: stat-earned-aether;
+}
+
+.stat-display.subdued-stat.is-earned.is-record-earned {
+  animation-name: stat-earned;
+}
+
+.stat-display.has-floating-reward {
+  overflow: visible;
+}
+
+.stat-reward-pop {
+  position: absolute;
+  z-index: 30;
+  top: -0.2rem;
+  right: 0.7rem;
+  color: var(--aether);
+  font: 900 clamp(0.8rem, 2vw, 1rem)/1 var(--font-display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.035em;
+  pointer-events: none;
+  text-shadow: 0 0 0.35rem rgb(103 232 255 / 75%), 0 0 1rem rgb(103 232 255 / 45%);
+  white-space: nowrap;
+  animation: stat-reward-float 1.15s cubic-bezier(0.18, 0.72, 0.25, 1) both;
+}
+
+.stat-reward-pop.is-reward,
+.stat-reward-pop.is-record {
+  color: var(--essence);
+  text-shadow: 0 0 0.35rem rgb(247 200 92 / 85%), 0 0 1rem rgb(255 138 72 / 52%);
+}
+
+.stat-reward-pop.is-record::before {
+  margin-right: 0.22rem;
+  content: "✦";
+  font-family: sans-serif;
+  font-size: 0.76em;
+}
+
+@keyframes stat-reward-float {
+  0% { transform: translateY(0.5rem) scale(0.82); opacity: 0; }
+  16% { transform: translateY(0) scale(1.08); opacity: 1; }
+  72% { transform: translateY(-1rem) scale(1); opacity: 1; }
+  100% { transform: translateY(-1.8rem) scale(0.96); opacity: 0; }
+}
+
 @keyframes stat-earned {
   0% {
     transform: scale(1);
@@ -774,6 +821,26 @@ h1 {
   100% {
     transform: scale(1);
     border-color: rgb(247 200 92 / 30%);
+  }
+}
+
+@keyframes stat-earned-aether {
+  0% {
+    transform: scale(1);
+    border-color: rgb(74 142 181 / 30%);
+  }
+
+  35% {
+    transform: translateY(-2px) scale(1.055);
+    border-color: rgb(103 232 255 / 78%);
+    background: linear-gradient(90deg, rgb(19 51 79 / 96%), rgb(15 32 56 / 94%));
+    box-shadow: 0 0 0 3px rgb(103 232 255 / 10%), 0 0 1.7rem rgb(103 232 255 / 28%);
+    filter: brightness(1.15);
+  }
+
+  100% {
+    transform: scale(1);
+    border-color: rgb(74 142 181 / 30%);
   }
 }
 

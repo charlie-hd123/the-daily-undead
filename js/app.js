@@ -12,25 +12,25 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261001-10";
+} from "./game-core.js?v=20261001-11";
 import {
   canUseRequestedPreviewDate,
   isLocalDevelopmentHostname,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261001-10";
-import { initialiseAccount } from "./account.js?v=20261001-10";
+} from "./progression.js?v=20261001-11";
+import { initialiseAccount } from "./account.js?v=20261001-11";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261001-10";
+} from "./community-stats.js?v=20261001-11";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261001-10";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-10";
+} from "./leaderboards.js?v=20261001-11";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-11";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -701,11 +701,27 @@ async function loadProtectedDates(fromDateKey, toDateKey) {
   }
 }
 
-function animateStat(label) {
+function animateStat(label, amount, theme) {
+  if (!Number.isInteger(amount) || amount <= 0) return;
   const display = label.closest(".stat-display");
+  const reward = document.createElement("span");
+  reward.className = `stat-reward-pop is-${theme}`;
+  reward.textContent = `+${progressNumberFormatter.format(amount)}`;
+  reward.setAttribute("aria-hidden", "true");
+  display.append(reward);
+  display.classList.add("has-floating-reward");
+  display.classList.toggle("is-record-earned", theme === "record");
   display.classList.remove("is-earned");
   void display.offsetWidth;
   display.classList.add("is-earned");
+  const finish = () => {
+    reward.remove();
+    if (!display.querySelector(".stat-reward-pop")) {
+      display.classList.remove("has-floating-reward", "is-record-earned");
+    }
+  };
+  reward.addEventListener("animationend", finish, { once: true });
+  window.setTimeout(finish, 1400);
   window.setTimeout(() => display.classList.remove("is-earned"), 850);
 }
 
@@ -810,7 +826,7 @@ function awardPoints(points, shouldAnimate = true) {
   score += points;
   saveScore();
   updateScoreDisplay();
-  if (shouldAnimate) animateStat(scoreLabel);
+  if (shouldAnimate) animateStat(scoreLabel, points, "reward");
 }
 
 function recordMapResult(isCorrect) {
@@ -825,12 +841,13 @@ function recordMapResult(isCorrect) {
   saveStreak();
   updateStreakDisplay();
   if (isCorrect) {
-    animateStat(streakLabel);
+    const roundTheme = streakCount > previousBestRound ? "record" : "aether";
+    animateStat(streakLabel, 1, roundTheme);
     if (!state.totalRoundsRecorded) {
       solves += 1;
       saveSolves();
       updateSolvesDisplay();
-      animateStat(solvesLabel);
+      animateStat(solvesLabel, 1, "aether");
     }
   }
   return isCorrect && streakCount > previousBestRound;
