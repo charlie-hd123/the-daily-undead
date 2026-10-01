@@ -62,7 +62,11 @@ preview AS (
     provable_points_removed,
     current_balance + provable_points_removed AS provable_lower_bound,
     smoothed_points_per_solve,
-    ROUND(stored_solves * smoothed_points_per_solve) AS performance_estimate
+    -- Keep every verified point exact. Only the older solves that pre-date the
+    -- verified result ledger need an estimated value.
+    verified_score
+      + ROUND(estimated_legacy_solves * smoothed_points_per_solve)
+      AS performance_estimate
   FROM estimates
 ),
 ranked AS (
@@ -83,7 +87,13 @@ SELECT
   provable_lower_bound,
   ROUND(smoothed_points_per_solve, 1) AS estimated_points_per_solve,
   performance_estimate,
-  CAST(ROUND(unrounded_opening_score / 10.0) * 10 AS INTEGER) AS proposed_opening_score,
-  CAST(ROUND(unrounded_opening_score / 10.0) * 10 AS INTEGER) - current_balance AS estimated_recovered_score
+  MAX(
+    current_balance,
+    CAST(ROUND(unrounded_opening_score / 10.0) * 10 AS INTEGER)
+  ) AS proposed_opening_score,
+  MAX(
+    current_balance,
+    CAST(ROUND(unrounded_opening_score / 10.0) * 10 AS INTEGER)
+  ) - current_balance AS estimated_recovered_score
 FROM ranked
 ORDER BY proposed_opening_score DESC, player;

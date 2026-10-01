@@ -5,10 +5,11 @@ not contain an `UPDATE`, expose account IDs/usernames, or become part of the D1
 migration chain.
 
 The estimate keeps each current Points balance as an absolute floor, adds every
-historic loss/revive cost that can be proved from saved snapshots, and estimates
-older unrecorded solves using a player's verified scoring average gently blended
-with the site-wide average. The highest of those three values becomes the proposed
-opening Score, rounded to 10.
+historic loss/revive cost that can be proved from saved snapshots, preserves
+every verified result at its exact recorded value, and estimates only older
+unrecorded solves using a player's verified scoring average gently blended with
+the site-wide average. The highest of those values becomes the proposed opening
+Score, rounded to 10 without ever dropping below the current balance.
 
 Before production launch:
 

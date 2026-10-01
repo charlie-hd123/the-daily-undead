@@ -541,6 +541,22 @@ test("the redesign migration preserves old balances and makes results repairable
   assert.doesNotMatch(schema, /DROP TABLE|DELETE FROM player_saves/i);
 });
 
+test("the Score migration preview is read-only, anonymous and estimates only legacy solves", async () => {
+  const preview = await fs.readFile(
+    new URL("../worker/analysis/score-migration-preview.sql", import.meta.url),
+    "utf8",
+  );
+
+  assert.doesNotMatch(preview, /\b(?:UPDATE|INSERT|DELETE|ALTER|DROP|CREATE)\b/i);
+  assert.doesNotMatch(preview, /username|email/i);
+  assert.match(preview, /printf\('Player %03d', anonymous_player\)/);
+  assert.match(
+    preview,
+    /verified_score\s*\+ ROUND\(estimated_legacy_solves \* smoothed_points_per_solve\)/,
+  );
+  assert.match(preview, /MAX\(\s*current_balance,[\s\S]*?AS proposed_opening_score/);
+});
+
 test("the Worker's verification catalogue matches the browser puzzle catalogue", async () => {
   const index = JSON.parse(await readProjectFile("data/maps/index.json"));
   const expectedMaps = await Promise.all(
