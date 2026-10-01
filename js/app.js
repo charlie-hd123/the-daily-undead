@@ -12,25 +12,25 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261001-3";
+} from "./game-core.js?v=20261001-4";
 import {
   canUseRequestedPreviewDate,
   isLocalDevelopmentHostname,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261001-3";
-import { initialiseAccount } from "./account.js?v=20261001-3";
+} from "./progression.js?v=20261001-4";
+import { initialiseAccount } from "./account.js?v=20261001-4";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261001-3";
+} from "./community-stats.js?v=20261001-4";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261001-3";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-3";
+} from "./leaderboards.js?v=20261001-4";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-4";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -1401,13 +1401,17 @@ function renderResult() {
       <div class="result-banner ${resultClass}${animateResult ? " animate" : ""}">
         <h2>${resultTitle}</h2>
         <p>${escapeHtml(resultCopy)}</p>
-        ${state.newBestRound ? `<p class="result-milestone">New Best Round: ${bestRound}</p>` : ""}
         ${
           !state.isCorrect
             ? `<p class="survival-summary">Your run ended at <strong>Round ${endedRound}</strong>. Your next game starts at <strong>Round 1</strong>.</p>`
             : ""
         }
       </div>
+      ${
+        state.newBestRound
+          ? `<p class="result-milestone-banner" role="status"><span>New Best Round</span><strong>${bestRound}</strong></p>`
+          : ""
+      }
       ${state.isCorrect ? renderBonus() : '<h3>Today’s three clues</h3><div id="clue-list" class="clue-list"></div>'}
       ${
         isFinished

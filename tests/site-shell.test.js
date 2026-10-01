@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261001-3"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261001-4"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -259,6 +259,9 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(css, /#account-button:not\(\.is-signed-in\)/);
   assert.match(css, /#account-button::before[\s\S]*mask-image:/);
   assert.match(css, /#leaderboards-button::before[\s\S]*mask-image:/);
+  assert.match(appScript, /<\/div>\s*\$\{\s*state\.newBestRound[\s\S]*?result-milestone-banner/);
+  assert.doesNotMatch(css, /\.result-banner \.result-milestone/);
+  assert.match(css, /\.result-milestone-banner \{/);
   assert.match(css, /\.account-button::after[\s\S]*content: "›";/);
   assert.match(css, /\.account-button:not\(:disabled\):hover/);
   assert.match(css, /@media \(max-width: 35rem\)[\s\S]*?\.account-button \{\s*width: 100%;/);
