@@ -662,7 +662,7 @@ h1 {
 .stat-display.subdued-stat {
   border-color: rgb(74 142 181 / 30%);
   background: linear-gradient(90deg, rgb(18 31 54 / 92%), rgb(13 23 41 / 88%));
-  color: rgb(175 197 219 / 76%);
+  color: rgb(221 232 244 / 92%);
   box-shadow: 0 0.35rem 1rem rgb(0 0 0 / 12%);
 }
 
@@ -675,8 +675,13 @@ h1 {
 .stat-display.subdued-stat strong {
   border-left-color: rgb(74 142 181 / 28%);
   background: linear-gradient(145deg, #233a59, #172841);
-  color: #d5e3f3;
+  color: #f0f5fb;
   box-shadow: inset 1px 0 rgb(255 255 255 / 5%);
+}
+
+.stat-display.subdued-stat.is-highest-round[aria-expanded="true"] {
+  border-color: rgb(247 200 92 / 78%);
+  box-shadow: 0 0 0 1px rgb(247 200 92 / 20%), 0 0 1.2rem rgb(247 200 92 / 16%);
 }
 
 .player-stat-explainer {
@@ -720,6 +725,11 @@ h1 {
 }
 
 .player-stat-explainer p { margin: 0; }
+
+.stat-explainer-record {
+  color: var(--essence);
+  font-weight: 800;
+}
 
 .stat-display.is-earned {
   animation: stat-earned 780ms ease-out both;

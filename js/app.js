@@ -12,25 +12,25 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261001-6";
+} from "./game-core.js?v=20261001-7";
 import {
   canUseRequestedPreviewDate,
   isLocalDevelopmentHostname,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261001-6";
-import { initialiseAccount } from "./account.js?v=20261001-6";
+} from "./progression.js?v=20261001-7";
+import { initialiseAccount } from "./account.js?v=20261001-7";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261001-6";
+} from "./community-stats.js?v=20261001-7";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261001-6";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-6";
+} from "./leaderboards.js?v=20261001-7";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-7";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -60,7 +60,7 @@ const legacyPointsStorageKey = "the-daily-undead:total-points";
 const statExplainers = {
   round: {
     title: "Round",
-    copy: "Your current survival run. It advances after each official solve and ends if you miss a required day or choose the wrong map.",
+    copy: "Your current survival run. It advances after each solve and ends if you miss a required day or choose the wrong map.",
   },
   score: {
     title: "Score",
@@ -731,9 +731,13 @@ function initialiseStatExplainers() {
 
     const content = statExplainers[button.dataset.statExplainer];
     title.textContent = content.title;
-    copy.textContent = button.classList.contains("is-highest-round")
-      ? "This is your highest Round yet. Keep the run alive tomorrow."
-      : content.copy;
+    copy.replaceChildren(document.createTextNode(content.copy));
+    if (button.classList.contains("is-highest-round")) {
+      const recordNotice = document.createElement("span");
+      recordNotice.className = "stat-explainer-record";
+      recordNotice.textContent = " This is your highest round!";
+      copy.append(recordNotice);
+    }
     button.setAttribute("aria-expanded", "true");
     statExplainer.hidden = false;
 

@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261001-6"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261001-7"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -364,7 +364,11 @@ test("player stat pills expose dismissible explainers", async () => {
 
   assert.equal((html.match(/data-stat-explainer="/g) || []).length, 3);
   assert.match(html, /id="player-stat-explainer"[^>]*role="status"[^>]*hidden/);
-  assert.match(app, /Your current survival run\./);
+  assert.match(
+    app,
+    /Your current survival run\. It advances after each solve and ends if you miss a required day or choose the wrong map\./,
+  );
+  assert.match(app, /recordNotice\.textContent = " This is your highest round!"/);
   assert.doesNotMatch(app, /unless you use a Revive/);
   assert.match(app, /Score, which never decreases or resets\./);
   assert.match(app, /permanent number of official Daily Undead puzzles/);
@@ -376,6 +380,8 @@ test("player stat pills expose dismissible explainers", async () => {
   assert.match(css, /\.stat-display\.subdued-stat \{[\s\S]*?border-color: rgb\(74 142 181 \/ 30%\);/);
   assert.match(css, /\.stat-display\.subdued-stat strong \{[\s\S]*?background: linear-gradient\(145deg, #233a59, #172841\);/);
   assert.match(css, /\.stat-display\.subdued-stat\[aria-expanded="true"\] \{[\s\S]*?border-color: rgb\(103 232 255 \/ 62%\);/);
+  assert.match(css, /\.stat-display\.subdued-stat\.is-highest-round\[aria-expanded="true"\] \{[\s\S]*?border-color: rgb\(247 200 92 \/ 78%\);/);
+  assert.match(css, /\.stat-explainer-record \{[\s\S]*?color: var\(--essence\);/);
 });
 
 test("survivor profiles always expose a labelled favourite memory section", async () => {
