@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261001-8"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261001-9"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -381,6 +381,8 @@ test("player stat pills expose dismissible explainers", async () => {
   assert.match(css, /\.stat-display\.subdued-stat strong \{[\s\S]*?background: linear-gradient\(145deg, #233a59, #172841\);/);
   assert.match(css, /\.stat-display\.subdued-stat\[aria-expanded="true"\] \{[\s\S]*?border-color: rgb\(103 232 255 \/ 62%\);/);
   assert.match(css, /\.stat-display\.subdued-stat\.is-highest-round\[aria-expanded="true"\] \{[\s\S]*?border-color: rgb\(247 200 92 \/ 78%\);/);
+  assert.match(app, /isHighestRound[\s\S]*?\? "record"[\s\S]*?"score" \? "reward" : "aether"/);
+  assert.match(css, /\.player-stat-explainer\[data-theme="aether"\] > strong \{[\s\S]*?color: var\(--aether\);/);
   assert.match(css, /\.stat-explainer-record \{[\s\S]*?color: var\(--essence\);/);
   assert.match(css, /\.stat-explainer-record::before \{[\s\S]*?content: "✦";/);
 });
@@ -401,8 +403,21 @@ test("survivor profiles always expose a labelled favourite memory section", asyn
   assert.doesNotMatch(account, /public-profile-identity-line/);
   assert.match(css, /\.public-profile-overview \{[\s\S]*?grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);/);
   assert.match(css, /@media \(max-width: 35rem\)[\s\S]*?\.public-profile-overview \{ grid-template-columns: repeat\(2, minmax\(0, 1fr\)\); \}/);
-  assert.match(css, /\.public-profile-stat\.is-primary \{/);
+  assert.doesNotMatch(css, /\.public-profile-stat\.is-primary/);
+  assert.doesNotMatch(account, /public-profile-stat\$\{primary/);
   assert.match(css, /\.public-profile-favourite \{/);
+});
+
+test("Double Points uses the Score reward yellow", async () => {
+  const [app, css] = await Promise.all([
+    readProjectFile("js/app.js"),
+    readProjectFile("styles.css"),
+  ]);
+
+  assert.match(app, /"Double Points!"/);
+  assert.match(css, /--essence: #f7c85c;/);
+  assert.match(css, /--perfect: var\(--essence\);/);
+  assert.match(css, /\.result-banner\.perfect \{[\s\S]*?color: var\(--perfect\);/);
 });
 
 test("the clue count stays editable until a map is confirmed", async () => {

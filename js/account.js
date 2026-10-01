@@ -6,7 +6,7 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261001-8";
+} from "./account-session.js?v=20261001-9";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -577,9 +577,9 @@ export async function initialiseAccount({
       copy.append(kicker, heading, joined);
       header.append(makeAvatar(documentObject, viewed.avatarId), copy);
 
-      const makeProfileStat = (label, value, primary = false) => {
+      const makeProfileStat = (label, value) => {
         const box = documentObject.createElement("div");
-        box.className = `public-profile-stat${primary ? " is-primary" : ""}`;
+        box.className = "public-profile-stat";
         const dt = documentObject.createElement("dt");
         const dd = documentObject.createElement("dd");
         dt.textContent = label;
@@ -590,7 +590,7 @@ export async function initialiseAccount({
       const stats = documentObject.createElement("dl");
       stats.className = "public-profile-overview";
       stats.append(
-        makeProfileStat("Score", result.stats.score, true),
+        makeProfileStat("Score", result.stats.score),
         makeProfileStat("Puzzle Solves", result.stats.solves),
         makeProfileStat("Current Round", Math.max(1, result.stats.currentRound)),
         makeProfileStat("Highest Round", result.stats.bestRound),

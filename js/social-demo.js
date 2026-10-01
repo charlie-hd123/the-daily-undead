@@ -243,11 +243,11 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
     openDialog(editorDialog);
   }
 
-  function makeFact(label, value, { primary = false, favourite = false } = {}) {
+  function makeFact(label, value, { favourite = false } = {}) {
     const item = documentObject.createElement("div");
     item.className = favourite
       ? "public-profile-favourite"
-      : `public-profile-stat${primary ? " is-primary" : ""}`;
+      : "public-profile-stat";
     const term = documentObject.createElement("dt");
     const description = documentObject.createElement("dd");
     term.textContent = label; description.textContent = value || "—";
@@ -269,7 +269,7 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
     copy.append(kicker, heading, joined); header.append(avatar(documentObject, viewed.avatarId), copy);
     const stats = documentObject.createElement("dl"); stats.className = "public-profile-overview";
     stats.append(
-      makeFact("Score", viewed.score ?? 0, { primary: true }),
+      makeFact("Score", viewed.score ?? 0),
       makeFact("Puzzle Solves", viewed.solves),
       makeFact("Current Round", Math.max(1, viewed.currentRound ?? viewed.bestRound - 3)),
       makeFact("Highest Round", viewed.bestRound),

@@ -12,25 +12,25 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261001-8";
+} from "./game-core.js?v=20261001-9";
 import {
   canUseRequestedPreviewDate,
   isLocalDevelopmentHostname,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261001-8";
-import { initialiseAccount } from "./account.js?v=20261001-8";
+} from "./progression.js?v=20261001-9";
+import { initialiseAccount } from "./account.js?v=20261001-9";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261001-8";
+} from "./community-stats.js?v=20261001-9";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261001-8";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-8";
+} from "./leaderboards.js?v=20261001-9";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261001-9";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -712,6 +712,7 @@ function animateStat(label) {
 function closeStatExplainer() {
   if (!statExplainer) return;
   statExplainer.hidden = true;
+  delete statExplainer.dataset.theme;
   playerStats?.querySelectorAll("[data-stat-explainer]").forEach((button) => {
     button.setAttribute("aria-expanded", "false");
   });
@@ -730,9 +731,13 @@ function initialiseStatExplainers() {
     if (wasOpen) return;
 
     const content = statExplainers[button.dataset.statExplainer];
+    const isHighestRound = button.classList.contains("is-highest-round");
+    statExplainer.dataset.theme = isHighestRound
+      ? "record"
+      : button.dataset.statExplainer === "score" ? "reward" : "aether";
     title.textContent = content.title;
     copy.replaceChildren(document.createTextNode(content.copy));
-    if (button.classList.contains("is-highest-round")) {
+    if (isHighestRound) {
       const recordNotice = document.createElement("span");
       recordNotice.className = "stat-explainer-record";
       recordNotice.textContent = "This is your highest round!";

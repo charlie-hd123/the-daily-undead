@@ -715,6 +715,19 @@ h1 {
   transform: translateX(-50%) rotate(45deg);
 }
 
+.player-stat-explainer[data-theme="aether"] {
+  border-color: rgb(103 232 255 / 38%);
+  box-shadow: 0 1rem 2.5rem rgb(0 0 0 / 45%), 0 0 1.5rem rgb(103 232 255 / 9%);
+}
+
+.player-stat-explainer[data-theme="aether"]::before {
+  border-color: rgb(103 232 255 / 38%) transparent transparent rgb(103 232 255 / 38%);
+}
+
+.player-stat-explainer[data-theme="aether"] > strong {
+  color: var(--aether);
+}
+
 .player-stat-explainer > strong {
   display: block;
   margin-bottom: 0.3rem;
@@ -1532,20 +1545,6 @@ h1 {
   color: #e3edf9;
   font: 800 1.1rem/1 var(--font-display);
   font-variant-numeric: tabular-nums;
-}
-
-.public-profile-stat.is-primary {
-  background: linear-gradient(145deg, rgb(61 43 14 / 62%), rgb(24 20 11 / 66%));
-  box-shadow: inset 2px 0 0 rgb(247 200 92 / 68%);
-}
-
-.public-profile-stat.is-primary dt,
-.public-profile-stat.is-primary dd {
-  color: var(--essence);
-}
-
-.public-profile-stat.is-primary dd {
-  font-size: 1.3rem;
 }
 
 .public-profile-favourite {
