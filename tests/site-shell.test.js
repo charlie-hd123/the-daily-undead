@@ -153,6 +153,7 @@ test("account controls support optional sign-in without exposing private credent
     /function saveBestRound\(\)[\s\S]*?localStorage\.setItem\(bestRoundStorageKey, String\(bestRound\)\)/,
   );
   assert.match(css, /\.leaderboard-entry\.is-current-player/);
+  assert.match(css, /\.leaderboard-supporting-metrics \{[\s\S]*?flex-wrap: nowrap;/);
   assert.match(css, /\.leaderboard-status \{\s*margin: 0 0 0\.85rem;/);
   assert.doesNotMatch(css, /\.leaderboard-status \{[^}]*min-height:/);
   const leaderboards = await readProjectFile("js/leaderboards.js");
