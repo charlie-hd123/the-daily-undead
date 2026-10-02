@@ -226,6 +226,7 @@ export function initialiseLeaderboards({
   const tabs = [...dialog.querySelectorAll("[data-leaderboard-tab]")];
   const panels = [...dialog.querySelectorAll("[data-leaderboard-panel]")];
   const findButtons = [...dialog.querySelectorAll("[data-leaderboard-find]")];
+  const panelToolbars = [...dialog.querySelectorAll(".leaderboard-panel-tools")];
   const yourRank = dialog.querySelector("[data-leaderboard-your-rank]");
   let allTimeEntries = [];
   let currentUsername = null;
@@ -236,6 +237,12 @@ export function initialiseLeaderboards({
         `[data-leaderboard-panel='${findButton.dataset.leaderboardFind}']`,
       );
       findButton.hidden = !panel?.querySelector(".is-current-player");
+    });
+  }
+
+  function updatePanelToolbars() {
+    panelToolbars.forEach((toolbar) => {
+      toolbar.hidden = ![...toolbar.children].some((child) => !child.hidden);
     });
   }
 
@@ -253,6 +260,8 @@ export function initialiseLeaderboards({
   tabs.forEach((tab) => {
     tab.addEventListener("click", () => selectTab(tab.dataset.leaderboardTab));
   });
+
+  updatePanelToolbars();
 
   findButtons.forEach((findButton) => {
     findButton.addEventListener("click", () => {
@@ -315,6 +324,7 @@ export function initialiseLeaderboards({
         yourRank.textContent = ownIndex < 0 ? "" : `Your Rank: #${ownIndex + 1}`;
       }
       updateFindButtons();
+      updatePanelToolbars();
       status.textContent = "See today’s correct players and the all-time leaders.";
       status.dataset.state = "ready";
     } catch {

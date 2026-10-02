@@ -1880,7 +1880,7 @@ h1 {
 .leaderboard-dialog [role="tabpanel"] {
   max-height: min(31rem, 58vh);
   overflow-y: auto;
-  margin-top: 1rem;
+  margin-top: 0.65rem;
   padding: 0.1rem 0.2rem 0.25rem 0;
   scroll-behavior: smooth;
 }
@@ -1894,8 +1894,12 @@ h1 {
 }
 
 .leaderboard-panel-tools {
-  min-height: 2.3rem;
-  margin-bottom: 0.8rem;
+  min-height: 2.1rem;
+  margin-bottom: 0.6rem;
+}
+
+.leaderboard-panel-tools[hidden] {
+  display: none;
 }
 
 .leaderboard-panel-tools p,
@@ -1941,6 +1945,7 @@ h1 {
   font: 700 0.7rem/1 var(--font-display);
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  transform: translateY(0.2rem);
 }
 
 .leaderboard-find-me[hidden] {
@@ -2231,10 +2236,19 @@ h1 {
 
   .leaderboard-dialog [role="tabpanel"] {
     max-height: min(32rem, 61vh);
+    margin-top: 0.45rem;
   }
 
   .leaderboard-all-time-tools {
     align-items: flex-end;
+  }
+
+  .leaderboard-panel-tools {
+    margin-bottom: 0.45rem;
+  }
+
+  .leaderboard-find-me {
+    transform: translateY(0.3rem);
   }
 
   .leaderboard-ranking-control {

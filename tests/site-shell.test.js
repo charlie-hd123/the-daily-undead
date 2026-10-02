@@ -105,7 +105,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261002-5"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261002-6"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -155,7 +155,12 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(css, /\.leaderboard-entry\.is-current-player/);
   assert.match(css, /\.leaderboard-status \{\s*margin: 0 0 0\.85rem;/);
   assert.doesNotMatch(css, /\.leaderboard-status \{[^}]*min-height:/);
-  assert.match(await readProjectFile("js/leaderboards.js"), /scrollIntoView\(\{ block: "center"/);
+  const leaderboards = await readProjectFile("js/leaderboards.js");
+  assert.match(leaderboards, /scrollIntoView\(\{ block: "center"/);
+  assert.match(leaderboards, /toolbar\.hidden = !\[\.\.\.toolbar\.children\]\.some/);
+  assert.match(css, /\.leaderboard-dialog \[role="tabpanel"\] \{[\s\S]*?margin-top: 0\.65rem;/);
+  assert.match(css, /\.leaderboard-panel-tools\[hidden\] \{\s*display: none;/);
+  assert.match(css, /@media \(max-width: 35rem\)[\s\S]*?\.leaderboard-dialog \[role="tabpanel"\] \{[\s\S]*?margin-top: 0\.45rem;/);
   assert.match(
     html,
     /class="header-utility"[\s\S]*id="account-button"[\s\S]*class="round-timing"[\s\S]*class="player-stats"/,
