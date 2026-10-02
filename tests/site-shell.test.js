@@ -105,7 +105,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261002-6"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261002-7"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -161,6 +161,7 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(css, /\.leaderboard-dialog \[role="tabpanel"\] \{[\s\S]*?margin-top: 0\.65rem;/);
   assert.match(css, /\.leaderboard-panel-tools\[hidden\] \{\s*display: none;/);
   assert.match(css, /@media \(max-width: 35rem\)[\s\S]*?\.leaderboard-dialog \[role="tabpanel"\] \{[\s\S]*?margin-top: 0\.45rem;/);
+  assert.match(css, /@media \(max-width: 35rem\)[\s\S]*?\.leaderboard-all-time-tools \.leaderboard-find-me \{\s*transform: translateY\(0\.1rem\);/);
   assert.match(
     html,
     /class="header-utility"[\s\S]*id="account-button"[\s\S]*class="round-timing"[\s\S]*class="player-stats"/,

@@ -2251,6 +2251,10 @@ h1 {
     transform: translateY(0.3rem);
   }
 
+  .leaderboard-all-time-tools .leaderboard-find-me {
+    transform: translateY(0.1rem);
+  }
+
   .leaderboard-ranking-control {
     flex-wrap: wrap;
   }
