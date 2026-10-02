@@ -78,3 +78,20 @@ export function prepareMissedDayProgress({
 export function canUseRequestedPreviewDate(requestedDateKey, currentDateKey, isAuthorized) {
   return requestedDateKey <= currentDateKey || isAuthorized;
 }
+
+export const progressionUpdateAutoWindowMs = 2 * 24 * 60 * 60 * 1000;
+export const progressionUpdateReminderWindowMs = 4 * 24 * 60 * 60 * 1000;
+
+export function getProgressionUpdateVisibility({ launchAt, now, autoShown = false }) {
+  if (!Number.isFinite(launchAt) || !Number.isFinite(now)) {
+    return { showReminder: false, autoOpen: false };
+  }
+  const timeSinceLaunch = now - launchAt;
+  const showReminder =
+    timeSinceLaunch >= 0 && timeSinceLaunch < progressionUpdateReminderWindowMs;
+  return {
+    showReminder,
+    autoOpen:
+      showReminder && timeSinceLaunch < progressionUpdateAutoWindowMs && !autoShown,
+  };
+}

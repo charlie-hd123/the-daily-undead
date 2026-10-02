@@ -105,7 +105,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261002-3"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261002-4"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -445,12 +445,10 @@ test("the progression update auto-opens for two days and remains in leaderboards
   assert.match(html, /Your Score is our best estimate from the history available\./);
   assert.match(html, /leaderboard positions closely match the original standings\./);
   assert.match(html, /Nobody’s Score has been reset\./);
-  assert.match(app, /const progressionUpdateAutoWindowMs = 2 \* 24 \* 60 \* 60 \* 1000;/);
-  assert.match(app, /const progressionUpdateReminderWindowMs = 4 \* 24 \* 60 \* 60 \* 1000;/);
-  assert.match(app, /timeSinceLaunch < progressionUpdateAutoWindowMs/);
-  assert.match(app, /timeSinceLaunch >= progressionUpdateReminderWindowMs/);
+  assert.match(app, /getProgressionUpdateVisibility/);
+  assert.match(app, /if \(!visibility\.showReminder\) return;/);
+  assert.match(app, /if \(visibility\.autoOpen && !document\.querySelector\("dialog\[open\]"\)\)/);
   assert.match(app, /getCurrentTime\(\)\.getTime\(\)/);
-  assert.match(app, /if \(!Number\.isFinite\(launchAt\)\) return;/);
   assert.match(app, /function hasEstablishedProgress\(\)/);
   assert.match(app, /updateState\.autoShown = true;/);
   assert.match(app, /progressionUpdateButton\.addEventListener\("click", openProgressionUpdate\)/);

@@ -12,25 +12,26 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261002-3";
+} from "./game-core.js?v=20261002-4";
 import {
   canUseRequestedPreviewDate,
+  getProgressionUpdateVisibility,
   isLocalDevelopmentHostname,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261002-3";
-import { initialiseAccount } from "./account.js?v=20261002-3";
+} from "./progression.js?v=20261002-4";
+import { initialiseAccount } from "./account.js?v=20261002-4";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261002-3";
+} from "./community-stats.js?v=20261002-4";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261002-3";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261002-3";
+} from "./leaderboards.js?v=20261002-4";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261002-4";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -60,8 +61,6 @@ const solvesStorageKey = "the-daily-undead:total-rounds";
 const scoreStorageKey = "the-daily-undead:score";
 const legacyPointsStorageKey = "the-daily-undead:total-points";
 const progressionUpdateStorageKey = "the-daily-undead:progression-update-v2";
-const progressionUpdateAutoWindowMs = 2 * 24 * 60 * 60 * 1000;
-const progressionUpdateReminderWindowMs = 4 * 24 * 60 * 60 * 1000;
 const statExplainers = {
   round: {
     title: "Round",
@@ -764,14 +763,14 @@ function initialiseProgressionUpdate() {
   const launchAt = Date.parse(
     document.querySelector('meta[name="daily-undead-progression-launch-at"]')?.content || "",
   );
-  if (!Number.isFinite(launchAt)) return;
-
-  const now = getCurrentTime().getTime();
-  const timeSinceLaunch = now - launchAt;
-  if (timeSinceLaunch < 0 || timeSinceLaunch >= progressionUpdateReminderWindowMs) return;
-
   const saved = readProgressionUpdateState();
   const updateState = saved || { autoShown: false };
+  const visibility = getProgressionUpdateVisibility({
+    launchAt,
+    now: getCurrentTime().getTime(),
+    autoShown: updateState.autoShown,
+  });
+  if (!visibility.showReminder) return;
 
   progressionUpdateButton.hidden = false;
   progressionUpdateButton.addEventListener("click", openProgressionUpdate);
@@ -779,11 +778,7 @@ function initialiseProgressionUpdate() {
     button.addEventListener("click", () => progressionUpdateDialog.close());
   });
 
-  if (
-    timeSinceLaunch < progressionUpdateAutoWindowMs
-    && !updateState.autoShown
-    && !document.querySelector("dialog[open]")
-  ) {
+  if (visibility.autoOpen && !document.querySelector("dialog[open]")) {
     updateState.autoShown = true;
     writeProgressionUpdateState(updateState);
     openProgressionUpdate();

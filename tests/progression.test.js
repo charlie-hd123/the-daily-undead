@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 
 import {
   canUseRequestedPreviewDate,
+  getProgressionUpdateVisibility,
   getRequiredMissedDates,
   isLocalDevelopmentHostname,
   prepareMissedDayProgress,
@@ -107,4 +108,38 @@ test("future URL previews require dev-button authorization", () => {
   assert.equal(canUseRequestedPreviewDate("2026-07-31", "2026-07-30", false), false);
   assert.equal(canUseRequestedPreviewDate("2026-07-31", "2026-07-30", true), true);
   assert.equal(canUseRequestedPreviewDate("2026-07-29", "2026-07-30", false), true);
+});
+
+test("progression update windows end exactly two and four days after launch", () => {
+  const launchAt = Date.parse("2026-10-10T18:00:00Z");
+  const day = 24 * 60 * 60 * 1000;
+
+  assert.deepEqual(
+    getProgressionUpdateVisibility({ launchAt, now: launchAt - 1 }),
+    { showReminder: false, autoOpen: false },
+  );
+  assert.deepEqual(
+    getProgressionUpdateVisibility({ launchAt, now: launchAt }),
+    { showReminder: true, autoOpen: true },
+  );
+  assert.deepEqual(
+    getProgressionUpdateVisibility({ launchAt, now: launchAt + 2 * day - 1 }),
+    { showReminder: true, autoOpen: true },
+  );
+  assert.deepEqual(
+    getProgressionUpdateVisibility({ launchAt, now: launchAt + 2 * day }),
+    { showReminder: true, autoOpen: false },
+  );
+  assert.deepEqual(
+    getProgressionUpdateVisibility({ launchAt, now: launchAt + 4 * day - 1 }),
+    { showReminder: true, autoOpen: false },
+  );
+  assert.deepEqual(
+    getProgressionUpdateVisibility({ launchAt, now: launchAt + 4 * day }),
+    { showReminder: false, autoOpen: false },
+  );
+  assert.equal(
+    getProgressionUpdateVisibility({ launchAt, now: launchAt + day, autoShown: true }).autoOpen,
+    false,
+  );
 });
