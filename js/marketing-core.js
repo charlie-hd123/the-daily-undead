@@ -54,7 +54,6 @@ export function buildMarketingCopy({
   clue,
   yesterdayAnswer,
   solvePercentage,
-  postNumber = getDailyPostNumber(dateKey),
 }) {
   if (!isValidDateKey(dateKey)) throw new Error("A valid puzzle date is required.");
   if (typeof clue !== "string" || !clue.trim()) throw new Error("Today’s clue is required.");
@@ -67,14 +66,14 @@ export function buildMarketingCopy({
     : "—%";
   const cleanClue = clue.trim();
   const cleanAnswer = yesterdayAnswer.trim();
-  const redditTitle = `Can you guess the map from the main quest step? #${postNumber}`;
+  const redditTitle = `Can you guess the map from the main quest step? ${formatDiscordDate(dateKey)}`;
   const redditBody = [
     `Yesterday’s answer: ${cleanAnswer} 🧟`,
     `Yesterday’s solve rate: ${solved} 🔎`,
     "First correct Redditors: u/____, u/____, u/____ 👏",
     "",
     "Today’s main quest step:",
-    `*${cleanClue}*`,
+    cleanClue,
     "",
     "Which Treyarch Zombies map is it from?",
     "",
@@ -95,8 +94,6 @@ export function buildMarketingCopy({
     "",
     "Need another clue, or want to lock in your answer on The Daily Undead website?",
     "🔗 <https://thedailyundead.com/>",
-    "",
-    "📱 Tip: Open the game in Safari or Chrome rather than an in-app browser so your rounds, points and progress stay saved in the same place.",
   ].join("\n");
 
   return { redditTitle, redditBody, discordBody, solved };

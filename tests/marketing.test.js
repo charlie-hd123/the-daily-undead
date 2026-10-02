@@ -30,15 +30,19 @@ test("marketing copy fills daily data but leaves usernames blank", () => {
     solvePercentage: 67,
   });
 
-  assert.equal(copy.redditTitle, "Can you guess the map from the main quest step? #29");
+  assert.equal(copy.redditTitle, "Can you guess the map from the main quest step? 10 Sept");
   assert.match(copy.redditBody, /Yesterday’s answer: Liberty Falls 🧟/);
   assert.match(copy.redditBody, /Yesterday’s solve rate: 67% 🔎/);
   assert.match(copy.redditBody, /First correct Redditors:/);
   assert.match(copy.redditBody, /u\/____, u\/____, u\/____/);
+  assert.match(copy.redditBody, /Today’s main quest step:\nDefeat the boss/);
+  assert.doesNotMatch(copy.redditBody, /\*Defeat the boss/);
   assert.match(copy.discordBody, /🧟 The Daily Undead · 10 Sept/);
   assert.match(copy.discordBody, /First correct guesses here:/);
   assert.match(copy.discordBody, /The Daily Undead website/);
   assert.match(copy.discordBody, /@____, @____, @____/);
+  assert.match(copy.discordBody, /🔗 <https:\/\/thedailyundead\.com\/>$/);
+  assert.doesNotMatch(copy.discordBody, /in-app browser|rounds, points and progress/);
   assert.doesNotMatch(copy.redditBody, /TXIC|Working5099|Expensive_Ad/);
   assert.doesNotMatch(copy.discordBody, /The blaze|Tob1asV|be nice/);
 });

@@ -10,7 +10,7 @@ import {
   getDailyPostNumber,
   getPreviousDateKey,
   isAppleMobileDevice,
-} from "./marketing-core.js?v=20260921-1";
+} from "./marketing-core.js?v=20261002-1";
 
 const pack = document.querySelector("#marketing-pack");
 const packDate = document.querySelector("#pack-date");
@@ -275,7 +275,6 @@ async function initialise() {
       clue,
       yesterdayAnswer,
       solvePercentage,
-      postNumber,
     });
     await drawDailyImage(clue);
 
