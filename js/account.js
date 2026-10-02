@@ -6,7 +6,7 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261002-1";
+} from "./account-session.js?v=20261002-2";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject

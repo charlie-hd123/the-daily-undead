@@ -96,7 +96,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261002-1"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261002-2"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -418,7 +418,7 @@ test("stat rewards stay attached to their header pills", async () => {
   assert.doesNotMatch(css, /\.reward-hud|reward-hud-arrival/);
 });
 
-test("established players can reopen the progression explanation from leaderboards for five days", async () => {
+test("the progression update auto-opens for two days and remains in leaderboards for four", async () => {
   const [html, css, app] = await Promise.all([
     readProjectFile("index.html"),
     readProjectFile("styles.css"),
@@ -435,7 +435,10 @@ test("established players can reopen the progression explanation from leaderboar
   assert.match(html, /Your Score is our best estimate from the history available\./);
   assert.match(html, /leaderboard positions closely match the original standings\./);
   assert.match(html, /Nobody’s Score has been reset\./);
-  assert.match(app, /const progressionUpdateWindowMs = 5 \* 24 \* 60 \* 60 \* 1000;/);
+  assert.match(app, /const progressionUpdateAutoWindowMs = 2 \* 24 \* 60 \* 60 \* 1000;/);
+  assert.match(app, /const progressionUpdateReminderWindowMs = 4 \* 24 \* 60 \* 60 \* 1000;/);
+  assert.match(app, /timeSinceFirstSeen < progressionUpdateAutoWindowMs/);
+  assert.match(app, /timeSinceFirstSeen >= progressionUpdateReminderWindowMs/);
   assert.match(app, /function hasEstablishedProgress\(\)/);
   assert.match(app, /updateState\.autoShown = true;/);
   assert.match(app, /progressionUpdateButton\.addEventListener\("click", openProgressionUpdate\)/);
