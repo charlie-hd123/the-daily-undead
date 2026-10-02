@@ -2150,7 +2150,7 @@ h1 {
 
 .leaderboard-supporting-metrics {
   display: flex;
-  flex-wrap: nowrap;
+  flex-direction: column;
   gap: 0.25rem 0.85rem;
   margin: 0;
 }
