@@ -66,7 +66,7 @@ export function buildMarketingCopy({
     : "—%";
   const cleanClue = clue.trim();
   const cleanAnswer = yesterdayAnswer.trim();
-  const redditTitle = `Can you guess the map from the main quest step? ${formatDiscordDate(dateKey)}`;
+  const redditTitle = `Can you guess the map from the main quest step? — ${formatDiscordDate(dateKey)}`;
   const redditBody = [
     `Yesterday’s answer: ${cleanAnswer} 🧟`,
     `Yesterday’s solve rate: ${solved} 🔎`,

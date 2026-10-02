@@ -30,7 +30,7 @@ test("marketing copy fills daily data but leaves usernames blank", () => {
     solvePercentage: 67,
   });
 
-  assert.equal(copy.redditTitle, "Can you guess the map from the main quest step? 10 Sept");
+  assert.equal(copy.redditTitle, "Can you guess the map from the main quest step? — 10 Sept");
   assert.match(copy.redditBody, /Yesterday’s answer: Liberty Falls 🧟/);
   assert.match(copy.redditBody, /Yesterday’s solve rate: 67% 🔎/);
   assert.match(copy.redditBody, /First correct Redditors:/);
