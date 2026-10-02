@@ -7,6 +7,8 @@
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <!-- Public API URL only; localhost is isolated to a local Worker on port 8787. -->
     <meta name="daily-undead-stats-api" content="https://api.thedailyundead.com">
+    <!-- Replace this marker with the exact UTC launch time in the production launch commit. -->
+    <meta name="daily-undead-progression-launch-at" content="__PROGRESSION_UPDATE_LAUNCH_AT__">
     <!-- Clerk publishable keys identify the public frontend and are safe to expose. -->
     <meta name="daily-undead-clerk-publishable-key" content="pk_live_Y2xlcmsudGhlZGFpbHl1bmRlYWQuY29tJA">
     <link rel="canonical" href="https://thedailyundead.com/">
@@ -15,9 +17,9 @@
       content="The Daily Undead — your daily Treyarch Zombies challenge. Reveal clues, identify the map, and put the steps in order."
     >
     <title>The Daily Undead</title>
-    <link rel="icon" href="./assets/favicon.png?v=20261002-2" type="image/png" sizes="128x128">
+    <link rel="icon" href="./assets/favicon.png?v=20261002-3" type="image/png" sizes="128x128">
     <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" sizes="180x180">
-    <link rel="stylesheet" href="./styles.css?v=20261002-2">
+    <link rel="stylesheet" href="./styles.css?v=20261002-3">
   </head>
   <body>
     <header class="site-header">
@@ -347,7 +349,7 @@
       <div data-public-profile-content></div>
     </dialog>
 
-    <script type="module" src="./js/app.js?v=20261002-2"></script>
+    <script type="module" src="./js/app.js?v=20261002-3"></script>
 
     <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "4eeb20e1411c4e7baf24969ced969c88"}'></script><!-- End Cloudflare Web Analytics -->
 

@@ -1,0 +1,9 @@
+{
+  "name": "daily-undead-stats",
+  "main": "src/maintenance.js",
+  "compatibility_date": "2026-08-12",
+  "workers_dev": false,
+  "vars": {
+    "ALLOWED_ORIGINS": "https://thedailyundead.com,https://www.thedailyundead.com"
+  }
+}

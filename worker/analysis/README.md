@@ -18,3 +18,7 @@ Before production launch:
 3. Tune the formula if the preview reveals unfair results.
 4. Prepare a separate, reviewed write migration. Never turn this preview query
    into an automatic production update.
+
+The reviewed write, verification and pre-reopening rollback are kept separately
+under `worker/launch/`. Generated username-linked output remains private and is
+never committed to the repository.

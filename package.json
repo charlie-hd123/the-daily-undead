@@ -9,6 +9,7 @@
     "start:profiles": "npx wrangler@latest dev --config worker/wrangler.profiles-local.jsonc --port 8788",
     "db:profiles": "npx wrangler@latest d1 migrations apply daily-undead-profiles-local --local --config worker/wrangler.profiles-local.jsonc",
     "build:staging": "node scripts/build-staging.mjs",
+    "validate:launch": "node scripts/validate-production-launch.mjs",
     "deploy:staging": "npm run build:staging && npx wrangler@latest pages deploy .staging-dist --project-name daily-undead-staging --branch staging",
     "generate:worker-catalog": "node scripts/generate-worker-catalog.js",
     "test": "node --test"

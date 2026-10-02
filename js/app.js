@@ -12,25 +12,25 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261002-2";
+} from "./game-core.js?v=20261002-3";
 import {
   canUseRequestedPreviewDate,
   isLocalDevelopmentHostname,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261002-2";
-import { initialiseAccount } from "./account.js?v=20261002-2";
+} from "./progression.js?v=20261002-3";
+import { initialiseAccount } from "./account.js?v=20261002-3";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261002-2";
+} from "./community-stats.js?v=20261002-3";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261002-2";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261002-2";
+} from "./leaderboards.js?v=20261002-3";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261002-3";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -59,7 +59,7 @@ const streakStorageKey = "the-daily-undead:streak";
 const solvesStorageKey = "the-daily-undead:total-rounds";
 const scoreStorageKey = "the-daily-undead:score";
 const legacyPointsStorageKey = "the-daily-undead:total-points";
-const progressionUpdateStorageKey = "the-daily-undead:progression-update-v1";
+const progressionUpdateStorageKey = "the-daily-undead:progression-update-v2";
 const progressionUpdateAutoWindowMs = 2 * 24 * 60 * 60 * 1000;
 const progressionUpdateReminderWindowMs = 4 * 24 * 60 * 60 * 1000;
 const statExplainers = {
@@ -737,7 +737,7 @@ function hasEstablishedProgress() {
 function readProgressionUpdateState() {
   try {
     const saved = JSON.parse(localStorage.getItem(progressionUpdateStorageKey));
-    return Number.isFinite(saved?.firstSeenAt) && saved.firstSeenAt > 0 ? saved : null;
+    return saved && typeof saved === "object" ? { autoShown: Boolean(saved.autoShown) } : null;
   } catch {
     return null;
   }
@@ -761,11 +761,17 @@ function openProgressionUpdate() {
 function initialiseProgressionUpdate() {
   if (!progressionUpdateButton || !progressionUpdateDialog || !hasEstablishedProgress()) return;
 
-  const now = Date.now();
+  const launchAt = Date.parse(
+    document.querySelector('meta[name="daily-undead-progression-launch-at"]')?.content || "",
+  );
+  if (!Number.isFinite(launchAt)) return;
+
+  const now = getCurrentTime().getTime();
+  const timeSinceLaunch = now - launchAt;
+  if (timeSinceLaunch < 0 || timeSinceLaunch >= progressionUpdateReminderWindowMs) return;
+
   const saved = readProgressionUpdateState();
-  const updateState = saved || { firstSeenAt: now, autoShown: false };
-  const timeSinceFirstSeen = now - updateState.firstSeenAt;
-  if (timeSinceFirstSeen >= progressionUpdateReminderWindowMs) return;
+  const updateState = saved || { autoShown: false };
 
   progressionUpdateButton.hidden = false;
   progressionUpdateButton.addEventListener("click", openProgressionUpdate);
@@ -774,7 +780,7 @@ function initialiseProgressionUpdate() {
   });
 
   if (
-    timeSinceFirstSeen < progressionUpdateAutoWindowMs
+    timeSinceLaunch < progressionUpdateAutoWindowMs
     && !updateState.autoShown
     && !document.querySelector("dialog[open]")
   ) {

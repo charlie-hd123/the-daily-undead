@@ -28,6 +28,15 @@ test("the published page uses local fonts and privacy-safe external links", asyn
   );
 });
 
+test("the launch package includes a restrained maintenance page", async () => {
+  const maintenance = await readProjectFile("maintenance.html");
+
+  assert.match(maintenance, /<h1>Scheduled maintenance<\/h1>/);
+  assert.match(maintenance, /Your Score, Puzzle Solves, Round and Highest Round are safe\./);
+  assert.doesNotMatch(maintenance, /regroup/i);
+  assert.doesNotMatch(maintenance, /https?:\/\//i);
+});
+
 test("the page's local release assets exist", async () => {
   const requiredFiles = [
     "assets/favicon.png",
@@ -96,7 +105,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261002-2"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261002-3"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -429,6 +438,7 @@ test("the progression update auto-opens for two days and remains in leaderboards
   assert.match(html, /id="leaderboards-dialog"[\s\S]*?id="progression-update-button"/);
   assert.doesNotMatch(html, /class="header-meta"[\s\S]*?id="progression-update-button"[\s\S]*?<\/header>/);
   assert.match(html, /id="progression-update-dialog"/);
+  assert.match(html, /name="daily-undead-progression-launch-at" content="__PROGRESSION_UPDATE_LAUNCH_AT__"/);
   assert.match(html, /<h2>A simpler scoring system<\/h2>/);
   assert.match(html, /It never decreases, resets or gets spent, so every successful puzzle moves you forward\./);
   assert.match(html, /Failing ends your current Round, but not your career progress\./);
@@ -437,8 +447,10 @@ test("the progression update auto-opens for two days and remains in leaderboards
   assert.match(html, /Nobody’s Score has been reset\./);
   assert.match(app, /const progressionUpdateAutoWindowMs = 2 \* 24 \* 60 \* 60 \* 1000;/);
   assert.match(app, /const progressionUpdateReminderWindowMs = 4 \* 24 \* 60 \* 60 \* 1000;/);
-  assert.match(app, /timeSinceFirstSeen < progressionUpdateAutoWindowMs/);
-  assert.match(app, /timeSinceFirstSeen >= progressionUpdateReminderWindowMs/);
+  assert.match(app, /timeSinceLaunch < progressionUpdateAutoWindowMs/);
+  assert.match(app, /timeSinceLaunch >= progressionUpdateReminderWindowMs/);
+  assert.match(app, /getCurrentTime\(\)\.getTime\(\)/);
+  assert.match(app, /if \(!Number\.isFinite\(launchAt\)\) return;/);
   assert.match(app, /function hasEstablishedProgress\(\)/);
   assert.match(app, /updateState\.autoShown = true;/);
   assert.match(app, /progressionUpdateButton\.addEventListener\("click", openProgressionUpdate\)/);

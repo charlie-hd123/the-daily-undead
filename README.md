@@ -144,6 +144,10 @@ Once this folder is pushed to a GitHub repository:
 
 No build command or GitHub Action is required. The included `CNAME` file connects the Pages site to [thedailyundead.com](https://thedailyundead.com/). Keep that file in the published branch.
 
+The scoring-redesign production cutover is documented in [`LAUNCH.md`](LAUNCH.md).
+Its opening Score write is deliberately separate from the automatic D1 migration
+chain and runs only during an explicitly approved maintenance window.
+
 ## Player accounts, data and feedback
 
 Accounts are optional. Guests keep using browser local storage. A player who chooses **Save progress** signs up or signs in through Clerk with an email verification code, then chooses a public username. There is no game password to remember or reset. On first setup, the player can import progress already stored on that device.

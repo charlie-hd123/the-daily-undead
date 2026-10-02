@@ -22,7 +22,8 @@ async function writeStagingHtml(filename, { banner = false } = {}) {
   const source = await readFile(path.join(root, filename), "utf8");
   let html = source
     .replace("https://api.thedailyundead.com", stagingApi)
-    .replace("pk_live_Y2xlcmsudGhlZGFpbHl1bmRlYWQuY29tJA", stagingClerkKey);
+    .replace("pk_live_Y2xlcmsudGhlZGFpbHl1bmRlYWQuY29tJA", stagingClerkKey)
+    .replace("__PROGRESSION_UPDATE_LAUNCH_AT__", new Date().toISOString());
   if (!html.includes('<meta name="robots"')) {
     html = html.replace(
       '<meta name="referrer" content="strict-origin-when-cross-origin">',
@@ -61,6 +62,7 @@ async function writeStagingHtml(filename, { banner = false } = {}) {
 
 await writeStagingHtml("index.html", { banner: true });
 await writeStagingHtml("marketing.html");
+await writeStagingHtml("maintenance.html");
 
 await writeFile(
   path.join(output, "_headers"),

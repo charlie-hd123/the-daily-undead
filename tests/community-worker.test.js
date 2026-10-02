@@ -557,6 +557,33 @@ test("the Score migration preview is read-only, anonymous and estimates only leg
   assert.match(preview, /MAX\(\s*current_balance,[\s\S]*?AS proposed_opening_score/);
 });
 
+test("the opening Score write is backed up, one-time and progression-safe", async () => {
+  const [migration, verification, rollback, finalPreview] = await Promise.all([
+    readProjectFile("worker/launch/opening-score-migration.sql"),
+    readProjectFile("worker/launch/opening-score-verification.sql"),
+    readProjectFile("worker/launch/opening-score-rollback.sql"),
+    readProjectFile("worker/launch/final-score-preview.sql"),
+  ]);
+
+  assert.match(migration, /CREATE TABLE IF NOT EXISTS score_migration_backup/);
+  assert.match(migration, /INSERT OR IGNORE INTO score_migration_backup/);
+  assert.match(migration, /score_migration_method = 'lifetime-estimate-v1'/);
+  assert.match(migration, /COALESCE\(score_migration_method, ''\) <> 'lifetime-estimate-v1'/);
+  assert.match(migration, /estimated_legacy_solves \* smoothed_points_per_solve/);
+  assert.doesNotMatch(migration, /SET[\s\S]*?\b(?:current_round|best_round|total_rounds)\s*=/i);
+
+  assert.match(verification, /score_below_old_balance/);
+  assert.match(verification, /changed_current_rounds/);
+  assert.match(verification, /changed_highest_rounds/);
+  assert.match(verification, /changed_solves/);
+  assert.match(rollback, /EMERGENCY PRE-LAUNCH ROLLBACK ONLY/);
+  assert.match(rollback, /backup\.score_before/);
+
+  assert.doesNotMatch(finalPreview, /\b(?:UPDATE|INSERT|DELETE|ALTER|DROP|CREATE)\b/i);
+  assert.match(finalPreview, /profiles\.username/);
+  assert.match(finalPreview, /proposed_score/);
+});
+
 test("the Worker's verification catalogue matches the browser puzzle catalogue", async () => {
   const index = JSON.parse(await readProjectFile("data/maps/index.json"));
   const expectedMaps = await Promise.all(

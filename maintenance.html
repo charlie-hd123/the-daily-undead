@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="referrer" content="no-referrer">
+    <title>Scheduled maintenance · The Daily Undead</title>
+    <link rel="icon" href="./assets/favicon.png" type="image/png" sizes="128x128">
+    <style>
+      @font-face {
+        font-family: "Barlow";
+        src: url("./assets/fonts/barlow-400.ttf") format("truetype");
+        font-display: swap;
+      }
+      @font-face {
+        font-family: "Barlow Condensed";
+        src: url("./assets/fonts/barlow-condensed-800.ttf") format("truetype");
+        font-display: swap;
+        font-weight: 800;
+      }
+      :root {
+        color-scheme: dark;
+        font-family: "Barlow", system-ui, sans-serif;
+        background: #05070d;
+        color: #f6f7fb;
+      }
+      * { box-sizing: border-box; }
+      body {
+        display: grid;
+        min-height: 100svh;
+        margin: 0;
+        padding: 1.25rem;
+        place-items: center;
+        background:
+          radial-gradient(circle at 50% 18%, rgb(103 232 255 / 12%), transparent 28rem),
+          radial-gradient(circle at 75% 80%, rgb(158 119 255 / 10%), transparent 24rem),
+          linear-gradient(155deg, #080b13, #03050a 72%);
+      }
+      main {
+        width: min(100%, 38rem);
+        padding: clamp(1.5rem, 5vw, 2.75rem);
+        border: 1px solid rgb(160 201 255 / 28%);
+        border-radius: 1rem;
+        background: linear-gradient(145deg, rgb(20 27 43 / 96%), rgb(8 11 20 / 98%));
+        box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 50%), 0 0 3rem rgb(103 232 255 / 7%);
+        text-align: center;
+      }
+      .mark {
+        display: grid;
+        width: 3.25rem;
+        height: 3.25rem;
+        margin: 0 auto 1.25rem;
+        border: 1px solid rgb(103 232 255 / 45%);
+        border-radius: 50%;
+        color: #67e8ff;
+        font-size: 1.5rem;
+        place-items: center;
+        box-shadow: 0 0 1.5rem rgb(103 232 255 / 15%);
+      }
+      .kicker {
+        margin: 0 0 0.5rem;
+        color: #67e8ff;
+        font: 800 0.78rem/1.2 "Barlow Condensed", sans-serif;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      h1 {
+        margin: 0;
+        font: 800 clamp(2.2rem, 9vw, 4rem)/0.95 "Barlow Condensed", sans-serif;
+        letter-spacing: -0.02em;
+        text-transform: uppercase;
+      }
+      p {
+        margin: 1.1rem auto 0;
+        max-width: 31rem;
+        color: #b7c0d1;
+        font-size: 1.04rem;
+        line-height: 1.55;
+      }
+      strong { color: #f7c85c; }
+      .status {
+        margin-top: 1.5rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid rgb(160 201 255 / 16%);
+        color: #dce3ee;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <span class="mark" aria-hidden="true">☣</span>
+      <p class="kicker">The Daily Undead</p>
+      <h1>Scheduled maintenance</h1>
+      <p>We’re updating the scoring and progression system. The site will be available again shortly.</p>
+      <p><strong>Your Score, Puzzle Solves, Round and Highest Round are safe.</strong></p>
+      <p class="status">Refresh this page in a little while.</p>
+    </main>
+  </body>
+</html>

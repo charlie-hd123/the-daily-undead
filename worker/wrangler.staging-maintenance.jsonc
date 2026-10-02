@@ -1,0 +1,10 @@
+{
+  "name": "daily-undead-staging-api",
+  "main": "src/maintenance.js",
+  "compatibility_date": "2026-08-12",
+  "workers_dev": true,
+  "preview_urls": true,
+  "vars": {
+    "ALLOWED_ORIGINS": "https://daily-undead-staging.pages.dev"
+  }
+}
