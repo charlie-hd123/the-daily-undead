@@ -438,7 +438,10 @@ test("the progression update auto-opens for two days and remains in leaderboards
   assert.match(html, /id="leaderboards-dialog"[\s\S]*?id="progression-update-button"/);
   assert.doesNotMatch(html, /class="header-meta"[\s\S]*?id="progression-update-button"[\s\S]*?<\/header>/);
   assert.match(html, /id="progression-update-dialog"/);
-  assert.match(html, /name="daily-undead-progression-launch-at" content="__PROGRESSION_UPDATE_LAUNCH_AT__"/);
+  assert.match(
+    html,
+    /name="daily-undead-progression-launch-at" content="\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z"/,
+  );
   assert.match(html, /<h2>A simpler scoring system<\/h2>/);
   assert.match(html, /It never decreases, resets or gets spent, so every successful puzzle moves you forward\./);
   assert.match(html, /Failing ends your current Round, but not your career progress\./);
