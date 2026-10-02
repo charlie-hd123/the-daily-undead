@@ -529,6 +529,7 @@ test("the redesign migration preserves old balances and makes results repairable
     fs.readFile(new URL("../worker/migrations/0006_scoring_progression_redesign.sql", import.meta.url), "utf8"),
     fs.readFile(new URL("../worker/migrations/0007_add_round_reconstruction_anchor.sql", import.meta.url), "utf8"),
     fs.readFile(new URL("../worker/migrations/0008_make_result_awards_atomic.sql", import.meta.url), "utf8"),
+    fs.readFile(new URL("../worker/migrations/0009_round_starts_at_one.sql", import.meta.url), "utf8"),
   ]).then((parts) => parts.join("\n"));
   assert.match(schema, /ADD COLUMN score INTEGER NOT NULL DEFAULT 0/);
   assert.match(schema, /SET score = MAX\(score, points_balance\)/);
@@ -538,6 +539,9 @@ test("the redesign migration preserves old balances and makes results repairable
   assert.match(schema, /round_anchor_value = current_round/);
   assert.match(schema, /ADD COLUMN progression_applied/);
   assert.match(schema, /SET score_awarded = points_earned/);
+  assert.match(schema, /current_round = current_round \+ 1/);
+  assert.match(schema, /best_round = best_round \+ 1/);
+  assert.match(schema, /round_anchor_value = round_anchor_value \+ 1/);
   assert.doesNotMatch(schema, /DROP TABLE|DELETE FROM player_saves/i);
 });
 

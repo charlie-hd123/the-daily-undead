@@ -46,7 +46,7 @@ export function sanitizeProgress(value = {}) {
     }
   }
 
-  const currentRound = safeCounter(value.currentRound);
+  const currentRound = Math.max(1, safeCounter(value.currentRound));
   const score = safeCounter(value.score ?? value.pointsBalance);
   const solves = safeCounter(value.solves ?? value.totalRounds);
   return {
@@ -235,16 +235,16 @@ export async function reconstructRound(db, userId, progressRow, todayDateKey) {
   const protectedDates = new Set(
     (protectedQuery.results || []).map((row) => row.game_date),
   );
-  let currentRound = Number(progressRow.round_anchor_value || 0);
+  let currentRound = Math.max(1, Number(progressRow.round_anchor_value || 0));
   let bestRound = Math.max(Number(progressRow.best_round || 0), currentRound);
 
   for (let date = followingDateKey(anchorDate); date <= todayDateKey; date = followingDateKey(date)) {
     if (protectedDates.has(date)) continue;
     if (results.has(date)) {
-      currentRound = results.get(date) ? currentRound + 1 : 0;
+      currentRound = results.get(date) ? currentRound + 1 : 1;
       bestRound = Math.max(bestRound, currentRound);
     } else if (date < todayDateKey) {
-      currentRound = 0;
+      currentRound = 1;
     }
   }
 
@@ -365,8 +365,8 @@ export async function registerAccount(db, request, userId) {
       )
       .bind(
         userId,
-        body.importLocalProgress ? progress.currentRound : 0,
-        body.importLocalProgress ? progress.bestRound : 0,
+        body.importLocalProgress ? progress.currentRound : 1,
+        body.importLocalProgress ? progress.bestRound : 1,
         body.importLocalProgress ? progress.score : 0,
         body.importLocalProgress ? progress.solves : 0,
         body.importLocalProgress ? progress.lastPlayedDate : null,
@@ -377,7 +377,7 @@ export async function registerAccount(db, request, userId) {
         body.importLocalProgress ? "guest-local-import" : "new-account",
         new Date().toISOString(),
         body.importLocalProgress ? progress.lastPlayedDate : puzzleDate,
-        body.importLocalProgress ? progress.currentRound : 0,
+        body.importLocalProgress ? progress.currentRound : 1,
       ),
   ];
 
@@ -661,7 +661,7 @@ export async function recordVerifiedMapResult(db, request, userId) {
             FROM player_daily_results
             WHERE user_id = ? AND puzzle_date = ? AND progression_applied = 0
           ), 1) = 1 THEN current_round
-          ELSE 0
+          ELSE 1
         END,
         revision = revision + 1,
         updated_at = CURRENT_TIMESTAMP

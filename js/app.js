@@ -12,26 +12,27 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261002-4";
+} from "./game-core.js?v=20261002-5";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
   isLocalDevelopmentHostname,
+  migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261002-4";
-import { initialiseAccount } from "./account.js?v=20261002-4";
+} from "./progression.js?v=20261002-5";
+import { initialiseAccount } from "./account.js?v=20261002-5";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261002-4";
+} from "./community-stats.js?v=20261002-5";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261002-4";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261002-4";
+} from "./leaderboards.js?v=20261002-5";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261002-5";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -57,6 +58,7 @@ const socialDemoEnabled = isLocalDevelopment && new URLSearchParams(window.locat
 const communityStatsApiUrl = resolveCommunityStatsApiUrl({ isLocalDevelopment });
 const leaderboardsApiUrl = resolveLeaderboardsApiUrl({ isLocalDevelopment });
 const streakStorageKey = "the-daily-undead:streak";
+const roundNumberingStorageKey = "the-daily-undead:round-numbering";
 const solvesStorageKey = "the-daily-undead:total-rounds";
 const scoreStorageKey = "the-daily-undead:score";
 const legacyPointsStorageKey = "the-daily-undead:total-points";
@@ -528,9 +530,9 @@ function storageKey() {
 function loadStreak() {
   try {
     const savedStreak = Number.parseInt(localStorage.getItem(streakStorageKey), 10);
-    return Number.isInteger(savedStreak) && savedStreak >= 0 ? savedStreak : 0;
+    return Number.isInteger(savedStreak) && savedStreak >= 1 ? savedStreak : 1;
   } catch {
-    return 0;
+    return 1;
   }
 }
 
@@ -841,7 +843,7 @@ function initialiseStatExplainers() {
 }
 
 function updateStreakDisplay() {
-  const formattedStreak = progressNumberFormatter.format(Math.max(1, streakCount));
+  const formattedStreak = progressNumberFormatter.format(streakCount);
   streakLabel.textContent = formattedStreak;
   streakLabel.closest(".stat-display").setAttribute(
     "aria-label",
@@ -856,7 +858,7 @@ function updateRoundMilestoneDisplay() {
   if (isHighestRound) {
     display.setAttribute(
       "aria-label",
-      `Round: ${progressNumberFormatter.format(Math.max(1, streakCount))}. New highest round. Learn more.`,
+      `Round: ${progressNumberFormatter.format(streakCount)}. New highest round. Learn more.`,
     );
     display.title = "Highest Round yet";
   } else {
@@ -1595,6 +1597,11 @@ async function initialise() {
     initialiseProfileScrollbars();
     const dateKey = getDateKey();
     liveDateKey = getUtcDateKey(getCurrentTime());
+    migrateStoredRoundNumbering(localStorage, {
+      streakKey: streakStorageKey,
+      bestRoundKey: bestRoundStorageKey,
+      versionKey: roundNumberingStorageKey,
+    });
     streakCount = loadStreak();
     bestRound = Math.max(loadBestRound(), streakCount);
     // Older browser saves only tracked the current round. Persist that value as

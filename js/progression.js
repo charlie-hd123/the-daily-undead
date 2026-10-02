@@ -2,6 +2,23 @@ export function isLocalDevelopmentHostname(hostname) {
   return ["localhost", "127.0.0.1", "::1", "[::1]"].includes(hostname);
 }
 
+export function migrateStoredRoundNumbering(storage, { streakKey, bestRoundKey, versionKey }) {
+  try {
+    if (storage.getItem(versionKey) === "starts-at-one") return false;
+
+    for (const key of [streakKey, bestRoundKey]) {
+      const legacyValue = Number.parseInt(storage.getItem(key), 10);
+      if (Number.isInteger(legacyValue) && legacyValue >= 0) {
+        storage.setItem(key, String(legacyValue + 1));
+      }
+    }
+    storage.setItem(versionKey, "starts-at-one");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 export function getElapsedUtcDays(fromDateKey, toDateKey) {
   if (!fromDateKey || !toDateKey) return 0;
 
@@ -56,7 +73,7 @@ export function prepareMissedDayProgress({
     return { ...unchanged, missedDayState: savedState };
   }
 
-  if (!requiredMissedDates.length || currentRound === 0) {
+  if (!requiredMissedDates.length || currentRound <= 1) {
     return { ...unchanged, missedDayState: null };
   }
 
@@ -68,7 +85,7 @@ export function prepareMissedDayProgress({
       roundsBeforeLoss: currentRound,
       resolved: false,
     },
-    currentRound: 0,
+    currentRound: 1,
     score,
     shouldSaveState: true,
     progressReset: true,

@@ -105,7 +105,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261002-4"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261002-5"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -381,6 +381,8 @@ test("player stat pills expose dismissible explainers", async () => {
   assert.doesNotMatch(app, /unless you use a Revive/);
   assert.match(app, /Points earned in each puzzle are added to Score, which never decreases or resets\./);
   assert.match(app, /The total number of Daily Undead puzzles you’ve solved\./);
+  assert.match(app, /migrateStoredRoundNumbering\(localStorage, \{/);
+  assert.match(app, /versionKey: roundNumberingStorageKey,[\s\S]*streakCount = loadStreak\(\);/);
   assert.match(app, /if \(wasOpen\) return;/);
   assert.match(app, /if \(!playerStats\.contains\(event\.target\)\) closeStatExplainer\(\)/);
   assert.match(app, /event\.key === "Escape"/);

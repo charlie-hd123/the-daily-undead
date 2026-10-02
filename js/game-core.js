@@ -160,9 +160,9 @@ export function toggleOrderedSelection(selectedIds, id, limit = 3) {
 
 export function calculateNextStreak(currentStreak, isCorrect) {
   const safeCurrentStreak =
-    Number.isInteger(currentStreak) && currentStreak >= 0 ? currentStreak : 0;
+    Number.isInteger(currentStreak) && currentStreak >= 1 ? currentStreak : 1;
 
-  return isCorrect ? safeCurrentStreak + 1 : 0;
+  return isCorrect ? safeCurrentStreak + 1 : 1;
 }
 
 export function calculateMapPoints(cluesRevealed) {

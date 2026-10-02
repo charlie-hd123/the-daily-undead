@@ -6,8 +6,29 @@ import {
   getProgressionUpdateVisibility,
   getRequiredMissedDates,
   isLocalDevelopmentHostname,
+  migrateStoredRoundNumbering,
   prepareMissedDayProgress,
 } from "../js/progression.js";
+
+test("browser-only Round history shifts from zero-based to Round 1 exactly once", () => {
+  const values = new Map([
+    ["streak", "0"],
+    ["best", "1"],
+  ]);
+  const storage = {
+    getItem: (key) => values.get(key) ?? null,
+    setItem: (key, value) => values.set(key, value),
+  };
+  const keys = { streakKey: "streak", bestRoundKey: "best", versionKey: "version" };
+
+  assert.equal(migrateStoredRoundNumbering(storage, keys), true);
+  assert.equal(values.get("streak"), "1");
+  assert.equal(values.get("best"), "2");
+  assert.equal(values.get("version"), "starts-at-one");
+  assert.equal(migrateStoredRoundNumbering(storage, keys), false);
+  assert.equal(values.get("streak"), "1");
+  assert.equal(values.get("best"), "2");
+});
 
 test("developer controls are enabled only on local hostnames", () => {
   assert.equal(isLocalDevelopmentHostname("localhost"), true);
@@ -46,7 +67,7 @@ test("missed required dates reset only the Round", () => {
     roundsBeforeLoss: 4,
     resolved: false,
   });
-  assert.equal(result.currentRound, 0);
+  assert.equal(result.currentRound, 1);
   assert.equal(result.score, 900);
   assert.equal(result.progressReset, true);
 });
@@ -80,7 +101,7 @@ test("an unresolved Round loss is repaired when its missed date is protected lat
     },
     lastPlayedDate: "2026-07-27",
     dateKey: "2026-07-29",
-    currentRound: 0,
+    currentRound: 1,
     score: 5000,
     protectedDates: ["2026-07-28"],
   });
@@ -95,11 +116,11 @@ test("a player already between runs is not repeatedly reset", () => {
     savedState: { dateKey: "2026-07-28", missedDays: 1, roundsBeforeLoss: 3, resolved: true },
     lastPlayedDate: "2026-07-26",
     dateKey: "2026-07-30",
-    currentRound: 0,
+    currentRound: 1,
     score: 800,
   });
   assert.equal(result.missedDayState, null);
-  assert.equal(result.currentRound, 0);
+  assert.equal(result.currentRound, 1);
   assert.equal(result.score, 800);
   assert.equal(result.progressReset, false);
 });
