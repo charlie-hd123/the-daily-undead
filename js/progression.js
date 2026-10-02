@@ -19,6 +19,95 @@ export function migrateStoredRoundNumbering(storage, { streakKey, bestRoundKey, 
   }
 }
 
+const legacyScoreMigrationVersion = "lifetime-estimate-v1";
+// Frozen production totals at the 2 October 2026 progression cutover. Keeping
+// the ratio fixed gives legacy browser saves the same basis as account saves.
+const launchVerifiedPoints = 13_500;
+const launchVerifiedSolves = 161;
+
+function nonNegativeInteger(value) {
+  const number = Number(value);
+  return Number.isInteger(number) && number >= 0 ? number : 0;
+}
+
+function knownDailyScore(dailyState) {
+  if (
+    dailyState?.phase !== "result" ||
+    dailyState.isCorrect !== true ||
+    dailyState.totalRoundsRecorded !== true ||
+    dailyState.pointsRecorded !== true
+  ) return { score: 0, solves: 0, complete: false };
+
+  const mapPoints = [10, 20, 50].includes(dailyState.mapPoints)
+    ? dailyState.mapPoints
+    : 0;
+  const bonusPoints =
+    dailyState.bonusPointsRecorded === true &&
+    dailyState.bonusComplete === true &&
+    dailyState.bonusPoints === mapPoints
+      ? mapPoints
+      : 0;
+  return {
+    score: mapPoints + bonusPoints,
+    solves: 1,
+    complete: dailyState.bonusPointsRecorded === true,
+  };
+}
+
+export function migrateLegacyLocalScore(storage, {
+  scoreKey,
+  legacyPointsKey,
+  markerKey,
+  currentScore,
+  solves,
+  dailyState,
+}) {
+  const unchanged = {
+    score: nonNegativeInteger(currentScore),
+    migrated: false,
+  };
+
+  let legacyPoints;
+  try {
+    if (storage.getItem(markerKey) === legacyScoreMigrationVersion) return unchanged;
+    const storedLegacyPoints = storage.getItem(legacyPointsKey);
+    if (storedLegacyPoints == null) return unchanged;
+    legacyPoints = nonNegativeInteger(storedLegacyPoints);
+  } catch {
+    return unchanged;
+  }
+
+  const storedSolves = nonNegativeInteger(solves);
+  const known = knownDailyScore(dailyState);
+  const knownSolves = Math.min(known.solves, storedSolves);
+  const legacySolves = storedSolves - knownSolves;
+  const launchAverage = launchVerifiedPoints / launchVerifiedSolves;
+  const smoothedAverage = known.complete
+    ? (known.score + (launchAverage * 5)) / (knownSolves + 5)
+    : launchAverage;
+  const performanceEstimate =
+    known.score + Math.round(legacySolves * smoothedAverage);
+  const estimatedScore = Math.round(performanceEstimate / 10) * 10;
+  const migratedScore = Math.max(unchanged.score, legacyPoints, estimatedScore);
+
+  let scoreWasSaved = false;
+  try {
+    storage.setItem(scoreKey, String(migratedScore));
+    scoreWasSaved = true;
+    storage.setItem(markerKey, legacyScoreMigrationVersion);
+  } catch {
+    return {
+      score: scoreWasSaved ? migratedScore : unchanged.score,
+      migrated: scoreWasSaved && migratedScore > unchanged.score,
+    };
+  }
+
+  return {
+    score: migratedScore,
+    migrated: migratedScore > unchanged.score,
+  };
+}
+
 export function getElapsedUtcDays(fromDateKey, toDateKey) {
   if (!fromDateKey || !toDateKey) return 0;
 

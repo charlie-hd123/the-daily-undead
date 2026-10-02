@@ -12,27 +12,28 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261002-7";
+} from "./game-core.js?v=20261002-8";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
   isLocalDevelopmentHostname,
+  migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261002-7";
-import { initialiseAccount } from "./account.js?v=20261002-7";
+} from "./progression.js?v=20261002-8";
+import { initialiseAccount } from "./account.js?v=20261002-8";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261002-7";
+} from "./community-stats.js?v=20261002-8";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261002-7";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261002-7";
+} from "./leaderboards.js?v=20261002-8";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261002-8";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -62,6 +63,7 @@ const roundNumberingStorageKey = "the-daily-undead:round-numbering";
 const solvesStorageKey = "the-daily-undead:total-rounds";
 const scoreStorageKey = "the-daily-undead:score";
 const legacyPointsStorageKey = "the-daily-undead:total-points";
+const legacyScoreMigrationStorageKey = "the-daily-undead:legacy-score-migration";
 const progressionUpdateStorageKey = "the-daily-undead:progression-update-v2";
 const statExplainers = {
   round: {
@@ -1612,6 +1614,14 @@ async function initialise() {
     lastPlayedDate = loadLastPlayedDate();
     puzzle = buildDailyPuzzle(dateKey, maps);
     state = loadState();
+    score = migrateLegacyLocalScore(localStorage, {
+      scoreKey: scoreStorageKey,
+      legacyPointsKey: legacyPointsStorageKey,
+      markerKey: legacyScoreMigrationStorageKey,
+      currentScore: score,
+      solves,
+      dailyState: state,
+    }).score;
     accountController = socialDemoEnabled
       ? initialiseSocialDemo()
       : await initialiseAccount({

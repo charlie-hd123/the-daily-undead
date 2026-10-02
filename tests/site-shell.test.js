@@ -105,7 +105,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261002-7"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261002-8"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -463,6 +463,10 @@ test("the progression update auto-opens for two days and remains in leaderboards
   assert.match(app, /function hasEstablishedProgress\(\)/);
   assert.match(app, /updateState\.autoShown = true;/);
   assert.match(app, /progressionUpdateButton\.addEventListener\("click", openProgressionUpdate\)/);
+  assert.match(
+    app,
+    /state = loadState\(\);[\s\S]*?migrateLegacyLocalScore\(localStorage,[\s\S]*?initialiseAccount\([\s\S]*?initialiseProgressionUpdate\(\);/,
+  );
   assert.match(css, /\.progression-update-button \{/);
   assert.match(css, /\.progression-update-dialog \.progression-update-benefit \{/);
   assert.match(css, /\.progression-estimate-note \{/);
