@@ -317,12 +317,12 @@ test("avatar unlocks use imported highest-round and maps-solved progress", async
   });
 
   const roundLocked = await updateSocialProfile(
-    progressOnlyDb({ best_round: 49, total_rounds: 500 }),
+    progressOnlyDb({ best_round: 29, total_rounds: 500 }),
     request("shadowman"),
     "user_1",
   );
   assert.equal(roundLocked.status, 403);
-  assert.match(roundLocked.body.error, /Round 50/);
+  assert.match(roundLocked.body.error, /Round 30/);
 
   const mapsLocked = await updateSocialProfile(
     progressOnlyDb({ best_round: 100, total_rounds: 19 }),

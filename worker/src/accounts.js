@@ -125,15 +125,15 @@ const legacyAvatarIds = new Map([
 ]);
 const avatarUnlocks = new Map([
   ["samantha", { type: "round", value: 5 }], ["dr-maxis", { type: "round", value: 5 }],
-  ["misty", { type: "round", value: 10 }], ["stuhlinger", { type: "round", value: 10 }],
-  ["marlton", { type: "round", value: 10 }], ["russman", { type: "round", value: 10 }],
+  ["misty", { type: "round", value: 15 }], ["stuhlinger", { type: "round", value: 15 }],
+  ["marlton", { type: "round", value: 15 }], ["russman", { type: "round", value: 15 }],
   ["tedd", { type: "maps", value: 20 }], ["brutus", { type: "maps", value: 50 }],
-  ["shadowman", { type: "round", value: 50 }], ["dr-monty", { type: "maps", value: 100 }],
+  ["shadowman", { type: "round", value: 30 }], ["dr-monty", { type: "maps", value: 100 }],
   ["scarlett", { type: "maps", value: 25 }], ["diego", { type: "maps", value: 25 }],
   ["bruno", { type: "maps", value: 25 }], ["stanton", { type: "maps", value: 25 }],
-  ["weaver", { type: "round", value: 15 }], ["grey", { type: "round", value: 15 }],
-  ["carver", { type: "round", value: 15 }], ["maya", { type: "round", value: 15 }],
-  ["warden", { type: "round", value: 50 }],
+  ["weaver", { type: "round", value: 10 }], ["grey", { type: "round", value: 10 }],
+  ["carver", { type: "round", value: 10 }], ["maya", { type: "round", value: 10 }],
+  ["warden", { type: "round", value: 30 }],
 ]);
 
 function normalizeAvatarId(value) {

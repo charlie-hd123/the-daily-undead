@@ -6,7 +6,7 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261001-16";
+} from "./account-session.js?v=20261002-1";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -326,23 +326,23 @@ const avatarOptions = [
   ["takeo", "Takeo Masaki"], ["nikolai", "Nikolai Belinski"],
   ["samantha", "Samantha Maxis", { type: "round", value: 5 }],
   ["dr-maxis", "Dr. Ludwig Maxis", { type: "round", value: 5 }],
-  ["misty", "Misty", { type: "round", value: 10 }],
-  ["stuhlinger", "Samuel Stuhlinger", { type: "round", value: 10 }],
-  ["marlton", "Marlton Johnson", { type: "round", value: 10 }],
-  ["russman", "Russman", { type: "round", value: 10 }],
+  ["misty", "Misty", { type: "round", value: 15 }],
+  ["stuhlinger", "Samuel Stuhlinger", { type: "round", value: 15 }],
+  ["marlton", "Marlton Johnson", { type: "round", value: 15 }],
+  ["russman", "Russman", { type: "round", value: 15 }],
   ["tedd", "T.E.D.D.", { type: "maps", value: 20 }],
   ["brutus", "Brutus", { type: "maps", value: 50 }],
   ["dr-monty", "Dr. Monty", { type: "maps", value: 100 }],
-  ["shadowman", "The Shadowman", { type: "round", value: 50 }],
+  ["shadowman", "The Shadowman", { type: "round", value: 30 }],
   ["scarlett", "Scarlett Rhodes", { type: "maps", value: 25 }],
   ["diego", "Diego Necalli", { type: "maps", value: 25 }],
   ["bruno", "Bruno Delacroix", { type: "maps", value: 25 }],
   ["stanton", "Stanton Shaw", { type: "maps", value: 25 }],
-  ["weaver", "Grigori Weaver", { type: "round", value: 15 }],
-  ["grey", "Dr. Elizabeth Grey", { type: "round", value: 15 }],
-  ["carver", "Mac Carver", { type: "round", value: 15 }],
-  ["maya", "Maya Aguinaldo", { type: "round", value: 15 }],
-  ["warden", "The Warden", { type: "round", value: 50 }],
+  ["weaver", "Grigori Weaver", { type: "round", value: 10 }],
+  ["grey", "Dr. Elizabeth Grey", { type: "round", value: 10 }],
+  ["carver", "Mac Carver", { type: "round", value: 10 }],
+  ["maya", "Maya Aguinaldo", { type: "round", value: 10 }],
+  ["warden", "The Warden", { type: "round", value: 30 }],
 ];
 const themeOptions = [
   { id: "default", label: "Default", requiredMaps: 0 },
