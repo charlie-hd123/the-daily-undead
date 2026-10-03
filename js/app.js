@@ -12,7 +12,7 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261002-8";
+} from "./game-core.js?v=20261003-1";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -20,20 +20,23 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261002-8";
-import { initialiseAccount } from "./account.js?v=20261002-8";
+} from "./progression.js?v=20261003-1";
+import {
+  confirmAccountResultSubmission,
+  initialiseAccount,
+} from "./account.js?v=20261003-1";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261002-8";
+} from "./community-stats.js?v=20261003-1";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261002-8";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261002-8";
+} from "./leaderboards.js?v=20261003-1";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261003-1";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -113,6 +116,8 @@ let activeScreenKey = null;
 let pendingFocusSelector = null;
 let accountController = {
   canSync: false,
+  resultSubmissionRequiresSignIn: false,
+  requestResultSignIn() {},
   scheduleSave() {},
   async recordMapResult() { return null; },
   async recordBonusResult() { return null; },
@@ -1025,22 +1030,6 @@ function applyRemoteAccount(account) {
   }
 }
 
-function verifySavedAccountResult() {
-  if (!accountController.canSync || state.phase !== "result" || !state.selectedMapId) return;
-  accountController.recordMapResult({
-    puzzleDate: puzzle.dateKey,
-    puzzleId: puzzle.key,
-    selectedMapId: state.selectedMapId,
-    cluesUsed: state.lockedClues,
-  });
-  if (state.bonusComplete || state.bonusFailed) {
-    accountController.recordBonusResult({
-      puzzleDate: puzzle.dateKey,
-      bonusOrder: state.bonusOrder,
-    });
-  }
-}
-
 function migrateCompletedScore() {
   if (state.phase !== "result") return;
 
@@ -1254,6 +1243,7 @@ function renderMapSelection() {
     setState({ phase: "game", selectedGameId: null, selectedMapId: null });
   });
   app.querySelector("#confirm-map").addEventListener("click", () => {
+    if (!confirmAccountResultSubmission(accountController)) return;
     const isCorrect = isAcceptedMapSelection(
       state.selectedMapId,
       puzzle.map.id,
@@ -1550,6 +1540,7 @@ function renderResult() {
     });
   });
   app.querySelector("#submit-order").addEventListener("click", () => {
+    if (!confirmAccountResultSubmission(accountController)) return;
     accountController.recordBonusResult({
       puzzleDate: puzzle.dateKey,
       bonusOrder: state.bonusOrder,
@@ -1633,7 +1624,6 @@ async function initialise() {
     protectedDates = await loadProtectedDates(lastPlayedDate, dateKey);
     prepareCommunityStatsDisplay();
     migrateCompletedScore();
-    verifySavedAccountResult();
     clearTemporaryLocalProgress();
     if (state.phase === "result" && typeof state.isCorrect === "boolean") {
       recordCommunityAttempt(state.isCorrect);

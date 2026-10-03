@@ -105,7 +105,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261002-8"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261003-1"]));
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {
@@ -213,6 +213,8 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(html, /Your existing cloud save is safe\./);
   assert.match(html, /id="account-progress-conflict-dialog"/);
   assert.match(account, /accountButton\.textContent = "Session expired";/);
+  assert.equal((appScript.match(/confirmAccountResultSubmission\(accountController\)/g) || []).length, 2);
+  assert.match(account, /await replaySavedAccountResult/);
   assert.match(account, /readRememberedAccount/);
   assert.match(account, /readPendingProgress/);
   assert.match(account, /baseRevision/);

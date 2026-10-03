@@ -6,7 +6,7 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261002-8";
+} from "./account-session.js?v=20261003-1";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -319,6 +319,45 @@ async function requestJson(clerk, apiUrl, path, options = {}) {
     throw error;
   }
   return result;
+}
+
+export function confirmAccountResultSubmission(controller) {
+  if (!controller?.resultSubmissionRequiresSignIn) return true;
+  controller.requestResultSignIn?.();
+  return false;
+}
+
+export async function replaySavedAccountResult({
+  dailyState,
+  puzzleDate,
+  sendMapResult,
+  sendBonusResult,
+}) {
+  if (
+    dailyState?.phase !== "result" ||
+    typeof dailyState.selectedMapId !== "string" ||
+    !Number.isInteger(dailyState.lockedClues)
+  ) {
+    return null;
+  }
+
+  const mapResult = await sendMapResult({
+    puzzleDate,
+    puzzleId: dailyState.puzzleKey,
+    selectedMapId: dailyState.selectedMapId,
+    cluesUsed: dailyState.lockedClues,
+  });
+  let progress = mapResult?.progress || null;
+
+  if (dailyState.bonusComplete || dailyState.bonusFailed) {
+    const bonusResult = await sendBonusResult({
+      puzzleDate,
+      bonusOrder: Array.isArray(dailyState.bonusOrder) ? dailyState.bonusOrder : [],
+    });
+    progress = bonusResult?.progress || progress;
+  }
+
+  return progress;
 }
 
 const avatarOptions = [
@@ -751,6 +790,8 @@ export async function initialiseAccount({
       scheduleSave: remembered
         ? () => persistPendingProgress(remembered.userId, remembered.revision)
         : () => {},
+      resultSubmissionRequiresSignIn: Boolean(remembered),
+      requestResultSignIn: showExpiredSession,
     });
   }
 
@@ -877,6 +918,26 @@ export async function initialiseAccount({
       clearPendingProgress(globalThis.localStorage, userId);
       pendingProgress = null;
     }
+  }
+
+  try {
+    const replayedProgress = await replaySavedAccountResult({
+      dailyState: account.dailyState,
+      puzzleDate,
+      sendMapResult: (payload) => requestJson(clerk, apiUrl, "/api/account/results/map", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }),
+      sendBonusResult: (payload) => requestJson(clerk, apiUrl, "/api/account/results/bonus", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }),
+    });
+    if (replayedProgress) account.progress = replayedProgress;
+  } catch {
+    // The saved daily state remains available for another replay after a refresh.
   }
 
   applyRemoteAccount(account);
@@ -1224,6 +1285,8 @@ export async function initialiseAccount({
     available: true,
     signedIn: true,
     canSync: true,
+    resultSubmissionRequiresSignIn: false,
+    requestResultSignIn: showExpiredSession,
     profile,
     scheduleSave,
     recordMapResult,
@@ -1237,6 +1300,7 @@ export async function initialiseAccount({
     wasSignedIn = false;
     controller.canSync = false;
     if (!intentionalSignOut && readRememberedAccount(globalThis.localStorage)) {
+      controller.resultSubmissionRequiresSignIn = true;
       persistPendingProgress(userId, currentRevision);
       showExpiredSession();
     }
@@ -1250,11 +1314,15 @@ function createUnavailableController({
   signedIn = false,
   openPlayerProfile = async () => {},
   scheduleSave = () => {},
+  resultSubmissionRequiresSignIn = false,
+  requestResultSignIn = () => {},
 } = {}) {
   return {
     available: Boolean(clerk),
     signedIn,
     canSync: false,
+    resultSubmissionRequiresSignIn,
+    requestResultSignIn,
     profile: null,
     scheduleSave,
     async recordMapResult() { return null; },
