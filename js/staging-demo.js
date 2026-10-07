@@ -277,7 +277,7 @@ function renderPuzzleCard(type) {
       </div>
       ${status ? `
         <div class="puzzle-choice-status-row">
-          <p class="puzzle-choice-status">${escapeHtml(status)}</p>
+          <p class="puzzle-choice-status${canSeeResult ? " is-complete" : ""}">${escapeHtml(status)}</p>
           ${canSeeResult ? `<button class="puzzle-result-link" type="button" data-see-result="${type}">See result</button>` : ""}
         </div>
       ` : ""}

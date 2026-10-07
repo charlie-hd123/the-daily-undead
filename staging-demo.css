@@ -108,6 +108,10 @@
   font-weight: 700;
 }
 
+.puzzle-choice-status.is-complete {
+  color: #77808f !important;
+}
+
 .puzzle-result-link {
   padding: 0;
   border: 0;
