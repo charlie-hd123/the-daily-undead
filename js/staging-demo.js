@@ -412,7 +412,7 @@ function renderCompletion(type, session, mode) {
       ${resultDetail}
       <div class="actions share-score-actions">
         <button id="share-demo-score" class="button share-score-button" type="button">Share with your squad</button>
-        ${official ? '<button id="return-to-puzzle-home" class="button" type="button">Play another puzzle, just for fun</button>' : ""}
+        ${official ? '<button id="return-to-puzzle-home" class="button" type="button"><span class="result-action-title">Play another puzzle.</span><span class="result-action-subline">Just for fun. Risk-free.</span></button>' : ""}
       </div>
       <p id="share-demo-score-status" class="share-score-status" aria-live="polite"></p>
     </section>

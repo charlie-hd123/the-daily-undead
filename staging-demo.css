@@ -278,6 +278,25 @@
   flex-direction: column;
 }
 
+.result-action-title,
+.result-action-subline {
+  display: block;
+}
+
+.result-action-subline {
+  margin-top: 0.12rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.025em;
+  text-transform: none;
+}
+
+@media (min-width: 48.01rem) {
+  .share-score-actions .button {
+    width: min(100%, 32rem);
+    max-width: 32rem;
+  }
+}
+
 .demo-footer {
   margin-top: 1rem;
 }
