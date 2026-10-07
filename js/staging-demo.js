@@ -257,11 +257,11 @@ function getCardStatus(type) {
     const result = dayState.officialResult;
     return result?.success
       ? `Official complete · ${result.points} points`
-      : "Official complete · Run ended";
+      : "Today’s official puzzle is complete.";
   }
   if (!dayState.officialCompleted) return "Locked until the official result is complete";
   if (session?.complete) return "Completed just for fun";
-  return "Available just for fun · No effect on stats";
+  return "Play risk-free. No effect on your stats.";
 }
 
 function renderPuzzleCard(type) {
