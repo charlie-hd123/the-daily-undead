@@ -1,6 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-labelledby="title">
   <title id="title">Mystery Zombies map</title>
-  <circle cx="120" cy="120" r="102" fill="#0d223b" stroke="#67e8ff" stroke-width="8"/>
   <path fill="#183d62" stroke="#67e8ff" stroke-linejoin="round" stroke-width="7" d="m42 75 50-20 57 19 49-20v113l-49 20-57-19-50 20z"/>
   <path fill="none" stroke="#67e8ff" stroke-width="6" d="M92 55v113m57-94v113"/>
   <circle cx="121" cy="117" r="37" fill="#0d223b"/>

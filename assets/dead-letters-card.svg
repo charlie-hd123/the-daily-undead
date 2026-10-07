@@ -1,6 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-labelledby="title">
   <title id="title">Mystery word tiles</title>
-  <circle cx="120" cy="120" r="102" fill="#0d223b" stroke="#67e8ff" stroke-width="8"/>
   <g stroke="#67e8ff" stroke-width="6">
     <rect x="31" y="75" width="52" height="66" rx="9" fill="#183d62"/>
     <rect x="94" y="75" width="52" height="66" rx="9" fill="#183d62"/>
