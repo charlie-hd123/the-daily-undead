@@ -269,13 +269,27 @@
 }
 
 .share-score-actions .button {
-  width: min(100%, 20rem);
+  width: min(100%, 32rem);
+  max-width: 32rem;
+  min-height: 4rem;
   flex: 0 0 auto;
 }
 
 .share-score-actions {
   align-items: center;
   flex-direction: column;
+}
+
+.result-action-title,
+.result-action-subline {
+  display: block;
+}
+
+.result-action-subline {
+  margin-top: 0.12rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.025em;
+  text-transform: none;
 }
 
 .demo-footer {
