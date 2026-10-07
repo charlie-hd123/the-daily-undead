@@ -68,7 +68,7 @@
   width: 7.5rem;
   height: 7.5rem;
   object-fit: contain;
-  opacity: 0.34;
+  opacity: 0.27;
   pointer-events: none;
 }
 
@@ -305,7 +305,7 @@
     right: 0.55rem;
     width: 5.4rem;
     height: 5.4rem;
-    opacity: 0.3;
+    opacity: 0.24;
   }
 
   .puzzle-choice-copy h3 {
