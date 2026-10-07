@@ -429,7 +429,6 @@ function renderCompletion(type, session, mode) {
       <section class="bonus-panel">
         <p class="word-result-category">${escapeHtml(session.summary?.label || "Uncategorised")}</p>
         <h2 class="final-map-name">${escapeHtml(answer)}</h2>
-        <p class="helper-text">${escapeHtml(session.summary?.detail || "")}</p>
       </section>
     `;
   app.innerHTML = `
