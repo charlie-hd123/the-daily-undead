@@ -11,17 +11,12 @@ authentication provider and transactional account email delivery change:
 - Application-owned IDs (`acct_...`) keep game accounts independent of Clerk,
   Supabase and Cloudflare identity formats.
 
-## Safety boundary
+## Current safety boundary
 
-The production frontend remains on Clerk until the frontend cutover is
-explicitly approved. The production Worker may accept both Clerk and Supabase
-during the overlap period, but the Supabase metadata fields in the production
-HTML remain empty. The frontend intentionally falls back to Clerk in that
-state.
-
-Do not add Supabase production values to the production page, deploy the
-production Worker changes, apply D1 migration `0010`, or change Clerk settings
-as part of staging verification.
+The production frontend switched to Supabase Auth on 7 October 2026. The
+production Worker continues accepting both Clerk and Supabase during the
+rollback overlap period. Clerk configuration, imported Supabase users and the
+historical identity mappings must remain in place until that period ends.
 
 ## Staging state
 
@@ -69,6 +64,9 @@ represent a duplicate production account.
   `backups/daily-undead-stats-pre-auth-identity-20261006T191900Z.sql`
 - Backup SHA-256:
   `7a012b54f30dbb796033676e1523c87f0b7e291ee5fe4188c82c1e6bf08d0926`
+- Cutover D1 Time Travel bookmark:
+  `0000146e-00000000-000050fd-148eb9b171522d68eb7bc4869d26510f`
+- Cutover restore window: seven days from 7 October 2026
 - Production D1 identity migration: applied and verified
 - D1 verification: 39 profiles, 39 unique account IDs, 39 Clerk identities,
   0 missing mappings and 0 orphans
@@ -84,7 +82,14 @@ represent a duplicate production account.
 - Production Supabase authentication: OTP exchange reached the live Worker and
   created one Supabase identity for `TheWarden`; D1 confirms that Clerk and
   Supabase both resolve to the same application-owned account
-- Production frontend and Clerk settings: unchanged
+- Production frontend: Supabase Auth enabled on 7 October 2026
+- Clerk settings: unchanged; Worker fallback retained for rollback
+- Cutover verification: eight-digit Resend code accepted, existing `TheWarden`
+  account restored with Score 4,780 and 59 Solves, session persisted after a
+  reload, public statistics and leaderboards remained available
+- Post-cutover D1 verification: 39 profiles, 39 unique account IDs, 39 Clerk
+  identities, 1 linked Supabase identity, 0 missing account IDs and 0 orphans
+- Supabase authenticated activity: visit recorded at cutover
 
 ## Identity linking model
 
