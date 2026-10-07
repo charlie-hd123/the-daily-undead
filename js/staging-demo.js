@@ -34,16 +34,16 @@ const puzzleTypes = {
   easter: {
     name: "Quest Steps",
     shortName: "Quest Steps",
-    kicker: "Main quest challenge",
-    description: "Identify today’s Zombies map from its Easter egg steps, then order the steps for Double Points.",
-    image: "./assets/quest-steps-card.png",
+    kicker: "Main quest puzzle",
+    description: "Identify today’s Zombies map from its Easter egg steps.",
+    image: "./assets/quest-steps-card.svg",
   },
   word: {
-    name: "Word of the Dead",
-    shortName: "Word of the Dead",
-    kicker: "Letter challenge",
-    description: "Reveal today’s Zombies word or phrase. Every incorrect letter removes 20 potential points.",
-    image: "./assets/word-of-the-dead-card.png",
+    name: "Dead Letters",
+    shortName: "Dead Letters",
+    kicker: "Word puzzle",
+    description: "Reveal today’s Zombies word or phrase.",
+    image: "./assets/dead-letters-card.svg",
   },
 };
 
@@ -251,7 +251,7 @@ function getCardAction(type) {
 
 function getCardStatus(type) {
   const session = dayState.sessions[type];
-  if (!dayState.officialType) return "Available as today’s official puzzle";
+  if (!dayState.officialType) return "";
   if (dayState.officialType === type) {
     if (!dayState.officialCompleted) return "Your official choice · In progress";
     const result = dayState.officialResult;
@@ -275,7 +275,7 @@ function renderPuzzleCard(type) {
         <p class="kicker">${escapeHtml(puzzle.kicker)}</p>
         <h3>${escapeHtml(puzzle.name)}</h3>
         <p>${escapeHtml(puzzle.description)}</p>
-        <p class="puzzle-choice-status">${escapeHtml(getCardStatus(type))}</p>
+        ${getCardStatus(type) ? `<p class="puzzle-choice-status">${escapeHtml(getCardStatus(type))}</p>` : ""}
       </div>
       <div class="puzzle-choice-actions">
         <button
@@ -293,14 +293,14 @@ function renderPuzzleCard(type) {
 function renderHub() {
   activePlay = null;
   const guidance = !dayState.officialType
-    ? "Pick one puzzle to count towards your daily score. You can play the others afterwards for fun, risk free."
+    ? "Pick a puzzle to count towards your daily score. You can play others afterwards for fun, risk free."
     : dayState.officialCompleted
       ? "Your official result is complete. The other puzzle is available if you would like to play again for fun."
       : `Finish ${puzzleTypes[dayState.officialType].name} to unlock the other puzzle just for fun.`;
   app.innerHTML = `
     <section class="panel puzzle-hub-panel">
       <div class="puzzle-hub-hero">
-        ${renderHeading("Choose your puzzle", guidance, "Daily puzzle selection")}
+        ${renderHeading("Choose your puzzle", guidance, "Today’s puzzles")}
       </div>
       <div class="puzzle-choice-grid">
         ${renderPuzzleCard("easter")}

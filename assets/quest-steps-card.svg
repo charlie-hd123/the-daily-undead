@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-labelledby="title">
+  <title id="title">Numbered quest steps on a folded map</title>
+  <path fill="#102746" d="M25 55 83 31l74 25 58-24v151l-58 25-74-25-58 24z"/>
+  <path fill="#18365d" d="m83 31 74 25v152l-74-25z"/>
+  <path fill="none" stroke="#f7c85c" stroke-linecap="round" stroke-linejoin="round" stroke-width="9" d="m55 151 43-65 48 52 39-58"/>
+  <g fill="#f7c85c" stroke="#0c1d33" stroke-width="5">
+    <circle cx="55" cy="151" r="19"/><circle cx="98" cy="86" r="19"/><circle cx="146" cy="138" r="19"/><circle cx="185" cy="80" r="19"/>
+  </g>
+  <g fill="#0c1d33" font-family="Arial, sans-serif" font-size="20" font-weight="900" text-anchor="middle">
+    <text x="55" y="158">1</text><text x="98" y="93">2</text><text x="146" y="145">3</text><text x="185" y="87">4</text>
+  </g>
+</svg>
