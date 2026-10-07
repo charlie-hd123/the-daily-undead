@@ -277,13 +277,13 @@ function renderPuzzleCard(type) {
         <p class="kicker">${escapeHtml(puzzle.kicker)}</p>
         <h3>${escapeHtml(puzzle.name)}</h3>
         <p>${escapeHtml(puzzle.description)}</p>
-        ${status ? `
-          <div class="puzzle-choice-status-row">
-            <p class="puzzle-choice-status">${escapeHtml(status)}</p>
-            ${canSeeResult ? `<button class="puzzle-result-link" type="button" data-see-result="${type}">See result</button>` : ""}
-          </div>
-        ` : ""}
       </div>
+      ${status ? `
+        <div class="puzzle-choice-status-row">
+          <p class="puzzle-choice-status">${escapeHtml(status)}</p>
+          ${canSeeResult ? `<button class="puzzle-result-link" type="button" data-see-result="${type}">See result</button>` : ""}
+        </div>
+      ` : ""}
       <div class="puzzle-choice-actions">
         <button
           class="button primary"
