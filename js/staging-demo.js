@@ -541,10 +541,8 @@ function renderWordPuzzle() {
   app.innerHTML = `
     <section class="panel word-puzzle-panel">
       ${renderHeading(
-        "Reveal the Zombies answer",
-        activePlay?.mode === "official"
-          ? "This is your official puzzle. Five incorrect letters end today’s Round."
-          : "Playing just for fun. This result will not change your stats.",
+        "Identify the Zombies word",
+        "Try to solve the Zombies word or phrase by revealing its letters",
         activePlay?.mode === "official" ? "Official puzzle" : "Just for fun",
       )}
       <div class="word-scoreboard" aria-label="Word puzzle score">
