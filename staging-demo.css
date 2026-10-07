@@ -189,6 +189,15 @@
   font: 900 2rem/1 var(--font-display);
 }
 
+.word-scoreboard .word-mistakes strong {
+  color: #77808f;
+}
+
+.word-result-category {
+  margin: 0.25rem 0 1.1rem;
+  color: var(--muted-strong);
+}
+
 .word-answer {
   display: flex;
   min-height: 9rem;
@@ -346,6 +355,16 @@
 
   .word-scoreboard > div {
     padding-inline: 0.5rem;
+  }
+
+  .word-keyboard-row {
+    gap: 0.18rem;
+  }
+
+  .word-key {
+    width: clamp(1.8rem, 8vw, 2.05rem);
+    min-height: 3.1rem;
+    font-size: 1rem;
   }
 
   .puzzle-choice-copy {

@@ -39,9 +39,9 @@ const puzzleTypes = {
     image: "./assets/quest-steps-card.svg",
   },
   word: {
-    name: "Dead Letters",
-    shortName: "Dead Letters",
-    kicker: "Word puzzle",
+    name: "Last Words",
+    shortName: "Last Words",
+    kicker: "Letter puzzle",
     description: "Can you identify the Zombies word or phrase by revealing its letters?",
     image: "./assets/dead-letters-card.svg",
   },
@@ -317,7 +317,10 @@ function renderHub() {
         ${renderPuzzleCard("easter")}
       </div>
     </section>
+    ${dayState.officialCompleted ? renderNextRoundScreen() : ""}
   `;
+
+  if (dayState.officialCompleted) updateCountdown();
 
   app.querySelectorAll("[data-card-action]").forEach((button) => {
     if (button.disabled) return;
@@ -379,14 +382,16 @@ function renderCompletion(type, session, mode) {
     ? selectableMaps.find((map) => map.id === session.selectedMapId)
     : null;
   const clueLabel = session.cluesRevealed === 1 ? "clue" : "clues";
-  const resultTitle = failedBonus
-    ? "Not quite"
-    : perfectResult
-      ? "Double Points!"
-      : session.success
-        ? "Round Survived!"
-        : "Run ended";
-  const resultCopy = isEaster
+  const resultTitle = !official
+    ? failedBonus || !session.success ? "Not quite" : "Puzzle complete"
+    : failedBonus
+      ? "Not quite"
+      : perfectResult
+        ? "Double Points!"
+        : session.success
+          ? "Round Survived!"
+          : "Run ended";
+  const officialResultCopy = isEaster
     ? failedBonus
       ? `You identified ${answer}, but the step order was incorrect. You still earned ${session.mapPoints} points this round.`
       : perfectResult
@@ -397,6 +402,18 @@ function renderCompletion(type, session, mode) {
     : session.success
       ? `You revealed ${answer} with ${session.wrongGuesses} ${session.wrongGuesses === 1 ? "mistake" : "mistakes"}. You earned ${session.points} points this round.`
       : `You did not reveal the answer. Today’s answer was ${answer}. Your permanent Score and Solves are safe.`;
+  const funResultCopy = isEaster
+    ? failedBonus
+      ? `You identified ${answer}, but the step order was incorrect.`
+      : perfectResult
+        ? `You found ${answer} using ${session.cluesRevealed} ${clueLabel} and got the steps in the correct order.`
+        : session.success
+          ? `You identified ${answer} using ${session.cluesRevealed} ${clueLabel}.`
+          : `You chose ${selectedMap?.title ?? "an unknown map"}. Today’s answer was ${answer}.`
+    : session.success
+      ? `You revealed ${answer} with ${session.wrongGuesses} ${session.wrongGuesses === 1 ? "mistake" : "mistakes"}.`
+      : `You did not reveal the answer. Today’s answer was ${answer}.`;
+  const resultCopy = official ? officialResultCopy : `${funResultCopy} This result did not affect your stats.`;
   const resultClass = failedBonus
     ? "partial"
     : perfectResult
@@ -410,6 +427,8 @@ function renderCompletion(type, session, mode) {
       : `<h3>Today’s three clues</h3><div class="clue-list">${renderClueCards({ cluesRevealed: 3 })}</div>`
     : `
       <section class="bonus-panel">
+        <p class="kicker">Category</p>
+        <h3 class="word-result-category">${escapeHtml(session.summary?.label || "Uncategorised")}</h3>
         <p class="kicker">Answer</p>
         <h2 class="final-map-name">${escapeHtml(answer)}</h2>
         <p class="helper-text">${escapeHtml(session.summary?.detail || "")}</p>
@@ -420,7 +439,7 @@ function renderCompletion(type, session, mode) {
       <div class="result-banner ${resultClass} animate">
         <h2>${resultTitle}</h2>
         <p>${escapeHtml(resultCopy)}</p>
-        ${!session.success ? `<p class="survival-summary">Your run ended at <strong>Round ${Math.max(1, session.roundsSurvivedBeforeLoss || 1)}</strong>. Your next game starts at <strong>Round 1</strong>.</p>` : ""}
+        ${official && !session.success ? `<p class="survival-summary">Your run ended at <strong>Round ${Math.max(1, session.roundsSurvivedBeforeLoss || 1)}</strong>. Your next game starts at <strong>Round 1</strong>.</p>` : ""}
       </div>
       ${resultDetail}
       <div class="actions share-score-actions">
@@ -550,7 +569,7 @@ function renderWordPuzzle() {
       )}
       <div class="word-scoreboard" aria-label="Word puzzle score">
         <div><span>Potential score</span><strong>${potentialPoints}</strong></div>
-        <div><span>Mistakes</span><strong>${session.wrongGuesses} / 5</strong></div>
+        <div class="word-mistakes"><span>Mistakes</span><strong>${session.wrongGuesses} / 5</strong></div>
       </div>
       <div class="word-answer" aria-label="Partially revealed answer">
         ${renderWordSlots(wordPuzzle.entry.answer, revealed)}

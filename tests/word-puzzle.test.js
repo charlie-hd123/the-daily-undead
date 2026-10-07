@@ -32,10 +32,10 @@ test("the starting letter exists in the answer but never reveals its first lette
   }
 });
 
-test("word points fall by 20 and reach zero on the fifth mistake", () => {
+test("word points follow the configured ladder and reach zero on the fifth mistake", () => {
   assert.deepEqual(
     [0, 1, 2, 3, 4, 5, 6].map(calculateWordPoints),
-    [100, 80, 60, 40, 20, 0, 0],
+    [100, 50, 40, 20, 10, 0, 0],
   );
 });
 

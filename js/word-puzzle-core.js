@@ -60,7 +60,7 @@ export function buildDailyWordPuzzle(dateKey, entries) {
 
 export function calculateWordPoints(wrongGuesses) {
   const misses = Number.isInteger(wrongGuesses) ? wrongGuesses : 0;
-  return Math.max(0, 100 - Math.max(0, misses) * 20);
+  return [100, 50, 40, 20, 10][Math.max(0, misses)] ?? 0;
 }
 
 export function isWordSolved(answer, revealedLetters) {
