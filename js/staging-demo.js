@@ -42,7 +42,7 @@ const puzzleTypes = {
     name: "Dead Letters",
     shortName: "Dead Letters",
     kicker: "Word puzzle",
-    description: "Can you solve today’s word of the dead?",
+    description: "Can you solve today’s Zombies word or phrase?",
     image: "./assets/dead-letters-card.svg",
   },
 };
