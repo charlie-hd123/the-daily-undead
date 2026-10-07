@@ -427,9 +427,7 @@ function renderCompletion(type, session, mode) {
       : `<h3>Today’s three clues</h3><div class="clue-list">${renderClueCards({ cluesRevealed: 3 })}</div>`
     : `
       <section class="bonus-panel">
-        <p class="kicker">Category</p>
-        <h3 class="word-result-category">${escapeHtml(session.summary?.label || "Uncategorised")}</h3>
-        <p class="kicker">Answer</p>
+        <p class="word-result-category">${escapeHtml(session.summary?.label || "Uncategorised")}</p>
         <h2 class="final-map-name">${escapeHtml(answer)}</h2>
         <p class="helper-text">${escapeHtml(session.summary?.detail || "")}</p>
       </section>
