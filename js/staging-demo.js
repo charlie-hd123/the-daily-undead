@@ -411,8 +411,8 @@ function renderCompletion(type, session, mode) {
       </div>
       ${resultDetail}
       <div class="actions share-score-actions">
-        <button id="share-demo-score" class="button share-score-button" type="button">Share with your squad</button>
         ${official ? '<button id="return-to-puzzle-home" class="button" type="button">Play another puzzle</button>' : ""}
+        <button id="share-demo-score" class="button share-score-button" type="button">Share with your squad</button>
       </div>
       <p id="share-demo-score-status" class="share-score-status" aria-live="polite"></p>
     </section>
