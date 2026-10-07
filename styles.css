@@ -1804,6 +1804,9 @@ h1 {
 }
 
 .leaderboard-player-identity { display: flex; align-items: center; gap: 0.55rem; min-width: 0; }
+.leaderboard-player-avatar { display: block; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; }
+.leaderboard-player-avatar:hover .zombie-avatar { border-color: var(--aether); box-shadow: 0 0 0 2px rgb(125 249 255 / 20%); }
+.leaderboard-player-avatar:focus-visible { outline: 2px solid var(--aether); outline-offset: 3px; }
 .zombie-avatar-small { width: 2.25rem; height: 2.25rem; flex: 0 0 auto; }
 .leaderboard-player-name { overflow: hidden; padding: 0; border: 0; background: none; color: var(--text); cursor: pointer; font: 800 1.04rem/1 var(--font-display); text-align: left; text-overflow: ellipsis; white-space: nowrap; }
 .leaderboard-player-name:hover { color: var(--aether); text-decoration: underline; }

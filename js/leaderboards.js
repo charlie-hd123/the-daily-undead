@@ -72,16 +72,22 @@ function makePlayer(
   player.className = "leaderboard-player";
   const identity = documentObject.createElement("span");
   identity.className = "leaderboard-player-identity";
+  const avatarButton = documentObject.createElement("button");
+  avatarButton.type = "button";
+  avatarButton.className = "leaderboard-player-avatar";
+  avatarButton.dataset.viewProfile = username;
+  avatarButton.setAttribute("aria-label", `View ${username}’s survivor profile`);
   const avatar = documentObject.createElement("span");
   avatar.className = "zombie-avatar zombie-avatar-small";
   avatar.dataset.avatar = avatarId;
   avatar.setAttribute("aria-hidden", "true");
+  avatarButton.append(avatar);
   const name = documentObject.createElement("button");
   name.type = "button";
   name.className = "leaderboard-player-name";
   name.dataset.viewProfile = username;
   name.textContent = username;
-  identity.append(avatar, name);
+  identity.append(avatarButton, name);
   player.append(identity);
 
   if (resultLabel) {

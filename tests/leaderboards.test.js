@@ -188,3 +188,11 @@ test("the leaderboard uses player-facing introductory copy", async () => {
   assert.match(browserScript, /Leaderboards couldn’t be loaded\. Please try again\./);
   assert.doesNotMatch(browserScript, /verified results|imported and synced progress/i);
 });
+
+test("leaderboard avatars open the same survivor profile as usernames", async () => {
+  const browserScript = await fs.readFile(new URL("js/leaderboards.js", projectRoot), "utf8");
+
+  assert.match(browserScript, /avatarButton\.dataset\.viewProfile = username/);
+  assert.match(browserScript, /View \$\{username\}’s survivor profile/);
+  assert.match(browserScript, /identity\.append\(avatarButton, name\)/);
+});

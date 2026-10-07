@@ -105,7 +105,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261007-1"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261007-2"]));
 });
 
 test("production Supabase Auth accepts both staging and production OTP lengths", async () => {
