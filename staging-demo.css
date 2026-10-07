@@ -2,28 +2,6 @@
   cursor: default;
 }
 
-.demo-notice {
-  display: flex;
-  width: min(100% - 1.25rem, 74rem);
-  margin: 0.8rem auto 0;
-  padding: 0.75rem 1rem;
-  align-items: center;
-  justify-content: center;
-  gap: 0.65rem;
-  border: 1px solid rgb(247 200 92 / 32%);
-  border-radius: 0.8rem;
-  background: rgb(247 200 92 / 8%);
-  color: var(--muted-strong);
-  font-size: 0.88rem;
-  text-align: center;
-}
-
-.demo-notice strong {
-  color: var(--essence);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
 .puzzle-hub-panel {
   overflow: hidden;
   padding: 0;
@@ -51,15 +29,16 @@
 .puzzle-choice-card {
   display: grid;
   grid-template-rows: 1fr auto;
+  min-height: 12rem;
   min-width: 0;
   overflow: hidden;
   position: relative;
   border: 1px solid rgb(247 200 92 / 25%);
   border-radius: 1rem;
   background:
-    radial-gradient(circle at 100% 0%, rgb(247 200 92 / 10%), transparent 44%),
+    radial-gradient(circle at 92% 22%, rgb(247 200 92 / 13%), transparent 35%),
     linear-gradient(155deg, rgb(25 27 40 / 95%), rgb(10 14 25 / 96%));
-  box-shadow: 0 1rem 2.5rem rgb(0 0 0 / 20%);
+  box-shadow: inset 0 1px rgb(255 255 255 / 4%), 0 1rem 2.5rem rgb(0 0 0 / 20%);
 }
 
 .puzzle-choice-card::before {
@@ -78,23 +57,23 @@
 .puzzle-choice-copy {
   position: relative;
   z-index: 1;
-  padding: 0.85rem 6rem 0.55rem 1.05rem;
+  padding: 1.2rem 8.4rem 0.9rem 1.35rem;
 }
 
 .puzzle-choice-art {
   position: absolute;
   z-index: 0;
-  top: 0.45rem;
-  right: 0.35rem;
-  width: 6.6rem;
-  height: 6.6rem;
+  top: 0.85rem;
+  right: 0.75rem;
+  width: 7.5rem;
+  height: 7.5rem;
   object-fit: contain;
-  opacity: 0.24;
+  opacity: 0.34;
   pointer-events: none;
 }
 
 .puzzle-choice-copy h3 {
-  margin: 0.2rem 0 0.35rem;
+  margin: 0.32rem 0 0.6rem;
   font: 800 clamp(1.4rem, 3.6vw, 1.8rem)/1 var(--font-display);
   text-transform: uppercase;
   letter-spacing: 0.02em;
@@ -107,6 +86,7 @@
 .puzzle-choice-copy > p {
   margin: 0;
   color: var(--muted-strong);
+  line-height: 1.5;
 }
 
 .puzzle-choice-status {
@@ -121,7 +101,7 @@
 .puzzle-choice-actions {
   position: relative;
   z-index: 1;
-  padding: 0 0.85rem 0.8rem 1.05rem;
+  padding: 0 1rem 1rem 1.35rem;
 }
 
 .puzzle-choice-actions .button {
@@ -296,11 +276,6 @@
     gap: 0.55rem;
   }
 
-  .demo-notice {
-    align-items: flex-start;
-    flex-direction: column;
-    text-align: left;
-  }
 }
 
 @media (max-width: 35rem) {
@@ -313,19 +288,20 @@
   }
 
   .puzzle-choice-copy {
-    padding: 0.72rem 4.7rem 0.45rem 0.9rem;
+    padding: 1rem 5.8rem 0.75rem 1.05rem;
   }
 
   .puzzle-choice-art {
-    top: 0.3rem;
-    right: 0.25rem;
-    width: 4.8rem;
-    height: 4.8rem;
-    opacity: 0.22;
+    top: 0.75rem;
+    right: 0.55rem;
+    width: 5.4rem;
+    height: 5.4rem;
+    opacity: 0.3;
   }
 
   .puzzle-choice-copy h3 {
-    font-size: 1.35rem;
+    margin-bottom: 0.45rem;
+    font-size: 1.4rem;
   }
 
   .puzzle-choice-copy > p:not(.kicker) {
@@ -334,7 +310,7 @@
   }
 
   .puzzle-choice-actions {
-    padding: 0 0.75rem 0.7rem 0.9rem;
+    padding: 0 0.85rem 0.85rem 1.05rem;
   }
 
   .puzzle-choice-actions .button {
