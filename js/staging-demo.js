@@ -35,14 +35,14 @@ const puzzleTypes = {
     name: "Quest Steps",
     shortName: "Quest Steps",
     kicker: "Main quest puzzle",
-    description: "Identify today’s Zombies map from its Easter egg steps.",
+    description: "Can you identify today’s Zombies map from its Easter egg steps?",
     image: "./assets/quest-steps-card.svg",
   },
   word: {
     name: "Dead Letters",
     shortName: "Dead Letters",
     kicker: "Word puzzle",
-    description: "Reveal today’s Zombies word or phrase.",
+    description: "Can you solve today’s word of the dead?",
     image: "./assets/dead-letters-card.svg",
   },
 };
@@ -300,7 +300,7 @@ function renderHub() {
   app.innerHTML = `
     <section class="panel puzzle-hub-panel">
       <div class="puzzle-hub-hero">
-        ${renderHeading("Choose your puzzle", guidance, "Today’s puzzles")}
+        ${renderHeading("Choose your daily puzzle", guidance, "Today’s round")}
       </div>
       <div class="puzzle-choice-grid">
         ${renderPuzzleCard("easter")}
