@@ -59,10 +59,7 @@ test("the staging demo imports every playable spreadsheet answer", async () => {
   ));
   const answers = Object.values(source.categories).flat();
   assert.equal(Object.keys(source.categories).length, 10);
-  assert.equal(answers.length, 99);
-  assert.equal(new Set(answers.map((answer) => answer.toUpperCase())).size, 99);
-  assert.deepEqual(source.excluded, [{
-    answer: "115",
-    reason: "The letter-only demo requires at least two distinct A-Z letters.",
-  }]);
+  assert.equal(answers.length, 90);
+  assert.equal(new Set(answers.map((answer) => answer.toUpperCase())).size, 90);
+  assert.deepEqual(source.excluded, []);
 });
