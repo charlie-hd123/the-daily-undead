@@ -35,14 +35,14 @@ const puzzleTypes = {
     name: "Quest Steps",
     shortName: "Quest Steps",
     kicker: "Easter egg puzzle",
-    description: "Can you identify today’s Zombies map from its Easter egg steps?",
+    description: "Can you identify the Zombies map from its Easter egg steps?",
     image: "./assets/quest-steps-card.svg",
   },
   word: {
     name: "Dead Letters",
     shortName: "Dead Letters",
     kicker: "Word puzzle",
-    description: "Can you solve today’s Zombies word or phrase by revealing its letters?",
+    description: "Can you identify the Zombies word or phrase by revealing its letters?",
     image: "./assets/dead-letters-card.svg",
   },
 };
