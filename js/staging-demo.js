@@ -154,7 +154,13 @@ function updateCountdown() {
   const hours = String(Math.floor(seconds / 3600)).padStart(2, "0");
   const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
   const finalSeconds = String(seconds % 60).padStart(2, "0");
-  countdownLabel.textContent = `${hours}:${minutes}:${finalSeconds}`;
+  const formatted = `${hours}:${minutes}:${finalSeconds}`;
+  countdownLabel.textContent = formatted;
+  const endScreenCountdown = document.querySelector("#end-screen-countdown");
+  if (endScreenCountdown) {
+    endScreenCountdown.textContent = formatted;
+    endScreenCountdown.setAttribute("aria-label", `${seconds} seconds until the next round`);
+  }
 }
 
 function renderHeading(title, description, kicker = "Today’s puzzle") {
@@ -188,6 +194,8 @@ function createEasterSession() {
     selectedMapId: null,
     mapPoints: 0,
     bonusOrder: [],
+    bonusComplete: false,
+    bonusFailed: false,
     complete: false,
     success: null,
     points: 0,
@@ -371,6 +379,7 @@ function applyOfficialProgression(type, success, points) {
 
 function finishPuzzle(type, { success, points, summary }) {
   const session = ensureSession(type);
+  session.roundsSurvivedBeforeLoss = profile.round;
   session.complete = true;
   session.success = success;
   session.points = points;
@@ -391,33 +400,145 @@ function finishPuzzle(type, { success, points, summary }) {
 
 function renderCompletion(type, session, mode) {
   const official = mode === "official";
-  const resultTitle = session.success ? "Round Survived!" : "Run ended";
-  const resultCopy = official
+  const answer = session.summary?.answer || "";
+  const isEaster = type === "easter";
+  const failedBonus = isEaster && session.success && session.bonusFailed;
+  const perfectResult = isEaster && session.success && session.bonusComplete;
+  const selectedMap = isEaster
+    ? selectableMaps.find((map) => map.id === session.selectedMapId)
+    : null;
+  const clueLabel = session.cluesRevealed === 1 ? "clue" : "clues";
+  const resultTitle = failedBonus
+    ? "Not quite"
+    : perfectResult
+      ? "Double Points!"
+      : session.success
+        ? "Round Survived!"
+        : "Run ended";
+  const resultCopy = isEaster
+    ? failedBonus
+      ? `You identified ${answer}, but the step order was incorrect. You still earned ${session.mapPoints} points this round.`
+      : perfectResult
+        ? `You found ${answer} using ${session.cluesRevealed} ${clueLabel} and got the steps in the correct order. You earned ${session.points} points this round.`
+        : session.success
+          ? `You identified ${answer} using ${session.cluesRevealed} ${clueLabel}. You earned ${session.points} points this round.`
+          : `You chose ${selectedMap?.title ?? "an unknown map"}. Today’s answer was ${answer}. Your permanent Score and Solves are safe.`
+    : session.success
+      ? `You revealed ${answer} with ${session.wrongGuesses} ${session.wrongGuesses === 1 ? "mistake" : "mistakes"}. You earned ${session.points} points this round.`
+      : `You did not reveal the answer. Today’s answer was ${answer}. Your permanent Score and Solves are safe.`;
+  const resultClass = failedBonus
+    ? "partial"
+    : perfectResult
+      ? "perfect"
+      : session.success
+        ? "correct"
+        : "failed";
+  const resultDetail = isEaster
     ? session.success
-      ? `You earned ${session.points} points. Your Score, Solves and Round have advanced.`
-      : "Your Round has reset to 1. Your permanent Score and Solves remain safe."
-    : "This result was just for fun, so your Score, Solves and Round have not changed.";
-  const homeLabel = official ? "Play another puzzle for fun" : "Return to puzzle home";
+      ? renderEasterBonusResult(session)
+      : `<h3>Today’s three clues</h3><div class="clue-list">${renderClueCards({ cluesRevealed: 3 })}</div>`
+    : `
+      <section class="bonus-panel">
+        <p class="kicker">Answer</p>
+        <h2 class="final-map-name">${escapeHtml(answer)}</h2>
+        <p class="helper-text">${escapeHtml(session.summary?.detail || "")}</p>
+      </section>
+    `;
   app.innerHTML = `
-    <section class="panel demo-completion-panel">
-      <div class="result-banner ${session.success ? "correct" : "failed"}">
-        <p class="kicker">${official ? "Official result" : "Just for fun"} · ${escapeHtml(puzzleTypes[type].name)}</p>
+    <section class="panel">
+      <div class="result-banner ${resultClass} animate">
         <h2>${resultTitle}</h2>
         <p>${escapeHtml(resultCopy)}</p>
+        ${!session.success ? `<p class="survival-summary">Your run ended at <strong>Round ${Math.max(1, session.roundsSurvivedBeforeLoss || 1)}</strong>. Your next game starts at <strong>Round 1</strong>.</p>` : ""}
       </div>
-      <div class="demo-answer-reveal">
-        <span>${escapeHtml(session.summary?.label || "Today’s answer")}</span>
-        <strong>${escapeHtml(session.summary?.answer || "")}</strong>
-        ${session.summary?.detail ? `<p>${escapeHtml(session.summary.detail)}</p>` : ""}
+      ${resultDetail}
+      <div class="actions share-score-actions">
+        <button id="share-demo-score" class="button share-score-button" type="button">Share with your squad</button>
+        ${official ? '<button id="return-to-puzzle-home" class="button" type="button">Play another puzzle for fun</button>' : ""}
       </div>
-      ${renderHubStats()}
-      <div class="completion-next-step">
-        <p>${official ? "Finished for today? You can close the game here." : "That’s both of today’s puzzles complete."}</p>
-        <button id="return-to-puzzle-home" class="button" type="button">${homeLabel}</button>
-      </div>
+      <p id="share-demo-score-status" class="share-score-status" aria-live="polite"></p>
+    </section>
+    ${renderNextRoundScreen()}
+  `;
+  updateCountdown();
+  app.querySelector("#return-to-puzzle-home")?.addEventListener("click", renderHub);
+  app.querySelector("#share-demo-score").addEventListener("click", (event) => {
+    shareDemoScore(event.currentTarget, app.querySelector("#share-demo-score-status"), type, session);
+  });
+}
+
+function renderCorrectStepOrder(showTicks = false) {
+  return `
+    <ol class="steps-order">
+      ${easterPuzzle.chronologicalSteps.map((step, index) => `
+        <li>
+          <span class="order-rank">${index + 1}</span>
+          <span>${escapeHtml(step.clue)}</span>
+          ${showTicks ? '<span class="step-tick" aria-label="Correct">✓</span>' : ""}
+        </li>
+      `).join("")}
+    </ol>
+  `;
+}
+
+function renderEasterBonusResult(session) {
+  const answer = getAnswerDisplayTitle(easterPuzzle.map, catalog.answerEquivalents);
+  if (session.bonusComplete) {
+    return `
+      <section class="bonus-panel">
+        <p class="kicker">Map</p>
+        <h2 class="final-map-name">${escapeHtml(answer)}</h2>
+        ${renderCorrectStepOrder(true)}
+      </section>
+    `;
+  }
+  return `
+    <section class="bonus-panel">
+      <h3>Bonus missed</h3>
+      <p class="helper-text">The steps were not in the correct order.</p>
+      <p class="kicker">Map</p>
+      <h2 class="final-map-name">${escapeHtml(answer)}</h2>
+      ${renderCorrectStepOrder()}
     </section>
   `;
-  app.querySelector("#return-to-puzzle-home").addEventListener("click", renderHub);
+}
+
+function renderNextRoundScreen() {
+  return `
+    <section class="next-round-screen" aria-labelledby="next-round-screen-title" aria-live="off">
+      <p class="kicker">Next round</p>
+      <h3 id="next-round-screen-title">Next map in</h3>
+      <strong id="end-screen-countdown" class="end-screen-countdown" aria-label="Time until the next round">--:--:--</strong>
+      <p class="next-round-motivation">Return tomorrow to keep your Round alive.</p>
+    </section>
+  `;
+}
+
+async function shareDemoScore(button, status, type, session) {
+  const text = [
+    `🧟 The Daily Undead · ${formatDate(dateKey)}`,
+    `${puzzleTypes[type].name} · ${session.points} points`,
+    `🔥 Round: ${profile.round}`,
+    `⚡ Score: ${profile.score}`,
+    `🏆 Solves: ${profile.solves}`,
+  ].join("\n");
+  if (typeof navigator.share === "function") {
+    try {
+      await navigator.share({ text });
+      button.textContent = "Shared!";
+      status.textContent = "Your score was shared.";
+      return;
+    } catch (error) {
+      if (error?.name === "AbortError") return;
+    }
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    button.textContent = "Score copied!";
+    status.textContent = "Sharing wasn’t available, so your score was copied instead.";
+  } catch {
+    status.textContent = "Couldn’t share automatically. Please try again.";
+  }
 }
 
 function renderWordSlots(answer, revealedLetters) {
@@ -659,17 +780,26 @@ function submitEasterMap(session) {
 }
 
 function renderEasterBonus(session) {
+  const answer = getAnswerDisplayTitle(easterPuzzle.map, catalog.answerEquivalents);
+  const clueLabel = session.cluesRevealed === 1 ? "clue" : "clues";
   app.innerHTML = `
     <section class="panel">
-      ${renderHeading("Put the steps in order", `You found the map and secured ${session.mapPoints} points. Order the steps to double it.`, "Bonus objective")}
-      <p class="selection-progress">Selected: ${session.bonusOrder.length} of 3</p>
-      <ul class="order-choice-list">
-        ${easterPuzzle.displayedSteps.map((step) => {
-          const selectedIndex = session.bonusOrder.indexOf(step.id);
-          return `<li><button class="order-choice" type="button" data-step-id="${escapeHtml(step.id)}" aria-pressed="${selectedIndex >= 0}"><span class="order-rank">${selectedIndex >= 0 ? selectedIndex + 1 : "+"}</span><span class="order-text">${escapeHtml(step.clue)}</span></button></li>`;
-        }).join("")}
-      </ul>
-      <div class="actions"><button id="submit-demo-order" class="button primary" type="button" ${session.bonusOrder.length === 3 ? "" : "disabled"}>Submit order · One attempt only</button></div>
+      <div class="result-banner correct animate">
+        <h2>Round Survived!</h2>
+        <p>You identified ${escapeHtml(answer)} using ${session.cluesRevealed} ${clueLabel}. You earned ${session.mapPoints} points this round.</p>
+      </div>
+      <section class="bonus-panel">
+        <h3>Bonus Objective: Put the steps in order</h3>
+        <p class="helper-text">Select the steps in the order they occur to earn Double Points. Tap a selected step again to remove it and revise your order.</p>
+        <p class="selection-progress">Selected: ${session.bonusOrder.length} of 3</p>
+        <ul class="order-choice-list">
+          ${easterPuzzle.displayedSteps.map((step) => {
+            const selectedIndex = session.bonusOrder.indexOf(step.id);
+            return `<li><button class="order-choice" type="button" data-step-id="${escapeHtml(step.id)}" aria-pressed="${selectedIndex >= 0}"><span class="order-rank">${selectedIndex >= 0 ? selectedIndex + 1 : "+"}</span><span class="order-text">${escapeHtml(step.clue)}</span></button></li>`;
+          }).join("")}
+        </ul>
+        <div class="actions"><button id="submit-demo-order" class="button primary" type="button" ${session.bonusOrder.length === 3 ? "" : "disabled"}>Submit order · One attempt only</button></div>
+      </section>
     </section>
   `;
   app.querySelectorAll("[data-step-id]").forEach((button) => button.addEventListener("click", () => {
@@ -680,6 +810,8 @@ function renderEasterBonus(session) {
   app.querySelector("#submit-demo-order").addEventListener("click", () => {
     const bonusCorrect = isCorrectOrder(session.bonusOrder, easterPuzzle.chronologicalSteps);
     const bonusPoints = calculateBonusPoints(session.mapPoints, bonusCorrect);
+    session.bonusComplete = bonusCorrect;
+    session.bonusFailed = !bonusCorrect;
     finishPuzzle("easter", {
       success: true,
       points: session.mapPoints + bonusPoints,

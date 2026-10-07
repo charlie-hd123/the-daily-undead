@@ -360,57 +360,8 @@
   color: white;
 }
 
-.demo-completion-panel {
-  display: grid;
-  gap: 1rem;
-}
-
-.demo-answer-reveal {
-  display: grid;
-  padding: clamp(1.25rem, 4vw, 2rem);
-  justify-items: center;
-  border: 1px solid var(--border);
-  border-radius: 0.9rem;
-  background: rgb(7 10 18 / 55%);
-  text-align: center;
-}
-
-.demo-answer-reveal span {
-  color: var(--muted);
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.demo-answer-reveal strong {
-  margin-top: 0.3rem;
-  color: var(--aether);
-  font: 900 clamp(1.35rem, 4vw, 2rem)/1 var(--font-display);
-  text-transform: uppercase;
-}
-
-.demo-answer-reveal p {
-  margin-top: 0.25rem;
-  color: var(--muted-strong);
-}
-
-.demo-completion-panel .hub-stats {
-  width: min(100%, 36rem);
-  margin-inline: auto;
-}
-
-.completion-next-step {
-  display: grid;
-  justify-items: center;
-  gap: 0.75rem;
-  padding-top: 0.4rem;
-  text-align: center;
-}
-
-.completion-next-step p {
-  margin: 0;
-  color: var(--muted);
+.share-score-actions .button {
+  flex: 1 1 15rem;
 }
 
 .demo-footer {
