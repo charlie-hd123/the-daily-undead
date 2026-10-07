@@ -6,7 +6,7 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261007-3";
+} from "./account-session.js?v=20261007-4";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -663,7 +663,7 @@ export async function initialiseAccount({
         bio.textContent = viewed.bio;
         content.push(bio);
       }
-      content.push(stats, favourites);
+      content.push(favourites, stats);
       if (profile && viewed.username === profile.username) {
         const editLink = documentObject.createElement("button");
         editLink.className = "public-profile-edit-link";
@@ -693,7 +693,7 @@ export async function initialiseAccount({
   try {
     clerk = await withTimeout(
       supabaseConfigured
-        ? import("./supabase-auth.js?v=20261007-3").then(({ loadSupabaseAuth }) => (
+        ? import("./supabase-auth.js?v=20261007-4").then(({ loadSupabaseAuth }) => (
           loadSupabaseAuth(documentObject)
         ))
         : loadClerk(publishableKey),

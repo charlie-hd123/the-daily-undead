@@ -105,7 +105,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261007-3"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261007-4"]));
 });
 
 test("production Supabase Auth accepts both staging and production OTP lengths", async () => {
@@ -510,7 +510,8 @@ test("survivor profiles hide an empty favourite memory section", async () => {
   assert.match(demo, /if \(viewed\.bio\) \{[\s\S]*?content\.push\(bio\);[\s\S]*?\}/);
   assert.match(css, /\.public-profile-bio::before[\s\S]*?content: "FAVOURITE MEMORY"/);
   assert.match(account, /stats\.append\([\s\S]*?makeProfileStat\("Score"[\s\S]*?makeProfileStat\("Puzzle Solves"[\s\S]*?makeProfileStat\("Current Round"[\s\S]*?makeProfileStat\("Highest Round"/);
-  assert.match(account, /const content = \[header\];[\s\S]*?content\.push\(stats, favourites\)/);
+  assert.match(account, /const content = \[header\];[\s\S]*?content\.push\(favourites, stats\)/);
+  assert.match(demo, /const content = \[header\];[\s\S]*?content\.push\(favourites, stats\)/);
   assert.doesNotMatch(account, /makeStatGroup|"Career"|"Survival"/);
   assert.doesNotMatch(account, /public-profile-identity-line/);
   assert.match(css, /\.public-profile-overview \{[\s\S]*?grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);/);

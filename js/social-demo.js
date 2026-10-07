@@ -283,7 +283,7 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
       bio.textContent = viewed.bio;
       content.push(bio);
     }
-    content.push(stats, favourites);
+    content.push(favourites, stats);
     if (viewed.username === state.profile.username) {
       const editLink = documentObject.createElement("button");
       editLink.className = "public-profile-edit-link";
