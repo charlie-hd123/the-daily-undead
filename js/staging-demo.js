@@ -542,7 +542,7 @@ function renderWordPuzzle() {
   app.innerHTML = `
     <section class="panel word-puzzle-panel">
       ${renderHeading(
-        "Identify the Zombies word",
+        "Which Zombies word is it?",
         "Try to solve the Zombies word or phrase by revealing its letters",
         activePlay?.mode === "official" ? "Official puzzle" : "Just for fun",
         activePlay?.mode === "official" ? "" : "Playing just for fun. This result will not change your stats.",
