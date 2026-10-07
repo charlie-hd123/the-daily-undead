@@ -304,7 +304,7 @@ function renderHub() {
   app.innerHTML = `
     <section class="panel puzzle-hub-panel">
       <div class="puzzle-hub-hero">
-        ${renderHeading("Choose your daily puzzle", guidance, "Today’s round")}
+        ${renderHeading("Choose your daily puzzle", guidance, dayState.officialCompleted ? "Just for fun" : "Today’s round")}
       </div>
       <div class="puzzle-choice-grid">
         ${renderPuzzleCard("word")}
