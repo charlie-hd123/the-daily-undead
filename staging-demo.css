@@ -57,7 +57,7 @@
 .puzzle-choice-copy {
   position: relative;
   z-index: 1;
-  padding: 1.2rem 8.4rem 0.9rem 1.35rem;
+  padding: 1.2rem 9.4rem 0.9rem 1.35rem;
 }
 
 .puzzle-choice-art {
@@ -297,7 +297,7 @@
   }
 
   .puzzle-choice-copy {
-    padding: 1rem 5.8rem 0.75rem 1.05rem;
+    padding: 1rem 6.7rem 0.75rem 1.05rem;
   }
 
   .puzzle-choice-art {
