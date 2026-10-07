@@ -150,11 +150,11 @@ chain and runs only during an explicitly approved maintenance window.
 
 ## Player accounts, data and feedback
 
-Accounts are optional. Guests keep using browser local storage. A player who chooses **Save progress** signs up or signs in through Clerk with an email verification code, then chooses a public username. There is no game password to remember or reset. On first setup, the player can import progress already stored on that device.
+Accounts are optional. Guests keep using browser local storage. A player who chooses **Save progress** signs up or signs in through Supabase Auth with an email verification code delivered by Resend, then chooses a public username. There is no game password to remember or reset. On first setup, the player can import progress already stored on that device.
 
-Clerk stores the email address and authentication/session data. Cloudflare D1 stores only Clerk's opaque user ID, the chosen username, synchronised progress, per-day puzzle state, and a server-verified daily-result ledger. Players can change their unique public username from the Clerk account panel; this updates the same D1 profile without affecting saved progress or results. D1 does not store email addresses, passwords, or email codes. The Today leaderboard uses the verified ledger to show signed-in players who correctly identified the map, ranked by points earned that day, alongside the anonymous community count for everyone who played. The All Time leaderboard ranks accounts by permanent Score and shows Puzzle Solves and Highest Round as supporting information.
+Supabase stores the email address and authentication/session data. Cloudflare D1 stores an application-owned account ID, provider identity mappings, the chosen username, synchronised progress, per-day puzzle state, and a server-verified daily-result ledger. Players can change their unique public username from the site account panel without affecting saved progress or results. D1 does not store email addresses, passwords, or email codes. The Today leaderboard uses the verified ledger to show signed-in players who correctly identified the map, ranked by points earned that day, alongside the anonymous community count for everyone who played. The All Time leaderboard ranks accounts by permanent Score and shows Puzzle Solves and Highest Round as supporting information.
 
-The free Clerk production plan expires browser sessions after seven days. Once a browser has successfully loaded an account, the site remembers only that opaque Clerk user ID and the latest cloud-save revision. If Clerk later reports no active session, the player sees a prominent session-expired prompt. In-progress puzzle choices are retained in a user-scoped pending snapshot, but an expired account must sign back in before submitting the map or bonus result so the permanent Score, Solves and Round can be verified. A different account can never receive the pending progress. If both the device and cloud changed, the player chooses which save to keep; clearing all browser data removes pending local progress but never deletes or replaces the existing D1 cloud save.
+Once a browser has successfully loaded an account, the site remembers only the application-owned account ID and latest cloud-save revision. If Supabase later reports no active session, the player sees a prominent session-expired prompt. In-progress puzzle choices are retained in a user-scoped pending snapshot, but an expired account must sign back in before submitting the map or bonus result so the permanent Score, Solves and Round can be verified. A different account can never receive the pending progress. If both the device and cloud changed, the player chooses which save to keep; clearing all browser data removes pending local progress but never deletes or replaces the existing D1 cloud save.
 
 The existing anonymous community count remains separate. It uses a random browser-local identifier; the Worker hashes it before D1 storage and records only the puzzle/date, answer map, and correct/incorrect result. Cloudflare Web Analytics and Worker invocation logs are enabled in the Cloudflare account. Clearing site data removes guest progress; signed-in progress can be restored after signing in again.
 
@@ -167,7 +167,8 @@ index.html             App shell
 styles.css             Mobile-first functional styling
 assets/fonts/          Locally hosted Barlow fonts and their OFL licence
 js/app.js              Screens, interactions, saved progress
-js/account.js          Optional Clerk sign-in and cross-device sync
+js/account.js          Optional account sign-in and cross-device sync
+js/supabase-auth.js    Supabase email-code authentication adapter
 js/game-core.js        Seeded daily puzzle and order logic
 js/progression.js      Missed-day, protected-date, and preview rules
 js/community-stats.js  Anonymous attempt submission and aggregate display

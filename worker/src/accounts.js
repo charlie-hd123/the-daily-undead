@@ -325,7 +325,12 @@ export async function getAccount(db, userId, dateKey) {
   };
 }
 
-export async function registerAccount(db, request, userId) {
+export async function registerAccount(
+  db,
+  request,
+  userId,
+  { accountId = userId, identity = null } = {},
+) {
   const body = await readJsonBody(request);
   const username = normalizeUsername(body.username);
   if (!username) {
@@ -350,10 +355,10 @@ export async function registerAccount(db, request, userId) {
     db
       .prepare(
         `INSERT INTO player_profiles (
-          user_id, username, leaderboard_visible, legacy_imported_at
-        ) VALUES (?, ?, 1, ?)`,
+          user_id, account_id, username, leaderboard_visible, legacy_imported_at
+        ) VALUES (?, ?, ?, 1, ?)`,
       )
-      .bind(userId, username, importedAt),
+      .bind(userId, accountId, username, importedAt),
     db
       .prepare(
         `INSERT INTO player_saves (
@@ -381,6 +386,15 @@ export async function registerAccount(db, request, userId) {
       ),
   ];
 
+  if (identity) {
+    statements.push(
+      db.prepare(
+        `INSERT INTO account_identities (provider, provider_subject, account_id)
+        VALUES (?, ?, ?)`,
+      ).bind(identity.provider, identity.subject, accountId),
+    );
+  }
+
   if (body.importLocalProgress && puzzleDate && dailyState) {
     statements.push(
       db
@@ -400,7 +414,7 @@ export async function registerAccount(db, request, userId) {
     throw error;
   }
 
-  return { status: 201, body: { username } };
+  return { status: 201, body: { username, accountId } };
 }
 
 export async function updateAccountUsername(db, request, userId) {

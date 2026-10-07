@@ -4,10 +4,15 @@
   "compatibility_date": "2026-08-12",
   "workers_dev": true,
   "preview_urls": true,
+  "triggers": {
+    "crons": ["0 */12 * * *"]
+  },
   "vars": {
     "ALLOWED_ORIGINS": "https://daily-undead-staging.pages.dev",
     "CLERK_ISSUER": "https://rapid-pigeon-846.clerk.accounts.dev",
-    "CLERK_AUTHORIZED_PARTIES": "https://daily-undead-staging.pages.dev"
+    "CLERK_AUTHORIZED_PARTIES": "https://daily-undead-staging.pages.dev",
+    "SUPABASE_ISSUER": "https://zsnnvzhimtlhpvwhwxpy.supabase.co/auth/v1",
+    "SUPABASE_HEARTBEAT_URL": "https://zsnnvzhimtlhpvwhwxpy.supabase.co/functions/v1/project-heartbeat"
   },
   "d1_databases": [
     {

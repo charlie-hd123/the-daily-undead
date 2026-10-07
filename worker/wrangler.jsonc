@@ -3,10 +3,15 @@
   "main": "src/index.js",
   "compatibility_date": "2026-08-12",
   "workers_dev": false,
+  "triggers": {
+    "crons": ["0 */12 * * *"]
+  },
   "vars": {
     "ALLOWED_ORIGINS": "https://thedailyundead.com,https://www.thedailyundead.com",
     "CLERK_ISSUER": "https://clerk.thedailyundead.com",
-    "CLERK_AUTHORIZED_PARTIES": "https://thedailyundead.com,https://www.thedailyundead.com"
+    "CLERK_AUTHORIZED_PARTIES": "https://thedailyundead.com,https://www.thedailyundead.com",
+    "SUPABASE_ISSUER": "https://bhqhfxwdcpujfxxvcoeo.supabase.co/auth/v1",
+    "SUPABASE_HEARTBEAT_URL": "https://bhqhfxwdcpujfxxvcoeo.supabase.co/functions/v1/project-heartbeat"
   },
   "d1_databases": [
     {

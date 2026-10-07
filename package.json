@@ -4,6 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build:auth-vendor": "esbuild node_modules/@supabase/supabase-js/dist/index.mjs --bundle --format=esm --platform=browser --minify --outfile=js/vendor/supabase.js",
+    "migrate:auth-users": "node scripts/migrate-clerk-users-to-supabase.mjs",
     "start": "python3 -m http.server 8080",
     "start:leaderboards": "npx wrangler@latest dev --config worker/wrangler.leaderboards-local.jsonc --port 8788",
     "start:profiles": "npx wrangler@latest dev --config worker/wrangler.profiles-local.jsonc --port 8788",
@@ -13,5 +15,11 @@
     "deploy:staging": "npm run build:staging && npx wrangler@latest pages deploy .staging-dist --project-name daily-undead-staging --branch staging",
     "generate:worker-catalog": "node scripts/generate-worker-catalog.js",
     "test": "node --test"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.2"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
   }
 }

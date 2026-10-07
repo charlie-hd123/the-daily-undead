@@ -12,7 +12,7 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261003-1";
+} from "./game-core.js?v=20261007-1";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -20,23 +20,23 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261003-1";
+} from "./progression.js?v=20261007-1";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261003-1";
+} from "./account.js?v=20261007-1";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261003-1";
+} from "./community-stats.js?v=20261007-1";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261003-1";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261003-1";
+} from "./leaderboards.js?v=20261007-1";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261007-1";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");

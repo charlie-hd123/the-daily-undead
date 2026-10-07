@@ -11,15 +11,18 @@
     <meta name="daily-undead-progression-launch-at" content="2026-10-02T09:11:35Z">
     <!-- Clerk publishable keys identify the public frontend and are safe to expose. -->
     <meta name="daily-undead-clerk-publishable-key" content="pk_live_Y2xlcmsudGhlZGFpbHl1bmRlYWQuY29tJA">
+    <!-- Supabase publishable configuration is safe to expose; Clerk remains available for rollback. -->
+    <meta name="daily-undead-supabase-url" content="https://bhqhfxwdcpujfxxvcoeo.supabase.co">
+    <meta name="daily-undead-supabase-publishable-key" content="sb_publishable_MbUwrP6JY8xVSyqiC0683g__7bRCOYk">
     <link rel="canonical" href="https://thedailyundead.com/">
     <meta
       name="description"
       content="The Daily Undead — your daily Treyarch Zombies challenge. Reveal clues, identify the map, and put the steps in order."
     >
     <title>The Daily Undead</title>
-    <link rel="icon" href="./assets/favicon.png?v=20261003-1" type="image/png" sizes="128x128">
+    <link rel="icon" href="./assets/favicon.png?v=20261007-1" type="image/png" sizes="128x128">
     <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" sizes="180x180">
-    <link rel="stylesheet" href="./styles.css?v=20261003-1">
+    <link rel="stylesheet" href="./styles.css?v=20261007-1">
   </head>
   <body>
     <header class="site-header">
@@ -145,6 +148,41 @@
         <button id="account-create" class="button primary" type="button">Create account</button>
         <button id="account-sign-in" class="button" type="button">Sign in</button>
       </div>
+    </dialog>
+
+    <dialog id="supabase-auth-dialog" class="account-dialog supabase-auth-dialog">
+      <button class="dialog-close" type="button" data-close-supabase-auth aria-label="Close">×</button>
+      <p class="kicker">The Daily Undead Account</p>
+      <h2 data-supabase-auth-title>Sign in</h2>
+      <p data-supabase-auth-description>Enter the email for your Daily Undead account.</p>
+      <form id="supabase-auth-form" novalidate>
+        <div data-supabase-email-step>
+          <label class="account-field">
+            <span>Email</span>
+            <input name="email" type="email" autocomplete="email" inputmode="email" required>
+          </label>
+          <button class="button primary" type="submit">Send code</button>
+        </div>
+        <div data-supabase-code-step hidden>
+          <label class="account-field">
+            <span>Verification code</span>
+            <input
+              name="code"
+              type="text"
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              pattern="[0-9]{6}|[0-9]{8}"
+              maxlength="8"
+            >
+          </label>
+          <div class="actions supabase-code-actions">
+            <button class="button primary" type="submit">Verify code</button>
+            <button class="button" type="button" data-supabase-auth-resend>Resend code</button>
+            <button class="button" type="button" data-supabase-auth-back>Use another email</button>
+          </div>
+        </div>
+        <p class="account-error" data-supabase-auth-error role="alert"></p>
+      </form>
     </dialog>
 
     <dialog id="leaderboards-dialog" class="account-dialog leaderboard-dialog">
@@ -295,7 +333,7 @@
       <button class="dialog-close" type="button" data-close-account-dialog aria-label="Close">×</button>
       <p class="kicker">Account protection</p>
       <h2>Security</h2>
-      <p>Your login is protected by Clerk. The Daily Undead never sees or stores your password.</p>
+      <p data-account-security-copy>Your login is protected by Clerk. The Daily Undead never sees or stores your password.</p>
       <div class="account-security-status">
         <span aria-hidden="true">✓</span>
         <div><strong>Signed in securely</strong><small data-account-security-email>Current device</small></div>
@@ -349,7 +387,7 @@
       <div data-public-profile-content></div>
     </dialog>
 
-    <script type="module" src="./js/app.js?v=20261003-1"></script>
+    <script type="module" src="./js/app.js?v=20261007-1"></script>
 
     <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "4eeb20e1411c4e7baf24969ced969c88"}'></script><!-- End Cloudflare Web Analytics -->
 

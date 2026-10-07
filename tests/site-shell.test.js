@@ -105,7 +105,29 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261003-1"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261007-1"]));
+});
+
+test("production Supabase Auth accepts both staging and production OTP lengths", async () => {
+  const [html, supabaseAuth] = await Promise.all([
+    readProjectFile("index.html"),
+    readProjectFile("js/supabase-auth.js"),
+  ]);
+
+  assert.match(
+    html,
+    /name="daily-undead-supabase-url" content="https:\/\/bhqhfxwdcpujfxxvcoeo\.supabase\.co"/,
+  );
+  assert.match(
+    html,
+    /name="daily-undead-supabase-publishable-key" content="sb_publishable_[A-Za-z0-9_-]+"/,
+  );
+  assert.doesNotMatch(html, /sb_secret_/);
+  assert.match(html, /<span>Verification code<\/span>/);
+  assert.match(html, /pattern="\[0-9\]\{6\}\|\[0-9\]\{8\}"/);
+  assert.match(html, /maxlength="8"/);
+  assert.match(supabaseAuth, /\^\(\?:\\d\{6\}\|\\d\{8\}\)\$/);
+  assert.doesNotMatch(supabaseAuth, /six-digit/i);
 });
 
 test("account controls support optional sign-in without exposing private credentials", async () => {

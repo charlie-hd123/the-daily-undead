@@ -6,6 +6,8 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.join(root, ".staging-dist");
 const stagingApi = "https://daily-undead-staging-api.charlieharrisondavies.workers.dev";
 const stagingClerkKey = "pk_test_cmFwaWQtcGlnZW9uLTg0Ni5jbGVyay5hY2NvdW50cy5kZXYk";
+const stagingSupabaseUrl = "https://zsnnvzhimtlhpvwhwxpy.supabase.co";
+const stagingSupabasePublishableKey = "sb_publishable_YfgJYTqB09B7dKxzZ1NMYA_CN9XiAkO";
 
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
@@ -23,6 +25,14 @@ async function writeStagingHtml(filename, { banner = false } = {}) {
   let html = source
     .replace("https://api.thedailyundead.com", stagingApi)
     .replace("pk_live_Y2xlcmsudGhlZGFpbHl1bmRlYWQuY29tJA", stagingClerkKey)
+    .replace(
+      /name="daily-undead-supabase-url" content="[^"]*"/,
+      `name="daily-undead-supabase-url" content="${stagingSupabaseUrl}"`,
+    )
+    .replace(
+      /name="daily-undead-supabase-publishable-key" content="[^"]*"/,
+      `name="daily-undead-supabase-publishable-key" content="${stagingSupabasePublishableKey}"`,
+    )
     .replace("__PROGRESSION_UPDATE_LAUNCH_AT__", new Date().toISOString());
   if (!html.includes('<meta name="robots"')) {
     html = html.replace(

@@ -6,12 +6,20 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261003-1";
+} from "./account-session.js?v=20261007-1";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
     .querySelector('meta[name="daily-undead-clerk-publishable-key"]')
     ?.content?.trim() || null;
+}
+
+function hasSupabaseConfiguration(documentObject = document) {
+  const read = (name) => documentObject
+    .querySelector(`meta[name="${name}"]`)
+    ?.content?.trim() || "";
+  return /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(read("daily-undead-supabase-url"))
+    && read("daily-undead-supabase-publishable-key").startsWith("sb_publishable_");
 }
 
 function getClerkDomain(publishableKey) {
@@ -577,6 +585,7 @@ export async function initialiseAccount({
   const publicProfileDialog = documentObject.querySelector("#player-profile-dialog");
   const publicProfileContent = documentObject.querySelector("[data-public-profile-content]");
   const publishableKey = getClerkPublishableKey(documentObject);
+  const supabaseConfigured = hasSupabaseConfiguration(documentObject);
   let clerk = null;
   let profile = null;
   let saveTimer = null;
@@ -669,7 +678,7 @@ export async function initialiseAccount({
     }
   }
 
-  if (!accountButton || !publishableKey || !apiUrl) {
+  if (!accountButton || (!supabaseConfigured && !publishableKey) || !apiUrl) {
     if (accountButton) accountButton.hidden = true;
     return createUnavailableController({ openPlayerProfile });
   }
@@ -680,7 +689,11 @@ export async function initialiseAccount({
 
   try {
     clerk = await withTimeout(
-      loadClerk(publishableKey),
+      supabaseConfigured
+        ? import("./supabase-auth.js?v=20261007-1").then(({ loadSupabaseAuth }) => (
+          loadSupabaseAuth(documentObject)
+        ))
+        : loadClerk(publishableKey),
       5_000,
       "Account sign-in took too long to load.",
     );
@@ -797,6 +810,19 @@ export async function initialiseAccount({
 
   accountButton.classList.add("is-signed-in");
 
+  if (clerk.kind === "supabase") {
+    const securityCopy = documentObject.querySelector("[data-account-security-copy]");
+    const securityDescription = documentObject.querySelector('[data-account-description="security"]');
+    const profileButton = documentObject.querySelector("[data-open-clerk-profile]");
+    const securityButton = documentObject.querySelector("[data-open-clerk-security]");
+    if (securityCopy) {
+      securityCopy.textContent = "Your login uses a short-lived email code. The Daily Undead never sees or stores a password.";
+    }
+    if (securityDescription) securityDescription.textContent = "Email codes and signed-in devices";
+    if (profileButton) profileButton.hidden = true;
+    if (securityButton) securityButton.hidden = true;
+  }
+
   let account;
   try {
     const url = new URL("/api/account", apiUrl);
@@ -857,8 +883,21 @@ export async function initialiseAccount({
   }
 
   profile = account.profile;
-  const userId = clerk.user.id;
+  const userId = account.accountId || clerk.user.id;
+  const legacyUserId = account.legacyUserId;
   let pendingProgress = readPendingProgress(globalThis.localStorage, userId);
+  if (!pendingProgress && legacyUserId && legacyUserId !== userId) {
+    const legacyPending = readPendingProgress(globalThis.localStorage, legacyUserId);
+    if (legacyPending) {
+      writePendingProgress(globalThis.localStorage, { ...legacyPending, userId });
+      clearPendingProgress(globalThis.localStorage, legacyUserId);
+      pendingProgress = readPendingProgress(globalThis.localStorage, userId);
+    }
+    const remembered = rememberedAccount();
+    if (remembered?.userId === legacyUserId) {
+      rememberAccount(globalThis.localStorage, { ...remembered, userId });
+    }
+  }
   if (!pendingProgress) {
     try {
       if (globalThis.localStorage.getItem(legacyDirtyStorageKey) === userId) {

@@ -25,36 +25,39 @@ function memoryStorage() {
   };
 }
 
-test("remembered accounts retain only a Clerk user id and cloud revision", () => {
+test("remembered accounts retain only an app-owned account id and cloud revision", () => {
   const storage = memoryStorage();
-  assert.equal(rememberAccount(storage, { userId: "user_alpha", revision: 12 }), true);
-  assert.deepEqual(readRememberedAccount(storage), { userId: "user_alpha", revision: 12 });
+  const accountId = "acct_1234567890abcdef1234567890abcdef";
+  assert.equal(rememberAccount(storage, { userId: accountId, revision: 12 }), true);
+  assert.deepEqual(readRememberedAccount(storage), { userId: accountId, revision: 12 });
   assert.doesNotMatch(storage.getItem(accountMemoryStorageKey), /email|token/i);
 
   forgetRememberedAccount(storage);
   assert.equal(readRememberedAccount(storage), null);
 });
 
-test("pending progress remains isolated by Clerk user id", () => {
+test("pending progress remains isolated by app-owned account id", () => {
   const storage = memoryStorage();
   const snapshot = { progress: { currentRound: 15 }, dailyState: { phase: "result" } };
+  const accountId = "acct_1234567890abcdef1234567890abcdef";
+  const otherAccountId = "acct_abcdef1234567890abcdef1234567890";
 
   assert.equal(writePendingProgress(storage, {
-    userId: "user_alpha",
+    userId: accountId,
     revision: 7,
     puzzleDate: "2026-09-27",
     snapshot,
   }), true);
 
-  const pending = readPendingProgress(storage, "user_alpha");
+  const pending = readPendingProgress(storage, accountId);
   assert.deepEqual(pending.snapshot, snapshot);
   assert.equal(pending.revision, 7);
-  assert.equal(readPendingProgress(storage, "user_bravo"), null);
-  assert.equal(pendingProgressBelongsTo(pending, "user_alpha"), true);
-  assert.equal(pendingProgressBelongsTo(pending, "user_bravo"), false);
+  assert.equal(readPendingProgress(storage, otherAccountId), null);
+  assert.equal(pendingProgressBelongsTo(pending, accountId), true);
+  assert.equal(pendingProgressBelongsTo(pending, otherAccountId), false);
 
-  clearPendingProgress(storage, "user_alpha");
-  assert.equal(readPendingProgress(storage, "user_alpha"), null);
+  clearPendingProgress(storage, accountId);
+  assert.equal(readPendingProgress(storage, accountId), null);
 });
 
 test("cleared or malformed storage is treated as a clean browser", () => {

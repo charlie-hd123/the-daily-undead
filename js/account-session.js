@@ -11,7 +11,10 @@ function parseStoredObject(storage, key) {
 }
 
 function validUserId(value) {
-  return typeof value === "string" && value.startsWith("user_") && value.length <= 200;
+  return typeof value === "string" && (
+    /^user_[A-Za-z0-9]+$/.test(value) ||
+    /^acct_[0-9a-f]{32}$/i.test(value)
+  ) && value.length <= 200;
 }
 
 function normalizeRevision(value) {

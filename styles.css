@@ -1284,6 +1284,21 @@ h1 {
   margin-top: 1.4rem;
 }
 
+.supabase-auth-dialog form > div > .button {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.supabase-code-actions {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.supabase-auth-dialog .account-error:empty {
+  display: none;
+}
+
 .account-field {
   display: grid;
   gap: 0.45rem;

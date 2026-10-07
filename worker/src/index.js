@@ -1,4 +1,4 @@
-import { verifyClerkRequest } from "./auth.js";
+import { verifyAccountRequest } from "./auth.js";
 import {
   getAccount,
   getPublicProfile,
@@ -10,6 +10,10 @@ import {
   updateAccountUsername,
 } from "./accounts.js";
 import { readLeaderboards } from "./leaderboards.js";
+import {
+  createAccountId,
+  resolveAccountIdentity,
+} from "./identities.js";
 
 const jsonHeaders = {
   "Content-Type": "application/json; charset=utf-8",
@@ -235,18 +239,39 @@ async function handleAttempt(request, env) {
 }
 
 async function handleAccountRequest(request, env, url) {
-  let identity;
+  let verifiedIdentity;
   try {
-    identity = await verifyClerkRequest(request, env);
+    verifiedIdentity = await verifyAccountRequest(request, env);
   } catch (error) {
     return errorResponse(request, env, error.message || "The account session is invalid.", 401);
   }
 
+  const identity = await resolveAccountIdentity(env.DB, verifiedIdentity);
+  if (!identity) {
+    return errorResponse(request, env, "The account identity is invalid.", 401);
+  }
+
   let result;
   if (url.pathname === "/api/account" && request.method === "GET") {
-    result = await getAccount(env.DB, identity.userId, url.searchParams.get("date"));
+    result = identity.userId
+      ? await getAccount(env.DB, identity.userId, url.searchParams.get("date"))
+      : { status: 200, body: { needsOnboarding: true, accountId: null } };
+    if (identity.accountId) {
+      result.body.accountId = identity.accountId;
+      result.body.legacyUserId = identity.userId;
+    }
   } else if (url.pathname === "/api/account/register" && request.method === "POST") {
-    result = await registerAccount(env.DB, request, identity.userId);
+    if (identity.userId) {
+      result = { status: 409, body: { error: "This account is already set up." } };
+    } else {
+      const accountId = createAccountId();
+      result = await registerAccount(env.DB, request, accountId, {
+        accountId,
+        identity: verifiedIdentity,
+      });
+    }
+  } else if (!identity.userId) {
+    result = { status: 409, body: { error: "Finish setting up your account first." } };
   } else if (url.pathname === "/api/account/username" && request.method === "PUT") {
     result = await updateAccountUsername(env.DB, request, identity.userId);
   } else if (url.pathname === "/api/account/profile" && request.method === "PUT") {
@@ -300,7 +325,11 @@ export default {
       if (url.pathname === "/health" && request.method === "GET") {
         return jsonResponse(request, env, {
           ok: true,
-          accountsConfigured: Boolean(env.CLERK_ISSUER),
+          accountsConfigured: Boolean(env.CLERK_ISSUER || env.SUPABASE_ISSUER),
+          accountProviders: {
+            clerk: Boolean(env.CLERK_ISSUER),
+            supabase: Boolean(env.SUPABASE_ISSUER),
+          },
         });
       }
       return errorResponse(request, env, "Not found.", 404);
@@ -311,5 +340,15 @@ export default {
       console.error("Community statistics request failed", error);
       return errorResponse(request, env, "Statistics are temporarily unavailable.", 503);
     }
+  },
+  async scheduled(_controller, env, context) {
+    if (!env.SUPABASE_HEARTBEAT_URL || !env.SUPABASE_HEARTBEAT_SECRET_KEY) return;
+    context.waitUntil((async () => {
+      const response = await fetch(env.SUPABASE_HEARTBEAT_URL, {
+        method: "POST",
+        headers: { apikey: env.SUPABASE_HEARTBEAT_SECRET_KEY },
+      });
+      if (!response.ok) throw new Error(`Supabase heartbeat failed with HTTP ${response.status}.`);
+    })());
   },
 };
