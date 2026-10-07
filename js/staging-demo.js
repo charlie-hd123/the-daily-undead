@@ -412,7 +412,7 @@ function renderCompletion(type, session, mode) {
       ${resultDetail}
       <div class="actions share-score-actions">
         <button id="share-demo-score" class="button share-score-button" type="button">Share with your squad</button>
-        ${official ? '<button id="return-to-puzzle-home" class="button" type="button">Play another puzzle for fun</button>' : ""}
+        ${official ? '<button id="return-to-puzzle-home" class="button" type="button">Play another puzzle, just for fun</button>' : ""}
       </div>
       <p id="share-demo-score-status" class="share-score-status" aria-live="polite"></p>
     </section>
@@ -465,8 +465,8 @@ function renderNextRoundScreen() {
   return `
     <section class="next-round-screen" aria-labelledby="next-round-screen-title" aria-live="off">
       <p class="kicker">Next round</p>
-      <h3 id="next-round-screen-title">Next map in</h3>
-      <strong id="end-screen-countdown" class="end-screen-countdown" aria-label="Time until the next round">--:--:--</strong>
+      <h3 id="next-round-screen-title">New puzzles in</h3>
+      <strong id="end-screen-countdown" class="end-screen-countdown" aria-label="Time until the new puzzles">--:--:--</strong>
       <p class="next-round-motivation">Return tomorrow to keep your Round alive.</p>
     </section>
   `;
@@ -639,7 +639,9 @@ function renderEasterClues(session) {
     <section class="panel">
       ${renderHeading(
         "Which Zombies map is it?",
-        activePlay?.mode === "official" ? "This is your official puzzle." : "Playing just for fun. This result will not change your stats.",
+        activePlay?.mode === "official"
+          ? "Identify the map from its main quest steps. Reveal as few clues as possible to earn more points."
+          : "Playing just for fun. This result will not change your stats.",
         activePlay?.mode === "official" ? "Official puzzle" : "Just for fun",
       )}
       <div class="clue-list">${renderClueCards(session)}</div>
@@ -665,7 +667,7 @@ function renderEasterGameSelection(session) {
   const games = catalog.games.slice().sort((left, right) => left.releaseOrder - right.releaseOrder);
   app.innerHTML = `
     <section class="panel">
-      ${renderHeading("Choose the game", `You revealed ${session.cluesRevealed} ${session.cluesRevealed === 1 ? "clue" : "clues"}.`, "Lock in your answer")}
+      ${renderHeading("Choose the game", `You have revealed ${session.cluesRevealed} ${session.cluesRevealed === 1 ? "clue" : "clues"}.`, "Lock in your answer")}
       <ul class="card-grid">
         ${games.map((game) => `<li><button class="card-button" type="button" data-game-id="${escapeHtml(game.id)}"><span class="game-label">Call of Duty</span><span class="card-title">${escapeHtml(game.title)}</span></button></li>`).join("")}
       </ul>

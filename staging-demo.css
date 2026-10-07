@@ -269,7 +269,13 @@
 }
 
 .share-score-actions .button {
-  flex: 1 1 15rem;
+  width: min(100%, 20rem);
+  flex: 0 0 auto;
+}
+
+.share-score-actions {
+  align-items: center;
+  flex-direction: column;
 }
 
 .demo-footer {
