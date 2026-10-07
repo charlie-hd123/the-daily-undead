@@ -19,6 +19,12 @@
   margin: 0;
 }
 
+.screen-heading .puzzle-mode-note {
+  margin-top: 0.5rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .puzzle-choice-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

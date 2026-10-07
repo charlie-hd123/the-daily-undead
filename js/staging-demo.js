@@ -164,12 +164,13 @@ function updateCountdown() {
   }
 }
 
-function renderHeading(title, description, kicker = "Today’s puzzle") {
+function renderHeading(title, description, kicker = "Today’s puzzle", note = "") {
   return `
     <div class="screen-heading">
       <p class="kicker">${escapeHtml(kicker)}</p>
       <h2>${escapeHtml(title)}</h2>
       <p>${escapeHtml(description)}</p>
+      ${note ? `<p class="puzzle-mode-note">${escapeHtml(note)}</p>` : ""}
     </div>
   `;
 }
@@ -544,6 +545,7 @@ function renderWordPuzzle() {
         "Identify the Zombies word",
         "Try to solve the Zombies word or phrase by revealing its letters",
         activePlay?.mode === "official" ? "Official puzzle" : "Just for fun",
+        activePlay?.mode === "official" ? "" : "Playing just for fun. This result will not change your stats.",
       )}
       <div class="word-scoreboard" aria-label="Word puzzle score">
         <div><span>Potential score</span><strong>${potentialPoints}</strong></div>
@@ -648,10 +650,9 @@ function renderEasterClues(session) {
     <section class="panel">
       ${renderHeading(
         "Which Zombies map is it?",
-        activePlay?.mode === "official"
-          ? "Identify the map from its main quest steps. Reveal as few clues as possible to earn more points."
-          : "Playing just for fun. This result will not change your stats.",
+        "Identify the map from its main quest steps. Reveal as few clues as possible to earn more points.",
         activePlay?.mode === "official" ? "Official puzzle" : "Just for fun",
+        activePlay?.mode === "official" ? "" : "Playing just for fun. This result will not change your stats.",
       )}
       <div class="clue-list">${renderClueCards(session)}</div>
       <div class="actions">
