@@ -278,22 +278,6 @@
   flex-direction: column;
 }
 
-.result-action-title,
-.result-action-subline {
-  display: block;
-}
-
-.result-action-subline {
-  margin-top: 0.16rem;
-  color: rgb(241 245 251 / 72%);
-  font-family: "Barlow", ui-sans-serif, system-ui, sans-serif;
-  font-size: 0.8rem;
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: 0.01em;
-  text-transform: none;
-}
-
 @media (min-width: 48.01rem) {
   .share-score-actions .button {
     width: min(100%, 32rem);
