@@ -28,8 +28,6 @@ const solvesLabel = document.querySelector("#demo-solves");
 const roundLabel = document.querySelector("#demo-round");
 const advanceButton = document.querySelector("#advance-demo-day");
 const rulesDialog = document.querySelector("#rules-dialog");
-const choiceDialog = document.querySelector("#choice-dialog");
-const confirmChoiceButton = document.querySelector("#confirm-official-choice");
 
 const profileStorageKey = "daily-undead:multi-puzzle-demo:profile";
 const dayStoragePrefix = "daily-undead:multi-puzzle-demo:day:";
@@ -58,7 +56,6 @@ let dateKey;
 let dayState;
 let profile;
 let activePlay = null;
-let pendingChoice = null;
 
 function escapeHtml(value) {
   return String(value)
@@ -124,6 +121,7 @@ function createDayState() {
     officialCompleted: false,
     officialResult: null,
     progressionApplied: false,
+    lastCompleted: null,
     sessions: { easter: null, word: null },
   };
 }
@@ -230,20 +228,11 @@ function openRules(type) {
   rulesDialog.showModal();
 }
 
-function requestOfficialChoice(type) {
-  pendingChoice = type;
-  choiceDialog.querySelector("[data-choice-title]").textContent = puzzleTypes[type].name;
-  choiceDialog.showModal();
-}
-
-function lockOfficialChoice() {
-  if (!pendingChoice || dayState.officialType) return;
-  dayState.officialType = pendingChoice;
-  ensureSession(pendingChoice);
+function lockOfficialChoice(type) {
+  if (!type || dayState.officialType) return;
+  dayState.officialType = type;
+  ensureSession(type);
   persist();
-  choiceDialog.close();
-  const type = pendingChoice;
-  pendingChoice = null;
   startPuzzle(type, "official");
 }
 
@@ -295,17 +284,16 @@ function renderPuzzleCard(type) {
   const official = dayState.officialType === type;
   return `
     <article class="puzzle-choice-card${official ? " is-official" : ""}" data-puzzle-card="${type}">
-      <div class="puzzle-choice-art puzzle-choice-art-${type}" aria-hidden="true">
-        <span>${type === "word" ? "A_Z" : "? ? ?"}</span>
-      </div>
       <div class="puzzle-choice-copy">
         <p class="kicker">${escapeHtml(puzzle.kicker)}</p>
-        <h3>${escapeHtml(puzzle.name)}</h3>
+        <div class="puzzle-choice-title-row">
+          <h3>${escapeHtml(puzzle.name)}</h3>
+          <button class="puzzle-rules-link" type="button" data-rules="${type}">How to play</button>
+        </div>
         <p>${escapeHtml(puzzle.description)}</p>
         <p class="puzzle-choice-status">${escapeHtml(getCardStatus(type))}</p>
       </div>
       <div class="puzzle-choice-actions">
-        <button class="button" type="button" data-rules="${type}">How to play</button>
         <button
           class="button primary"
           type="button"
@@ -328,6 +316,7 @@ function renderHub() {
   app.innerHTML = `
     <section class="panel puzzle-hub-panel">
       ${renderHeading("Choose today’s challenge", guidance, "Daily puzzle home")}
+      ${renderLatestResult()}
       <div class="puzzle-choice-grid">
         ${renderPuzzleCard("easter")}
         ${renderPuzzleCard("word")}
@@ -349,10 +338,36 @@ function renderHub() {
     button.addEventListener("click", () => {
       const type = button.dataset.puzzleType;
       const action = button.dataset.cardAction;
-      if (action === "choose") requestOfficialChoice(type);
+      if (action === "choose") lockOfficialChoice(type);
       else startPuzzle(type, action);
     });
   });
+}
+
+function renderLatestResult() {
+  const result = dayState.lastCompleted;
+  if (!result) return "";
+  const official = result.mode === "official";
+  const title = result.success ? "Round Survived!" : "Run ended";
+  const copy = official
+    ? result.success
+      ? `${result.points} points added to the prototype Score.`
+      : "The prototype Round has reset to 1. Score and Solves remain safe."
+    : "Completed just for fun. Score, Solves and Round were not changed.";
+  return `
+    <div class="hub-result-banner ${result.success ? "is-success" : "is-failure"}">
+      <div>
+        <p class="kicker">${official ? "Official result" : "Just for fun"} · ${escapeHtml(puzzleTypes[result.type].name)}</p>
+        <h3>${title}</h3>
+        <p>${escapeHtml(copy)}</p>
+      </div>
+      <div class="hub-result-answer">
+        <span>${escapeHtml(result.summary?.label || "Today’s answer")}</span>
+        <strong>${escapeHtml(result.summary?.answer || "")}</strong>
+        ${result.summary?.detail ? `<small>${escapeHtml(result.summary.detail)}</small>` : ""}
+      </div>
+    </div>
+  `;
 }
 
 function applyOfficialProgression(type, success, points) {
@@ -379,36 +394,15 @@ function finishPuzzle(type, { success, points, summary }) {
   if (activePlay?.mode === "official") {
     applyOfficialProgression(type, success, points);
   }
+  dayState.lastCompleted = {
+    type,
+    mode: activePlay?.mode || "for_fun",
+    success,
+    points,
+    summary,
+  };
   persist();
-  renderCompletion(type, session, activePlay?.mode || "for_fun");
-}
-
-function renderCompletion(type, session, mode) {
-  const official = mode === "official";
-  const resultTitle = session.success ? "Round Survived!" : "Run ended";
-  const resultCopy = official
-    ? session.success
-      ? `You earned ${session.points} points. Your Score, Solves and Round have advanced in this prototype.`
-      : "Your prototype Round has reset to 1. Permanent Score and Solves remain safe."
-    : "This result was just for fun, so your Score, Solves and Round have not changed.";
-  app.innerHTML = `
-    <section class="panel demo-completion-panel">
-      <div class="result-banner ${session.success ? "correct" : "failed"}">
-        <p class="kicker">${official ? "Official result" : "Just for fun"} · ${escapeHtml(puzzleTypes[type].name)}</p>
-        <h2>${resultTitle}</h2>
-        <p>${escapeHtml(resultCopy)}</p>
-      </div>
-      <div class="demo-answer-reveal">
-        <span>${escapeHtml(session.summary?.label || "Today’s answer")}</span>
-        <strong>${escapeHtml(session.summary?.answer || "")}</strong>
-        ${session.summary?.detail ? `<p>${escapeHtml(session.summary.detail)}</p>` : ""}
-      </div>
-      <div class="actions">
-        <button id="return-to-puzzle-home" class="button primary" type="button">Return to puzzle home</button>
-      </div>
-    </section>
-  `;
-  app.querySelector("#return-to-puzzle-home").addEventListener("click", renderHub);
+  renderHub();
 }
 
 function renderWordSlots(answer, revealedLetters) {
@@ -428,7 +422,7 @@ function renderWordSlots(answer, revealedLetters) {
 function renderWordPuzzle() {
   const session = ensureSession("word");
   if (session.complete) {
-    renderCompletion("word", session, activePlay?.mode || "for_fun");
+    renderHub();
     return;
   }
   const answerLetters = wordPuzzle.entry.answer.toUpperCase();
@@ -455,7 +449,6 @@ function renderWordPuzzle() {
       <div class="word-answer" aria-label="Partially revealed answer">
         ${renderWordSlots(wordPuzzle.entry.answer, revealed)}
       </div>
-      <p class="word-starting-letter">Starting letter: <strong>${wordPuzzle.initialLetter}</strong></p>
       <div class="word-keyboard" aria-label="Letter keyboard">
         ${keyboardRows.map((row) => `
           <div class="word-keyboard-row">
@@ -476,13 +469,11 @@ function renderWordPuzzle() {
         `).join("")}
       </div>
       <p id="word-game-status" class="word-game-status" aria-live="polite">Choose a letter.</p>
-      <div class="actions"><button id="leave-word-puzzle" class="button" type="button">Back to puzzle home</button></div>
     </section>
   `;
   app.querySelectorAll("[data-letter]").forEach((button) => {
     button.addEventListener("click", () => submitLetter(button.dataset.letter));
   });
-  app.querySelector("#leave-word-puzzle").addEventListener("click", renderHub);
 }
 
 function submitLetter(value) {
@@ -534,7 +525,7 @@ function renderClueCards(session) {
 function renderEasterPuzzle() {
   const session = ensureSession("easter");
   if (session.complete) {
-    renderCompletion("easter", session, activePlay?.mode || "for_fun");
+    renderHub();
     return;
   }
   if (session.phase === "game") renderEasterGameSelection(session);
@@ -555,7 +546,6 @@ function renderEasterClues(session) {
       <div class="actions">
         <button id="demo-reveal-clue" class="button" type="button" ${session.cluesRevealed >= 3 ? "disabled" : ""}>${session.cluesRevealed >= 3 ? "All clues revealed" : "Reveal next clue"}</button>
         <button id="demo-select-map" class="button primary" type="button">Select map · ${session.cluesRevealed} ${session.cluesRevealed === 1 ? "clue" : "clues"}</button>
-        <button id="leave-easter-puzzle" class="button" type="button">Back to puzzle home</button>
       </div>
     </section>
   `;
@@ -569,7 +559,6 @@ function renderEasterClues(session) {
     persist();
     renderEasterPuzzle();
   });
-  app.querySelector("#leave-easter-puzzle").addEventListener("click", renderHub);
 }
 
 function renderEasterGameSelection(session) {
@@ -715,11 +704,6 @@ function advanceDay() {
 
 function initialiseDialogs() {
   document.querySelectorAll("[data-close-rules]").forEach((button) => button.addEventListener("click", () => rulesDialog.close()));
-  document.querySelectorAll("[data-close-choice]").forEach((button) => button.addEventListener("click", () => {
-    pendingChoice = null;
-    choiceDialog.close();
-  }));
-  confirmChoiceButton.addEventListener("click", lockOfficialChoice);
 }
 
 async function initialise() {
@@ -734,7 +718,7 @@ async function initialise() {
     initialiseDialogs();
     advanceButton.addEventListener("click", advanceDay);
     document.addEventListener("keydown", (event) => {
-      if (activePlay?.type !== "word" || rulesDialog.open || choiceDialog.open) return;
+      if (activePlay?.type !== "word" || rulesDialog.open) return;
       const letter = normalizeLetter(event.key);
       if (letter) submitLetter(letter);
     });
