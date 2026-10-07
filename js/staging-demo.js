@@ -34,7 +34,7 @@ const puzzleTypes = {
   easter: {
     name: "Quest Steps",
     shortName: "Quest Steps",
-    kicker: "Main quest puzzle",
+    kicker: "Easter egg puzzle",
     description: "Can you identify today’s Zombies map from its Easter egg steps?",
     image: "./assets/quest-steps-card.svg",
   },
@@ -293,7 +293,7 @@ function renderPuzzleCard(type) {
 function renderHub() {
   activePlay = null;
   const guidance = !dayState.officialType
-    ? "Pick a puzzle to count towards your daily score. You can play others afterwards for fun, risk free."
+    ? "Pick one puzzle for today’s scored round. Your choice locks when you start. Play the others afterwards for fun, risk free."
     : dayState.officialCompleted
       ? "Your official result is complete. The other puzzle is available if you would like to play again for fun."
       : `Finish ${puzzleTypes[dayState.officialType].name} to unlock the other puzzle just for fun.`;
