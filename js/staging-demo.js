@@ -257,7 +257,7 @@ function getCardStatus(type) {
     const result = dayState.officialResult;
     return result?.success
       ? `Official complete · ${result.points} points`
-      : "Today’s official puzzle is complete.";
+      : "Today’s puzzle is complete.";
   }
   if (!dayState.officialCompleted) return "Locked until the official result is complete";
   if (session?.complete) return "Completed just for fun";
@@ -268,6 +268,8 @@ function renderPuzzleCard(type) {
   const puzzle = puzzleTypes[type];
   const action = getCardAction(type);
   const official = dayState.officialType === type;
+  const status = getCardStatus(type);
+  const canSeeResult = official && dayState.officialCompleted;
   return `
     <article class="puzzle-choice-card${official ? " is-official" : ""}" data-puzzle-card="${type}">
       <img class="puzzle-choice-art" src="${puzzle.image}" alt="" width="512" height="512">
@@ -275,7 +277,12 @@ function renderPuzzleCard(type) {
         <p class="kicker">${escapeHtml(puzzle.kicker)}</p>
         <h3>${escapeHtml(puzzle.name)}</h3>
         <p>${escapeHtml(puzzle.description)}</p>
-        ${getCardStatus(type) ? `<p class="puzzle-choice-status">${escapeHtml(getCardStatus(type))}</p>` : ""}
+        ${status ? `
+          <div class="puzzle-choice-status-row">
+            <p class="puzzle-choice-status">${escapeHtml(status)}</p>
+            ${canSeeResult ? `<button class="puzzle-result-link" type="button" data-see-result="${type}">See result</button>` : ""}
+          </div>
+        ` : ""}
       </div>
       <div class="puzzle-choice-actions">
         <button
@@ -317,6 +324,9 @@ function renderHub() {
       if (action === "choose") lockOfficialChoice(type);
       else startPuzzle(type, action);
     });
+  });
+  app.querySelectorAll("[data-see-result]").forEach((button) => {
+    button.addEventListener("click", () => startPuzzle(button.dataset.seeResult, "official"));
   });
 }
 
