@@ -303,8 +303,8 @@ function renderHub() {
         ${renderHeading("Choose your daily puzzle", guidance, "Today’s round")}
       </div>
       <div class="puzzle-choice-grid">
-        ${renderPuzzleCard("easter")}
         ${renderPuzzleCard("word")}
+        ${renderPuzzleCard("easter")}
       </div>
     </section>
   `;
