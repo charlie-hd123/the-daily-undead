@@ -91,6 +91,7 @@
 
 .puzzle-choice-status-row {
   display: flex;
+  width: calc(100% + 9.25rem);
   margin: 0.65rem 0 0;
   padding-top: 0.55rem;
   align-items: baseline;
@@ -104,6 +105,7 @@
   color: #67e8ff !important;
   font-size: 0.82rem;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .puzzle-result-link {
@@ -338,6 +340,10 @@
 
   .puzzle-choice-copy {
     padding: 1rem 7.4rem 0.75rem 1.05rem;
+  }
+
+  .puzzle-choice-status-row {
+    width: calc(100% + 6.35rem);
   }
 
   .puzzle-choice-art {
