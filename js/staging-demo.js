@@ -268,6 +268,7 @@ function renderPuzzleCard(type) {
   const official = dayState.officialType === type;
   const status = getCardStatus(type);
   const canSeeResult = official && dayState.officialCompleted;
+  const isCompleted = Boolean(dayState.sessions[type]?.complete);
   return `
     <article class="puzzle-choice-card${official ? " is-official" : ""}" data-puzzle-card="${type}">
       <img class="puzzle-choice-art" src="${puzzle.image}" alt="" width="512" height="512">
@@ -278,7 +279,7 @@ function renderPuzzleCard(type) {
       </div>
       ${status ? `
         <div class="puzzle-choice-status-row">
-          <p class="puzzle-choice-status${canSeeResult ? " is-complete" : ""}">${escapeHtml(status)}</p>
+          <p class="puzzle-choice-status${isCompleted ? " is-complete" : ""}">${escapeHtml(status)}</p>
           ${canSeeResult ? `<button class="puzzle-result-link" type="button" data-see-result="${type}">See result</button>` : ""}
         </div>
       ` : ""}
