@@ -293,7 +293,7 @@ function renderPuzzleCard(type) {
 function renderHub() {
   activePlay = null;
   const guidance = !dayState.officialType
-    ? "Choose today’s scored puzzle—it locks when you start. Play the others afterwards for fun."
+    ? "Choose today’s scored puzzle. It locks when you start. Play the others afterwards for fun."
     : dayState.officialCompleted
       ? "Your official result is complete. The other puzzle is available if you would like to play again for fun."
       : `Finish ${puzzleTypes[dayState.officialType].name} to unlock the other puzzle just for fun.`;
