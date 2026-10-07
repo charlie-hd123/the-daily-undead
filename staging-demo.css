@@ -112,9 +112,10 @@
   box-shadow: 0 0.45rem 1.1rem rgb(35 175 220 / 20%);
 }
 
-.puzzle-choice-actions .button:hover:not(:disabled) {
+.puzzle-choice-actions .button.primary:hover:not(:disabled) {
   border-color: #a6f2ff;
   background: linear-gradient(135deg, #8defff, #36a8d8);
+  box-shadow: 0 0 0 1px rgb(141 239 255 / 32%), 0 0.9rem 2.5rem rgb(37 143 192 / 25%);
 }
 
 .word-puzzle-panel {
