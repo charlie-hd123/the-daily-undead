@@ -302,7 +302,7 @@ function renderHub() {
   const guidance = !dayState.officialType
     ? "Pick one puzzle for today’s scored round. Play the others afterwards for fun, risk-free."
     : dayState.officialCompleted
-      ? "Your official result is complete. The other puzzle is available if you would like to play again for fun."
+      ? "Your official round is complete. Other puzzles are available if you would like to play just for fun."
       : `Finish ${puzzleTypes[dayState.officialType].name} to unlock the other puzzle just for fun.`;
   app.innerHTML = `
     <section class="panel puzzle-hub-panel">
