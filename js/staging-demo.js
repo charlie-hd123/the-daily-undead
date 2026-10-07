@@ -282,16 +282,20 @@ function renderPuzzleCard(type) {
   const puzzle = puzzleTypes[type];
   const action = getCardAction(type);
   const official = dayState.officialType === type;
+  const number = type === "easter" ? "01" : "02";
   return `
     <article class="puzzle-choice-card${official ? " is-official" : ""}" data-puzzle-card="${type}">
       <div class="puzzle-choice-copy">
-        <p class="kicker">${escapeHtml(puzzle.kicker)}</p>
-        <div class="puzzle-choice-title-row">
-          <h3>${escapeHtml(puzzle.name)}</h3>
+        <div class="puzzle-choice-kicker-row">
+          <p class="kicker">${escapeHtml(puzzle.kicker)}</p>
+          <span class="puzzle-choice-number" aria-hidden="true">${number}</span>
+        </div>
+        <h3>${escapeHtml(puzzle.name)}</h3>
+        <p>${escapeHtml(puzzle.description)}</p>
+        <div class="puzzle-choice-meta">
+          <p class="puzzle-choice-status">${escapeHtml(getCardStatus(type))}</p>
           <button class="puzzle-rules-link" type="button" data-rules="${type}">How to play</button>
         </div>
-        <p>${escapeHtml(puzzle.description)}</p>
-        <p class="puzzle-choice-status">${escapeHtml(getCardStatus(type))}</p>
       </div>
       <div class="puzzle-choice-actions">
         <button
@@ -306,27 +310,33 @@ function renderPuzzleCard(type) {
   `;
 }
 
+function renderHubStats() {
+  return `
+    <div class="hub-stats" aria-label="Your current prototype statistics">
+      <div><span>Score</span><strong>${profile.score.toLocaleString("en-GB")}</strong></div>
+      <div><span>Solves</span><strong>${profile.solves.toLocaleString("en-GB")}</strong></div>
+      <div><span>Round</span><strong>${profile.round.toLocaleString("en-GB")}</strong></div>
+    </div>
+  `;
+}
+
 function renderHub() {
   activePlay = null;
   const guidance = !dayState.officialType
-    ? "Read either game’s rules, then choose the one that will count for today. Your choice cannot be changed."
+    ? "Pick the one puzzle that will count towards today’s Score, Solves and Round. Your choice locks when you tap."
     : dayState.officialCompleted
-      ? "Your official result is locked in. The other daily puzzle is now available just for fun."
+      ? "Your official result is complete. The other puzzle is available if you would like to play again for fun."
       : `Finish ${puzzleTypes[dayState.officialType].name} to unlock the other puzzle just for fun.`;
   app.innerHTML = `
     <section class="panel puzzle-hub-panel">
-      ${renderHeading("Choose today’s challenge", guidance, "Daily puzzle home")}
-      ${renderLatestResult()}
+      <div class="puzzle-hub-hero">
+        ${renderHeading(dayState.officialType ? "Today’s puzzles" : "Choose your official puzzle", guidance, "Daily challenge")}
+        ${renderHubStats()}
+      </div>
       <div class="puzzle-choice-grid">
         ${renderPuzzleCard("easter")}
         ${renderPuzzleCard("word")}
       </div>
-      ${dayState.officialCompleted ? `
-        <div class="official-result-recap ${dayState.officialResult?.success ? "is-success" : "is-failure"}">
-          <strong>Today’s official result</strong>
-          <span>${escapeHtml(puzzleTypes[dayState.officialType].name)} · ${dayState.officialResult?.success ? `${dayState.officialResult.points} points` : "Run ended"}</span>
-        </div>
-      ` : ""}
     </section>
   `;
 
@@ -342,32 +352,6 @@ function renderHub() {
       else startPuzzle(type, action);
     });
   });
-}
-
-function renderLatestResult() {
-  const result = dayState.lastCompleted;
-  if (!result) return "";
-  const official = result.mode === "official";
-  const title = result.success ? "Round Survived!" : "Run ended";
-  const copy = official
-    ? result.success
-      ? `${result.points} points added to the prototype Score.`
-      : "The prototype Round has reset to 1. Score and Solves remain safe."
-    : "Completed just for fun. Score, Solves and Round were not changed.";
-  return `
-    <div class="hub-result-banner ${result.success ? "is-success" : "is-failure"}">
-      <div>
-        <p class="kicker">${official ? "Official result" : "Just for fun"} · ${escapeHtml(puzzleTypes[result.type].name)}</p>
-        <h3>${title}</h3>
-        <p>${escapeHtml(copy)}</p>
-      </div>
-      <div class="hub-result-answer">
-        <span>${escapeHtml(result.summary?.label || "Today’s answer")}</span>
-        <strong>${escapeHtml(result.summary?.answer || "")}</strong>
-        ${result.summary?.detail ? `<small>${escapeHtml(result.summary.detail)}</small>` : ""}
-      </div>
-    </div>
-  `;
 }
 
 function applyOfficialProgression(type, success, points) {
@@ -402,7 +386,38 @@ function finishPuzzle(type, { success, points, summary }) {
     summary,
   };
   persist();
-  renderHub();
+  renderCompletion(type, session, activePlay?.mode || "for_fun");
+}
+
+function renderCompletion(type, session, mode) {
+  const official = mode === "official";
+  const resultTitle = session.success ? "Round Survived!" : "Run ended";
+  const resultCopy = official
+    ? session.success
+      ? `You earned ${session.points} points. Your Score, Solves and Round have advanced.`
+      : "Your Round has reset to 1. Your permanent Score and Solves remain safe."
+    : "This result was just for fun, so your Score, Solves and Round have not changed.";
+  const homeLabel = official ? "Play another puzzle for fun" : "Return to puzzle home";
+  app.innerHTML = `
+    <section class="panel demo-completion-panel">
+      <div class="result-banner ${session.success ? "correct" : "failed"}">
+        <p class="kicker">${official ? "Official result" : "Just for fun"} · ${escapeHtml(puzzleTypes[type].name)}</p>
+        <h2>${resultTitle}</h2>
+        <p>${escapeHtml(resultCopy)}</p>
+      </div>
+      <div class="demo-answer-reveal">
+        <span>${escapeHtml(session.summary?.label || "Today’s answer")}</span>
+        <strong>${escapeHtml(session.summary?.answer || "")}</strong>
+        ${session.summary?.detail ? `<p>${escapeHtml(session.summary.detail)}</p>` : ""}
+      </div>
+      ${renderHubStats()}
+      <div class="completion-next-step">
+        <p>${official ? "Finished for today? You can close the game here." : "That’s both of today’s puzzles complete."}</p>
+        <button id="return-to-puzzle-home" class="button" type="button">${homeLabel}</button>
+      </div>
+    </section>
+  `;
+  app.querySelector("#return-to-puzzle-home").addEventListener("click", renderHub);
 }
 
 function renderWordSlots(answer, revealedLetters) {
@@ -422,7 +437,7 @@ function renderWordSlots(answer, revealedLetters) {
 function renderWordPuzzle() {
   const session = ensureSession("word");
   if (session.complete) {
-    renderHub();
+    renderCompletion("word", session, activePlay?.mode || "for_fun");
     return;
   }
   const answerLetters = wordPuzzle.entry.answer.toUpperCase();
@@ -462,7 +477,13 @@ function renderWordPuzzle() {
                   : used
                     ? " is-incorrect"
                     : "";
-              const stateLabel = !used ? "Unused" : correct ? "Correct" : "Incorrect";
+              const stateLabel = letter === wordPuzzle.initialLetter
+                ? "Starting letter"
+                : !used
+                  ? "Unused"
+                  : correct
+                    ? "Correct"
+                    : "Incorrect";
               return `<button class="word-key${stateClass}" type="button" data-letter="${letter}" aria-label="${letter}: ${stateLabel}" ${used ? "disabled" : ""}>${letter}</button>`;
             }).join("")}
           </div>
@@ -525,7 +546,7 @@ function renderClueCards(session) {
 function renderEasterPuzzle() {
   const session = ensureSession("easter");
   if (session.complete) {
-    renderHub();
+    renderCompletion("easter", session, activePlay?.mode || "for_fun");
     return;
   }
   if (session.phase === "game") renderEasterGameSelection(session);
