@@ -27,22 +27,23 @@ const scoreLabel = document.querySelector("#demo-score");
 const solvesLabel = document.querySelector("#demo-solves");
 const roundLabel = document.querySelector("#demo-round");
 const advanceButton = document.querySelector("#advance-demo-day");
-const rulesDialog = document.querySelector("#rules-dialog");
 
 const profileStorageKey = "daily-undead:multi-puzzle-demo:profile";
 const dayStoragePrefix = "daily-undead:multi-puzzle-demo:day:";
 const puzzleTypes = {
   easter: {
-    name: "Easter Egg Hunt",
-    shortName: "Easter Egg",
+    name: "Quest Steps",
+    shortName: "Quest Steps",
     kicker: "Main quest challenge",
     description: "Identify today’s Zombies map from its Easter egg steps, then order the steps for Double Points.",
+    image: "./assets/quest-steps-card.png",
   },
   word: {
-    name: "Zombies Word Puzzle",
-    shortName: "Word Puzzle",
+    name: "Word of the Dead",
+    shortName: "Word of the Dead",
     kicker: "Letter challenge",
     description: "Reveal today’s Zombies word or phrase. Every incorrect letter removes 20 potential points.",
+    image: "./assets/word-of-the-dead-card.png",
   },
 };
 
@@ -213,29 +214,6 @@ function ensureSession(type) {
   return session;
 }
 
-function openRules(type) {
-  const isWord = type === "word";
-  rulesDialog.querySelector("[data-rules-title]").textContent = puzzleTypes[type].name;
-  rulesDialog.querySelector("[data-rules-copy]").innerHTML = isWord
-    ? `
-      <ul class="demo-rules-list">
-        <li>One letter is revealed at the start, but never the first letter.</li>
-        <li>Correct letters reveal every matching position and cost no points.</li>
-        <li>Each incorrect letter removes 20 from the potential score.</li>
-        <li>Reveal the full answer before five mistakes to survive the Round.</li>
-      </ul>
-    `
-    : `
-      <ul class="demo-rules-list">
-        <li>Identify the map from one, two or three main-quest clues.</li>
-        <li>Fewer clues award more points.</li>
-        <li>A correct map unlocks one attempt to order three quest steps.</li>
-        <li>A correct order doubles the map points.</li>
-      </ul>
-    `;
-  rulesDialog.showModal();
-}
-
 function lockOfficialChoice(type) {
   if (!type || dayState.officialType) return;
   dayState.officialType = type;
@@ -254,7 +232,7 @@ function startPuzzle(type, mode) {
 function getCardAction(type) {
   const session = dayState.sessions[type];
   if (!dayState.officialType) {
-    return { label: "Choose as official", disabled: false, action: "choose" };
+    return { label: "Play puzzle", disabled: false, action: "choose" };
   }
   if (dayState.officialType === type) {
     if (!dayState.officialCompleted) {
@@ -290,20 +268,14 @@ function renderPuzzleCard(type) {
   const puzzle = puzzleTypes[type];
   const action = getCardAction(type);
   const official = dayState.officialType === type;
-  const number = type === "easter" ? "01" : "02";
   return `
     <article class="puzzle-choice-card${official ? " is-official" : ""}" data-puzzle-card="${type}">
+      <img class="puzzle-choice-art" src="${puzzle.image}" alt="" width="512" height="512">
       <div class="puzzle-choice-copy">
-        <div class="puzzle-choice-kicker-row">
-          <p class="kicker">${escapeHtml(puzzle.kicker)}</p>
-          <span class="puzzle-choice-number" aria-hidden="true">${number}</span>
-        </div>
+        <p class="kicker">${escapeHtml(puzzle.kicker)}</p>
         <h3>${escapeHtml(puzzle.name)}</h3>
         <p>${escapeHtml(puzzle.description)}</p>
-        <div class="puzzle-choice-meta">
-          <p class="puzzle-choice-status">${escapeHtml(getCardStatus(type))}</p>
-          <button class="puzzle-rules-link" type="button" data-rules="${type}">How to play</button>
-        </div>
+        <p class="puzzle-choice-status">${escapeHtml(getCardStatus(type))}</p>
       </div>
       <div class="puzzle-choice-actions">
         <button
@@ -318,28 +290,17 @@ function renderPuzzleCard(type) {
   `;
 }
 
-function renderHubStats() {
-  return `
-    <div class="hub-stats" aria-label="Your current prototype statistics">
-      <div><span>Score</span><strong>${profile.score.toLocaleString("en-GB")}</strong></div>
-      <div><span>Solves</span><strong>${profile.solves.toLocaleString("en-GB")}</strong></div>
-      <div><span>Round</span><strong>${profile.round.toLocaleString("en-GB")}</strong></div>
-    </div>
-  `;
-}
-
 function renderHub() {
   activePlay = null;
   const guidance = !dayState.officialType
-    ? "Pick the one puzzle that will count towards today’s Score, Solves and Round. Your choice locks when you tap."
+    ? "Pick one puzzle to count towards your daily score. You can play the others afterwards for fun, risk free."
     : dayState.officialCompleted
       ? "Your official result is complete. The other puzzle is available if you would like to play again for fun."
       : `Finish ${puzzleTypes[dayState.officialType].name} to unlock the other puzzle just for fun.`;
   app.innerHTML = `
     <section class="panel puzzle-hub-panel">
       <div class="puzzle-hub-hero">
-        ${renderHeading(dayState.officialType ? "Today’s puzzles" : "Choose your official puzzle", guidance, "Daily challenge")}
-        ${renderHubStats()}
+        ${renderHeading("Choose your puzzle", guidance, "Daily puzzle selection")}
       </div>
       <div class="puzzle-choice-grid">
         ${renderPuzzleCard("easter")}
@@ -348,9 +309,6 @@ function renderHub() {
     </section>
   `;
 
-  app.querySelectorAll("[data-rules]").forEach((button) => {
-    button.addEventListener("click", () => openRules(button.dataset.rules));
-  });
   app.querySelectorAll("[data-card-action]").forEach((button) => {
     if (button.disabled) return;
     button.addEventListener("click", () => {
@@ -855,10 +813,6 @@ function advanceDay() {
   window.location.search = params.toString();
 }
 
-function initialiseDialogs() {
-  document.querySelectorAll("[data-close-rules]").forEach((button) => button.addEventListener("click", () => rulesDialog.close()));
-}
-
 async function initialise() {
   try {
     dateKey = getRequestedDateKey();
@@ -868,10 +822,9 @@ async function initialise() {
     easterPuzzle = buildDailyPuzzle(dateKey, maps);
     wordPuzzle = buildDailyWordPuzzle(dateKey, wordEntries);
     dayState = loadDayState();
-    initialiseDialogs();
     advanceButton.addEventListener("click", advanceDay);
     document.addEventListener("keydown", (event) => {
-      if (activePlay?.type !== "word" || rulesDialog.open) return;
+      if (activePlay?.type !== "word") return;
       const letter = normalizeLetter(event.key);
       if (letter) submitLetter(letter);
     });
