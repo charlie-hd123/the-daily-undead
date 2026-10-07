@@ -1,0 +1,130 @@
+{
+  "source": "Word Bank for new puzzle",
+  "categories": {
+    "Characters": [
+      "Edward Richtofen",
+      "Tank Dempsey",
+      "Nikolai Belinski",
+      "Takeo Masaki",
+      "Samantha Maxis",
+      "Dr. Ludvig Maxis",
+      "Abigail “Misty” Briarton",
+      "Samuel J. Stuhlinger",
+      "Marlton Johnson",
+      "Russman"
+    ],
+    "Maps": [
+      "Nacht der Untoten",
+      "Kino der Toten",
+      "Five",
+      "Ascension",
+      "Moon",
+      "Origins",
+      "Mob of the Dead",
+      "Buried",
+      "Shadows of Evil",
+      "Der Eisendrache"
+    ],
+    "Perks": [
+      "Juggernog",
+      "Speed Cola",
+      "Quick Revive",
+      "Double Tap",
+      "Mule Kick",
+      "Stamin-Up",
+      "PhD Flopper",
+      "Deadshot Daiquiri",
+      "Widow's Wine",
+      "Electric Cherry"
+    ],
+    "Wonder Weapons": [
+      "Ray Gun",
+      "Ray Gun Mark II",
+      "Wunderwaffe DG-2",
+      "Thundergun",
+      "Winter's Howl",
+      "Wave Gun",
+      "Blundergat",
+      "Apothicon Servant",
+      "Staff of Ice",
+      "Staff of Fire"
+    ],
+    "Enemies": [
+      "Hellhound",
+      "Panzer Soldat",
+      "Brutus",
+      "Margwa",
+      "Nova Crawler",
+      "Megaton",
+      "Mimic",
+      "Mangler",
+      "Abomination",
+      "Disciple"
+    ],
+    "Power-Ups": [
+      "Max Ammo",
+      "Insta-Kill",
+      "Double Points",
+      "Nuke",
+      "Carpenter",
+      "Fire Sale",
+      "Death Machine",
+      "Zombie Blood",
+      "Full Power",
+      "Bonfire Sale"
+    ],
+    "GobbleGums": [
+      "Perkaholic",
+      "Shopping Free",
+      "Alchemical Antithesis",
+      "Immolation Liquidation",
+      "Phoenix Up",
+      "Near Death Experience",
+      "Soda Fountain",
+      "Wall Power",
+      "Crate Power",
+      "Anywhere But Here!"
+    ],
+    "Equipment & Buildables": [
+      "Monkey Bomb",
+      "Gersh Device",
+      "Hell's Retriever",
+      "Hell's Redeemer",
+      "Zombie Shield",
+      "Rocket Shield",
+      "Ragnarok DG-4",
+      "Maxis Drone",
+      "Trample Steam",
+      "Dragon Strike"
+    ],
+    "Story & Lore": [
+      "Aether",
+      "Dark Aether",
+      "Group 935",
+      "Element 115",
+      "Agartha",
+      "Apothicon",
+      "Keeper",
+      "Primis",
+      "Ultimis",
+      "Victis"
+    ],
+    "Songs": [
+      "Beauty of Annihilation",
+      "Lullaby for a Deadman",
+      "The One",
+      "Abracadavre",
+      "Pareidolia",
+      "Archangel",
+      "Dead Again",
+      "Where Are We Going",
+      "Always Running"
+    ]
+  },
+  "excluded": [
+    {
+      "answer": "115",
+      "reason": "The letter-only demo requires at least two distinct A-Z letters."
+    }
+  ]
+}

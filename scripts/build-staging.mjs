@@ -16,11 +16,11 @@ for (const directory of ["assets", "data", "js"]) {
   await cp(path.join(root, directory), path.join(output, directory), { recursive: true });
 }
 
-for (const filename of ["styles.css", "marketing.css"]) {
+for (const filename of ["styles.css", "marketing.css", "staging-demo.css"]) {
   await cp(path.join(root, filename), path.join(output, filename));
 }
 
-async function writeStagingHtml(filename, { banner = false } = {}) {
+async function writeStagingHtml(filename, { banner = false, outputFilename = filename } = {}) {
   const source = await readFile(path.join(root, filename), "utf8");
   let html = source
     .replace("https://api.thedailyundead.com", stagingApi)
@@ -67,10 +67,10 @@ async function writeStagingHtml(filename, { banner = false } = {}) {
       );
   }
 
-  await writeFile(path.join(output, filename), html);
+  await writeFile(path.join(output, outputFilename), html);
 }
 
-await writeStagingHtml("index.html", { banner: true });
+await writeStagingHtml("staging-demo.html", { banner: true, outputFilename: "index.html" });
 await writeStagingHtml("marketing.html");
 await writeStagingHtml("maintenance.html");
 
