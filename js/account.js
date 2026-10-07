@@ -6,7 +6,7 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261007-2";
+} from "./account-session.js?v=20261007-3";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -643,10 +643,6 @@ export async function initialiseAccount({
         makeProfileStat("Current Round", Math.max(1, result.stats.currentRound)),
         makeProfileStat("Highest Round", result.stats.bestRound),
       );
-      const bio = documentObject.createElement("p");
-      bio.className = "public-profile-bio";
-      bio.textContent = viewed.bio || "No favourite memory shared yet.";
-      bio.classList.toggle("is-empty", !viewed.bio);
       const favourites = documentObject.createElement("dl");
       favourites.className = "public-profile-favourites";
       [["Favourite game", viewed.favouriteGame], ["Favourite map", viewed.favouriteMap]].forEach(([label, value]) => {
@@ -660,7 +656,14 @@ export async function initialiseAccount({
         box.append(dt, dd);
         favourites.append(box);
       });
-      const content = [header, bio, stats, favourites];
+      const content = [header];
+      if (viewed.bio) {
+        const bio = documentObject.createElement("p");
+        bio.className = "public-profile-bio";
+        bio.textContent = viewed.bio;
+        content.push(bio);
+      }
+      content.push(stats, favourites);
       if (profile && viewed.username === profile.username) {
         const editLink = documentObject.createElement("button");
         editLink.className = "public-profile-edit-link";
@@ -690,7 +693,7 @@ export async function initialiseAccount({
   try {
     clerk = await withTimeout(
       supabaseConfigured
-        ? import("./supabase-auth.js?v=20261007-2").then(({ loadSupabaseAuth }) => (
+        ? import("./supabase-auth.js?v=20261007-3").then(({ loadSupabaseAuth }) => (
           loadSupabaseAuth(documentObject)
         ))
         : loadClerk(publishableKey),

@@ -274,13 +274,16 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
       makeFact("Current Round", Math.max(1, viewed.currentRound ?? viewed.bestRound - 3)),
       makeFact("Highest Round", viewed.bestRound),
     );
-    const bio = documentObject.createElement("p");
-    bio.className = "public-profile-bio";
-    bio.textContent = viewed.bio || "No favourite memory shared yet.";
-    bio.classList.toggle("is-empty", !viewed.bio);
     const favourites = documentObject.createElement("dl"); favourites.className = "public-profile-favourites";
     [["Favourite game", viewed.favouriteGame], ["Favourite map", viewed.favouriteMap]].forEach(([label, value]) => favourites.append(makeFact(label, value, { favourite: true })));
-    const content = [header, bio, stats, favourites];
+    const content = [header];
+    if (viewed.bio) {
+      const bio = documentObject.createElement("p");
+      bio.className = "public-profile-bio";
+      bio.textContent = viewed.bio;
+      content.push(bio);
+    }
+    content.push(stats, favourites);
     if (viewed.username === state.profile.username) {
       const editLink = documentObject.createElement("button");
       editLink.className = "public-profile-edit-link";
