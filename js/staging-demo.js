@@ -254,10 +254,7 @@ function getCardStatus(type) {
   if (!dayState.officialType) return "";
   if (dayState.officialType === type) {
     if (!dayState.officialCompleted) return "Your official choice · In progress";
-    const result = dayState.officialResult;
-    return result?.success
-      ? `Official complete · ${result.points} points`
-      : "Today’s puzzle is complete.";
+    return "Today’s puzzle is complete.";
   }
   if (!dayState.officialCompleted) return "Locked until the official result is complete";
   if (session?.complete) return "Completed just for fun";
