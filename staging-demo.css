@@ -284,9 +284,13 @@
 }
 
 .result-action-subline {
-  margin-top: 0.12rem;
-  font-size: 0.82rem;
-  letter-spacing: 0.025em;
+  margin-top: 0.16rem;
+  color: rgb(241 245 251 / 72%);
+  font-family: "Barlow", ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
   text-transform: none;
 }
 
