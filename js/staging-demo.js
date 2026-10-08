@@ -432,13 +432,13 @@ function renderCompletion(type, session, mode) {
   const resultClass = failedBonus
     ? "partial"
     : perfectResult
-      ? "perfect"
+      ? official ? "perfect" : "correct"
       : session.success
         ? "correct"
         : "failed";
   const resultDetail = isEaster
     ? session.success
-      ? renderEasterBonusResult(session)
+      ? renderEasterBonusResult(session, official)
       : `<h3>Today’s three clues</h3><div class="clue-list">${renderClueCards({ cluesRevealed: 3 })}</div>`
     : `
       <section class="bonus-panel">
@@ -487,7 +487,7 @@ function renderCorrectStepOrder(showTicks = false) {
   `;
 }
 
-function renderEasterBonusResult(session) {
+function renderEasterBonusResult(session, official) {
   const answer = getAnswerDisplayTitle(easterPuzzle.map, catalog.answerEquivalents);
   if (session.bonusComplete) {
     return `
@@ -500,8 +500,7 @@ function renderEasterBonusResult(session) {
   }
   return `
     <section class="bonus-panel">
-      <h3>Bonus missed</h3>
-      <p class="helper-text">The steps were not in the correct order.</p>
+      ${official ? '<h3>Bonus missed</h3><p class="helper-text">The steps were not in the correct order.</p>' : ""}
       <p class="kicker">Map</p>
       <h2 class="final-map-name">${escapeHtml(answer)}</h2>
       ${renderCorrectStepOrder()}
@@ -792,15 +791,20 @@ function submitEasterMap(session) {
 function renderEasterBonus(session) {
   const answer = getAnswerDisplayTitle(easterPuzzle.map, catalog.answerEquivalents);
   const clueLabel = session.cluesRevealed === 1 ? "clue" : "clues";
+  const official = activePlay?.mode === "official";
   app.innerHTML = `
     <section class="panel">
       <div class="result-banner correct animate">
-        <h2>Round Survived!</h2>
-        <p>You identified ${escapeHtml(answer)} using ${session.cluesRevealed} ${clueLabel}. You earned ${session.mapPoints} points this round.</p>
+        <h2>${official ? "Round Survived!" : "Map identified!"}</h2>
+        <p>${official
+          ? `You identified ${escapeHtml(answer)} using ${session.cluesRevealed} ${clueLabel}. You earned ${session.mapPoints} points this round.`
+          : `You identified ${escapeHtml(answer)} using ${session.cluesRevealed} ${clueLabel}. Now try the bonus objective.`}</p>
       </div>
       <section class="bonus-panel">
         <h3>Bonus Objective: Put the steps in order</h3>
-        <p class="helper-text">Select the steps in the order they occur to earn Double Points. Tap a selected step again to remove it and revise your order.</p>
+        <p class="helper-text">${official
+          ? "Select the steps in the order they occur to earn Double Points. Tap a selected step again to remove it and revise your order."
+          : "Select the steps in the order they occur. Tap a selected step again to remove it and revise your order."}</p>
         <p class="selection-progress">Selected: ${session.bonusOrder.length} of 3</p>
         <ul class="order-choice-list">
           ${easterPuzzle.displayedSteps.map((step) => {
