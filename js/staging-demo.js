@@ -432,7 +432,7 @@ function renderCompletion(type, session, mode) {
   const resultClass = failedBonus
     ? "partial"
     : perfectResult
-      ? official ? "perfect" : "correct"
+      ? "correct"
       : session.success
         ? "correct"
         : "failed";
@@ -563,7 +563,7 @@ function renderWordSlots(answer, revealedLetters) {
   `).join('<span class="word-space" aria-hidden="true"></span>');
 }
 
-function renderWordPuzzle() {
+function renderWordPuzzle(scoreChanged = false) {
   const session = ensureSession("word");
   if (session.complete) {
     renderCompletion("word", session, activePlay?.mode || "for_fun");
@@ -576,6 +576,11 @@ function renderWordPuzzle() {
     if (answerLetters.includes(letter)) revealed.add(letter);
   });
   const potentialPoints = calculateWordPoints(session.wrongGuesses);
+  const longestWordLength = Math.max(
+    ...wordPuzzle.entry.answer.split(/\s+/).map(
+      (word) => [...word].filter((character) => /[A-Z]/i.test(character)).length,
+    ),
+  );
   const keyboardRows = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
   app.innerHTML = `
     <section class="panel word-puzzle-panel">
@@ -586,10 +591,10 @@ function renderWordPuzzle() {
         activePlay?.mode === "official" ? "" : "Playing just for fun. This result will not change your stats.",
       )}
       <div class="word-scoreboard" aria-label="Word puzzle score">
-        <div><span>Potential score</span><strong>${potentialPoints}</strong></div>
+        <div><span>Potential score</span><strong class="word-score-value${scoreChanged ? " is-changing" : ""}">${potentialPoints}</strong></div>
         <div class="word-mistakes"><span>Mistakes</span><strong>${session.wrongGuesses} / 5</strong></div>
       </div>
-      <div class="word-answer" aria-label="Partially revealed answer">
+      <div class="word-answer${longestWordLength >= 11 ? " has-long-word" : ""}" aria-label="Partially revealed answer">
         ${renderWordSlots(wordPuzzle.entry.answer, revealed)}
       </div>
       <div class="word-keyboard" aria-label="Letter keyboard">
@@ -660,7 +665,7 @@ function submitLetter(value) {
     });
     return;
   }
-  renderWordPuzzle();
+  renderWordPuzzle(!correct);
   const status = app.querySelector("#word-game-status");
   if (status) {
     status.textContent = correct
@@ -814,7 +819,7 @@ function renderEasterBonus(session) {
   const clueLabel = session.cluesRevealed === 1 ? "clue" : "clues";
   const official = activePlay?.mode === "official";
   app.innerHTML = `
-    <section class="panel">
+    <section class="panel easter-bonus-panel">
       ${official ? "" : '<p class="kicker">Just for fun</p>'}
       <div class="result-banner correct animate">
         <h2>${official ? "Round Survived!" : "Map identified!"}</h2>

@@ -155,6 +155,27 @@
   box-shadow: 0 0 0 1px rgb(141 239 255 / 32%), 0 0.9rem 2.5rem rgb(37 143 192 / 25%);
 }
 
+.button.primary {
+  border-color: #67e8ff;
+  background: linear-gradient(135deg, #67e8ff, #258fc0);
+  color: #041117;
+  box-shadow: 0 0.55rem 1.4rem rgb(35 175 220 / 20%);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .button.primary:hover:not(:disabled) {
+    border-color: #a6f2ff;
+    background: linear-gradient(135deg, #8defff, #36a8d8);
+    box-shadow: 0 0 0 1px rgb(141 239 255 / 32%), 0 0.9rem 2.5rem rgb(37 143 192 / 25%);
+  }
+}
+
+.selection-progress {
+  border-color: rgb(103 232 255 / 28%);
+  background: rgb(103 232 255 / 8%);
+  color: var(--aether);
+}
+
 .word-puzzle-panel {
   overflow: hidden;
 }
@@ -212,6 +233,11 @@
   text-transform: uppercase;
 }
 
+.word-answer.has-long-word .word-letter {
+  width: clamp(0.95rem, 3.8vw, 1.8rem);
+  font-size: clamp(1.2rem, 4.4vw, 2rem);
+}
+
 .word-token {
   display: inline-flex;
   gap: clamp(0.16rem, 0.7vw, 0.35rem);
@@ -249,12 +275,35 @@
 
 .word-game-status {
   margin: 0.8rem 0 0;
-  color: var(--muted);
+  color: var(--muted-strong);
+  font-weight: 500;
   text-align: center;
 }
 
 .word-game-status {
   min-height: 1.4em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .word-score-value.is-changing {
+    animation: word-score-change 340ms ease-out both;
+  }
+}
+
+@keyframes word-score-change {
+  0% {
+    transform: scale(1);
+  }
+
+  45% {
+    transform: scale(1.12);
+    filter: brightness(1.28);
+  }
+
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
 }
 
 .word-keyboard {
@@ -359,6 +408,12 @@
     padding-inline: 0.5rem;
   }
 
+  .word-answer {
+    min-height: 6.5rem;
+    padding: 0.85rem 0.25rem;
+    row-gap: 0.65rem;
+  }
+
   .word-keyboard-row {
     gap: 0.1rem;
   }
@@ -373,6 +428,55 @@
     width: clamp(1.85rem, 8.5vw, 2.1rem);
     min-height: 3.2rem;
     font-size: 1rem;
+  }
+
+  .easter-bonus-panel .result-banner {
+    margin-bottom: 0.7rem;
+    padding: 0.75rem 0.85rem 0.8rem;
+  }
+
+  .easter-bonus-panel .result-banner h2 {
+    font-size: 1.8rem;
+  }
+
+  .easter-bonus-panel .result-banner p {
+    font-size: 0.9rem;
+    line-height: 1.35;
+  }
+
+  .easter-bonus-panel .bonus-panel {
+    margin-top: 0.8rem;
+    padding-top: 0.8rem;
+  }
+
+  .easter-bonus-panel .bonus-panel h3 {
+    font-size: 1.55rem;
+  }
+
+  .easter-bonus-panel .selection-progress {
+    margin: 0.6rem 0;
+  }
+
+  .easter-bonus-panel .order-choice-list {
+    gap: 0.5rem;
+  }
+
+  .easter-bonus-panel .order-choice {
+    min-height: 5.25rem;
+    gap: 0.55rem;
+    padding: 0.65rem;
+  }
+
+  .easter-bonus-panel .order-rank {
+    width: 2.35rem;
+    height: 2.35rem;
+    font-size: 1.05rem;
+  }
+
+  .easter-bonus-panel .order-text {
+    padding-top: 0;
+    font-size: 0.94rem;
+    line-height: 1.3;
   }
 
   .puzzle-choice-copy {
