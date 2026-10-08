@@ -325,7 +325,11 @@ function renderHub() {
               ? "Play another puzzle"
               : "Choose your daily puzzle",
           guidance,
-          dayState.officialCompleted ? "Just for fun" : "Today’s round",
+          allPuzzlesCompleted
+            ? "All puzzles"
+            : dayState.officialCompleted
+              ? "Just for fun"
+              : "Today’s round",
         )}
       </div>
       <div class="puzzle-choice-grid">
