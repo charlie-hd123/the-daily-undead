@@ -427,6 +427,9 @@ function renderCompletion(type, session, mode) {
     : null;
   const clueLabel = session.cluesRevealed === 1 ? "clue" : "clues";
   const answerWithPunctuation = punctuateSentenceEnding(answer);
+  const answerMarkup = `<strong class="result-answer-name">${escapeHtml(answer)}</strong>`;
+  const answerSentenceMarkup = `<strong class="result-answer-name">${escapeHtml(answerWithPunctuation)}</strong>`;
+  const selectedAnswerMarkup = `<strong class="result-answer-name">${escapeHtml(selectedMap?.title ?? "an unknown map")}</strong>`;
   const resultTitle = !official
     ? failedBonus || !session.success ? "Not quite" : "Puzzle Complete!"
     : failedBonus
@@ -438,26 +441,26 @@ function renderCompletion(type, session, mode) {
           : "Run ended";
   const officialResultCopy = isEaster
     ? failedBonus
-      ? `You identified ${answer}, but the step order was incorrect. You still earned ${session.mapPoints} points this round.`
+      ? `You identified ${answerMarkup}, but the step order was incorrect. You still earned ${session.mapPoints} points this round.`
       : perfectResult
-        ? `You found ${answer} using ${session.cluesRevealed} ${clueLabel} and got the steps in the correct order. You earned ${session.points} points this round.`
+        ? `You found ${answerMarkup} using ${session.cluesRevealed} ${clueLabel} and got the steps in the correct order. You earned ${session.points} points this round.`
         : session.success
-          ? `You identified ${answer} using ${session.cluesRevealed} ${clueLabel}. You earned ${session.points} points this round.`
-          : `You chose ${selectedMap?.title ?? "an unknown map"}. Today’s answer was ${answerWithPunctuation} Your permanent Score and Solves are safe.`
+          ? `You identified ${answerMarkup} using ${session.cluesRevealed} ${clueLabel}. You earned ${session.points} points this round.`
+          : `You chose ${selectedAnswerMarkup}. Today’s answer was ${answerSentenceMarkup} Your permanent Score and Solves are safe.`
     : session.success
-      ? `You revealed ${answer} with ${session.wrongGuesses} ${session.wrongGuesses === 1 ? "mistake" : "mistakes"}. You earned ${session.points} points this round.`
-      : `You did not reveal the answer. Today’s answer was ${answerWithPunctuation} Your permanent Score and Solves are safe.`;
+      ? `You revealed ${answerMarkup} with ${session.wrongGuesses} ${session.wrongGuesses === 1 ? "mistake" : "mistakes"}. You earned ${session.points} points this round.`
+      : `You did not reveal the answer. Today’s answer was ${answerSentenceMarkup} Your permanent Score and Solves are safe.`;
   const funResultCopy = isEaster
     ? failedBonus
-      ? `You identified ${answer}, but the step order was incorrect.`
+      ? `You identified ${answerMarkup}, but the step order was incorrect.`
       : perfectResult
-        ? `You found ${answer} using ${session.cluesRevealed} ${clueLabel} and got the steps in the correct order.`
+        ? `You found ${answerMarkup} using ${session.cluesRevealed} ${clueLabel} and got the steps in the correct order.`
         : session.success
-          ? `You identified ${answer} using ${session.cluesRevealed} ${clueLabel}.`
-          : `You chose ${selectedMap?.title ?? "an unknown map"}. Today’s answer was ${answerWithPunctuation}`
+          ? `You identified ${answerMarkup} using ${session.cluesRevealed} ${clueLabel}.`
+          : `You chose ${selectedAnswerMarkup}. Today’s answer was ${answerSentenceMarkup}`
     : session.success
-      ? `You revealed ${answer} with ${session.wrongGuesses} ${session.wrongGuesses === 1 ? "mistake" : "mistakes"}.`
-      : `You did not reveal the answer. Today’s answer was ${answerWithPunctuation}`;
+      ? `You revealed ${answerMarkup} with ${session.wrongGuesses} ${session.wrongGuesses === 1 ? "mistake" : "mistakes"}.`
+      : `You did not reveal the answer. Today’s answer was ${answerSentenceMarkup}`;
   const resultCopy = official ? officialResultCopy : `${funResultCopy} This result did not affect your stats.`;
   const resultClass = failedBonus
     ? "partial"
@@ -480,7 +483,7 @@ function renderCompletion(type, session, mode) {
     <section class="panel">
       <div class="result-banner ${resultClass} animate${perfectResult && official ? " double-points-result" : ""}${failedBonus ? " bonus-correction-result" : ""}">
         <h2>${resultTitle}</h2>
-        <p>${escapeHtml(resultCopy)}</p>
+        <p>${resultCopy}</p>
         ${perfectResult && official ? `<div class="double-points-total"><span>Round score</span><strong data-count-to="${session.points}">0</strong></div>` : ""}
         ${official && !session.success
           ? Math.max(1, session.roundsSurvivedBeforeLoss || 1) === 1
