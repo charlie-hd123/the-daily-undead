@@ -185,6 +185,9 @@ function createWordSession() {
     key: wordPuzzle.key,
     guesses: [],
     wrongGuesses: 0,
+    correctStreak: 0,
+    lastGuess: null,
+    pendingResult: null,
     complete: false,
     success: null,
     points: 0,
@@ -558,26 +561,65 @@ async function shareDemoScore(button, status, type, session) {
   }
 }
 
-function renderWordSlots(answer, revealedLetters) {
+function renderWordSlots(answer, revealedLetters, { revealLetter = "", finalReveal = false } = {}) {
   const revealed = new Set(revealedLetters);
-  return answer.split(" ").map((word) => `
-    <span class="word-token">
+  const newlyRevealedLetter = normalizeLetter(revealLetter);
+  let revealIndex = 0;
+  return answer.split(" ").map((word, wordIndex) => `
+    <span class="word-token${finalReveal ? " is-completing" : ""}"${finalReveal ? ` style="--word-index: ${wordIndex}"` : ""}>
       ${[...word].map((character) => {
         const letter = normalizeLetter(character);
         if (!letter) return `<span class="word-literal">${escapeHtml(character)}</span>`;
         const visible = revealed.has(letter);
-        return `<span class="word-letter${visible ? " is-visible" : ""}" aria-label="${visible ? letter : "Hidden letter"}">${visible ? letter : ""}</span>`;
+        const newlyRevealed = visible && letter === newlyRevealedLetter;
+        const stagger = newlyRevealed ? ` style="--reveal-index: ${revealIndex++}"` : "";
+        return `<span class="word-letter${visible ? " is-visible" : ""}${newlyRevealed ? " is-newly-revealed" : ""}"${stagger} aria-label="${visible ? letter : "Hidden letter"}">${visible ? letter : ""}</span>`;
       }).join("")}
     </span>
   `).join('<span class="word-space" aria-hidden="true"></span>');
 }
 
-function renderWordPuzzle(scoreChanged = false) {
+function getWordCompletionDelay(success) {
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return 120;
+  if (!success) return 850;
+  const wordCount = wordPuzzle.entry.answer.trim().split(/\s+/).length;
+  return Math.min(1750, 900 + ((wordCount - 1) * 180));
+}
+
+function finishPendingWordResult(session) {
+  const pendingResult = session.pendingResult;
+  if (!pendingResult || session.complete) return;
+  window.setTimeout(() => {
+    if (session.complete || session.pendingResult !== pendingResult) return;
+    session.pendingResult = null;
+    const success = pendingResult === "success";
+    finishPuzzle("word", {
+      success,
+      points: success ? calculateWordPoints(session.wrongGuesses) : 0,
+      summary: {
+        label: wordPuzzle.entry.category,
+        answer: wordPuzzle.entry.answer,
+        detail: success
+          ? `${session.wrongGuesses} ${session.wrongGuesses === 1 ? "mistake" : "mistakes"}`
+          : "Five incorrect letters",
+      },
+    });
+  }, getWordCompletionDelay(pendingResult === "success"));
+}
+
+function renderWordPuzzle({
+  scoreChanged = false,
+  revealLetter = "",
+  statusMessage = "",
+  statusType = "",
+} = {}) {
   const session = ensureSession("word");
   if (session.complete) {
     renderCompletion("word", session, activePlay?.mode || "for_fun");
     return;
   }
+  const finalReveal = session.pendingResult === "success";
+  const resultPending = Boolean(session.pendingResult);
   const answerLetters = wordPuzzle.entry.answer.toUpperCase();
   const guesses = new Set(session.guesses);
   const revealed = new Set([wordPuzzle.initialLetter]);
@@ -585,6 +627,13 @@ function renderWordPuzzle(scoreChanged = false) {
     if (answerLetters.includes(letter)) revealed.add(letter);
   });
   const potentialPoints = calculateWordPoints(session.wrongGuesses);
+  const displayedStatus = statusMessage || (finalReveal
+    ? "Answer revealed!"
+    : session.pendingResult === "failure"
+      ? "No attempts remaining."
+      : "Choose a letter.");
+  const displayedStatusType = statusType || (finalReveal ? "complete" : "");
+  const animatedLetter = revealLetter || (finalReveal ? session.lastGuess : "");
   const longestWordLength = Math.max(
     ...wordPuzzle.entry.answer.split(/\s+/).map(
       (word) => [...word].filter((character) => /[A-Z]/i.test(character)).length,
@@ -601,10 +650,16 @@ function renderWordPuzzle(scoreChanged = false) {
       )}
       <div class="word-scoreboard" aria-label="Word puzzle score">
         <div><span>Potential score</span><strong class="word-score-value${scoreChanged ? " is-changing" : ""}">${potentialPoints}</strong></div>
-        <div class="word-mistakes"><span>Mistakes</span><strong>${session.wrongGuesses} / 5</strong></div>
+        <div class="word-mistakes danger-level-${session.wrongGuesses}">
+          <span>Mistakes</span>
+          <strong>${session.wrongGuesses} / 5</strong>
+          <div class="word-danger-meter" aria-hidden="true">
+            ${[1, 2, 3, 4, 5].map((stage) => `<i class="${stage <= session.wrongGuesses ? "is-active" : ""}${scoreChanged && stage === session.wrongGuesses ? " is-new" : ""}"></i>`).join("")}
+          </div>
+        </div>
       </div>
-      <div class="word-answer${longestWordLength >= 11 ? " has-long-word" : ""}" aria-label="Partially revealed answer">
-        ${renderWordSlots(wordPuzzle.entry.answer, revealed)}
+      <div class="word-answer${longestWordLength >= 11 ? " has-long-word" : ""}${finalReveal ? " is-final-reveal" : ""}" aria-label="Partially revealed answer">
+        ${renderWordSlots(wordPuzzle.entry.answer, revealed, { revealLetter: animatedLetter, finalReveal })}
       </div>
       <div class="word-keyboard" aria-label="Letter keyboard">
         ${keyboardRows.map((row) => `
@@ -626,61 +681,60 @@ function renderWordPuzzle(scoreChanged = false) {
                   : correct
                     ? "Correct"
                     : "Incorrect";
-              return `<button class="word-key${stateClass}" type="button" data-letter="${letter}" aria-label="${letter}: ${stateLabel}" ${used ? "disabled" : ""}>${letter}</button>`;
+              return `<button class="word-key${stateClass}" type="button" data-letter="${letter}" aria-label="${letter}: ${stateLabel}" ${used || resultPending ? "disabled" : ""}>${letter}</button>`;
             }).join("")}
           </div>
         `).join("")}
       </div>
-      <p id="word-game-status" class="word-game-status" aria-live="polite">Choose a letter.</p>
+      <p id="word-game-status" class="word-game-status${displayedStatusType ? ` is-${displayedStatusType}` : ""}" aria-live="polite">${escapeHtml(displayedStatus)}</p>
     </section>
   `;
   app.querySelectorAll("[data-letter]").forEach((button) => {
     button.addEventListener("click", () => submitLetter(button.dataset.letter));
   });
+  if (resultPending) finishPendingWordResult(session);
 }
 
 function submitLetter(value) {
   if (activePlay?.type !== "word") return;
   const letter = normalizeLetter(value);
   const session = ensureSession("word");
-  if (!letter || session.complete || session.guesses.includes(letter) || letter === wordPuzzle.initialLetter) return;
+  if (!letter || session.complete || session.pendingResult || session.guesses.includes(letter) || letter === wordPuzzle.initialLetter) return;
   session.guesses.push(letter);
+  session.lastGuess = letter;
   const correct = wordPuzzle.entry.answer.toUpperCase().includes(letter);
-  if (!correct) session.wrongGuesses += 1;
+  if (correct) {
+    session.correctStreak = (session.correctStreak || 0) + 1;
+  } else {
+    session.wrongGuesses += 1;
+    session.correctStreak = 0;
+  }
   const revealed = [wordPuzzle.initialLetter, ...session.guesses];
   const solved = isWordSolved(wordPuzzle.entry.answer, revealed);
-  persist();
   if (solved) {
-    finishPuzzle("word", {
-      success: true,
-      points: calculateWordPoints(session.wrongGuesses),
-      summary: {
-        label: wordPuzzle.entry.category,
-        answer: wordPuzzle.entry.answer,
-        detail: `${session.wrongGuesses} ${session.wrongGuesses === 1 ? "mistake" : "mistakes"}`,
-      },
-    });
+    session.pendingResult = "success";
+    persist();
+    renderWordPuzzle({ revealLetter: letter, statusMessage: "Answer revealed!", statusType: "complete" });
     return;
   }
   if (session.wrongGuesses >= 5) {
-    finishPuzzle("word", {
-      success: false,
-      points: 0,
-      summary: {
-        label: wordPuzzle.entry.category,
-        answer: wordPuzzle.entry.answer,
-        detail: "Five incorrect letters",
-      },
-    });
+    session.pendingResult = "failure";
+    persist();
+    renderWordPuzzle({ scoreChanged: true, statusMessage: "No attempts remaining." });
     return;
   }
-  renderWordPuzzle(!correct);
-  const status = app.querySelector("#word-game-status");
-  if (status) {
-    status.textContent = correct
-      ? `${letter} is in the answer.`
-      : `${letter} is not in the answer. Potential score is now ${calculateWordPoints(session.wrongGuesses)}.`;
-  }
+  persist();
+  const streakMessage = session.correctStreak >= 2
+    ? `${session.correctStreak} correct letters in a row!`
+    : `${letter} is in the answer.`;
+  renderWordPuzzle({
+    scoreChanged: !correct,
+    revealLetter: correct ? letter : "",
+    statusMessage: correct
+      ? streakMessage
+      : `${letter} is not in the answer. Potential score is now ${calculateWordPoints(session.wrongGuesses)}.`,
+    statusType: correct && session.correctStreak >= 2 ? "streak" : "",
+  });
 }
 
 function renderClueCards(session) {
