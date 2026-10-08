@@ -1016,8 +1016,8 @@ function renderEasterBonus(session) {
       <section class="bonus-panel">
         <h3>Bonus: Put the steps in order</h3>
         <p class="helper-text">${official
-          ? "Select the steps in the order they occur to earn Double Points. Tap a selected step again to remove it and revise your order."
-          : "Select the steps in the order they occur. Tap a selected step again to remove it and revise your order."}</p>
+          ? "Order the steps to earn Double Points. Tap a selected step to remove it."
+          : "Order the steps correctly. Tap a selected step to remove it."}</p>
         <div class="bonus-order-status">
           <p class="selection-progress${selectedCount === 3 ? " is-ready" : ""}" aria-live="polite">${selectedCount === 3 ? "Ready to submit" : `Selected: ${selectedCount} of 3`}</p>
           <div class="order-chain${selectedCount === 3 ? " is-ready" : ""}" aria-hidden="true">
