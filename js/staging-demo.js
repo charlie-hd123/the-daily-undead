@@ -87,6 +87,11 @@ function formatDate(value) {
   }).format(new Date(`${value}T12:00:00Z`));
 }
 
+function punctuateSentenceEnding(value) {
+  const text = String(value || "");
+  return /[.!?]$/.test(text) ? text : `${text}.`;
+}
+
 function loadJson(key, fallback) {
   try {
     const saved = JSON.parse(localStorage.getItem(key));
@@ -298,8 +303,13 @@ function renderPuzzleCard(type) {
 
 function renderHub() {
   activePlay = null;
+  const allPuzzlesCompleted = Object.keys(puzzleTypes).every(
+    (type) => dayState.sessions[type]?.complete,
+  );
   const guidance = !dayState.officialType
     ? "Pick one puzzle for today’s scored round. Play the others afterwards for fun, risk-free."
+    : allPuzzlesCompleted
+      ? "You have completed all of today’s puzzles."
     : dayState.officialCompleted
       ? "Your official round is complete. Other puzzles are available if you would like to play just for fun."
       : `Finish ${puzzleTypes[dayState.officialType].name} to unlock the other puzzle just for fun.`;
@@ -307,7 +317,11 @@ function renderHub() {
     <section class="panel puzzle-hub-panel">
       <div class="puzzle-hub-hero">
         ${renderHeading(
-          dayState.officialCompleted ? "Play another puzzle" : "Choose your daily puzzle",
+          allPuzzlesCompleted
+            ? "Today’s puzzles are complete"
+            : dayState.officialCompleted
+              ? "Play another puzzle"
+              : "Choose your daily puzzle",
           guidance,
           dayState.officialCompleted ? "Just for fun" : "Today’s round",
         )}
@@ -382,6 +396,7 @@ function renderCompletion(type, session, mode) {
     ? selectableMaps.find((map) => map.id === session.selectedMapId)
     : null;
   const clueLabel = session.cluesRevealed === 1 ? "clue" : "clues";
+  const answerWithPunctuation = punctuateSentenceEnding(answer);
   const resultTitle = !official
     ? failedBonus || !session.success ? "Not quite" : "Puzzle complete"
     : failedBonus
@@ -398,10 +413,10 @@ function renderCompletion(type, session, mode) {
         ? `You found ${answer} using ${session.cluesRevealed} ${clueLabel} and got the steps in the correct order. You earned ${session.points} points this round.`
         : session.success
           ? `You identified ${answer} using ${session.cluesRevealed} ${clueLabel}. You earned ${session.points} points this round.`
-          : `You chose ${selectedMap?.title ?? "an unknown map"}. Today’s answer was ${answer}. Your permanent Score and Solves are safe.`
+          : `You chose ${selectedMap?.title ?? "an unknown map"}. Today’s answer was ${answerWithPunctuation} Your permanent Score and Solves are safe.`
     : session.success
       ? `You revealed ${answer} with ${session.wrongGuesses} ${session.wrongGuesses === 1 ? "mistake" : "mistakes"}. You earned ${session.points} points this round.`
-      : `You did not reveal the answer. Today’s answer was ${answer}. Your permanent Score and Solves are safe.`;
+      : `You did not reveal the answer. Today’s answer was ${answerWithPunctuation} Your permanent Score and Solves are safe.`;
   const funResultCopy = isEaster
     ? failedBonus
       ? `You identified ${answer}, but the step order was incorrect.`
@@ -409,10 +424,10 @@ function renderCompletion(type, session, mode) {
         ? `You found ${answer} using ${session.cluesRevealed} ${clueLabel} and got the steps in the correct order.`
         : session.success
           ? `You identified ${answer} using ${session.cluesRevealed} ${clueLabel}.`
-          : `You chose ${selectedMap?.title ?? "an unknown map"}. Today’s answer was ${answer}.`
+          : `You chose ${selectedMap?.title ?? "an unknown map"}. Today’s answer was ${answerWithPunctuation}`
     : session.success
       ? `You revealed ${answer} with ${session.wrongGuesses} ${session.wrongGuesses === 1 ? "mistake" : "mistakes"}.`
-      : `You did not reveal the answer. Today’s answer was ${answer}.`;
+      : `You did not reveal the answer. Today’s answer was ${answerWithPunctuation}`;
   const resultCopy = official ? officialResultCopy : `${funResultCopy} This result did not affect your stats.`;
   const resultClass = failedBonus
     ? "partial"
@@ -436,20 +451,24 @@ function renderCompletion(type, session, mode) {
       <div class="result-banner ${resultClass} animate">
         <h2>${resultTitle}</h2>
         <p>${escapeHtml(resultCopy)}</p>
-        ${official && !session.success ? `<p class="survival-summary">Your run ended at <strong>Round ${Math.max(1, session.roundsSurvivedBeforeLoss || 1)}</strong>. Your next game starts at <strong>Round 1</strong>.</p>` : ""}
+        ${official && !session.success
+          ? Math.max(1, session.roundsSurvivedBeforeLoss || 1) === 1
+            ? '<p class="survival-summary">Your Round remains at <strong>Round 1</strong>.</p>'
+            : `<p class="survival-summary">Your run ended at <strong>Round ${session.roundsSurvivedBeforeLoss}</strong>. Your next game starts at <strong>Round 1</strong>.</p>`
+          : ""}
       </div>
       ${resultDetail}
       <div class="actions share-score-actions">
-        <button id="share-demo-score" class="button share-score-button" type="button">Share with your squad</button>
+        ${official ? '<button id="share-demo-score" class="button share-score-button" type="button">Share with your squad</button>' : ""}
         <button id="return-to-puzzle-home" class="button" type="button">Play another puzzle</button>
       </div>
-      <p id="share-demo-score-status" class="share-score-status" aria-live="polite"></p>
+      ${official ? '<p id="share-demo-score-status" class="share-score-status" aria-live="polite"></p>' : ""}
     </section>
     ${renderNextRoundScreen()}
   `;
   updateCountdown();
   app.querySelector("#return-to-puzzle-home")?.addEventListener("click", renderHub);
-  app.querySelector("#share-demo-score").addEventListener("click", (event) => {
+  app.querySelector("#share-demo-score")?.addEventListener("click", (event) => {
     shareDemoScore(event.currentTarget, app.querySelector("#share-demo-score-status"), type, session);
   });
 }
@@ -641,7 +660,11 @@ function submitLetter(value) {
   }
   renderWordPuzzle();
   const status = app.querySelector("#word-game-status");
-  if (status) status.textContent = correct ? `${letter} is in the answer.` : `${letter} is not in the answer. 20 points lost.`;
+  if (status) {
+    status.textContent = correct
+      ? `${letter} is in the answer.`
+      : `${letter} is not in the answer. Potential score is now ${calculateWordPoints(session.wrongGuesses)}.`;
+  }
 }
 
 function renderClueCards(session) {
