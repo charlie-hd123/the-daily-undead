@@ -642,6 +642,7 @@ function renderWordPuzzle({
     renderCompletion("word", session, activePlay?.mode || "for_fun");
     return;
   }
+  const official = activePlay?.mode === "official";
   const finalReveal = session.pendingResult === "success";
   const resultPending = Boolean(session.pendingResult);
   const answerLetters = wordPuzzle.entry.answer.toUpperCase();
@@ -669,11 +670,11 @@ function renderWordPuzzle({
       ${renderHeading(
         "Which Zombies word is it?",
         "Try to solve the Zombies word or phrase by revealing its letters.",
-        activePlay?.mode === "official" ? "Official puzzle" : "Just for fun",
-        activePlay?.mode === "official" ? "" : "Playing just for fun. This result will not change your stats.",
+        official ? "Official puzzle" : "Just for fun",
+        official ? "" : "Playing just for fun. This result will not change your stats.",
       )}
-      <div class="word-scoreboard" aria-label="Word puzzle score">
-        <div><span>Potential score</span><strong class="word-score-value${scoreChanged ? " is-changing" : ""}">${potentialPoints}</strong></div>
+      <div class="word-scoreboard${official ? "" : " is-single"}" aria-label="Word puzzle progress">
+        ${official ? `<div><span>Potential score</span><strong class="word-score-value${scoreChanged ? " is-changing" : ""}">${potentialPoints}</strong></div>` : ""}
         <div class="word-mistakes danger-level-${session.wrongGuesses}">
           <span>Mistakes</span>
           <strong>${session.wrongGuesses} / 5</strong>
