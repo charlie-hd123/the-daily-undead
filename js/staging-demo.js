@@ -484,7 +484,7 @@ function renderCompletion(type, session, mode) {
       <div class="result-banner ${resultClass} animate${perfectResult && official ? " double-points-result" : ""}${failedBonus ? " bonus-correction-result" : ""}">
         <h2>${resultTitle}</h2>
         <p>${resultCopy}</p>
-        ${perfectResult && official ? `<div class="double-points-total"><span>Round score</span><strong data-count-to="${session.points}">0</strong></div>` : ""}
+        ${official && session.success ? `<div class="result-score-total"><span>Round score</span><strong data-count-to="${session.points}">0</strong></div>` : ""}
         ${official && !session.success
           ? Math.max(1, session.roundsSurvivedBeforeLoss || 1) === 1
             ? '<p class="survival-summary">Your Round remains at <strong>Round 1</strong>.</p>'
