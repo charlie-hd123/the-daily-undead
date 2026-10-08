@@ -203,6 +203,7 @@ function createEasterSession() {
     selectedGameId: null,
     selectedMapId: null,
     mapPoints: 0,
+    mapProgressionApplied: false,
     bonusOrder: [],
     bonusComplete: false,
     bonusFailed: false,
@@ -362,9 +363,28 @@ function renderHub() {
   });
 }
 
+function applyOfficialEasterMapProgression(session) {
+  if (
+    dayState.officialType !== "easter"
+    || dayState.officialCompleted
+    || session.mapProgressionApplied
+  ) return false;
+
+  profile.score += session.mapPoints;
+  profile.solves += 1;
+  profile.round += 1;
+  profile.bestRound = Math.max(profile.bestRound, profile.round);
+  session.mapProgressionApplied = true;
+  dayState.progressionApplied = true;
+  return true;
+}
+
 function applyOfficialProgression(type, success, points) {
-  if (dayState.progressionApplied) return;
-  if (success) {
+  if (dayState.officialCompleted) return;
+  const session = ensureSession(type);
+  if (type === "easter" && success && session.mapProgressionApplied) {
+    profile.score += Math.max(0, points - session.mapPoints);
+  } else if (success) {
     profile.score += points;
     profile.solves += 1;
     profile.round += 1;
@@ -900,6 +920,7 @@ function submitEasterMap(session) {
     return;
   }
   session.mapPoints = calculateMapPoints(session.cluesRevealed);
+  if (activePlay?.mode === "official") applyOfficialEasterMapProgression(session);
   session.phase = "bonus";
   persist();
   renderEasterPuzzle();
@@ -980,6 +1001,7 @@ function renderEasterBonus(session) {
   const answer = getAnswerDisplayTitle(easterPuzzle.map, catalog.answerEquivalents);
   const clueLabel = session.cluesRevealed === 1 ? "clue" : "clues";
   const official = activePlay?.mode === "official";
+  if (official && applyOfficialEasterMapProgression(session)) persist();
   const pendingResult = session.pendingBonusResult;
   const selectedCount = session.bonusOrder.length;
   app.innerHTML = `
