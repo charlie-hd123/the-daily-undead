@@ -601,10 +601,10 @@ function renderWordSlots(answer, revealedLetters, { revealLetter = "", finalReve
 }
 
 function getWordCompletionDelay(success) {
-  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return 120;
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return success ? 1000 : 120;
   if (!success) return 850;
   const wordCount = wordPuzzle.entry.answer.trim().split(/\s+/).length;
-  return Math.min(1750, 900 + ((wordCount - 1) * 180));
+  return Math.min(2800, 1900 + ((wordCount - 1) * 180));
 }
 
 function finishPendingWordResult(session) {
