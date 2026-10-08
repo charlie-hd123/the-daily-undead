@@ -260,7 +260,7 @@ function getCardStatus(type) {
   if (!dayState.officialType) return "";
   if (dayState.officialType === type) {
     if (!dayState.officialCompleted) return "Your official choice · In progress";
-    return "Today’s puzzle is complete.";
+    return "Today’s puzzle is complete";
   }
   if (!dayState.officialCompleted) return "Locked until the official result is complete";
   if (session?.complete) return "Completed just for fun";
@@ -272,8 +272,8 @@ function renderPuzzleCard(type) {
   const action = getCardAction(type);
   const official = dayState.officialType === type;
   const status = getCardStatus(type);
-  const canSeeResult = official && dayState.officialCompleted;
   const isCompleted = Boolean(dayState.sessions[type]?.complete);
+  const canSeeResult = isCompleted;
   return `
     <article class="puzzle-choice-card${official ? " is-official" : ""}" data-puzzle-card="${type}">
       <img class="puzzle-choice-art" src="${puzzle.image}" alt="" width="512" height="512">
@@ -284,8 +284,11 @@ function renderPuzzleCard(type) {
       </div>
       ${status ? `
         <div class="puzzle-choice-status-row">
-          <p class="puzzle-choice-status${isCompleted ? " is-complete" : ""}">${escapeHtml(status)}</p>
-          ${canSeeResult ? `<button class="puzzle-result-link" type="button" data-see-result="${type}">See result</button>` : ""}
+          <div class="puzzle-choice-status-copy">
+            <p class="puzzle-choice-status${isCompleted ? " is-complete" : ""}">${escapeHtml(status)}</p>
+            ${official && isCompleted ? '<span class="official-result-marker">Official result</span>' : ""}
+          </div>
+          ${canSeeResult ? `<button class="puzzle-result-link" type="button" data-see-result="${type}" data-result-mode="${official ? "official" : "for_fun"}">See result</button>` : ""}
         </div>
       ` : ""}
       <div class="puzzle-choice-actions">
@@ -346,7 +349,7 @@ function renderHub() {
     });
   });
   app.querySelectorAll("[data-see-result]").forEach((button) => {
-    button.addEventListener("click", () => startPuzzle(button.dataset.seeResult, "official"));
+    button.addEventListener("click", () => startPuzzle(button.dataset.seeResult, button.dataset.resultMode));
   });
 }
 

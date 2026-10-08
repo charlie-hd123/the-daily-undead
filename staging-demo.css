@@ -114,8 +114,28 @@
   font-weight: 700;
 }
 
+.puzzle-choice-status-copy {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.5rem;
+}
+
 .puzzle-choice-status.is-complete {
   color: #77808f !important;
+}
+
+.official-result-marker {
+  padding: 0.12rem 0.38rem;
+  border: 1px solid rgba(103, 232, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(103, 232, 255, 0.045);
+  color: #8093a8;
+  font: 700 0.58rem/1.15 "Barlow Condensed", ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .puzzle-result-link {
