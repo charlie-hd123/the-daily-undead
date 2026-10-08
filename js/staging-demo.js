@@ -441,14 +441,14 @@ function renderCompletion(type, session, mode) {
           : "Run ended";
   const officialResultCopy = isEaster
     ? failedBonus
-      ? `You identified ${answerMarkup}, but the step order was incorrect. You still earned ${session.mapPoints} points this round.`
+      ? `You identified ${answerMarkup}, but the step order was incorrect.`
       : perfectResult
-        ? `You found ${answerMarkup} using ${session.cluesRevealed} ${clueLabel} and got the steps in the correct order. You earned ${session.points} points this round.`
+        ? `You found ${answerMarkup} using ${session.cluesRevealed} ${clueLabel} and got the steps in the correct order.`
         : session.success
-          ? `You identified ${answerMarkup} using ${session.cluesRevealed} ${clueLabel}. You earned ${session.points} points this round.`
+          ? `You identified ${answerMarkup} using ${session.cluesRevealed} ${clueLabel}.`
           : `You chose ${selectedAnswerMarkup}. Today’s answer was ${answerSentenceMarkup} Your permanent Score and Solves are safe.`
     : session.success
-      ? `You revealed ${answerMarkup} with ${session.wrongGuesses} ${session.wrongGuesses === 1 ? "mistake" : "mistakes"}. You earned ${session.points} points this round.`
+      ? `You revealed ${answerMarkup} with ${session.wrongGuesses} ${session.wrongGuesses === 1 ? "mistake" : "mistakes"}.`
       : `You did not reveal the answer. Today’s answer was ${answerSentenceMarkup} Your permanent Score and Solves are safe.`;
   const funResultCopy = isEaster
     ? failedBonus
@@ -722,6 +722,7 @@ function renderWordPuzzle({
 
 function submitLetter(value) {
   if (activePlay?.type !== "word") return;
+  const official = activePlay.mode === "official";
   const letter = normalizeLetter(value);
   const session = ensureSession("word");
   if (!letter || session.complete || session.pendingResult || session.guesses.includes(letter) || letter === wordPuzzle.initialLetter) return;
@@ -757,7 +758,9 @@ function submitLetter(value) {
     revealLetter: correct ? letter : "",
     statusMessage: correct
       ? streakMessage
-      : `${letter} is not in the answer. Potential score is now ${calculateWordPoints(session.wrongGuesses)}.`,
+      : official
+        ? `${letter} is not in the answer. Potential score is now ${calculateWordPoints(session.wrongGuesses)}.`
+        : `${letter} is not in the answer.`,
     statusType: correct && session.correctStreak >= 2 ? "streak" : "",
   });
 }
