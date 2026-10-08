@@ -398,7 +398,7 @@ function renderCompletion(type, session, mode) {
   const clueLabel = session.cluesRevealed === 1 ? "clue" : "clues";
   const answerWithPunctuation = punctuateSentenceEnding(answer);
   const resultTitle = !official
-    ? failedBonus || !session.success ? "Not quite" : "Puzzle complete"
+    ? failedBonus || !session.success ? "Not quite" : "Puzzle Complete!"
     : failedBonus
       ? "Not quite"
       : perfectResult
@@ -822,7 +822,7 @@ function renderEasterBonus(session) {
     <section class="panel easter-bonus-panel">
       ${official ? "" : '<p class="kicker">Just for fun</p>'}
       <div class="result-banner correct animate">
-        <h2>${official ? "Round Survived!" : "Map identified!"}</h2>
+        <h2>${official ? "Round Survived!" : "Map Identified!"}</h2>
         <p>${official
           ? `You identified ${escapeHtml(answer)} using ${session.cluesRevealed} ${clueLabel}. You earned ${session.mapPoints} points this round.`
           : `You identified ${escapeHtml(answer)} using ${session.cluesRevealed} ${clueLabel}. Now try the bonus objective.`}</p>
