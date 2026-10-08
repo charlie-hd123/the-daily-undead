@@ -1014,7 +1014,7 @@ function renderEasterBonus(session) {
           : `You identified <strong class="identified-map-name">${escapeHtml(answer)}</strong> using ${session.cluesRevealed} ${clueLabel}. Now try the bonus objective.`}</p>
       </div>
       <section class="bonus-panel">
-        <h3>Bonus Objective: Put the steps in order</h3>
+        <h3>Bonus: Put the steps in order</h3>
         <p class="helper-text">${official
           ? "Select the steps in the order they occur to earn Double Points. Tap a selected step again to remove it and revise your order."
           : "Select the steps in the order they occur. Tap a selected step again to remove it and revise your order."}</p>
