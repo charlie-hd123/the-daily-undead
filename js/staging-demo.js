@@ -250,7 +250,7 @@ function getCardAction(type) {
     return { label: "Finish official puzzle first", disabled: true, action: null };
   }
   if (session?.complete) {
-    return { label: "Just-for-fun puzzle complete", disabled: true, action: null };
+    return { label: "Puzzle complete", disabled: true, action: null };
   }
   return { label: session ? "Continue just for fun" : "Play just for fun", disabled: false, action: "for_fun" };
 }
@@ -509,12 +509,15 @@ function renderEasterBonusResult(session, official) {
 }
 
 function renderNextRoundScreen() {
+  const motivation = dayState.officialCompleted && dayState.officialResult?.success === false
+    ? "Return tomorrow to start a new Round."
+    : "Return tomorrow to keep your Round alive.";
   return `
     <section class="next-round-screen" aria-labelledby="next-round-screen-title" aria-live="off">
       <p class="kicker">Next round</p>
       <h3 id="next-round-screen-title">New puzzles in</h3>
       <strong id="end-screen-countdown" class="end-screen-countdown" aria-label="Time until the new puzzles">--:--:--</strong>
-      <p class="next-round-motivation">Return tomorrow to keep your Round alive.</p>
+      <p class="next-round-motivation">${motivation}</p>
     </section>
   `;
 }
@@ -578,7 +581,7 @@ function renderWordPuzzle() {
     <section class="panel word-puzzle-panel">
       ${renderHeading(
         "Which Zombies word is it?",
-        "Try to solve the Zombies word or phrase by revealing its letters",
+        "Try to solve the Zombies word or phrase by revealing its letters.",
         activePlay?.mode === "official" ? "Official puzzle" : "Just for fun",
         activePlay?.mode === "official" ? "" : "Playing just for fun. This result will not change your stats.",
       )}
@@ -685,13 +688,16 @@ function renderEasterPuzzle() {
 }
 
 function renderEasterClues(session) {
+  const official = activePlay?.mode === "official";
   app.innerHTML = `
     <section class="panel">
       ${renderHeading(
         "Which Zombies map is it?",
-        "Identify the map from its main quest steps. Reveal as few clues as possible to earn more points.",
-        activePlay?.mode === "official" ? "Official puzzle" : "Just for fun",
-        activePlay?.mode === "official" ? "" : "Playing just for fun. This result will not change your stats.",
+        official
+          ? "Identify the map from its main quest steps. Reveal as few clues as possible to earn more points."
+          : "Identify the map from its main quest steps. Reveal another clue if you need it.",
+        official ? "Official puzzle" : "Just for fun",
+        official ? "" : "Playing just for fun. This result will not change your stats.",
       )}
       <div class="clue-list">${renderClueCards(session)}</div>
       <div class="actions">
@@ -714,9 +720,10 @@ function renderEasterClues(session) {
 
 function renderEasterGameSelection(session) {
   const games = catalog.games.slice().sort((left, right) => left.releaseOrder - right.releaseOrder);
+  const kicker = activePlay?.mode === "official" ? "Lock in your answer" : "Just for fun";
   app.innerHTML = `
     <section class="panel">
-      ${renderHeading("Choose the game", `You have revealed ${session.cluesRevealed} ${session.cluesRevealed === 1 ? "clue" : "clues"}.`, "Lock in your answer")}
+      ${renderHeading("Choose the game", `You have revealed ${session.cluesRevealed} ${session.cluesRevealed === 1 ? "clue" : "clues"}.`, kicker)}
       <ul class="card-grid">
         ${games.map((game) => `<li><button class="card-button" type="button" data-game-id="${escapeHtml(game.id)}"><span class="game-label">Call of Duty</span><span class="card-title">${escapeHtml(game.title)}</span></button></li>`).join("")}
       </ul>
@@ -739,6 +746,7 @@ function renderEasterGameSelection(session) {
 
 function renderEasterMapSelection(session) {
   const game = catalog.games.find((item) => item.id === session.selectedGameId);
+  const kicker = activePlay?.mode === "official" ? "Lock in your answer" : "Just for fun";
   const gameMaps = orderMapsForGame(
     selectableMaps.filter((map) => isMapAvailableOnDate(map, dateKey)),
     session.selectedGameId,
@@ -746,7 +754,7 @@ function renderEasterMapSelection(session) {
   );
   app.innerHTML = `
     <section class="panel">
-      ${renderHeading(`Choose a ${game.title} map`, "Tap a map, then confirm your final answer.", "Lock in your answer")}
+      ${renderHeading(`Choose a ${game.title} map`, "Tap a map, then confirm your final answer.", kicker)}
       <ul class="card-grid">
         ${gameMaps.map((map) => `
           <li><button class="card-button" type="button" data-map-id="${escapeHtml(map.id)}" aria-pressed="${session.selectedMapId === map.id}"><span class="game-label">${escapeHtml(map.questTitle || map.gameTitle)}</span><span class="card-title">${escapeHtml(map.title)}</span></button></li>
@@ -807,6 +815,7 @@ function renderEasterBonus(session) {
   const official = activePlay?.mode === "official";
   app.innerHTML = `
     <section class="panel">
+      ${official ? "" : '<p class="kicker">Just for fun</p>'}
       <div class="result-banner correct animate">
         <h2>${official ? "Round Survived!" : "Map identified!"}</h2>
         <p>${official
