@@ -429,7 +429,7 @@ function renderCompletion(type, session, mode) {
   const answerWithPunctuation = punctuateSentenceEnding(answer);
   const answerMarkup = `<strong class="result-answer-name">${escapeHtml(answer)}</strong>`;
   const answerSentenceMarkup = `<strong class="result-answer-name">${escapeHtml(answerWithPunctuation)}</strong>`;
-  const selectedAnswerMarkup = `<strong class="result-answer-name">${escapeHtml(selectedMap?.title ?? "an unknown map")}</strong>`;
+  const selectedAnswerMarkup = escapeHtml(selectedMap?.title ?? "an unknown map");
   const resultTitle = !official
     ? failedBonus || !session.success ? "Not quite" : "Puzzle Complete!"
     : failedBonus
