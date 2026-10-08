@@ -303,11 +303,13 @@ function renderPuzzleCard(type) {
   `;
 }
 
+function areAllPuzzlesCompleted() {
+  return Object.keys(puzzleTypes).every((type) => dayState.sessions[type]?.complete);
+}
+
 function renderHub() {
   activePlay = null;
-  const allPuzzlesCompleted = Object.keys(puzzleTypes).every(
-    (type) => dayState.sessions[type]?.complete,
-  );
+  const allPuzzlesCompleted = areAllPuzzlesCompleted();
   const guidance = !dayState.officialType
     ? "Pick one puzzle for today’s scored round. Play the others afterwards for fun, risk-free."
     : allPuzzlesCompleted
@@ -394,6 +396,7 @@ function finishPuzzle(type, { success, points, summary }) {
 
 function renderCompletion(type, session, mode) {
   const official = mode === "official";
+  const allPuzzlesCompleted = areAllPuzzlesCompleted();
   const answer = session.summary?.answer || "";
   const isEaster = type === "easter";
   const failedBonus = isEaster && session.success && session.bonusFailed;
@@ -466,7 +469,7 @@ function renderCompletion(type, session, mode) {
       ${resultDetail}
       <div class="actions share-score-actions">
         ${official ? '<button id="share-demo-score" class="button share-score-button" type="button">Share with your squad</button>' : ""}
-        <button id="return-to-puzzle-home" class="button" type="button">Play another puzzle</button>
+        <button id="return-to-puzzle-home" class="button" type="button">${allPuzzlesCompleted ? "View puzzles" : "Play another puzzle"}</button>
       </div>
       ${official ? '<p id="share-demo-score-status" class="share-score-status" aria-live="polite"></p>' : ""}
     </section>
