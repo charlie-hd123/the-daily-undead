@@ -206,9 +206,9 @@
 
 .quest-intel-status {
   display: grid;
-  margin: 1rem 0;
+  margin: 0.8rem 0;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.65rem;
+  gap: 0.55rem;
 }
 
 .quest-intel-status.is-single {
@@ -217,7 +217,7 @@
 
 .quest-intel-status > div {
   display: grid;
-  padding: 0.65rem 0.85rem;
+  padding: 0.5rem 0.7rem;
   border: 1px solid var(--border);
   border-radius: 0.7rem;
   background: rgb(13 17 29 / 72%);
@@ -233,9 +233,9 @@
 }
 
 .quest-intel-status strong {
-  margin-top: 0.15rem;
+  margin-top: 0.1rem;
   color: #8793a5;
-  font: 900 1.55rem/1 var(--font-display);
+  font: 900 1.4rem/1 var(--font-display);
 }
 
 .quest-intel-status .quest-score-value {
@@ -387,8 +387,8 @@
 .word-scoreboard {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
-  margin: 1rem auto 0;
+  gap: 0.55rem;
+  margin: 0.8rem auto 0;
 }
 
 .word-scoreboard.is-single {
@@ -397,7 +397,7 @@
 
 .word-scoreboard > div {
   display: grid;
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.7rem;
   border: 1px solid var(--border);
   border-radius: 0.75rem;
   background: rgb(13 17 29 / 72%);
@@ -406,16 +406,16 @@
 
 .word-scoreboard span {
   color: var(--muted);
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
 .word-scoreboard strong {
-  margin-top: 0.2rem;
+  margin-top: 0.1rem;
   color: var(--essence);
-  font: 900 2rem/1 var(--font-display);
+  font: 900 1.4rem/1 var(--font-display);
 }
 
 .word-scoreboard .word-mistakes strong {
@@ -428,14 +428,14 @@
 
 .word-danger-meter {
   display: grid;
-  width: min(100%, 8rem);
-  margin: 0.55rem auto 0;
+  width: min(100%, 7rem);
+  margin: 0.35rem auto 0;
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.28rem;
 }
 
 .word-danger-meter i {
-  height: 0.24rem;
+  height: 0.2rem;
   border-radius: 999px;
   background: rgb(119 128 143 / 22%);
   box-shadow: inset 0 0 0 1px rgb(255 255 255 / 3%);
@@ -1011,6 +1011,39 @@
 }
 
 @media (max-width: 35rem) {
+  .quest-intel-status,
+  .word-scoreboard {
+    gap: 0.4rem;
+  }
+
+  .quest-intel-status {
+    margin-block: 0.65rem;
+  }
+
+  .word-scoreboard {
+    margin: 0.65rem auto 0;
+  }
+
+  .quest-intel-status > div,
+  .word-scoreboard > div {
+    padding: 0.4rem 0.45rem;
+  }
+
+  .quest-intel-status span,
+  .word-scoreboard span {
+    font-size: 0.64rem;
+  }
+
+  .quest-intel-status strong,
+  .word-scoreboard strong {
+    font-size: 1.25rem;
+  }
+
+  .word-danger-meter {
+    width: min(100%, 6rem);
+    margin-top: 0.25rem;
+  }
+
   .answer-selection-panel .screen-heading {
     margin-bottom: 0.75rem;
   }
@@ -1043,14 +1076,6 @@
 
   .answer-selection-panel .actions {
     margin-top: 0.65rem;
-  }
-
-  .word-scoreboard {
-    gap: 0.45rem;
-  }
-
-  .word-scoreboard > div {
-    padding-inline: 0.5rem;
   }
 
   .word-answer {

@@ -674,7 +674,6 @@ function renderWordPuzzle({
         official ? "" : "Playing just for fun. This result will not change your stats.",
       )}
       <div class="word-scoreboard${official ? "" : " is-single"}" aria-label="Word puzzle progress">
-        ${official ? `<div><span>Potential score</span><strong class="word-score-value${scoreChanged ? " is-changing" : ""}">${potentialPoints}</strong></div>` : ""}
         <div class="word-mistakes danger-level-${session.wrongGuesses}">
           <span>Mistakes</span>
           <strong>${session.wrongGuesses} / 5</strong>
@@ -682,6 +681,7 @@ function renderWordPuzzle({
             ${[1, 2, 3, 4, 5].map((stage) => `<i class="${stage <= session.wrongGuesses ? "is-active" : ""}${scoreChanged && stage === session.wrongGuesses ? " is-new" : ""}"></i>`).join("")}
           </div>
         </div>
+        ${official ? `<div><span>Potential score</span><strong class="word-score-value${scoreChanged ? " is-changing" : ""}">${potentialPoints}</strong></div>` : ""}
       </div>
       <div class="word-answer${longestWordLength >= 11 ? " has-long-word" : ""}${finalReveal ? " is-final-reveal" : ""}" aria-label="Partially revealed answer">
         ${renderWordSlots(wordPuzzle.entry.answer, revealed, { revealLetter: animatedLetter, finalReveal })}
