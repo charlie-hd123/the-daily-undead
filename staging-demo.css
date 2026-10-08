@@ -176,6 +176,26 @@
   color: var(--aether);
 }
 
+.answer-selection-panel .card-grid {
+  gap: 0.6rem;
+}
+
+.answer-selection-panel .card-button {
+  min-height: 6.35rem;
+  padding: 0.85rem 2.75rem 0.85rem 0.9rem;
+}
+
+.answer-selection-panel .card-button::after {
+  right: 0.8rem;
+  width: 1.65rem;
+  height: 1.65rem;
+}
+
+.answer-selection-panel .card-title {
+  margin-top: 0.35rem;
+  font-size: clamp(1.25rem, 3.7vw, 1.55rem);
+}
+
 .word-puzzle-panel {
   overflow: hidden;
 }
@@ -400,6 +420,40 @@
 }
 
 @media (max-width: 35rem) {
+  .answer-selection-panel .screen-heading {
+    margin-bottom: 0.75rem;
+  }
+
+  .answer-selection-panel .card-grid {
+    gap: 0.45rem;
+  }
+
+  .answer-selection-panel .card-button {
+    min-height: 5.4rem;
+    padding: 0.65rem 2.35rem 0.65rem 0.75rem;
+  }
+
+  .answer-selection-panel .card-button::after {
+    right: 0.6rem;
+    width: 1.45rem;
+    height: 1.45rem;
+  }
+
+  .answer-selection-panel .game-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+  }
+
+  .answer-selection-panel .card-title {
+    margin-top: 0.25rem;
+    font-size: 1.12rem;
+    line-height: 1.05;
+  }
+
+  .answer-selection-panel .actions {
+    margin-top: 0.65rem;
+  }
+
   .word-scoreboard {
     gap: 0.45rem;
   }

@@ -727,7 +727,7 @@ function renderEasterGameSelection(session) {
   const games = catalog.games.slice().sort((left, right) => left.releaseOrder - right.releaseOrder);
   const kicker = activePlay?.mode === "official" ? "Lock in your answer" : "Just for fun";
   app.innerHTML = `
-    <section class="panel">
+    <section class="panel answer-selection-panel">
       ${renderHeading("Choose the game", `You have revealed ${session.cluesRevealed} ${session.cluesRevealed === 1 ? "clue" : "clues"}.`, kicker)}
       <ul class="card-grid">
         ${games.map((game) => `<li><button class="card-button" type="button" data-game-id="${escapeHtml(game.id)}"><span class="game-label">Call of Duty</span><span class="card-title">${escapeHtml(game.title)}</span></button></li>`).join("")}
@@ -758,7 +758,7 @@ function renderEasterMapSelection(session) {
     catalog.mapOrder?.[session.selectedGameId],
   );
   app.innerHTML = `
-    <section class="panel">
+    <section class="panel answer-selection-panel">
       ${renderHeading(`Choose a ${game.title} map`, "Tap a map, then confirm your final answer.", kicker)}
       <ul class="card-grid">
         ${gameMaps.map((map) => `
