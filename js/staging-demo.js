@@ -800,7 +800,7 @@ function renderEasterClues(session, { newlyRevealedIndex = -1, scoreChanged = fa
       <div class="clue-list">${renderClueCards(session, newlyRevealedIndex)}</div>
       <div class="actions">
         <button id="demo-reveal-clue" class="button" type="button" ${session.cluesRevealed >= 3 ? "disabled" : ""}>${session.cluesRevealed >= 3 ? "All clues revealed" : "Reveal next clue"}</button>
-        <button id="demo-select-map" class="button primary" type="button">Select map · ${session.cluesRevealed} ${session.cluesRevealed === 1 ? "clue" : "clues"}</button>
+        <button id="demo-select-map" class="button primary" type="button">Select map</button>
       </div>
     </section>
   `;
