@@ -295,6 +295,15 @@
   gap: 0.75rem;
 }
 
+.easter-bonus-panel .selection-progress {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #8d9bb0;
+  box-shadow: none;
+}
+
 .order-chain {
   display: grid;
   width: 5.5rem;
@@ -316,20 +325,14 @@
 }
 
 .selection-progress.is-ready {
-  border-color: rgb(103 232 255 / 46%);
-  background: rgb(103 232 255 / 13%);
   color: #baf5ff;
-  box-shadow: 0 0 1rem rgb(103 232 255 / 10%);
 }
 
 .selection-progress.is-correct {
-  border-color: rgb(103 232 255 / 58%);
   color: #c9f7ff;
 }
 
 .selection-progress.is-incorrect {
-  border-color: rgb(255 101 119 / 48%);
-  background: rgb(255 101 119 / 9%);
   color: #ff98a5;
 }
 
