@@ -743,16 +743,19 @@ function submitLetter(value) {
   if (solved) {
     session.pendingResult = "success";
     persist();
+    pulseDevice([12, 35, 20]);
     renderWordPuzzle({ revealLetter: letter, statusMessage: "Answer revealed!", statusType: "complete" });
     return;
   }
   if (session.wrongGuesses >= 5) {
     session.pendingResult = "failure";
     persist();
+    pulseDevice(35);
     renderWordPuzzle({ scoreChanged: true, statusMessage: "No attempts remaining." });
     return;
   }
   persist();
+  pulseDevice(correct ? 8 : 22);
   const streakMessage = session.correctStreak >= 2
     ? `${session.correctStreak} correct letters in a row!`
     : `${letter} is in the answer.`;
