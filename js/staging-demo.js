@@ -788,6 +788,19 @@ function submitEasterMap(session) {
   renderEasterPuzzle();
 }
 
+function updateEasterBonusSelection(session) {
+  const progress = app.querySelector(".selection-progress");
+  if (progress) progress.textContent = `Selected: ${session.bonusOrder.length} of 3`;
+  app.querySelectorAll("[data-step-id]").forEach((button) => {
+    const selectedIndex = session.bonusOrder.indexOf(button.dataset.stepId);
+    button.setAttribute("aria-pressed", String(selectedIndex >= 0));
+    const rank = button.querySelector(".order-rank");
+    if (rank) rank.textContent = selectedIndex >= 0 ? String(selectedIndex + 1) : "+";
+  });
+  const submitButton = app.querySelector("#submit-demo-order");
+  if (submitButton) submitButton.disabled = session.bonusOrder.length !== 3;
+}
+
 function renderEasterBonus(session) {
   const answer = getAnswerDisplayTitle(easterPuzzle.map, catalog.answerEquivalents);
   const clueLabel = session.cluesRevealed === 1 ? "clue" : "clues";
@@ -819,7 +832,7 @@ function renderEasterBonus(session) {
   app.querySelectorAll("[data-step-id]").forEach((button) => button.addEventListener("click", () => {
     session.bonusOrder = toggleOrderedSelection(session.bonusOrder, button.dataset.stepId);
     persist();
-    renderEasterBonus(session);
+    updateEasterBonusSelection(session);
   }));
   app.querySelector("#submit-demo-order").addEventListener("click", () => {
     const bonusCorrect = isCorrectOrder(session.bonusOrder, easterPuzzle.chronologicalSteps);
