@@ -74,14 +74,6 @@ function slugify(value) {
     .replace(/^-|-$/g, "");
 }
 
-function pulseDevice(pattern = 10) {
-  try {
-    navigator.vibrate?.(pattern);
-  } catch {
-    // Haptic feedback is optional and unsupported browsers continue normally.
-  }
-}
-
 function getRequestedDateKey() {
   const requested = new URLSearchParams(window.location.search).get("date");
   return isValidDateKey(requested) ? requested : getUtcDateKey();
@@ -743,19 +735,16 @@ function submitLetter(value) {
   if (solved) {
     session.pendingResult = "success";
     persist();
-    pulseDevice([12, 35, 20]);
     renderWordPuzzle({ revealLetter: letter, statusMessage: "Answer revealed!", statusType: "complete" });
     return;
   }
   if (session.wrongGuesses >= 5) {
     session.pendingResult = "failure";
     persist();
-    pulseDevice(35);
     renderWordPuzzle({ scoreChanged: true, statusMessage: "No attempts remaining." });
     return;
   }
   persist();
-  pulseDevice(correct ? 8 : 22);
   const streakMessage = session.correctStreak >= 2
     ? `${session.correctStreak} correct letters in a row!`
     : `${letter} is in the answer.`;
@@ -814,7 +803,6 @@ function renderEasterClues(session, { newlyRevealedIndex = -1, scoreChanged = fa
   app.querySelector("#demo-reveal-clue")?.addEventListener("click", () => {
     session.cluesRevealed = Math.min(3, session.cluesRevealed + 1);
     persist();
-    pulseDevice(12);
     renderEasterClues(session, { newlyRevealedIndex: session.cluesRevealed - 1, scoreChanged: official });
   });
   app.querySelector("#demo-select-map").addEventListener("click", () => {
@@ -882,7 +870,6 @@ function renderEasterMapSelection(session) {
     button.classList.add("is-newly-selected");
     const confirmButton = app.querySelector("#confirm-demo-map");
     if (confirmButton) confirmButton.disabled = false;
-    pulseDevice(10);
   }));
   app.querySelector("#back-to-demo-games").addEventListener("click", () => {
     session.phase = "game";
@@ -891,7 +878,6 @@ function renderEasterMapSelection(session) {
     renderEasterPuzzle();
   });
   app.querySelector("#confirm-demo-map").addEventListener("click", () => {
-    pulseDevice(18);
     submitEasterMap(session);
   });
 }
@@ -937,7 +923,7 @@ function finishPendingEasterBonus(session) {
   }, getEasterBonusFeedbackDelay(pendingResult === "correct"));
 }
 
-function showPendingEasterBonusFeedback(session, withHaptics = false) {
+function showPendingEasterBonusFeedback(session) {
   const bonusCorrect = session.pendingBonusResult === "correct";
   const list = app.querySelector(".order-choice-list");
   list?.classList.toggle("is-order-correct", bonusCorrect);
@@ -953,7 +939,6 @@ function showPendingEasterBonusFeedback(session, withHaptics = false) {
   }
   const submitButton = app.querySelector("#submit-demo-order");
   if (submitButton) submitButton.disabled = true;
-  if (withHaptics) pulseDevice(bonusCorrect ? [18, 45, 18] : 35);
   finishPendingEasterBonus(session);
 }
 
@@ -1024,7 +1009,6 @@ function renderEasterBonus(session) {
     if (session.pendingBonusResult) return;
     session.bonusOrder = toggleOrderedSelection(session.bonusOrder, button.dataset.stepId);
     persist();
-    pulseDevice(8);
     updateEasterBonusSelection(session, button);
   }));
   app.querySelector("#submit-demo-order").addEventListener("click", () => {
@@ -1034,7 +1018,7 @@ function renderEasterBonus(session) {
     session.bonusFailed = !bonusCorrect;
     session.pendingBonusResult = bonusCorrect ? "correct" : "incorrect";
     persist();
-    showPendingEasterBonusFeedback(session, true);
+    showPendingEasterBonusFeedback(session);
   });
   if (pendingResult) showPendingEasterBonusFeedback(session);
 }
