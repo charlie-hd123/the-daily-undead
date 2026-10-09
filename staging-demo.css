@@ -568,7 +568,9 @@
 .word-game-status {
   margin: 0.8rem 0 0;
   color: var(--muted-strong);
+  font-size: clamp(0.86rem, 2.2vw, 0.95rem);
   font-weight: 500;
+  line-height: 1.4;
   text-align: center;
 }
 
