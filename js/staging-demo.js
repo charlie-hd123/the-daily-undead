@@ -687,6 +687,7 @@ function renderWordPuzzle({
         official ? "Official puzzle" : "Just for fun",
         official ? "" : "Playing just for fun. This result will not change your stats.",
       )}
+      <p class="word-play-category">${escapeHtml(wordPuzzle.entry.category)}</p>
       <div class="word-scoreboard${official ? "" : " is-single"}" aria-label="Word puzzle progress">
         <div class="word-mistakes danger-level-${session.wrongGuesses}">
           <span>Mistakes</span>

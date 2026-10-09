@@ -23,7 +23,7 @@ test("the same UTC date produces the same word and starting letters", () => {
   assert.deepEqual(first, second);
 });
 
-test("two different starting letters exist in the answer and never reveal its first letter", () => {
+test("a vowel and consonant start in the answer without revealing its first letter", () => {
   for (let day = 1; day <= 20; day += 1) {
     const dateKey = `2026-10-${String(day).padStart(2, "0")}`;
     const puzzle = buildDailyWordPuzzle(dateKey, entries);
@@ -32,7 +32,18 @@ test("two different starting letters exist in the answer and never reveal its fi
     assert.equal(new Set(puzzle.initialLetters).size, 2);
     assert.equal(puzzle.initialLetters.every((letter) => letters.includes(letter)), true);
     assert.equal(puzzle.initialLetters.includes(letters[0]), false);
+    assert.equal(puzzle.initialLetters.some((letter) => "AEIOU".includes(letter)), true);
+    assert.equal(puzzle.initialLetters.some((letter) => !"AEIOU".includes(letter)), true);
   }
+});
+
+test("answers without an eligible vowel still never reveal their first letter", () => {
+  const puzzle = buildDailyWordPuzzle("2026-10-07", [
+    { id: "agartha", category: "Story & Lore", answer: "Agartha", availableFrom: "2026-01-01" },
+  ]);
+
+  assert.equal(puzzle.initialLetters.length, 2);
+  assert.equal(puzzle.initialLetters.includes("A"), false);
 });
 
 test("a returning word can receive a different pair of starting letters", () => {

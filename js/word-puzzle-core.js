@@ -62,7 +62,14 @@ export function buildDailyWordPuzzle(dateKey, entries) {
     (letter) => letter !== firstLetter,
   );
   const revealRandom = createRng(hashString(`${dateKey}:${entry.id}:starting-letter`));
-  const initialLetters = shuffle(revealCandidates, revealRandom).slice(0, 2).sort();
+  const vowelCandidates = revealCandidates.filter((letter) => "AEIOU".includes(letter));
+  const consonantCandidates = revealCandidates.filter((letter) => !"AEIOU".includes(letter));
+  const initialLetters = vowelCandidates.length && consonantCandidates.length
+    ? [
+        shuffle(vowelCandidates, revealRandom)[0],
+        shuffle(consonantCandidates, revealRandom)[0],
+      ].sort()
+    : shuffle(revealCandidates, revealRandom).slice(0, 2).sort();
 
   return {
     dateKey,

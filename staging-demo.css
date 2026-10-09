@@ -469,6 +469,13 @@
   font-weight: 800;
 }
 
+.word-play-category {
+  margin: 0.85rem 0 0;
+  color: var(--aether);
+  font: 800 0.9rem/1.2 var(--font-body);
+  letter-spacing: 0.04em;
+}
+
 .word-answer {
   position: relative;
   display: flex;
