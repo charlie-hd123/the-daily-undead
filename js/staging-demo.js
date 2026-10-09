@@ -162,14 +162,13 @@ function updateCountdown() {
   }
 }
 
-function renderHeading(title, description, kicker = "Today’s puzzle", note = "", hint = "") {
+function renderHeading(title, description, kicker = "Today’s puzzle", note = "") {
   return `
     <div class="screen-heading">
       <p class="kicker">${escapeHtml(kicker)}</p>
       <h2>${escapeHtml(title)}</h2>
       <p>${escapeHtml(description)}</p>
       ${note ? `<p class="puzzle-mode-note">${escapeHtml(note)}</p>` : ""}
-      ${hint ? `<p class="heading-hint">${escapeHtml(hint)}</p>` : ""}
     </div>
   `;
 }
@@ -687,7 +686,6 @@ function renderWordPuzzle({
         "Try to solve the Zombies word or phrase by revealing its letters.",
         official ? "Official puzzle" : "Just for fun",
         official ? "" : "Playing just for fun. This result will not change your stats.",
-        `Hint: ${wordPuzzle.entry.category}`,
       )}
       <div class="word-scoreboard${official ? "" : " is-single"}" aria-label="Word puzzle progress">
         <div class="word-mistakes danger-level-${session.wrongGuesses}">
@@ -699,6 +697,7 @@ function renderWordPuzzle({
         </div>
         ${official ? `<div><span>Potential score</span><strong class="word-score-value${scoreChanged ? " is-changing" : ""}">${potentialPoints}</strong></div>` : ""}
       </div>
+      <p class="word-category-hint">Hint: ${escapeHtml(wordPuzzle.entry.category)}</p>
       <div class="word-answer${longestWordLength >= 11 ? " has-long-word" : ""}${finalReveal ? " is-final-reveal" : ""}" aria-label="Partially revealed answer">
         ${renderWordSlots(wordPuzzle.entry.answer, revealed, { revealLetter: animatedLetter, finalReveal })}
       </div>

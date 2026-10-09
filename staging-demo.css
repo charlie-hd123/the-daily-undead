@@ -25,8 +25,8 @@
   font-size: 0.9rem;
 }
 
-.screen-heading > p.heading-hint {
-  margin-top: 0.55rem;
+.word-category-hint {
+  margin: 0.65rem 0 -0.25rem;
   color: var(--aether);
   font-size: 0.9rem;
   font-weight: 600;
