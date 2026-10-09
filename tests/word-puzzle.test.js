@@ -17,20 +17,34 @@ const entries = [
   { id: "eisendrache", category: "Maps", answer: "Der Eisendrache", availableFrom: "2026-01-01" },
 ];
 
-test("the same UTC date produces the same word and starting letter", () => {
+test("the same UTC date produces the same word and starting letters", () => {
   const first = buildDailyWordPuzzle("2026-10-07", entries);
   const second = buildDailyWordPuzzle("2026-10-07", [...entries].reverse());
   assert.deepEqual(first, second);
 });
 
-test("the starting letter exists in the answer but never reveals its first letter", () => {
+test("two different starting letters exist in the answer and never reveal its first letter", () => {
   for (let day = 1; day <= 20; day += 1) {
     const dateKey = `2026-10-${String(day).padStart(2, "0")}`;
     const puzzle = buildDailyWordPuzzle(dateKey, entries);
     const letters = getAnswerLetters(puzzle.entry.answer);
-    assert.equal(letters.includes(puzzle.initialLetter), true);
-    assert.notEqual(puzzle.initialLetter, letters[0]);
+    assert.equal(puzzle.initialLetters.length, 2);
+    assert.equal(new Set(puzzle.initialLetters).size, 2);
+    assert.equal(puzzle.initialLetters.every((letter) => letters.includes(letter)), true);
+    assert.equal(puzzle.initialLetters.includes(letters[0]), false);
   }
+});
+
+test("a returning word can receive a different pair of starting letters", () => {
+  const repeatedWord = [entries[1]];
+  const startingPairs = new Set();
+
+  for (let day = 1; day <= 20; day += 1) {
+    const dateKey = `2026-10-${String(day).padStart(2, "0")}`;
+    startingPairs.add(buildDailyWordPuzzle(dateKey, repeatedWord).initialLetters.join(""));
+  }
+
+  assert.equal(startingPairs.size > 1, true);
 });
 
 test("word points follow the configured ladder and reach zero on the fifth mistake", () => {
@@ -46,9 +60,10 @@ test("all occurrences of a guessed letter count as revealed", () => {
   assert.equal(isWordSolved("Ray Gun", ["R", "A", "Y", "G", "U", "N"]), true);
 });
 
-test("letter-only entries require at least two distinct A-Z letters", () => {
+test("letter-only entries require at least three distinct A-Z letters", () => {
   assert.equal(isPlayableWordEntry({ id: "song-115", category: "Songs", answer: "115", availableFrom: "2026-01-01" }), false);
   assert.equal(isPlayableWordEntry({ id: "aaa", category: "Test", answer: "AAA", availableFrom: "2026-01-01" }), false);
+  assert.equal(isPlayableWordEntry({ id: "abab", category: "Test", answer: "ABAB", availableFrom: "2026-01-01" }), false);
   assert.equal(isPlayableWordEntry(entries[0]), true);
   assert.equal(isPlayableWordEntry({ ...entries[0], category: "" }), false);
   assert.equal(isPlayableWordEntry({ ...entries[0], availableFrom: "soon" }), false);

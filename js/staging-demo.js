@@ -114,7 +114,7 @@ function loadProfile() {
 
 function createDayState() {
   return {
-    version: 2,
+    version: 3,
     dateKey,
     officialType: null,
     officialCompleted: false,
@@ -127,7 +127,7 @@ function createDayState() {
 
 function loadDayState() {
   const saved = loadJson(`${dayStoragePrefix}${dateKey}`, null);
-  if (saved?.version !== 2 || saved?.dateKey !== dateKey) return createDayState();
+  if (saved?.version !== 3 || saved?.dateKey !== dateKey) return createDayState();
   return {
     ...createDayState(),
     ...saved,
@@ -660,7 +660,8 @@ function renderWordPuzzle({
   const resultPending = Boolean(session.pendingResult);
   const answerLetters = wordPuzzle.entry.answer.toUpperCase();
   const guesses = new Set(session.guesses);
-  const revealed = new Set([wordPuzzle.initialLetter]);
+  const initialLetters = new Set(wordPuzzle.initialLetters);
+  const revealed = new Set(wordPuzzle.initialLetters);
   session.guesses.forEach((letter) => {
     if (answerLetters.includes(letter)) revealed.add(letter);
   });
@@ -703,16 +704,16 @@ function renderWordPuzzle({
         ${keyboardRows.map((row) => `
           <div class="word-keyboard-row">
             ${[...row].map((letter) => {
-              const used = guesses.has(letter) || letter === wordPuzzle.initialLetter;
+              const used = guesses.has(letter) || initialLetters.has(letter);
               const correct = answerLetters.includes(letter);
-              const stateClass = letter === wordPuzzle.initialLetter
+              const stateClass = initialLetters.has(letter)
                 ? " is-revealed"
                 : used && correct
                   ? " is-correct"
                   : used
                     ? " is-incorrect"
                     : "";
-              const stateLabel = letter === wordPuzzle.initialLetter
+              const stateLabel = initialLetters.has(letter)
                 ? "Starting letter"
                 : !used
                   ? "Unused"
@@ -738,7 +739,7 @@ function submitLetter(value) {
   const official = activePlay.mode === "official";
   const letter = normalizeLetter(value);
   const session = ensureSession("word");
-  if (!letter || session.complete || session.pendingResult || session.guesses.includes(letter) || letter === wordPuzzle.initialLetter) return;
+  if (!letter || session.complete || session.pendingResult || session.guesses.includes(letter) || wordPuzzle.initialLetters.includes(letter)) return;
   session.guesses.push(letter);
   session.lastGuess = letter;
   const correct = wordPuzzle.entry.answer.toUpperCase().includes(letter);
@@ -748,7 +749,7 @@ function submitLetter(value) {
     session.wrongGuesses += 1;
     session.correctStreak = 0;
   }
-  const revealed = [wordPuzzle.initialLetter, ...session.guesses];
+  const revealed = [...wordPuzzle.initialLetters, ...session.guesses];
   const solved = isWordSolved(wordPuzzle.entry.answer, revealed);
   if (solved) {
     session.pendingResult = "success";

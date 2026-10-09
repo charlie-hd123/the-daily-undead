@@ -23,7 +23,7 @@ export function isPlayableWordEntry(entry) {
     isValidDateKey(entry.availableFrom) &&
     (entry.retiredFrom == null ||
       (isValidDateKey(entry.retiredFrom) && entry.retiredFrom > entry.availableFrom)) &&
-    getDistinctAnswerLetters(entry.answer).length >= 2
+    getDistinctAnswerLetters(entry.answer).length >= 3
   );
 }
 
@@ -62,13 +62,13 @@ export function buildDailyWordPuzzle(dateKey, entries) {
     (letter) => letter !== firstLetter,
   );
   const revealRandom = createRng(hashString(`${dateKey}:${entry.id}:starting-letter`));
-  const initialLetter = revealCandidates[Math.floor(revealRandom() * revealCandidates.length)];
+  const initialLetters = shuffle(revealCandidates, revealRandom).slice(0, 2).sort();
 
   return {
     dateKey,
     entry,
-    initialLetter,
-    key: `${dateKey}:word:${entry.id}:${initialLetter}`,
+    initialLetters,
+    key: `${dateKey}:word:${entry.id}:${initialLetters.join("")}`,
   };
 }
 
