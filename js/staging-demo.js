@@ -67,13 +67,6 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function slugify(value) {
-  return String(value)
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
-}
-
 function getRequestedDateKey() {
   const requested = new URLSearchParams(window.location.search).get("date");
   return isValidDateKey(requested) ? requested : getUtcDateKey();
@@ -121,7 +114,7 @@ function loadProfile() {
 
 function createDayState() {
   return {
-    version: 1,
+    version: 2,
     dateKey,
     officialType: null,
     officialCompleted: false,
@@ -134,7 +127,7 @@ function createDayState() {
 
 function loadDayState() {
   const saved = loadJson(`${dayStoragePrefix}${dateKey}`, null);
-  if (saved?.version !== 1 || saved?.dateKey !== dateKey) return createDayState();
+  if (saved?.version !== 2 || saved?.dateKey !== dateKey) return createDayState();
   return {
     ...createDayState(),
     ...saved,
@@ -1060,9 +1053,7 @@ async function loadData() {
   if (!wordResponse.ok || !indexResponse.ok) throw new Error("Could not load the demo catalogues.");
   const wordBank = await wordResponse.json();
   catalog = await indexResponse.json();
-  wordEntries = Object.entries(wordBank.categories).flatMap(([category, answers]) =>
-    answers.map((answer, index) => ({ id: `${slugify(category)}-${index + 1}`, category, answer })),
-  );
+  wordEntries = wordBank.words;
   maps = await Promise.all(catalog.maps.map(async (filename) => {
     const response = await fetch(`./data/maps/${filename}`, { cache: "no-store" });
     if (!response.ok) throw new Error(`Could not load ${filename}.`);

@@ -17,8 +17,22 @@ export function isPlayableWordEntry(entry) {
   return (
     typeof entry?.id === "string" &&
     entry.id.length > 0 &&
+    typeof entry?.category === "string" &&
+    entry.category.length > 0 &&
     typeof entry?.answer === "string" &&
+    isValidDateKey(entry.availableFrom) &&
+    (entry.retiredFrom == null ||
+      (isValidDateKey(entry.retiredFrom) && entry.retiredFrom > entry.availableFrom)) &&
     getDistinctAnswerLetters(entry.answer).length >= 2
+  );
+}
+
+export function isWordAvailableOnDate(entry, dateKey) {
+  return (
+    isPlayableWordEntry(entry) &&
+    isValidDateKey(dateKey) &&
+    entry.availableFrom <= dateKey &&
+    (entry.retiredFrom == null || dateKey < entry.retiredFrom)
   );
 }
 
@@ -32,7 +46,7 @@ export function buildDailyWordPuzzle(dateKey, entries) {
   }
 
   const playable = entries
-    .filter(isPlayableWordEntry)
+    .filter((entry) => isWordAvailableOnDate(entry, dateKey))
     .slice()
     .sort((left, right) => left.id.localeCompare(right.id));
   if (!playable.length) throw new Error("No playable word entries are available.");
