@@ -162,12 +162,12 @@ function updateCountdown() {
   }
 }
 
-function renderHeading(title, description, kicker = "Today’s puzzle", note = "") {
+function renderHeading(title, description, kicker = "Today’s puzzle", note = "", hint = "") {
   return `
     <div class="screen-heading">
       <p class="kicker">${escapeHtml(kicker)}</p>
       <h2>${escapeHtml(title)}</h2>
-      <p>${escapeHtml(description)}</p>
+      <p>${escapeHtml(description)}${hint ? ` <span class="heading-hint">${escapeHtml(hint)}</span>` : ""}</p>
       ${note ? `<p class="puzzle-mode-note">${escapeHtml(note)}</p>` : ""}
     </div>
   `;
@@ -686,8 +686,8 @@ function renderWordPuzzle({
         "Try to solve the Zombies word or phrase by revealing its letters.",
         official ? "Official puzzle" : "Just for fun",
         official ? "" : "Playing just for fun. This result will not change your stats.",
+        `Hint: ${wordPuzzle.entry.category}`,
       )}
-      <p class="word-play-category"><span>Category</span><strong>${escapeHtml(wordPuzzle.entry.category)}</strong></p>
       <div class="word-scoreboard${official ? "" : " is-single"}" aria-label="Word puzzle progress">
         <div class="word-mistakes danger-level-${session.wrongGuesses}">
           <span>Mistakes</span>
