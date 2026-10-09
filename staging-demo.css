@@ -470,6 +470,7 @@
 }
 
 .word-answer {
+  position: relative;
   display: flex;
   min-height: 9rem;
   padding: clamp(1.2rem, 4vw, 2.25rem) 0.5rem;
@@ -517,8 +518,27 @@
 }
 
 .word-answer.is-final-reveal {
-  border-bottom-color: rgb(103 232 255 / 58%);
-  background: radial-gradient(circle at center, rgb(103 232 255 / 9%), transparent 66%);
+  border-bottom-color: transparent;
+}
+
+.word-answer.is-final-reveal::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0.35rem 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgb(103 232 255 / 14%) 0%,
+    rgb(103 232 255 / 7%) 38%,
+    transparent 74%
+  );
+  content: "";
+  pointer-events: none;
+}
+
+.word-answer.is-final-reveal > * {
+  position: relative;
+  z-index: 1;
 }
 
 .word-literal {
@@ -637,6 +657,10 @@
 
   .word-answer.is-final-reveal {
     animation: word-final-impact 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  .word-answer.is-final-reveal::before {
+    animation: word-final-glow 1.15s ease-out both;
   }
 
   .word-token.is-completing {
@@ -875,13 +899,28 @@
   42% {
     transform: scale(1.018);
     filter: brightness(1.24);
-    box-shadow: inset 0 0 2.5rem rgb(103 232 255 / 16%);
   }
 
   100% {
     transform: scale(1);
     filter: brightness(1);
-    box-shadow: inset 0 0 0 rgb(103 232 255 / 0%);
+  }
+}
+
+@keyframes word-final-glow {
+  0% {
+    opacity: 0;
+    transform: scale(0.72);
+  }
+
+  42% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+
+  100% {
+    opacity: 0.72;
+    transform: scale(1);
   }
 }
 
