@@ -167,8 +167,9 @@ function renderHeading(title, description, kicker = "Today’s puzzle", note = "
     <div class="screen-heading">
       <p class="kicker">${escapeHtml(kicker)}</p>
       <h2>${escapeHtml(title)}</h2>
-      <p>${escapeHtml(description)}${hint ? ` <span class="heading-hint">${escapeHtml(hint)}</span>` : ""}</p>
+      <p>${escapeHtml(description)}</p>
       ${note ? `<p class="puzzle-mode-note">${escapeHtml(note)}</p>` : ""}
+      ${hint ? `<p class="heading-hint">${escapeHtml(hint)}</p>` : ""}
     </div>
   `;
 }

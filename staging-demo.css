@@ -25,9 +25,13 @@
   font-size: 0.9rem;
 }
 
-.screen-heading .heading-hint {
+.screen-heading > p.heading-hint {
+  margin-top: 0.55rem;
   color: var(--aether);
+  font-size: 0.9rem;
   font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
   white-space: nowrap;
 }
 
