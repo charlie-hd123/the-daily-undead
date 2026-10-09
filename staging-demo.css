@@ -470,10 +470,25 @@
 }
 
 .word-play-category {
+  display: inline-flex;
   margin: 0.85rem 0 0;
+  padding-left: 0.55rem;
+  align-items: baseline;
+  border-left: 2px solid rgb(103 232 255 / 72%);
+  gap: 0.42rem;
+  line-height: 1;
+}
+
+.word-play-category span {
+  color: var(--muted);
+  font: 800 0.68rem/1 var(--font-body);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.word-play-category strong {
   color: var(--aether);
-  font: 800 0.9rem/1.2 var(--font-body);
-  letter-spacing: 0.04em;
+  font: 800 0.9rem/1 var(--font-body);
 }
 
 .word-answer {
