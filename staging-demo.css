@@ -30,7 +30,7 @@
   flex: 0 0 100%;
   margin: 0;
   color: var(--aether);
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 600;
   line-height: 1.2;
   text-align: center;
@@ -496,8 +496,8 @@
 }
 
 .word-answer.has-long-word .word-letter {
-  width: clamp(0.95rem, 3.8vw, 1.8rem);
-  font-size: clamp(1.2rem, 4.4vw, 2rem);
+  width: clamp(1rem, 4vw, 1.9rem);
+  font-size: clamp(1.28rem, 4.6vw, 2.1rem);
 }
 
 .word-token {
@@ -513,12 +513,12 @@
 
 .word-letter {
   display: inline-grid;
-  width: clamp(1.05rem, 4.3vw, 2rem);
-  min-height: clamp(2rem, 7vw, 3rem);
+  width: clamp(1.1rem, 4.5vw, 2.1rem);
+  min-height: clamp(2.1rem, 7.3vw, 3.15rem);
   place-items: center;
   border-bottom: 0.16rem solid rgb(246 247 251 / 72%);
   color: transparent;
-  font: 900 clamp(1.35rem, 5vw, 2.2rem)/1 var(--font-display);
+  font: 900 clamp(1.45rem, 5.2vw, 2.35rem)/1 var(--font-display);
 }
 
 .word-letter.is-visible {
