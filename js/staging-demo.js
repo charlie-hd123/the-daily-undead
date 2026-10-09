@@ -697,9 +697,9 @@ function renderWordPuzzle({
         </div>
         ${official ? `<div><span>Potential score</span><strong class="word-score-value${scoreChanged ? " is-changing" : ""}">${potentialPoints}</strong></div>` : ""}
       </div>
-      <p class="word-category-hint">Hint: ${escapeHtml(wordPuzzle.entry.category)}</p>
       <div class="word-answer${longestWordLength >= 11 ? " has-long-word" : ""}${finalReveal ? " is-final-reveal" : ""}" aria-label="Partially revealed answer">
         ${renderWordSlots(wordPuzzle.entry.answer, revealed, { revealLetter: animatedLetter, finalReveal })}
+        <p class="word-category-hint">Hint: ${escapeHtml(wordPuzzle.entry.category)}</p>
       </div>
       <div class="word-keyboard" aria-label="Letter keyboard">
         ${keyboardRows.map((row) => `
