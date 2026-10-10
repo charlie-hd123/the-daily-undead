@@ -583,7 +583,17 @@
 }
 
 .word-answer.is-final-reveal .word-letter {
+  width: auto;
+  min-width: 0.62em;
   border-bottom-color: transparent;
+}
+
+.word-answer.is-final-reveal .word-answer-display {
+  justify-self: center;
+}
+
+.word-answer.is-final-reveal .word-token {
+  gap: clamp(0.08rem, 0.35vw, 0.18rem);
 }
 
 .word-answer.is-final-reveal .word-answer-display::before {
@@ -821,13 +831,9 @@
   }
 
   .word-answer.is-final-reveal .word-letter {
-    animation: word-underline-release 220ms ease-out both;
-  }
-
-  .word-answer.is-final-reveal .word-letter.is-newly-revealed {
     animation:
-      word-letter-reveal 420ms cubic-bezier(0.2, 0.9, 0.24, 1.25) both,
-      word-underline-release 220ms ease-out both;
+      word-underline-release 220ms ease-out both,
+      word-letter-victory-bounce 520ms calc(240ms + (var(--letter-index, 0) * 55ms)) cubic-bezier(0.2, 0.85, 0.24, 1.2) both;
   }
 
   .word-token.is-completing {
@@ -1278,6 +1284,25 @@
 
   100% {
     border-bottom-color: transparent;
+  }
+}
+
+@keyframes word-letter-victory-bounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    color: var(--text);
+    text-shadow: 0 0 0.8rem rgb(103 232 255 / 25%);
+  }
+
+  42% {
+    transform: translateY(-0.48rem) scale(1.14);
+    color: #d9fbff;
+    text-shadow: 0 0 1.25rem rgb(103 232 255 / 82%);
+  }
+
+  72% {
+    transform: translateY(0.08rem) scale(0.96);
+    color: #fff;
   }
 }
 

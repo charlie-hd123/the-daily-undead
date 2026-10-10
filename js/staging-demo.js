@@ -602,6 +602,7 @@ function renderWordSlots(answer, revealedLetters, { revealLetter = "", finalReve
   const revealed = new Set(revealedLetters);
   const newlyRevealedLetter = normalizeLetter(revealLetter);
   let revealIndex = 0;
+  let letterIndex = 0;
   return answer.split(" ").map((word, wordIndex) => `
     <span class="word-token${finalReveal ? " is-completing" : ""}"${finalReveal ? ` style="--word-index: ${wordIndex}"` : ""}>
       ${[...word].map((character) => {
@@ -609,8 +610,9 @@ function renderWordSlots(answer, revealedLetters, { revealLetter = "", finalReve
         if (!letter) return `<span class="word-literal">${escapeHtml(character)}</span>`;
         const visible = revealed.has(letter);
         const newlyRevealed = visible && letter === newlyRevealedLetter;
-        const stagger = newlyRevealed ? ` style="--reveal-index: ${revealIndex++}"` : "";
-        return `<span class="word-letter${visible ? " is-visible" : ""}${newlyRevealed ? " is-newly-revealed" : ""}"${stagger} aria-label="${visible ? letter : "Hidden letter"}">${visible ? letter : ""}</span>`;
+        const animationIndexes = [`--letter-index: ${letterIndex++}`];
+        if (newlyRevealed) animationIndexes.push(`--reveal-index: ${revealIndex++}`);
+        return `<span class="word-letter${visible ? " is-visible" : ""}${newlyRevealed ? " is-newly-revealed" : ""}" style="${animationIndexes.join("; ")}" aria-label="${visible ? letter : "Hidden letter"}">${visible ? letter : ""}</span>`;
       }).join("")}
     </span>
   `).join('<span class="word-space" aria-hidden="true"></span>');
@@ -620,7 +622,9 @@ function getWordCompletionDelay(success) {
   if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return success ? 1000 : 120;
   if (!success) return 850;
   const wordCount = wordPuzzle.entry.answer.trim().split(/\s+/).length;
-  return Math.min(2800, 1900 + ((wordCount - 1) * 180));
+  const letterCount = [...wordPuzzle.entry.answer].filter((character) => /[A-Z]/i.test(character)).length;
+  const stagedLetterDuration = 1250 + (letterCount * 55);
+  return Math.min(3600, Math.max(1900 + ((wordCount - 1) * 180), stagedLetterDuration));
 }
 
 function finishPendingWordResult(session) {
