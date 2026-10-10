@@ -520,18 +520,27 @@
 
 .word-answer {
   position: relative;
-  display: flex;
+  display: grid;
   min-height: 9rem;
   margin-top: clamp(1rem, 3vw, 1.4rem);
   padding: clamp(1.2rem, 4vw, 2.25rem) 0.5rem;
-  align-items: center;
   align-content: center;
+  row-gap: 1rem;
+  border-bottom: 1px solid var(--border);
+  text-transform: uppercase;
+}
+
+.word-answer-display {
+  position: relative;
+  display: flex;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  align-items: end;
   justify-content: center;
   flex-wrap: wrap;
   row-gap: 1rem;
-  border-bottom: 1px solid var(--border);
   isolation: isolate;
-  text-transform: uppercase;
 }
 
 .word-answer.has-long-word .word-letter {
@@ -573,10 +582,10 @@
   border-bottom-color: transparent;
 }
 
-.word-answer.is-final-reveal::before {
+.word-answer.is-final-reveal .word-answer-display::before {
   position: absolute;
   z-index: 0;
-  inset: 0.35rem 0;
+  inset: -1.5rem -2.25rem;
   border-radius: 50%;
   background: radial-gradient(
     ellipse at center,
@@ -589,27 +598,27 @@
   pointer-events: none;
 }
 
-.word-answer > * {
+.word-answer-display > * {
   position: relative;
   z-index: 1;
 }
 
-.word-answer.is-correct-feedback::after,
-.word-answer.is-mistake-feedback::after {
+.word-answer.is-correct-feedback .word-answer-display::after,
+.word-answer.is-mistake-feedback .word-answer-display::after {
   position: absolute;
   z-index: 0;
-  inset: 0.6rem -0.3rem;
+  inset: -1.2rem -1.8rem;
   border-radius: 50%;
   content: "";
   opacity: 0;
   pointer-events: none;
 }
 
-.word-answer.is-correct-feedback::after {
+.word-answer.is-correct-feedback .word-answer-display::after {
   background: radial-gradient(ellipse at center, rgb(103 232 255 / 13%), transparent 70%);
 }
 
-.word-answer.is-mistake-feedback::after {
+.word-answer.is-mistake-feedback .word-answer-display::after {
   background: radial-gradient(ellipse at center, rgb(255 101 119 / 11%), transparent 70%);
 }
 
@@ -774,7 +783,7 @@
     animation-delay: calc(var(--reveal-index, 0) * 90ms);
   }
 
-  .word-answer.is-correct-feedback::after {
+  .word-answer.is-correct-feedback .word-answer-display::after {
     animation: word-answer-correct-pulse 640ms ease-out both;
   }
 
@@ -782,7 +791,7 @@
     animation: word-answer-miss 360ms ease-out both;
   }
 
-  .word-answer.is-mistake-feedback::after {
+  .word-answer.is-mistake-feedback .word-answer-display::after {
     animation: word-answer-miss-pulse 620ms ease-out both;
   }
 
@@ -803,7 +812,7 @@
     animation: word-final-impact 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
   }
 
-  .word-answer.is-final-reveal::before {
+  .word-answer.is-final-reveal .word-answer-display::before {
     animation: word-final-glow 1.35s ease-out both;
   }
 
