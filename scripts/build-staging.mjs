@@ -8,6 +8,7 @@ const stagingApi = "https://daily-undead-staging-api.charlieharrisondavies.worke
 const stagingClerkKey = "pk_test_cmFwaWQtcGlnZW9uLTg0Ni5jbGVyay5hY2NvdW50cy5kZXYk";
 const stagingSupabaseUrl = "https://zsnnvzhimtlhpvwhwxpy.supabase.co";
 const stagingSupabasePublishableKey = "sb_publishable_YfgJYTqB09B7dKxzZ1NMYA_CN9XiAkO";
+const stagingAssetVersion = Date.now().toString(36);
 
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });
@@ -34,6 +35,11 @@ async function writeStagingHtml(filename, { banner = false, outputFilename = fil
       `name="daily-undead-supabase-publishable-key" content="${stagingSupabasePublishableKey}"`,
     )
     .replace("__PROGRESSION_UPDATE_LAUNCH_AT__", new Date().toISOString());
+  if (filename === "staging-demo.html") {
+    html = html
+      .replace("./staging-demo.css", `./staging-demo.css?v=${stagingAssetVersion}`)
+      .replace("./js/staging-demo.js", `./js/staging-demo.js?v=${stagingAssetVersion}`);
+  }
   if (!html.includes('<meta name="robots"')) {
     html = html.replace(
       '<meta name="referrer" content="strict-origin-when-cross-origin">',
