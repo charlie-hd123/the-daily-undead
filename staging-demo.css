@@ -582,6 +582,10 @@
   border-bottom-color: transparent;
 }
 
+.word-answer.is-final-reveal .word-letter {
+  border-bottom-color: transparent;
+}
+
 .word-answer.is-final-reveal .word-answer-display::before {
   position: absolute;
   z-index: 0;
@@ -809,11 +813,21 @@
   }
 
   .word-answer.is-final-reveal {
-    animation: word-final-impact 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation: word-final-impact 900ms 180ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
   }
 
   .word-answer.is-final-reveal .word-answer-display::before {
-    animation: word-final-glow 1.35s ease-out both;
+    animation: word-final-glow 1.35s 180ms ease-out both;
+  }
+
+  .word-answer.is-final-reveal .word-letter {
+    animation: word-underline-release 220ms ease-out both;
+  }
+
+  .word-answer.is-final-reveal .word-letter.is-newly-revealed {
+    animation:
+      word-letter-reveal 420ms cubic-bezier(0.2, 0.9, 0.24, 1.25) both,
+      word-underline-release 220ms ease-out both;
   }
 
   .word-token.is-completing {
@@ -1250,6 +1264,20 @@
   100% {
     transform: scale(1);
     filter: brightness(1);
+  }
+}
+
+@keyframes word-underline-release {
+  0% {
+    border-bottom-color: rgb(246 247 251 / 72%);
+  }
+
+  55% {
+    border-bottom-color: rgb(103 232 255 / 32%);
+  }
+
+  100% {
+    border-bottom-color: transparent;
   }
 }
 
