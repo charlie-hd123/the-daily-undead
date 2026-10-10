@@ -647,6 +647,7 @@ function finishPendingWordResult(session) {
 function renderWordPuzzle({
   scoreChanged = false,
   revealLetter = "",
+  feedbackLetter = "",
   statusMessage = "",
   statusType = "",
 } = {}) {
@@ -673,6 +674,9 @@ function renderWordPuzzle({
       : "Choose a letter.");
   const displayedStatusType = statusType || (finalReveal ? "complete" : "");
   const animatedLetter = revealLetter || (finalReveal ? session.lastGuess : "");
+  const activeFeedbackLetter = normalizeLetter(feedbackLetter);
+  const correctFeedback = Boolean(normalizeLetter(revealLetter)) && !finalReveal;
+  const mistakeFeedback = scoreChanged && !finalReveal;
   const longestWordLength = Math.max(
     ...wordPuzzle.entry.answer.split(/\s+/).map(
       (word) => [...word].filter((character) => /[A-Z]/i.test(character)).length,
@@ -697,7 +701,7 @@ function renderWordPuzzle({
         </div>
         ${official ? `<div><span>Potential score</span><strong class="word-score-value${scoreChanged ? " is-changing" : ""}">${potentialPoints}</strong></div>` : ""}
       </div>
-      <div class="word-answer${longestWordLength >= 11 ? " has-long-word" : ""}${finalReveal ? " is-final-reveal" : ""}" aria-label="Partially revealed answer">
+      <div class="word-answer${longestWordLength >= 11 ? " has-long-word" : ""}${correctFeedback ? " is-correct-feedback" : ""}${mistakeFeedback ? " is-mistake-feedback" : ""}${finalReveal ? " is-final-reveal" : ""}" aria-label="Partially revealed answer">
         ${renderWordSlots(wordPuzzle.entry.answer, revealed, { revealLetter: animatedLetter, finalReveal })}
         <p class="word-category-hint">Hint: ${escapeHtml(wordPuzzle.entry.category)}</p>
       </div>
@@ -707,6 +711,7 @@ function renderWordPuzzle({
             ${[...row].map((letter) => {
               const used = guesses.has(letter) || initialLetters.has(letter);
               const correct = answerLetters.includes(letter);
+              const isFeedbackKey = letter === activeFeedbackLetter;
               const stateClass = initialLetters.has(letter)
                 ? " is-revealed"
                 : used && correct
@@ -714,6 +719,9 @@ function renderWordPuzzle({
                   : used
                     ? " is-incorrect"
                     : "";
+              const feedbackClass = isFeedbackKey
+                ? correct ? " is-newly-correct" : " is-newly-incorrect"
+                : "";
               const stateLabel = initialLetters.has(letter)
                 ? "Starting letter"
                 : !used
@@ -721,7 +729,7 @@ function renderWordPuzzle({
                   : correct
                     ? "Correct"
                     : "Incorrect";
-              return `<button class="word-key${stateClass}" type="button" data-letter="${letter}" aria-label="${letter}: ${stateLabel}" ${used || resultPending ? "disabled" : ""}>${letter}</button>`;
+              return `<button class="word-key${stateClass}${feedbackClass}" type="button" data-letter="${letter}" aria-label="${letter}: ${stateLabel}" ${used || resultPending ? "disabled" : ""}>${letter}</button>`;
             }).join("")}
           </div>
         `).join("")}
@@ -755,13 +763,13 @@ function submitLetter(value) {
   if (solved) {
     session.pendingResult = "success";
     persist();
-    renderWordPuzzle({ revealLetter: letter, statusMessage: "Answer revealed!", statusType: "complete" });
+    renderWordPuzzle({ revealLetter: letter, feedbackLetter: letter, statusMessage: "Answer revealed!", statusType: "complete" });
     return;
   }
   if (session.wrongGuesses >= 5) {
     session.pendingResult = "failure";
     persist();
-    renderWordPuzzle({ scoreChanged: true, statusMessage: "No attempts remaining." });
+    renderWordPuzzle({ scoreChanged: true, feedbackLetter: letter, statusMessage: "No attempts remaining." });
     return;
   }
   persist();
@@ -771,6 +779,7 @@ function submitLetter(value) {
   renderWordPuzzle({
     scoreChanged: !correct,
     revealLetter: correct ? letter : "",
+    feedbackLetter: letter,
     statusMessage: correct
       ? streakMessage
       : official
