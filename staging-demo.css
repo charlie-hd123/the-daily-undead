@@ -259,9 +259,9 @@
   display: inline-block;
 }
 
-.quest-clue-panel .clue-card::before,
-.quest-clue-panel .clue-card:nth-child(2)::before,
-.quest-clue-panel .clue-card:nth-child(3)::before {
+.clue-card::before,
+.clue-card:nth-child(2)::before,
+.clue-card:nth-child(3)::before {
   background: linear-gradient(90deg, #67e8ff 0%, #4fabe5 55%, #8b78d8 100%);
   box-shadow: 0 0 0.8rem rgb(103 232 255 / 28%);
 }
