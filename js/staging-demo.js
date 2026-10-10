@@ -821,20 +821,32 @@ function renderEasterClues(session, { newlyRevealedIndex = -1, scoreChanged = fa
         official ? "" : "Playing just for fun. This result will not change your stats.",
       )}
       <div class="quest-intel-status${official ? "" : " is-single"}" aria-label="Quest puzzle progress">
-        <div><span>Clues revealed</span><strong>${session.cluesRevealed} / 3</strong></div>
+        <div><span>Clues revealed</span><strong class="quest-clue-count${newlyRevealedIndex >= 0 ? " is-changing" : ""}">${session.cluesRevealed} / 3</strong></div>
         ${official ? `<div><span>Potential score</span><strong class="quest-score-value${scoreChanged ? " is-changing" : ""}">${potentialPoints}</strong></div>` : ""}
       </div>
       <div class="clue-list">${renderClueCards(session, newlyRevealedIndex)}</div>
       <div class="actions">
-        <button id="demo-reveal-clue" class="button" type="button" ${session.cluesRevealed >= 3 ? "disabled" : ""}>${session.cluesRevealed >= 3 ? "All clues revealed" : "Reveal next clue"}</button>
-        <button id="demo-select-map" class="button primary" type="button">Select map</button>
+        <button id="demo-reveal-clue" class="button quest-reveal-button" type="button" ${session.cluesRevealed >= 3 ? "disabled" : ""}>${session.cluesRevealed >= 3 ? "All clues revealed" : "Reveal next clue"}</button>
+        <button id="demo-select-map" class="button primary quest-select-map${newlyRevealedIndex >= 0 ? " is-ready-cue" : ""}" type="button">Select map</button>
       </div>
     </section>
   `;
-  app.querySelector("#demo-reveal-clue")?.addEventListener("click", () => {
-    session.cluesRevealed = Math.min(3, session.cluesRevealed + 1);
-    persist();
-    renderEasterClues(session, { newlyRevealedIndex: session.cluesRevealed - 1, scoreChanged: official });
+  app.querySelector("#demo-reveal-clue")?.addEventListener("click", (event) => {
+    const button = event.currentTarget;
+    if (button.classList.contains("is-activating")) return;
+    const revealClue = () => {
+      if (session.cluesRevealed >= 3) return;
+      session.cluesRevealed = Math.min(3, session.cluesRevealed + 1);
+      persist();
+      renderEasterClues(session, { newlyRevealedIndex: session.cluesRevealed - 1, scoreChanged: official });
+    };
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      revealClue();
+      return;
+    }
+    button.classList.add("is-activating");
+    button.setAttribute("aria-disabled", "true");
+    window.setTimeout(revealClue, 180);
   });
   app.querySelector("#demo-select-map").addEventListener("click", () => {
     session.phase = "game";
@@ -849,8 +861,8 @@ function renderEasterGameSelection(session) {
   app.innerHTML = `
     <section class="panel answer-selection-panel">
       ${renderHeading("Choose the game", `You have revealed ${session.cluesRevealed} ${session.cluesRevealed === 1 ? "clue" : "clues"}.`, kicker)}
-      <ul class="card-grid">
-        ${games.map((game) => `<li><button class="card-button" type="button" data-game-id="${escapeHtml(game.id)}"><span class="game-label">Call of Duty</span><span class="card-title">${escapeHtml(game.title)}</span></button></li>`).join("")}
+      <ul class="card-grid is-entering">
+        ${games.map((game, index) => `<li style="--card-index: ${index}"><button class="card-button" type="button" data-game-id="${escapeHtml(game.id)}"><span class="game-label">Call of Duty</span><span class="card-title">${escapeHtml(game.title)}</span></button></li>`).join("")}
       </ul>
       <div class="actions"><button id="back-to-demo-clues" class="button" type="button">Back to clues</button></div>
     </section>
@@ -880,9 +892,9 @@ function renderEasterMapSelection(session) {
   app.innerHTML = `
     <section class="panel answer-selection-panel">
       ${renderHeading(`Choose a ${game.title} map`, "Tap a map, then confirm your final answer.", kicker)}
-      <ul class="card-grid">
-        ${gameMaps.map((map) => `
-          <li><button class="card-button" type="button" data-map-id="${escapeHtml(map.id)}" aria-pressed="${session.selectedMapId === map.id}"><span class="game-label">${escapeHtml(map.questTitle || map.gameTitle)}</span><span class="card-title">${escapeHtml(map.title)}</span></button></li>
+      <ul class="card-grid is-entering">
+        ${gameMaps.map((map, index) => `
+          <li style="--card-index: ${index}"><button class="card-button" type="button" data-map-id="${escapeHtml(map.id)}" aria-pressed="${session.selectedMapId === map.id}"><span class="game-label">${escapeHtml(map.questTitle || map.gameTitle)}</span><span class="card-title">${escapeHtml(map.title)}</span></button></li>
         `).join("")}
       </ul>
       <div class="actions">
