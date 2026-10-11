@@ -31,8 +31,6 @@ const yesterdayEasterAnswerLabel = document.querySelector("#demo-yesterday-easte
 const yesterdayWordAnswerLabel = document.querySelector("#demo-yesterday-word-answer");
 const leaderboardsButton = document.querySelector("#leaderboards-button");
 const leaderboardsDialog = document.querySelector("#demo-leaderboards-dialog");
-const leaderboardWordAnswerLabel = document.querySelector("#demo-leaderboard-word-answer");
-const leaderboardEasterAnswerLabel = document.querySelector("#demo-leaderboard-easter-answer");
 
 const profileStorageKey = "daily-undead:multi-puzzle-demo:profile";
 const dayStoragePrefix = "daily-undead:multi-puzzle-demo:day:";
@@ -106,14 +104,8 @@ function updateCommunityDemo() {
 function initialiseDemoLeaderboards() {
   const periodTabs = [...document.querySelectorAll("[data-demo-leaderboard-period]")];
   const periodPanels = [...document.querySelectorAll("[data-demo-leaderboard-panel]")];
-  const puzzleTabs = [...document.querySelectorAll("[data-demo-puzzle-tab]")];
-  const puzzlePanels = [...document.querySelectorAll("[data-demo-puzzle-panel]")];
-
-  leaderboardWordAnswerLabel.textContent = wordPuzzle.entry.answer;
-  leaderboardEasterAnswerLabel.textContent = getAnswerDisplayTitle(
-    easterPuzzle.map,
-    catalog.answerEquivalents,
-  );
+  const filterButtons = [...document.querySelectorAll("[data-demo-puzzle-filter]")];
+  const todayEntries = [...document.querySelectorAll("[data-demo-puzzle-entry]")];
 
   const selectTab = (tabs, panels, value, tabAttribute, panelAttribute) => {
     tabs.forEach((tab) => {
@@ -131,9 +123,20 @@ function initialiseDemoLeaderboards() {
       selectTab(periodTabs, periodPanels, tab.dataset.demoLeaderboardPeriod, "demoLeaderboardPeriod", "demoLeaderboardPanel");
     });
   });
-  puzzleTabs.forEach((tab) => {
-    tab.addEventListener("click", () => {
-      selectTab(puzzleTabs, puzzlePanels, tab.dataset.demoPuzzleTab, "demoPuzzleTab", "demoPuzzlePanel");
+  filterButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const selectedFilter = button.getAttribute("aria-pressed") === "true"
+        ? null
+        : button.dataset.demoPuzzleFilter;
+      filterButtons.forEach((filterButton) => {
+        filterButton.setAttribute(
+          "aria-pressed",
+          String(filterButton.dataset.demoPuzzleFilter === selectedFilter),
+        );
+      });
+      todayEntries.forEach((entry) => {
+        entry.hidden = Boolean(selectedFilter && entry.dataset.demoPuzzleEntry !== selectedFilter);
+      });
     });
   });
 

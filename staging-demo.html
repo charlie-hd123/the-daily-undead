@@ -115,105 +115,58 @@
             <strong>30</strong>
             <span>players today</span>
           </p>
-          <span class="demo-official-note">Official results</span>
         </div>
 
-        <div class="demo-puzzle-tabs" role="tablist" aria-label="Today’s puzzle leaderboard">
-          <button
-            id="demo-last-words-tab"
-            type="button"
-            role="tab"
-            aria-selected="true"
-            aria-controls="demo-last-words-leaders"
-            data-demo-puzzle-tab="word"
-          >
-            <span>Letter puzzle</span>
-            <strong>Last Words</strong>
-          </button>
-          <button
-            id="demo-quest-steps-tab"
-            type="button"
-            role="tab"
-            aria-selected="false"
-            aria-controls="demo-quest-steps-leaders"
-            data-demo-puzzle-tab="easter"
-            tabindex="-1"
-          >
-            <span>Easter egg puzzle</span>
-            <strong>Quest Steps</strong>
-          </button>
+        <div class="demo-puzzle-filter-row">
+          <span>Filter</span>
+          <div class="demo-puzzle-filters" aria-label="Filter today’s leaderboard by puzzle">
+            <button type="button" aria-pressed="false" data-demo-puzzle-filter="word">Last Words</button>
+            <button type="button" aria-pressed="false" data-demo-puzzle-filter="easter">Quest Steps</button>
+          </div>
         </div>
 
-        <section
-          id="demo-last-words-leaders"
-          class="demo-puzzle-leaderboard"
-          role="tabpanel"
-          aria-labelledby="demo-last-words-tab"
-          data-demo-puzzle-panel="word"
-        >
-          <div class="demo-leaderboard-answer">
-            <span>Today’s answer</span>
-            <strong id="demo-leaderboard-word-answer">—</strong>
-          </div>
-          <ol class="leaderboard-list">
-            <li class="leaderboard-entry leaderboard-today-entry">
-              <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="richtofen" aria-hidden="true"></span><div class="leaderboard-player"><strong>AWildReen</strong><small class="leaderboard-result is-elite">0 mistakes</small></div></div>
-              <div class="leaderboard-score"><strong>100</strong><small>PTS</small></div>
-            </li>
-            <li class="leaderboard-entry leaderboard-today-entry">
-              <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="dempsey" aria-hidden="true"></span><div class="leaderboard-player"><strong>Basti_TTV</strong><small class="leaderboard-result is-elite">0 mistakes</small></div></div>
-              <div class="leaderboard-score"><strong>100</strong><small>PTS</small></div>
-            </li>
-            <li class="leaderboard-entry leaderboard-today-entry">
-              <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="takeo" aria-hidden="true"></span><div class="leaderboard-player"><strong>Bongomon</strong><small class="leaderboard-result is-correct">1 mistake</small></div></div>
-              <div class="leaderboard-score"><strong>50</strong><small>PTS</small></div>
-            </li>
-            <li class="leaderboard-entry leaderboard-today-entry">
-              <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="nikolai" aria-hidden="true"></span><div class="leaderboard-player"><strong>Exp188</strong><small class="leaderboard-result is-correct">1 mistake</small></div></div>
-              <div class="leaderboard-score"><strong>50</strong><small>PTS</small></div>
-            </li>
-            <li class="leaderboard-entry leaderboard-today-entry">
-              <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="misty" aria-hidden="true"></span><div class="leaderboard-player"><strong>Lone</strong><small class="leaderboard-result is-correct">2 mistakes</small></div></div>
-              <div class="leaderboard-score"><strong>40</strong><small>PTS</small></div>
-            </li>
-          </ol>
-        </section>
-
-        <section
-          id="demo-quest-steps-leaders"
-          class="demo-puzzle-leaderboard"
-          role="tabpanel"
-          aria-labelledby="demo-quest-steps-tab"
-          data-demo-puzzle-panel="easter"
-          hidden
-        >
-          <div class="demo-leaderboard-answer">
-            <span>Today’s answer</span>
-            <strong id="demo-leaderboard-easter-answer">—</strong>
-          </div>
-          <ol class="leaderboard-list">
-            <li class="leaderboard-entry leaderboard-today-entry">
-              <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="samantha" aria-hidden="true"></span><div class="leaderboard-player"><strong>NovaHunter</strong><small class="leaderboard-result is-elite">1 clue <span class="leaderboard-result-accent">+ bonus</span></small></div></div>
-              <div class="leaderboard-score"><strong>100</strong><small>PTS</small></div>
-            </li>
-            <li class="leaderboard-entry leaderboard-today-entry">
-              <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="dr-maxis" aria-hidden="true"></span><div class="leaderboard-player"><strong>115Seeker</strong><small class="leaderboard-result is-correct">1 clue</small></div></div>
-              <div class="leaderboard-score"><strong>50</strong><small>PTS</small></div>
-            </li>
-            <li class="leaderboard-entry leaderboard-today-entry">
-              <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="warden" aria-hidden="true"></span><div class="leaderboard-player"><strong>DarkAether</strong><small class="leaderboard-result is-elite">2 clues <span class="leaderboard-result-accent">+ bonus</span></small></div></div>
-              <div class="leaderboard-score"><strong>40</strong><small>PTS</small></div>
-            </li>
-            <li class="leaderboard-entry leaderboard-today-entry">
-              <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="weaver" aria-hidden="true"></span><div class="leaderboard-player"><strong>RoundRobbin</strong><small class="leaderboard-result is-correct">2 clues</small></div></div>
-              <div class="leaderboard-score"><strong>20</strong><small>PTS</small></div>
-            </li>
-            <li class="leaderboard-entry leaderboard-today-entry">
-              <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="marlton" aria-hidden="true"></span><div class="leaderboard-player"><strong>PerkCola</strong><small class="leaderboard-result is-correct">3 clues</small></div></div>
-              <div class="leaderboard-score"><strong>10</strong><small>PTS</small></div>
-            </li>
-          </ol>
-        </section>
+        <ol class="leaderboard-list demo-today-list">
+          <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="word">
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="richtofen" aria-hidden="true"></span><div class="leaderboard-player"><strong>AWildReen</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Last Words</span><small class="leaderboard-result is-elite">Perfect solve</small></span></div></div>
+            <div class="leaderboard-score"><strong>100</strong><small>PTS</small></div>
+          </li>
+          <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="easter">
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="samantha" aria-hidden="true"></span><div class="leaderboard-player"><strong>NovaHunter</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Quest Steps</span><small class="leaderboard-result is-elite">1 clue <span class="leaderboard-result-accent">+ bonus</span></small></span></div></div>
+            <div class="leaderboard-score"><strong>100</strong><small>PTS</small></div>
+          </li>
+          <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="word">
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="dempsey" aria-hidden="true"></span><div class="leaderboard-player"><strong>Basti_TTV</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Last Words</span><small class="leaderboard-result is-elite">Perfect solve</small></span></div></div>
+            <div class="leaderboard-score"><strong>100</strong><small>PTS</small></div>
+          </li>
+          <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="easter">
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="dr-maxis" aria-hidden="true"></span><div class="leaderboard-player"><strong>115Seeker</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Quest Steps</span><small class="leaderboard-result is-correct">1 clue</small></span></div></div>
+            <div class="leaderboard-score"><strong>50</strong><small>PTS</small></div>
+          </li>
+          <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="word">
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="takeo" aria-hidden="true"></span><div class="leaderboard-player"><strong>Bongomon</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Last Words</span><small class="leaderboard-result is-correct">1 miss</small></span></div></div>
+            <div class="leaderboard-score"><strong>50</strong><small>PTS</small></div>
+          </li>
+          <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="word">
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="nikolai" aria-hidden="true"></span><div class="leaderboard-player"><strong>Exp188</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Last Words</span><small class="leaderboard-result is-correct">1 miss</small></span></div></div>
+            <div class="leaderboard-score"><strong>50</strong><small>PTS</small></div>
+          </li>
+          <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="easter">
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="warden" aria-hidden="true"></span><div class="leaderboard-player"><strong>DarkAether</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Quest Steps</span><small class="leaderboard-result is-elite">2 clues <span class="leaderboard-result-accent">+ bonus</span></small></span></div></div>
+            <div class="leaderboard-score"><strong>40</strong><small>PTS</small></div>
+          </li>
+          <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="word">
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="misty" aria-hidden="true"></span><div class="leaderboard-player"><strong>Lone</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Last Words</span><small class="leaderboard-result is-correct">2 misses</small></span></div></div>
+            <div class="leaderboard-score"><strong>40</strong><small>PTS</small></div>
+          </li>
+          <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="easter">
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="weaver" aria-hidden="true"></span><div class="leaderboard-player"><strong>RoundRobbin</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Quest Steps</span><small class="leaderboard-result is-correct">2 clues</small></span></div></div>
+            <div class="leaderboard-score"><strong>20</strong><small>PTS</small></div>
+          </li>
+          <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="easter">
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="marlton" aria-hidden="true"></span><div class="leaderboard-player"><strong>PerkCola</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Quest Steps</span><small class="leaderboard-result is-correct">3 clues</small></span></div></div>
+            <div class="leaderboard-score"><strong>10</strong><small>PTS</small></div>
+          </li>
+        </ol>
       </section>
 
       <section
@@ -223,28 +176,26 @@
         data-demo-leaderboard-panel="all-time"
         hidden
       >
-        <div class="leaderboard-panel-tools demo-all-time-heading">
-          <p>Combined progression across both puzzles</p>
-        </div>
+        <div class="leaderboard-panel-tools leaderboard-all-time-tools"></div>
         <ol class="leaderboard-list">
           <li class="leaderboard-entry leaderboard-all-time-entry">
             <span class="leaderboard-rank">1</span>
-            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="richtofen" aria-hidden="true"></span><div class="leaderboard-player"><strong>AWildReen</strong><small class="demo-all-time-solves">286 puzzle solves · Round 41</small></div></div>
+            <div class="leaderboard-player"><span class="leaderboard-player-identity"><span class="zombie-avatar zombie-avatar-small" data-avatar="richtofen" aria-hidden="true"></span><strong class="leaderboard-player-name">AWildReen</strong></span><dl class="leaderboard-supporting-metrics"><div><dt>Puzzle Solves</dt><dd>286</dd></div><div><dt>Highest Round</dt><dd>41</dd></div></dl></div>
             <dl class="leaderboard-primary-metric"><dt>Score</dt><dd>18,460</dd></dl>
           </li>
           <li class="leaderboard-entry leaderboard-all-time-entry">
             <span class="leaderboard-rank">2</span>
-            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="samantha" aria-hidden="true"></span><div class="leaderboard-player"><strong>NovaHunter</strong><small class="demo-all-time-solves">271 puzzle solves · Round 38</small></div></div>
+            <div class="leaderboard-player"><span class="leaderboard-player-identity"><span class="zombie-avatar zombie-avatar-small" data-avatar="samantha" aria-hidden="true"></span><strong class="leaderboard-player-name">NovaHunter</strong></span><dl class="leaderboard-supporting-metrics"><div><dt>Puzzle Solves</dt><dd>271</dd></div><div><dt>Highest Round</dt><dd>38</dd></div></dl></div>
             <dl class="leaderboard-primary-metric"><dt>Score</dt><dd>17,920</dd></dl>
           </li>
           <li class="leaderboard-entry leaderboard-all-time-entry">
             <span class="leaderboard-rank">3</span>
-            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="takeo" aria-hidden="true"></span><div class="leaderboard-player"><strong>Bongomon</strong><small class="demo-all-time-solves">255 puzzle solves · Round 35</small></div></div>
+            <div class="leaderboard-player"><span class="leaderboard-player-identity"><span class="zombie-avatar zombie-avatar-small" data-avatar="takeo" aria-hidden="true"></span><strong class="leaderboard-player-name">Bongomon</strong></span><dl class="leaderboard-supporting-metrics"><div><dt>Puzzle Solves</dt><dd>255</dd></div><div><dt>Highest Round</dt><dd>35</dd></div></dl></div>
             <dl class="leaderboard-primary-metric"><dt>Score</dt><dd>16,780</dd></dl>
           </li>
           <li class="leaderboard-entry leaderboard-all-time-entry">
             <span class="leaderboard-rank">4</span>
-            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="dempsey" aria-hidden="true"></span><div class="leaderboard-player"><strong>Basti_TTV</strong><small class="demo-all-time-solves">249 puzzle solves · Round 32</small></div></div>
+            <div class="leaderboard-player"><span class="leaderboard-player-identity"><span class="zombie-avatar zombie-avatar-small" data-avatar="dempsey" aria-hidden="true"></span><strong class="leaderboard-player-name">Basti_TTV</strong></span><dl class="leaderboard-supporting-metrics"><div><dt>Puzzle Solves</dt><dd>249</dd></div><div><dt>Highest Round</dt><dd>32</dd></div></dl></div>
             <dl class="leaderboard-primary-metric"><dt>Score</dt><dd>15,960</dd></dl>
           </li>
         </ol>
