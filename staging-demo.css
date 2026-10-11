@@ -300,6 +300,27 @@
   z-index: 1;
 }
 
+.clue-hidden-size,
+.clue-hidden-label {
+  grid-area: 1 / 1;
+}
+
+.clue-hidden-size {
+  visibility: hidden;
+}
+
+.clue-hidden-label {
+  align-self: center;
+  justify-self: center;
+}
+
+@media (max-width: 47.999rem) {
+  .quest-clue-panel .clue-card.is-hidden {
+    min-height: 7rem;
+    place-items: stretch;
+  }
+}
+
 .quest-reveal-button,
 .quest-select-map {
   position: relative;
