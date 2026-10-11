@@ -1018,6 +1018,70 @@
   letter-spacing: 0.025em;
 }
 
+@media (min-width: 60.0625rem) {
+  .word-puzzle-panel {
+    padding-block: 1.35rem;
+  }
+
+  .word-puzzle-panel .screen-heading {
+    margin-bottom: 0.7rem;
+  }
+
+  .word-puzzle-panel .screen-heading .kicker {
+    margin-bottom: 0.35rem;
+  }
+
+  .word-puzzle-panel .screen-heading h2 {
+    margin-bottom: 0.35rem;
+  }
+
+  .word-puzzle-panel .screen-heading > p:last-child {
+    line-height: 1.4;
+  }
+
+  .word-puzzle-panel .word-scoreboard {
+    width: min(100%, 36rem);
+    margin-top: 0.5rem;
+  }
+
+  .word-puzzle-panel .word-scoreboard > div {
+    padding-block: 0.38rem;
+  }
+
+  .word-puzzle-panel .word-danger-meter {
+    margin-top: 0.24rem;
+  }
+
+  .word-puzzle-panel .word-answer {
+    min-height: 6.8rem;
+    margin-top: 0.55rem;
+    padding: 0.65rem 0.5rem 0.75rem;
+    row-gap: 0.55rem;
+  }
+
+  .word-puzzle-panel .word-answer-display {
+    row-gap: 0.65rem;
+  }
+
+  .word-puzzle-panel .word-category-hint {
+    margin-top: 0.7rem;
+  }
+
+  .word-puzzle-panel .word-keyboard {
+    gap: 0.32rem;
+    width: min(100%, 42rem);
+    margin-top: 0.75rem;
+  }
+
+  .word-puzzle-panel .word-key {
+    min-height: 3rem;
+  }
+
+  .word-puzzle-panel .word-game-status {
+    margin-top: 0.5rem;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .quest-score-value.is-changing {
     animation: quest-score-change 460ms ease-out both;
