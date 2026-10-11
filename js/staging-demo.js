@@ -798,7 +798,7 @@ function submitLetter(value) {
 function renderClueCards(session, newlyRevealedIndex = -1) {
   return easterPuzzle.displayedSteps.map((step, index) => index < session.cluesRevealed
     ? `<article class="clue-card${index === newlyRevealedIndex ? " is-newly-revealed" : ""}"><p class="clue-number">Clue ${index + 1}</p><p class="clue-text">${escapeHtml(step.hardClue)}</p></article>`
-    : `<article class="clue-card is-hidden"><div class="clue-hidden-size" aria-hidden="true"><p class="clue-number">Clue ${index + 1}</p><p class="clue-text">${escapeHtml(step.hardClue)}</p></div><span class="clue-hidden-label">Clue ${index + 1} hidden</span></article>`).join("");
+    : `<article class="clue-card is-hidden">Clue ${index + 1} hidden</article>`).join("");
 }
 
 function renderEasterPuzzle() {
