@@ -202,19 +202,26 @@
 }
 
 .answer-selection-panel .card-button {
-  min-height: 6.35rem;
-  padding: 0.85rem 2.75rem 0.85rem 0.9rem;
+  min-height: 5.75rem;
+  padding: 0.7rem 0.85rem 0.72rem 0.9rem;
 }
 
 .answer-selection-panel .card-button::after {
-  right: 0.8rem;
-  width: 1.65rem;
-  height: 1.65rem;
+  top: 0.65rem;
+  right: 0.7rem;
+  width: 1.55rem;
+  height: 1.55rem;
+  transform: none;
+}
+
+.answer-selection-panel .game-label {
+  padding-right: 2.15rem;
+  font-size: 0.8rem;
 }
 
 .answer-selection-panel .card-title {
-  margin-top: 0.35rem;
-  font-size: clamp(1.25rem, 3.7vw, 1.55rem);
+  margin-top: 0.28rem;
+  font-size: clamp(1.35rem, 3.7vw, 1.62rem);
 }
 
 .quest-intel-status {
@@ -1020,18 +1027,18 @@
 
 @keyframes quest-map-check {
   0% {
-    transform: translateY(-50%) scale(0.58) rotate(-14deg);
+    transform: scale(0.58) rotate(-14deg);
     opacity: 0.3;
   }
 
   68% {
-    transform: translateY(-50%) scale(1.18) rotate(3deg);
+    transform: scale(1.18) rotate(3deg);
     opacity: 1;
     box-shadow: 0 0 1.4rem rgb(103 232 255 / 68%);
   }
 
   100% {
-    transform: translateY(-50%) scale(1) rotate(0);
+    transform: scale(1) rotate(0);
     opacity: 1;
     box-shadow: 0 0 1rem rgb(103 232 255 / 34%);
   }
@@ -1482,24 +1489,26 @@
   }
 
   .answer-selection-panel .card-button {
-    min-height: 5.4rem;
-    padding: 0.65rem 2.35rem 0.65rem 0.75rem;
+    min-height: 5.05rem;
+    padding: 0.55rem 0.65rem 0.58rem 0.75rem;
   }
 
   .answer-selection-panel .card-button::after {
-    right: 0.6rem;
-    width: 1.45rem;
-    height: 1.45rem;
+    top: 0.55rem;
+    right: 0.55rem;
+    width: 1.4rem;
+    height: 1.4rem;
   }
 
   .answer-selection-panel .game-label {
-    font-size: 0.72rem;
-    letter-spacing: 0.08em;
+    padding-right: 1.9rem;
+    font-size: 0.76rem;
+    letter-spacing: 0.09em;
   }
 
   .answer-selection-panel .card-title {
-    margin-top: 0.25rem;
-    font-size: 1.12rem;
+    margin-top: 0.2rem;
+    font-size: 1.2rem;
     line-height: 1.05;
   }
 
