@@ -206,7 +206,6 @@
   min-height: 5.75rem;
   padding: 0.7rem 0.85rem 0.72rem 0.9rem;
   align-content: center;
-  grid-template-rows: auto 2.2em;
 }
 
 .answer-selection-panel .card-button::after {
@@ -223,9 +222,7 @@
 }
 
 .answer-selection-panel .card-title {
-  display: flex;
-  margin-top: 0.18rem;
-  align-items: center;
+  margin-top: 0.14rem;
   font-size: clamp(1.35rem, 3.7vw, 1.62rem);
 }
 
@@ -1533,7 +1530,7 @@
   }
 
   .answer-selection-panel .card-title {
-    margin-top: 0.14rem;
+    margin-top: 0.1rem;
     font-size: 1.2rem;
     line-height: 1.05;
   }
