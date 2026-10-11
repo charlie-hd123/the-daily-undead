@@ -27,6 +27,8 @@ const scoreLabel = document.querySelector("#demo-score");
 const solvesLabel = document.querySelector("#demo-solves");
 const roundLabel = document.querySelector("#demo-round");
 const advanceButton = document.querySelector("#advance-demo-day");
+const yesterdayEasterAnswerLabel = document.querySelector("#demo-yesterday-easter-answer");
+const yesterdayWordAnswerLabel = document.querySelector("#demo-yesterday-word-answer");
 
 const profileStorageKey = "daily-undead:multi-puzzle-demo:profile";
 const dayStoragePrefix = "daily-undead:multi-puzzle-demo:day:";
@@ -78,6 +80,23 @@ function formatDate(value) {
     day: "numeric",
     month: "long",
   }).format(new Date(`${value}T12:00:00Z`));
+}
+
+function getPreviousDateKey(value) {
+  const date = new Date(`${value}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() - 1);
+  return date.toISOString().slice(0, 10);
+}
+
+function updateCommunityDemo() {
+  const yesterdayDateKey = getPreviousDateKey(dateKey);
+  const yesterdayEasterPuzzle = buildDailyPuzzle(yesterdayDateKey, maps);
+  const yesterdayWordPuzzle = buildDailyWordPuzzle(yesterdayDateKey, wordEntries);
+  yesterdayEasterAnswerLabel.textContent = getAnswerDisplayTitle(
+    yesterdayEasterPuzzle.map,
+    catalog.answerEquivalents,
+  );
+  yesterdayWordAnswerLabel.textContent = yesterdayWordPuzzle.entry.answer;
 }
 
 function punctuateSentenceEnding(value) {
@@ -1111,6 +1130,7 @@ async function initialise() {
     await loadData();
     easterPuzzle = buildDailyPuzzle(dateKey, maps);
     wordPuzzle = buildDailyWordPuzzle(dateKey, wordEntries);
+    updateCommunityDemo();
     dayState = loadDayState();
     advanceButton.addEventListener("click", advanceDay);
     document.addEventListener("keydown", (event) => {
