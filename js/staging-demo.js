@@ -152,6 +152,11 @@ function punctuateSentenceEnding(value) {
   return /[.!?]$/.test(text) ? text : `${text}.`;
 }
 
+function formatWordMisses(count) {
+  if (count === 0) return "no misses";
+  return `${count} ${count === 1 ? "miss" : "misses"}`;
+}
+
 function loadJson(key, fallback) {
   try {
     const saved = JSON.parse(localStorage.getItem(key));
@@ -528,7 +533,7 @@ function renderCompletion(type, session, mode) {
           ? `You identified ${answerMarkup} using ${session.cluesRevealed} ${clueLabel}.`
           : `You chose ${selectedAnswerMarkup}. Today’s answer was ${answerSentenceMarkup} Your permanent Score and Solves are safe.`
     : session.success
-      ? `You revealed ${answerMarkup} with ${session.wrongGuesses} ${session.wrongGuesses === 1 ? "mistake" : "mistakes"}.`
+      ? `You revealed ${answerMarkup} with ${formatWordMisses(session.wrongGuesses)}.`
       : `You did not reveal the answer. Today’s answer was ${answerSentenceMarkup} Your permanent Score and Solves are safe.`;
   const funResultCopy = isEaster
     ? failedBonus
@@ -539,7 +544,7 @@ function renderCompletion(type, session, mode) {
           ? `You identified ${answerMarkup} using ${session.cluesRevealed} ${clueLabel}.`
           : `You chose ${selectedAnswerMarkup}. Today’s answer was ${answerSentenceMarkup}`
     : session.success
-      ? `You revealed ${answerMarkup} with ${session.wrongGuesses} ${session.wrongGuesses === 1 ? "mistake" : "mistakes"}.`
+      ? `You revealed ${answerMarkup} with ${formatWordMisses(session.wrongGuesses)}.`
       : `You did not reveal the answer. Today’s answer was ${answerSentenceMarkup}`;
   const resultCopy = official ? officialResultCopy : `${funResultCopy} This result did not affect your stats.`;
   const resultClass = failedBonus
@@ -708,8 +713,8 @@ function finishPendingWordResult(session) {
         label: wordPuzzle.entry.category,
         answer: wordPuzzle.entry.answer,
         detail: success
-          ? `${session.wrongGuesses} ${session.wrongGuesses === 1 ? "mistake" : "mistakes"}`
-          : "Five incorrect letters",
+          ? session.wrongGuesses === 0 ? "Perfect solve" : formatWordMisses(session.wrongGuesses)
+          : "5 misses",
       },
     });
   }, getWordCompletionDelay(pendingResult === "success"));
@@ -741,7 +746,7 @@ function renderWordPuzzle({
   const displayedStatus = statusMessage || (finalReveal
     ? "Answer revealed!"
     : session.pendingResult === "failure"
-      ? "No attempts remaining."
+      ? "No guesses remaining."
       : "Choose a letter.");
   const displayedStatusType = statusType || (finalReveal ? "complete" : "");
   const animatedLetter = revealLetter || (finalReveal ? session.lastGuess : "");
@@ -764,7 +769,7 @@ function renderWordPuzzle({
       )}
       <div class="word-scoreboard${official ? "" : " is-single"}" aria-label="Word puzzle progress">
         <div class="word-mistakes danger-level-${session.wrongGuesses}">
-          <span>Mistakes</span>
+          <span>Misses</span>
           <strong>${session.wrongGuesses} / 5</strong>
           <div class="word-danger-meter" aria-hidden="true">
             ${[1, 2, 3, 4, 5].map((stage) => `<i class="${stage <= session.wrongGuesses ? "is-active" : ""}${scoreChanged && stage === session.wrongGuesses ? " is-new" : ""}"></i>`).join("")}
@@ -801,7 +806,7 @@ function renderWordPuzzle({
                   ? "Unused"
                   : correct
                     ? "Correct"
-                    : "Incorrect";
+                    : "Miss";
               return `<button class="word-key${stateClass}${feedbackClass}" type="button" data-letter="${letter}" aria-label="${letter}: ${stateLabel}" ${used || resultPending ? "disabled" : ""}>${letter}</button>`;
             }).join("")}
           </div>
@@ -842,7 +847,7 @@ function submitLetter(value) {
   if (session.wrongGuesses >= 5) {
     session.pendingResult = "failure";
     persist();
-    renderWordPuzzle({ scoreChanged: true, feedbackLetter: letter, statusMessage: "No attempts remaining." });
+    renderWordPuzzle({ scoreChanged: true, feedbackLetter: letter, statusMessage: "No guesses remaining." });
     return;
   }
   persist();
