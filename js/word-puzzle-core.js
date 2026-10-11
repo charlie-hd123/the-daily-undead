@@ -1,5 +1,13 @@
 import { createRng, getUtcDateKey, hashString, isValidDateKey, shuffle } from "./game-core.js";
 
+export const WORD_FAMILIARITY = Object.freeze({
+  WELL_KNOWN: "well_known",
+  LESS_KNOWN: "less_known",
+});
+
+const LESS_KNOWN_INTERVAL_DAYS = 5;
+const LESS_KNOWN_CADENCE_SLOT = LESS_KNOWN_INTERVAL_DAYS - 1;
+
 export function normalizeLetter(value) {
   const letter = String(value || "").toUpperCase();
   return /^[A-Z]$/.test(letter) ? letter : null;
@@ -20,6 +28,7 @@ export function isPlayableWordEntry(entry) {
     typeof entry?.category === "string" &&
     entry.category.length > 0 &&
     typeof entry?.answer === "string" &&
+    Object.values(WORD_FAMILIARITY).includes(entry.familiarity) &&
     isValidDateKey(entry.availableFrom) &&
     (entry.retiredFrom == null ||
       (isValidDateKey(entry.retiredFrom) && entry.retiredFrom > entry.availableFrom)) &&
@@ -40,6 +49,30 @@ function getUtcDayNumber(dateKey) {
   return Math.floor(Date.parse(`${dateKey}T00:00:00Z`) / 86400000);
 }
 
+function positiveModulo(value, divisor) {
+  return ((value % divisor) + divisor) % divisor;
+}
+
+function getFamiliaritySelection(dateKey, playable) {
+  const dayNumber = getUtcDayNumber(dateKey);
+  const cadenceSlot = positiveModulo(dayNumber, LESS_KNOWN_INTERVAL_DAYS);
+  const targetFamiliarity = cadenceSlot === LESS_KNOWN_CADENCE_SLOT
+    ? WORD_FAMILIARITY.LESS_KNOWN
+    : WORD_FAMILIARITY.WELL_KNOWN;
+  const preferredPool = playable.filter((entry) => entry.familiarity === targetFamiliarity);
+
+  if (!preferredPool.length) {
+    return { pool: playable, selectionIndex: dayNumber, targetFamiliarity: "mixed" };
+  }
+
+  const cadenceBlock = Math.floor(dayNumber / LESS_KNOWN_INTERVAL_DAYS);
+  const selectionIndex = targetFamiliarity === WORD_FAMILIARITY.LESS_KNOWN
+    ? cadenceBlock
+    : (cadenceBlock * (LESS_KNOWN_INTERVAL_DAYS - 1)) + cadenceSlot;
+
+  return { pool: preferredPool, selectionIndex, targetFamiliarity };
+}
+
 export function buildDailyWordPuzzle(dateKey, entries) {
   if (!isValidDateKey(dateKey) || !Array.isArray(entries)) {
     throw new Error("A valid UTC date and word list are required.");
@@ -51,10 +84,13 @@ export function buildDailyWordPuzzle(dateKey, entries) {
     .sort((left, right) => left.id.localeCompare(right.id));
   if (!playable.length) throw new Error("No playable word entries are available.");
 
-  const dayNumber = getUtcDayNumber(dateKey);
-  const cycle = Math.floor(dayNumber / playable.length);
-  const position = ((dayNumber % playable.length) + playable.length) % playable.length;
-  const ordered = shuffle(playable, createRng(hashString(`${cycle}:word-puzzle-order`)));
+  const { pool, selectionIndex, targetFamiliarity } = getFamiliaritySelection(dateKey, playable);
+  const cycle = Math.floor(selectionIndex / pool.length);
+  const position = positiveModulo(selectionIndex, pool.length);
+  const ordered = shuffle(
+    pool,
+    createRng(hashString(`${cycle}:${targetFamiliarity}:word-puzzle-order`)),
+  );
   const entry = ordered[position];
   const letters = getAnswerLetters(entry.answer);
   const firstLetter = letters[0];

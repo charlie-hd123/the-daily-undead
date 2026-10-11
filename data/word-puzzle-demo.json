@@ -1,96 +1,3867 @@
 {
-  "source": "Word Bank for new puzzle - updated",
+  "source": "The Daily Undead Word Bank Updated 11 Oct",
+  "selection": {
+    "wellKnownShare": 0.8,
+    "lessKnownShare": 0.2
+  },
   "words": [
-    { "id": "word-0001", "answer": "Edward Richtofen", "category": "Characters", "availableFrom": "2026-10-07" },
-    { "id": "word-0002", "answer": "Tank Dempsey", "category": "Characters", "availableFrom": "2026-10-07" },
-    { "id": "word-0003", "answer": "Nikolai Belinski", "category": "Characters", "availableFrom": "2026-10-07" },
-    { "id": "word-0004", "answer": "Takeo Masaki", "category": "Characters", "availableFrom": "2026-10-07" },
-    { "id": "word-0005", "answer": "Samantha Maxis", "category": "Characters", "availableFrom": "2026-10-07" },
-    { "id": "word-0006", "answer": "Dr. Ludvig Maxis", "category": "Characters", "availableFrom": "2026-10-07" },
-    { "id": "word-0007", "answer": "Abigail “Misty” Briarton", "category": "Characters", "availableFrom": "2026-10-07" },
-    { "id": "word-0008", "answer": "Samuel J. Stuhlinger", "category": "Characters", "availableFrom": "2026-10-07" },
-    { "id": "word-0009", "answer": "Marlton Johnson", "category": "Characters", "availableFrom": "2026-10-07" },
-    { "id": "word-0010", "answer": "Russman", "category": "Characters", "availableFrom": "2026-10-07" },
-    { "id": "word-0011", "answer": "Nacht der Untoten", "category": "Maps", "availableFrom": "2026-10-07" },
-    { "id": "word-0012", "answer": "Kino der Toten", "category": "Maps", "availableFrom": "2026-10-07" },
-    { "id": "word-0013", "answer": "Ascension", "category": "Maps", "availableFrom": "2026-10-07" },
-    { "id": "word-0014", "answer": "Origins", "category": "Maps", "availableFrom": "2026-10-07" },
-    { "id": "word-0015", "answer": "Mob of the Dead", "category": "Maps", "availableFrom": "2026-10-07" },
-    { "id": "word-0016", "answer": "Buried", "category": "Maps", "availableFrom": "2026-10-07" },
-    { "id": "word-0017", "answer": "Shadows of Evil", "category": "Maps", "availableFrom": "2026-10-07" },
-    { "id": "word-0018", "answer": "Der Eisendrache", "category": "Maps", "availableFrom": "2026-10-07" },
-    { "id": "word-0019", "answer": "Juggernog", "category": "Perks", "availableFrom": "2026-10-07" },
-    { "id": "word-0020", "answer": "Speed Cola", "category": "Perks", "availableFrom": "2026-10-07" },
-    { "id": "word-0021", "answer": "Quick Revive", "category": "Perks", "availableFrom": "2026-10-07" },
-    { "id": "word-0022", "answer": "Double Tap", "category": "Perks", "availableFrom": "2026-10-07" },
-    { "id": "word-0023", "answer": "Mule Kick", "category": "Perks", "availableFrom": "2026-10-07" },
-    { "id": "word-0024", "answer": "Stamin-Up", "category": "Perks", "availableFrom": "2026-10-07" },
-    { "id": "word-0025", "answer": "PhD Flopper", "category": "Perks", "availableFrom": "2026-10-07" },
-    { "id": "word-0026", "answer": "Deadshot Daiquiri", "category": "Perks", "availableFrom": "2026-10-07" },
-    { "id": "word-0027", "answer": "Widow's Wine", "category": "Perks", "availableFrom": "2026-10-07" },
-    { "id": "word-0028", "answer": "Electric Cherry", "category": "Perks", "availableFrom": "2026-10-07" },
-    { "id": "word-0029", "answer": "Ray Gun", "category": "Wonder Weapons", "availableFrom": "2026-10-07" },
-    { "id": "word-0030", "answer": "Ray Gun Mark II", "category": "Wonder Weapons", "availableFrom": "2026-10-07" },
-    { "id": "word-0031", "answer": "Wunderwaffe", "category": "Wonder Weapons", "availableFrom": "2026-10-07" },
-    { "id": "word-0032", "answer": "Thundergun", "category": "Wonder Weapons", "availableFrom": "2026-10-07" },
-    { "id": "word-0033", "answer": "Winter's Howl", "category": "Wonder Weapons", "availableFrom": "2026-10-07" },
-    { "id": "word-0034", "answer": "Wave Gun", "category": "Wonder Weapons", "availableFrom": "2026-10-07" },
-    { "id": "word-0035", "answer": "Blundergat", "category": "Wonder Weapons", "availableFrom": "2026-10-07" },
-    { "id": "word-0036", "answer": "Apothicon Servant", "category": "Wonder Weapons", "availableFrom": "2026-10-07" },
-    { "id": "word-0037", "answer": "Hellhound", "category": "Enemies", "availableFrom": "2026-10-07" },
-    { "id": "word-0038", "answer": "Panzer Soldat", "category": "Enemies", "availableFrom": "2026-10-07" },
-    { "id": "word-0039", "answer": "Brutus", "category": "Enemies", "availableFrom": "2026-10-07" },
-    { "id": "word-0040", "answer": "Margwa", "category": "Enemies", "availableFrom": "2026-10-07" },
-    { "id": "word-0041", "answer": "Nova Crawler", "category": "Enemies", "availableFrom": "2026-10-07" },
-    { "id": "word-0042", "answer": "Megaton", "category": "Enemies", "availableFrom": "2026-10-07" },
-    { "id": "word-0043", "answer": "Mimic", "category": "Enemies", "availableFrom": "2026-10-07" },
-    { "id": "word-0044", "answer": "Mangler", "category": "Enemies", "availableFrom": "2026-10-07" },
-    { "id": "word-0045", "answer": "Abomination", "category": "Enemies", "availableFrom": "2026-10-07" },
-    { "id": "word-0046", "answer": "Disciple", "category": "Enemies", "availableFrom": "2026-10-07" },
-    { "id": "word-0047", "answer": "Max Ammo", "category": "Power-Ups", "availableFrom": "2026-10-07" },
-    { "id": "word-0048", "answer": "Insta-Kill", "category": "Power-Ups", "availableFrom": "2026-10-07" },
-    { "id": "word-0049", "answer": "Double Points", "category": "Power-Ups", "availableFrom": "2026-10-07" },
-    { "id": "word-0050", "answer": "Carpenter", "category": "Power-Ups", "availableFrom": "2026-10-07" },
-    { "id": "word-0051", "answer": "Fire Sale", "category": "Power-Ups", "availableFrom": "2026-10-07" },
-    { "id": "word-0052", "answer": "Death Machine", "category": "Power-Ups", "availableFrom": "2026-10-07" },
-    { "id": "word-0053", "answer": "Zombie Blood", "category": "Power-Ups", "availableFrom": "2026-10-07" },
-    { "id": "word-0054", "answer": "Full Power", "category": "Power-Ups", "availableFrom": "2026-10-07" },
-    { "id": "word-0055", "answer": "Perkaholic", "category": "GobbleGums", "availableFrom": "2026-10-07" },
-    { "id": "word-0056", "answer": "Shopping Free", "category": "GobbleGums", "availableFrom": "2026-10-07" },
-    { "id": "word-0057", "answer": "Alchemical Antithesis", "category": "GobbleGums", "availableFrom": "2026-10-07" },
-    { "id": "word-0058", "answer": "Immolation Liquidation", "category": "GobbleGums", "availableFrom": "2026-10-07" },
-    { "id": "word-0059", "answer": "Phoenix Up", "category": "GobbleGums", "availableFrom": "2026-10-07" },
-    { "id": "word-0060", "answer": "Near Death Experience", "category": "GobbleGums", "availableFrom": "2026-10-07" },
-    { "id": "word-0061", "answer": "Soda Fountain", "category": "GobbleGums", "availableFrom": "2026-10-07" },
-    { "id": "word-0062", "answer": "Wall Power", "category": "GobbleGums", "availableFrom": "2026-10-07" },
-    { "id": "word-0063", "answer": "Crate Power", "category": "GobbleGums", "availableFrom": "2026-10-07" },
-    { "id": "word-0064", "answer": "Anywhere But Here!", "category": "GobbleGums", "availableFrom": "2026-10-07" },
-    { "id": "word-0065", "answer": "Monkey Bomb", "category": "Equipment & Buildables", "availableFrom": "2026-10-07" },
-    { "id": "word-0066", "answer": "Gersh Device", "category": "Equipment & Buildables", "availableFrom": "2026-10-07" },
-    { "id": "word-0067", "answer": "Hell's Retriever", "category": "Equipment & Buildables", "availableFrom": "2026-10-07" },
-    { "id": "word-0068", "answer": "Hell's Redeemer", "category": "Equipment & Buildables", "availableFrom": "2026-10-07" },
-    { "id": "word-0069", "answer": "Zombie Shield", "category": "Equipment & Buildables", "availableFrom": "2026-10-07" },
-    { "id": "word-0070", "answer": "Rocket Shield", "category": "Equipment & Buildables", "availableFrom": "2026-10-07" },
-    { "id": "word-0071", "answer": "Maxis Drone", "category": "Equipment & Buildables", "availableFrom": "2026-10-07" },
-    { "id": "word-0072", "answer": "Trample Steam", "category": "Equipment & Buildables", "availableFrom": "2026-10-07" },
-    { "id": "word-0073", "answer": "Dragon Strike", "category": "Equipment & Buildables", "availableFrom": "2026-10-07" },
-    { "id": "word-0074", "answer": "Aether", "category": "Story & Lore", "availableFrom": "2026-10-07" },
-    { "id": "word-0075", "answer": "Dark Aether", "category": "Story & Lore", "availableFrom": "2026-10-07" },
-    { "id": "word-0076", "answer": "Agartha", "category": "Story & Lore", "availableFrom": "2026-10-07" },
-    { "id": "word-0077", "answer": "Apothicon", "category": "Story & Lore", "availableFrom": "2026-10-07" },
-    { "id": "word-0078", "answer": "Keeper", "category": "Story & Lore", "availableFrom": "2026-10-07" },
-    { "id": "word-0079", "answer": "Primis", "category": "Story & Lore", "availableFrom": "2026-10-07" },
-    { "id": "word-0080", "answer": "Ultimis", "category": "Story & Lore", "availableFrom": "2026-10-07" },
-    { "id": "word-0081", "answer": "Victis", "category": "Story & Lore", "availableFrom": "2026-10-07" },
-    { "id": "word-0082", "answer": "Beauty of Annihilation", "category": "Songs", "availableFrom": "2026-10-07" },
-    { "id": "word-0083", "answer": "Lullaby of a Deadman", "category": "Songs", "availableFrom": "2026-10-07" },
-    { "id": "word-0084", "answer": "The One", "category": "Songs", "availableFrom": "2026-10-07" },
-    { "id": "word-0085", "answer": "Abracadavre", "category": "Songs", "availableFrom": "2026-10-07" },
-    { "id": "word-0086", "answer": "Pareidolia", "category": "Songs", "availableFrom": "2026-10-07" },
-    { "id": "word-0087", "answer": "Archangel", "category": "Songs", "availableFrom": "2026-10-07" },
-    { "id": "word-0088", "answer": "Dead Again", "category": "Songs", "availableFrom": "2026-10-07" },
-    { "id": "word-0089", "answer": "Where Are We Going", "category": "Songs", "availableFrom": "2026-10-07" },
-    { "id": "word-0090", "answer": "Always Running", "category": "Songs", "availableFrom": "2026-10-07" }
+    {
+      "id": "lw-0001",
+      "answer": "Edward Richtofen",
+      "category": "Characters & Bosses",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0002",
+      "answer": "Tank Dempsey",
+      "category": "Characters & Bosses",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0003",
+      "answer": "Nikolai Belinski",
+      "category": "Characters & Bosses",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0004",
+      "answer": "Takeo Masaki",
+      "category": "Characters & Bosses",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0005",
+      "answer": "Samantha Maxis",
+      "category": "Characters & Bosses",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0006",
+      "answer": "Dr. Ludvig Maxis",
+      "category": "Characters & Bosses",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0007",
+      "answer": "Abigail “Misty” Briarton",
+      "category": "Characters & Bosses",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0008",
+      "answer": "Samuel J. Stuhlinger",
+      "category": "Characters & Bosses",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0009",
+      "answer": "Russman",
+      "category": "Characters & Bosses",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0010",
+      "answer": "Marlton Johnson",
+      "category": "Characters & Bosses",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0011",
+      "answer": "The Weasel",
+      "category": "Characters & Bosses",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0012",
+      "answer": "Albert “Weasel” Arlington",
+      "category": "Characters & Bosses",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0013",
+      "answer": "George A. Romero",
+      "category": "Characters & Bosses",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0014",
+      "answer": "Shadowman",
+      "category": "Characters & Bosses",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0015",
+      "answer": "Dr. Monty",
+      "category": "Characters & Bosses",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0016",
+      "answer": "John F. Kennedy",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0017",
+      "answer": "Avogadro",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0018",
+      "answer": "Grigori Weaver",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0019",
+      "answer": "Mr. Peeks",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0020",
+      "answer": "Salvatore DeLuca",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0021",
+      "answer": "Billy Handsome",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0022",
+      "answer": "Michael “Finn” O'Leary",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0023",
+      "answer": "Richard Nixon",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0024",
+      "answer": "Fidel Castro",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0025",
+      "answer": "Robert McNamara",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0026",
+      "answer": "Danny Trejo",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0027",
+      "answer": "Sarah Michelle Gellar",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0028",
+      "answer": "Robert Englund",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0029",
+      "answer": "Michael Rooker",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0030",
+      "answer": "Floyd Campbell",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0031",
+      "answer": "Nero Blackstone",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0032",
+      "answer": "Jessica Rose",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0033",
+      "answer": "Jack Vincent",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0034",
+      "answer": "The Warden",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0035",
+      "answer": "The Forsaken",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0036",
+      "answer": "Sergei Ravenov",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0037",
+      "answer": "Maya Aguinaldo",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0038",
+      "answer": "Dr. Elizabeth Grey",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0039",
+      "answer": "Mackenzie “Mac” Carver",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0040",
+      "answer": "William Peck",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0041",
+      "answer": "Scarlett Rhodes",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0042",
+      "answer": "Stanton Shaw",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0043",
+      "answer": "Diego Necalli",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0044",
+      "answer": "Bruno Delacroix",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0045",
+      "answer": "Sophia",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0046",
+      "answer": "Lev Kravchenko",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0047",
+      "answer": "Aleksandra Valentina",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0048",
+      "answer": "Dr. Strauss",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0049",
+      "answer": "The Director",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0050",
+      "answer": "Peter McCain",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0051",
+      "answer": "Doctor Groph",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0052",
+      "answer": "Alistair Rhodes",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0053",
+      "answer": "The Entity",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0054",
+      "answer": "Kazimir Zykov",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0055",
+      "answer": "Pablo Marinus",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0056",
+      "answer": "Nathan Aguinaldo",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0057",
+      "answer": "Doctor Panos",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0058",
+      "answer": "Dr. Blanchard",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0059",
+      "answer": "Dr. Modi",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0060",
+      "answer": "Pegasus",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0061",
+      "answer": "Cornelius Pernell",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0062",
+      "answer": "Yuri Zavoyski",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0063",
+      "answer": "Dr. Ulrich Vogel",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0064",
+      "answer": "Jebediah Brown",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0065",
+      "answer": "Godfrey",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0066",
+      "answer": "Gideon Jones",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0067",
+      "answer": "Veytharion",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0068",
+      "answer": "Caltheris",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0069",
+      "answer": "Dravakar",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0070",
+      "answer": "Nyxara",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0071",
+      "answer": "Dr. Schuster",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0072",
+      "answer": "Christina Fowler",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0073",
+      "answer": "Jonathan Warwick",
+      "category": "Characters & Bosses",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0074",
+      "answer": "Hellhound",
+      "category": "Enemies & Creatures",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0075",
+      "answer": "Mangler",
+      "category": "Enemies & Creatures",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0076",
+      "answer": "Panzersoldat",
+      "category": "Enemies & Creatures",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0077",
+      "answer": "Brutus",
+      "category": "Enemies & Creatures",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0078",
+      "answer": "Margwa",
+      "category": "Enemies & Creatures",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0079",
+      "answer": "Nova Crawler",
+      "category": "Enemies & Creatures",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0080",
+      "answer": "Pentagon Thief",
+      "category": "Enemies & Creatures",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0081",
+      "answer": "Denizen",
+      "category": "Enemies & Creatures",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0082",
+      "answer": "Space Monkey",
+      "category": "Enemies & Creatures",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0083",
+      "answer": "Megaton",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0084",
+      "answer": "Abomination",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0085",
+      "answer": "Plaguehound",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0086",
+      "answer": "Disciple",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0087",
+      "answer": "Napalm Zombie",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0088",
+      "answer": "Shrieker Zombie",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0089",
+      "answer": "Keeper",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0090",
+      "answer": "Thrasher",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0091",
+      "answer": "Parasite",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0092",
+      "answer": "Armored Zombie",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0093",
+      "answer": "Vermin",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0094",
+      "answer": "Amalgam",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0095",
+      "answer": "Blightfather",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0096",
+      "answer": "Doppelghast",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0097",
+      "answer": "Templar Zombie",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0098",
+      "answer": "Valkyrie Drone",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0099",
+      "answer": "Gladiator",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0100",
+      "answer": "Werewolf",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0101",
+      "answer": "Stoker",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0102",
+      "answer": "Shock Mimic",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0103",
+      "answer": "Tempest",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0104",
+      "answer": "Catalyst Zombie",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0105",
+      "answer": "Rad-Hound",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0106",
+      "answer": "Ravager",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0107",
+      "answer": "Scorched Zombie",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0108",
+      "answer": "Toxic Zombie",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0109",
+      "answer": "Gegenees",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0110",
+      "answer": "Elder Disciple",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0111",
+      "answer": "Necropincer",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0112",
+      "answer": "Web Mother",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0113",
+      "answer": "Deathspinners",
+      "category": "Enemies & Creatures",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0114",
+      "answer": "Ray Gun",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0115",
+      "answer": "Thundergun",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0116",
+      "answer": "Wunderwaffe",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0117",
+      "answer": "Ray Gun Mark II",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0118",
+      "answer": "Mustang and Sally",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0119",
+      "answer": "Bowie Knife",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0120",
+      "answer": "Ballistic Knife",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0121",
+      "answer": "Olympia",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0122",
+      "answer": "Thompson",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0123",
+      "answer": "Apothicon Servant",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0124",
+      "answer": "Staff of Ice",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0125",
+      "answer": "Staff of Fire",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0126",
+      "answer": "Staff of Lightning",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0127",
+      "answer": "Staff of Wind",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0128",
+      "answer": "Blundergat",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0129",
+      "answer": "Sliquifier",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0130",
+      "answer": "Jet Gun",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0131",
+      "answer": "Storm Bow",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0132",
+      "answer": "Wrath of the Ancients",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0133",
+      "answer": "Paralyzer",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0134",
+      "answer": "Ray Gun Mark III",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0135",
+      "answer": "Wave Gun",
+      "category": "Weapons & Upgrades",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0136",
+      "answer": "Crossbow",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0137",
+      "answer": "War Machine",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0138",
+      "answer": "Flamethrower",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0139",
+      "answer": "China Lake",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0140",
+      "answer": "Winter's Howl",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0141",
+      "answer": "Scavenger",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0142",
+      "answer": "Wolf Bow",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0143",
+      "answer": "Void Bow",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0144",
+      "answer": "Fire Bow",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0145",
+      "answer": "Acidgat",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0146",
+      "answer": "Golden Spork",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0147",
+      "answer": "D.I.E. Shockwave",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0148",
+      "answer": "Beamsmasher",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0149",
+      "answer": "Chrysalax",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0150",
+      "answer": "Magmagat",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0151",
+      "answer": "Zeus Cannon",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0152",
+      "answer": "Apothicon Sword",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0153",
+      "answer": "Skull of Nan Sapwe",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0154",
+      "answer": "Bastard Sword",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0155",
+      "answer": "Kraken",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0156",
+      "answer": "Death of Orion",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0157",
+      "answer": "Alistair's Folly",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0158",
+      "answer": "Gauntlet of Siegfried",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0159",
+      "answer": "Springfield",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0160",
+      "answer": "Tundragun",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0161",
+      "answer": "Hammer of Valhalla",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0162",
+      "answer": "Scepter of Ra",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0163",
+      "answer": "Viper and Dragon",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0164",
+      "answer": "Chakrams of Vengeance",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0165",
+      "answer": "Hand of Charon",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0166",
+      "answer": "Hand of Gaia",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0167",
+      "answer": "Hand of Hemera",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0168",
+      "answer": "Hand of Ouranos",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0169",
+      "answer": "Savage Impaler",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0170",
+      "answer": "Gorgofex",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0171",
+      "answer": "Necrofluid Gauntlet",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0172",
+      "answer": "Jotunn Star",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0173",
+      "answer": "Nekomancer",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0174",
+      "answer": "Warden's Blight",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0175",
+      "answer": "Sundergat",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0176",
+      "answer": "CRBR-S Swarm",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0177",
+      "answer": "CRBR-S Blazer",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0178",
+      "answer": "CRBR-S Diffuser",
+      "category": "Weapons & Upgrades",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0179",
+      "answer": "Kino der Toten",
+      "category": "Maps & Locations",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0180",
+      "answer": "Nacht der Untoten",
+      "category": "Maps & Locations",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0181",
+      "answer": "Der Riese",
+      "category": "Maps & Locations",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0182",
+      "answer": "TranZit",
+      "category": "Maps & Locations",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0183",
+      "answer": "Origins",
+      "category": "Maps & Locations",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0184",
+      "answer": "Mob of the Dead",
+      "category": "Maps & Locations",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0185",
+      "answer": "Der Eisendrache",
+      "category": "Maps & Locations",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0186",
+      "answer": "Shadows of Evil",
+      "category": "Maps & Locations",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0187",
+      "answer": "Buried",
+      "category": "Maps & Locations",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0188",
+      "answer": "Nuketown",
+      "category": "Maps & Locations",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0189",
+      "answer": "Ascension",
+      "category": "Maps & Locations",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0190",
+      "answer": "The Giant",
+      "category": "Maps & Locations",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0191",
+      "answer": "Shi No Numa",
+      "category": "Maps & Locations",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0192",
+      "answer": "Verrückt",
+      "category": "Maps & Locations",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0193",
+      "answer": "Call of the Dead",
+      "category": "Maps & Locations",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0194",
+      "answer": "Gorod Krovi",
+      "category": "Maps & Locations",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0195",
+      "answer": "Revelations",
+      "category": "Maps & Locations",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0196",
+      "answer": "Die Rise",
+      "category": "Maps & Locations",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0197",
+      "answer": "Shangri-La",
+      "category": "Maps & Locations",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0198",
+      "answer": "Liberty Falls",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0199",
+      "answer": "Terminus",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0200",
+      "answer": "Die Maschine",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0201",
+      "answer": "Zetsubou No Shima",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0202",
+      "answer": "Blood of the Dead",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0203",
+      "answer": "Classified",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0204",
+      "answer": "Firebase Z",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0205",
+      "answer": "Mauer der Toten",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0206",
+      "answer": "Voyage of Despair",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0207",
+      "answer": "Ancient Evil",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0208",
+      "answer": "Dead of the Night",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0209",
+      "answer": "Tag der Toten",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0210",
+      "answer": "Alpha Omega",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0211",
+      "answer": "Forsaken",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0212",
+      "answer": "Citadelle des Morts",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0213",
+      "answer": "The Tomb",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0214",
+      "answer": "Shattered Veil",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0215",
+      "answer": "Ashes of the Damned",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0216",
+      "answer": "Reckoning",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0217",
+      "answer": "Alcatraz Island",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0218",
+      "answer": "Pentagon",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0219",
+      "answer": "Green Run",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0220",
+      "answer": "Crazy Place",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0221",
+      "answer": "Golden Gate Bridge",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0222",
+      "answer": "Excavation Site",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0223",
+      "answer": "The Witch's House",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0224",
+      "answer": "Groom Lake",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0225",
+      "answer": "Astra Malorum",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0226",
+      "answer": "Paradox Junction",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0227",
+      "answer": "Totenreich",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0228",
+      "answer": "Kowakujō",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0229",
+      "answer": "Rex Infernus",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0230",
+      "answer": "Dr. Monty's House",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0231",
+      "answer": "Morg City",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0232",
+      "answer": "Eagle's Nest",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0233",
+      "answer": "Pyramid Room",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0234",
+      "answer": "Liberty Lanes",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0235",
+      "answer": "Footlight District",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0236",
+      "answer": "Waterfront District",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0237",
+      "answer": "Canal District",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0238",
+      "answer": "Junction District",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0239",
+      "answer": "The Ruby Rabbit",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0240",
+      "answer": "Terminus Island",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0241",
+      "answer": "Soviet Cosmodrome",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0242",
+      "answer": "Odin Tower",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0243",
+      "answer": "Zeus Tower",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0244",
+      "answer": "Ra Tower",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0245",
+      "answer": "Danu Tower",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0246",
+      "answer": "Ashwood",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0247",
+      "answer": "Vandorn Farm",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0248",
+      "answer": "Zarya Cosmodrome",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0249",
+      "answer": "Eidskallen Lighthouse",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0250",
+      "answer": "Janus Towers",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0251",
+      "answer": "Dark Aether Nexus",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0252",
+      "answer": "Broken Arrow Facility",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0253",
+      "answer": "Asylum",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0254",
+      "answer": "Blackwater Lake",
+      "category": "Maps & Locations",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0255",
+      "answer": "Juggernog",
+      "category": "Perks & Power-Ups",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0256",
+      "answer": "Max Ammo",
+      "category": "Perks & Power-Ups",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0257",
+      "answer": "Insta-Kill",
+      "category": "Perks & Power-Ups",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0258",
+      "answer": "Double Points",
+      "category": "Perks & Power-Ups",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0259",
+      "answer": "Quick Revive",
+      "category": "Perks & Power-Ups",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0260",
+      "answer": "Speed Cola",
+      "category": "Perks & Power-Ups",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0261",
+      "answer": "Double Tap Root Beer",
+      "category": "Perks & Power-Ups",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0262",
+      "answer": "Double Tap II Root Beer",
+      "category": "Perks & Power-Ups",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0263",
+      "answer": "Stamin-Up",
+      "category": "Perks & Power-Ups",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0264",
+      "answer": "Fire Sale",
+      "category": "Perks & Power-Ups",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0265",
+      "answer": "Carpenter",
+      "category": "Perks & Power-Ups",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0266",
+      "answer": "Death Machine",
+      "category": "Perks & Power-Ups",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0267",
+      "answer": "PhD Flopper",
+      "category": "Perks & Power-Ups",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0268",
+      "answer": "Mule Kick",
+      "category": "Perks & Power-Ups",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0269",
+      "answer": "Deadshot Daiquiri",
+      "category": "Perks & Power-Ups",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0270",
+      "answer": "Widow's Wine",
+      "category": "Perks & Power-Ups",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0271",
+      "answer": "Electric Cherry",
+      "category": "Perks & Power-Ups",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0272",
+      "answer": "Vulture Aid",
+      "category": "Perks & Power-Ups",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0273",
+      "answer": "Tombstone Soda",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0274",
+      "answer": "Elemental Pop",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0275",
+      "answer": "PHD Slider",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0276",
+      "answer": "Zombie Blood",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0277",
+      "answer": "Death Perception",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0278",
+      "answer": "Who's Who",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0279",
+      "answer": "Max Armor",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0280",
+      "answer": "Bonus Points",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0281",
+      "answer": "Free Perk",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0282",
+      "answer": "Random Perk",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0283",
+      "answer": "Melee Macchiato",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0284",
+      "answer": "Dying Wish",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0285",
+      "answer": "Full Power",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0286",
+      "answer": "Bonfire Sale",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0287",
+      "answer": "Winter's Wail",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0288",
+      "answer": "Timeslip",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0289",
+      "answer": "Bandolier Bandit",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0290",
+      "answer": "Victorious Tortoise",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0291",
+      "answer": "Stone Cold Stronghold",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0292",
+      "answer": "Secret Sauce",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0293",
+      "answer": "Electric Burst",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0294",
+      "answer": "Deadshot Dealer",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0295",
+      "answer": "Ethereal Razor",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0296",
+      "answer": "Blood Wolf Bite",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0297",
+      "answer": "Wisp Tea",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0298",
+      "answer": "Zombshell",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0299",
+      "answer": "Blaze Phase",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0300",
+      "answer": "Blood Money",
+      "category": "Perks & Power-Ups",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0301",
+      "answer": "Perkaholic",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0302",
+      "answer": "Shopping Free",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0303",
+      "answer": "In Plain Sight",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0304",
+      "answer": "Anywhere But Here",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0305",
+      "answer": "Alchemical Antithesis",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0306",
+      "answer": "Immolation Liquidation",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0307",
+      "answer": "Wonderbar!",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0308",
+      "answer": "Phoenix Up",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0309",
+      "answer": "Wall Power",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0310",
+      "answer": "Crate Power",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0311",
+      "answer": "On the House",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0312",
+      "answer": "Soda Fountain",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0313",
+      "answer": "Near Death Experience",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0314",
+      "answer": "Cache Back",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0315",
+      "answer": "Power Vacuum",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0316",
+      "answer": "Reign Drops",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0317",
+      "answer": "Round Robbin'",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0318",
+      "answer": "Stock Option",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0319",
+      "answer": "Aftertaste",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0320",
+      "answer": "Self Medication",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0321",
+      "answer": "Killing Time",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0322",
+      "answer": "Idle Eyes",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0323",
+      "answer": "Unquenchable",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0324",
+      "answer": "Who's Keeping Score?",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0325",
+      "answer": "Undead Man Walking",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0326",
+      "answer": "Kill Joy",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0327",
+      "answer": "Temporal Gift",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0328",
+      "answer": "Free Fire",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0329",
+      "answer": "Hidden Power",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0330",
+      "answer": "Profit Sharing",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0331",
+      "answer": "Respin Cycle",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0332",
+      "answer": "Nowhere But There",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0333",
+      "answer": "Arsenal Accelerator",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0334",
+      "answer": "Shields Up",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0335",
+      "answer": "Armor Gettin'",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0336",
+      "answer": "Power Keg",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0337",
+      "answer": "Newtonian Negation",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0338",
+      "answer": "Flavor Hex",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0339",
+      "answer": "Perk Up",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0340",
+      "answer": "Equip Mint",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0341",
+      "answer": "Refresh Mint",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0342",
+      "answer": "Talkin' Bout Regeneration",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0343",
+      "answer": "Gift Card",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0344",
+      "answer": "Fully Packed",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0345",
+      "answer": "Round Off",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0346",
+      "answer": "Tactical Diffusion",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0347",
+      "answer": "Quacknarok",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0348",
+      "answer": "Slaylist",
+      "category": "GobbleGums & Elixirs",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0349",
+      "answer": "Pack-a-Punch",
+      "category": "Objects & Devices",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0350",
+      "answer": "Mystery Box",
+      "category": "Objects & Devices",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0351",
+      "answer": "Monkey Bomb",
+      "category": "Objects & Devices",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0352",
+      "answer": "Power Switch",
+      "category": "Objects & Devices",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0353",
+      "answer": "Perk-a-Cola Machine",
+      "category": "Objects & Devices",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0354",
+      "answer": "Der Wunderfizz",
+      "category": "Objects & Devices",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0355",
+      "answer": "Zombie Shield",
+      "category": "Objects & Devices",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0356",
+      "answer": "GobbleGum Machine",
+      "category": "Objects & Devices",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0357",
+      "answer": "Frag Grenade",
+      "category": "Objects & Devices",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0358",
+      "answer": "Semtex",
+      "category": "Objects & Devices",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0359",
+      "answer": "Claymore",
+      "category": "Objects & Devices",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0360",
+      "answer": "Self-Revive Kit",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0361",
+      "answer": "Armor Plates",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0362",
+      "answer": "Summoning Key",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0363",
+      "answer": "Hell's Retriever",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0364",
+      "answer": "Gersh Device",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0365",
+      "answer": "Li'l Arnie",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0366",
+      "answer": "Turbine",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0367",
+      "answer": "Trample Steam",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0368",
+      "answer": "Gramophone",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0369",
+      "answer": "QED Device",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0370",
+      "answer": "Matryoshka Dolls",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0371",
+      "answer": "Time Bomb",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0372",
+      "answer": "G-Strike",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0373",
+      "answer": "Hacker Device",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0374",
+      "answer": "Golden Shovel",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0375",
+      "answer": "Maxis Drone",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0376",
+      "answer": "PES Helmet",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0377",
+      "answer": "MPD Pyramid",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0378",
+      "answer": "Gateworm",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0379",
+      "answer": "Blood Vials",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0380",
+      "answer": "Kronorium",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0381",
+      "answer": "Apothicon Egg",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0382",
+      "answer": "Navcard",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0383",
+      "answer": "Decoy Grenade",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0384",
+      "answer": "Molotov Cocktail",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0385",
+      "answer": "Stim Shot",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0386",
+      "answer": "Combat Axe",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0387",
+      "answer": "Shock Charge",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0388",
+      "answer": "Smoke Grenade",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0389",
+      "answer": "Crafting Table",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0390",
+      "answer": "Arsenal Machine",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0391",
+      "answer": "Armor Station",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0392",
+      "answer": "Ammo Cache",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0393",
+      "answer": "Power Generator",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0394",
+      "answer": "Wraith Fire",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0395",
+      "answer": "Samantha's Music Box",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0396",
+      "answer": "Armor Vest",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0397",
+      "answer": "Electric Trap",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0398",
+      "answer": "Vril Device",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0399",
+      "answer": "Golden Rod",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0400",
+      "answer": "Vril Generator",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0401",
+      "answer": "Focusing Stone",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0402",
+      "answer": "Dragon Egg",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0403",
+      "answer": "Gramophone Record",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0404",
+      "answer": "Navcard Table",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0405",
+      "answer": "Subsurface Resonator",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0406",
+      "answer": "Electro-Shock Defense",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0407",
+      "answer": "Acid Trap",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0408",
+      "answer": "Head Chopper",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0409",
+      "answer": "Brazen Bull",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0410",
+      "answer": "Apollo's Will",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0411",
+      "answer": "Upgrade Station",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0412",
+      "answer": "Aetherscope",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0413",
+      "answer": "Sentinel Artifact",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0414",
+      "answer": "Agarthan Device",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0415",
+      "answer": "Elemental Shard",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0416",
+      "answer": "Excavator Pi",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0417",
+      "answer": "Aether Blade",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0418",
+      "answer": "Cursed Talisman",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0419",
+      "answer": "Rocket Test Trap",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0420",
+      "answer": "Saw Blade Trap",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0421",
+      "answer": "Dark Mechanism",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0422",
+      "answer": "Void Claw",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0423",
+      "answer": "Mystic Orb",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0424",
+      "answer": "Seal of Duality",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0425",
+      "answer": "World Seed",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0426",
+      "answer": "Aetherium Canister",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0427",
+      "answer": "Apothicon Blood",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0428",
+      "answer": "Titan Trap",
+      "category": "Objects & Devices",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0429",
+      "answer": "Primis",
+      "category": "Story & Quests",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0430",
+      "answer": "Ultimis",
+      "category": "Story & Quests",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0431",
+      "answer": "Victis",
+      "category": "Story & Quests",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0432",
+      "answer": "Dark Aether",
+      "category": "Story & Quests",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0433",
+      "answer": "Aether Story",
+      "category": "Story & Quests",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0434",
+      "answer": "Dark Aether Saga",
+      "category": "Story & Quests",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0435",
+      "answer": "Chaos Story",
+      "category": "Story & Quests",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0436",
+      "answer": "Apothicons",
+      "category": "Story & Quests",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0437",
+      "answer": "Keepers",
+      "category": "Story & Quests",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0438",
+      "answer": "Agartha",
+      "category": "Story & Quests",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0439",
+      "answer": "Requiem",
+      "category": "Story & Quests",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0440",
+      "answer": "Omega Group",
+      "category": "Story & Quests",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0441",
+      "answer": "The Cycle",
+      "category": "Story & Quests",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0442",
+      "answer": "The Illuminati",
+      "category": "Story & Quests",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0443",
+      "answer": "Broken Arrow",
+      "category": "Story & Quests",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0444",
+      "answer": "The Multiverse",
+      "category": "Story & Quests",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0445",
+      "answer": "Project Janus",
+      "category": "Story & Quests",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0446",
+      "answer": "Requiem Strike Team",
+      "category": "Story & Quests",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0447",
+      "answer": "Projekt Endstation",
+      "category": "Story & Quests",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0448",
+      "answer": "Ascension Group",
+      "category": "Story & Quests",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0449",
+      "answer": "Broken Cycle",
+      "category": "Story & Quests",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0450",
+      "answer": "Pop Goes the Weasel",
+      "category": "Story & Quests",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0451",
+      "answer": "Little Lost Girl",
+      "category": "Story & Quests",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0452",
+      "answer": "Richtofen's Grand Scheme",
+      "category": "Story & Quests",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0453",
+      "answer": "Tower of Babble",
+      "category": "Story & Quests",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0454",
+      "answer": "Big Bang Theory",
+      "category": "Story & Quests",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0455",
+      "answer": "Fly Trap",
+      "category": "Story & Quests",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0456",
+      "answer": "Time Travel Will Tell",
+      "category": "Story & Quests",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0457",
+      "answer": "Shadowsmiths",
+      "category": "Story & Quests",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0458",
+      "answer": "Damned",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0459",
+      "answer": "Beauty of Annihilation",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0460",
+      "answer": "Not Ready to Die",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0461",
+      "answer": "Archangel",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0462",
+      "answer": "Shepherd of Fire",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0463",
+      "answer": "Where Are We Going",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0464",
+      "answer": "Abracadavre",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0465",
+      "answer": "Lullaby of a Dead Man",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0466",
+      "answer": "Always Running",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0467",
+      "answer": "Pareidolia",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0468",
+      "answer": "Coming Home",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0469",
+      "answer": "The One",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0470",
+      "answer": "The Gift",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0471",
+      "answer": "Won't Back Down",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0472",
+      "answer": "Rusty Cage",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0473",
+      "answer": "Nightmare",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0474",
+      "answer": "Carrion",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0475",
+      "answer": "We All Fall Down",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0476",
+      "answer": "Dead Again",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0477",
+      "answer": "Dead Ended",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0478",
+      "answer": "Snakeskin Boots",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0479",
+      "answer": "Mad Hatter",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0480",
+      "answer": "Dead Flowers",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0481",
+      "answer": "Undone",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0482",
+      "answer": "Drowning",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0483",
+      "answer": "Shockwave",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0484",
+      "answer": "Stormbound",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0485",
+      "answer": "Mystery",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0486",
+      "answer": "Remember Forever",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0487",
+      "answer": "I Am the Well",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0488",
+      "answer": "Cold Hard Cash",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0489",
+      "answer": "A Light from the Shore",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0490",
+      "answer": "Can You Hear Me? (Come In)",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0491",
+      "answer": "Remember Us",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0492",
+      "answer": "Destroy Something Beautiful",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0493",
+      "answer": "Falling to Pieces",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0494",
+      "answer": "Turn to Ashes",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0495",
+      "answer": "Come Back Down",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0496",
+      "answer": "No One There",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0497",
+      "answer": "Evencry",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0498",
+      "answer": "All We Are",
+      "category": "Songs & Themes",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0499",
+      "answer": "Perk-a-Colas",
+      "category": "Gameplay & Misc",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0500",
+      "answer": "Wall Buy",
+      "category": "Gameplay & Misc",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0501",
+      "answer": "Teleporter",
+      "category": "Gameplay & Misc",
+      "familiarity": "well_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0502",
+      "answer": "Exfil",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0503",
+      "answer": "Field Upgrades",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0504",
+      "answer": "Dead Wire",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0505",
+      "answer": "Aether Shroud",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0506",
+      "answer": "Ring of Fire",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0507",
+      "answer": "Chopper Gunner",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0508",
+      "answer": "Sentry Gun",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0509",
+      "answer": "Afterlife",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0510",
+      "answer": "Beast Mode",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0511",
+      "answer": "Liquid Divinium",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0512",
+      "answer": "Brain Rot",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0513",
+      "answer": "Napalm Burst",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0514",
+      "answer": "Cryo Freeze",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0515",
+      "answer": "Mutant Injection",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0516",
+      "answer": "Rampage Inducer",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0517",
+      "answer": "Healing Aura",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0518",
+      "answer": "Blast Furnace",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0519",
+      "answer": "Fire Works",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0520",
+      "answer": "Thunder Wall",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0521",
+      "answer": "Lunar Lander",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0522",
+      "answer": "Zipline",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0523",
+      "answer": "Gondola",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0524",
+      "answer": "Dark Aether Portal",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0525",
+      "answer": "Aetherium Crystals",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0526",
+      "answer": "Aether Tool",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0527",
+      "answer": "Golden Armor",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0528",
+      "answer": "Frenzied Guard",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0529",
+      "answer": "Energy Mine",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0530",
+      "answer": "Tesla Storm",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0531",
+      "answer": "Frost Blast",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0532",
+      "answer": "Toxic Growth",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0533",
+      "answer": "Shatter Blast",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0534",
+      "answer": "S.A.M. Trials",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0535",
+      "answer": "Dragon Strike",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0536",
+      "answer": "Hellstorm Missile",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0537",
+      "answer": "Napalm Strike",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0538",
+      "answer": "Cruise Missile",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0539",
+      "answer": "Shadow Rift",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0540",
+      "answer": "Light Mend",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0541",
+      "answer": "Launch Pad",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0542",
+      "answer": "Jump Pad",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0543",
+      "answer": "Nebulium Plasma",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0544",
+      "answer": "Aetherium",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0545",
+      "answer": "Dark Aether Crystal",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0546",
+      "answer": "Pegasus Strike",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0547",
+      "answer": "Dark Flare",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0548",
+      "answer": "Mister Peeks",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0549",
+      "answer": "Wild Fire",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0550",
+      "answer": "T.E.D.D. Tasks",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    },
+    {
+      "id": "lw-0551",
+      "answer": "Eternal Perks",
+      "category": "Gameplay & Misc",
+      "familiarity": "less_known",
+      "availableFrom": "2026-10-07"
+    }
   ],
   "excluded": []
 }
