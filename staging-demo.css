@@ -1040,12 +1040,8 @@
   }
 
   .word-puzzle-panel .word-scoreboard {
-    width: min(100%, 36rem);
+    width: 100%;
     margin-top: 0.5rem;
-  }
-
-  .word-puzzle-panel .word-scoreboard > div {
-    padding-block: 0.38rem;
   }
 
   .word-puzzle-panel .word-danger-meter {
@@ -1069,7 +1065,6 @@
 
   .word-puzzle-panel .word-keyboard {
     gap: 0.32rem;
-    width: min(100%, 42rem);
     margin-top: 0.75rem;
   }
 
