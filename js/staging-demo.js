@@ -29,6 +29,10 @@ const roundLabel = document.querySelector("#demo-round");
 const advanceButton = document.querySelector("#advance-demo-day");
 const yesterdayEasterAnswerLabel = document.querySelector("#demo-yesterday-easter-answer");
 const yesterdayWordAnswerLabel = document.querySelector("#demo-yesterday-word-answer");
+const leaderboardsButton = document.querySelector("#leaderboards-button");
+const leaderboardsDialog = document.querySelector("#demo-leaderboards-dialog");
+const leaderboardWordAnswerLabel = document.querySelector("#demo-leaderboard-word-answer");
+const leaderboardEasterAnswerLabel = document.querySelector("#demo-leaderboard-easter-answer");
 
 const profileStorageKey = "daily-undead:multi-puzzle-demo:profile";
 const dayStoragePrefix = "daily-undead:multi-puzzle-demo:day:";
@@ -97,6 +101,47 @@ function updateCommunityDemo() {
     catalog.answerEquivalents,
   );
   yesterdayWordAnswerLabel.textContent = yesterdayWordPuzzle.entry.answer;
+}
+
+function initialiseDemoLeaderboards() {
+  const periodTabs = [...document.querySelectorAll("[data-demo-leaderboard-period]")];
+  const periodPanels = [...document.querySelectorAll("[data-demo-leaderboard-panel]")];
+  const puzzleTabs = [...document.querySelectorAll("[data-demo-puzzle-tab]")];
+  const puzzlePanels = [...document.querySelectorAll("[data-demo-puzzle-panel]")];
+
+  leaderboardWordAnswerLabel.textContent = wordPuzzle.entry.answer;
+  leaderboardEasterAnswerLabel.textContent = getAnswerDisplayTitle(
+    easterPuzzle.map,
+    catalog.answerEquivalents,
+  );
+
+  const selectTab = (tabs, panels, value, tabAttribute, panelAttribute) => {
+    tabs.forEach((tab) => {
+      const selected = tab.dataset[tabAttribute] === value;
+      tab.setAttribute("aria-selected", String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+    });
+    panels.forEach((panel) => {
+      panel.hidden = panel.dataset[panelAttribute] !== value;
+    });
+  };
+
+  periodTabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      selectTab(periodTabs, periodPanels, tab.dataset.demoLeaderboardPeriod, "demoLeaderboardPeriod", "demoLeaderboardPanel");
+    });
+  });
+  puzzleTabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      selectTab(puzzleTabs, puzzlePanels, tab.dataset.demoPuzzleTab, "demoPuzzleTab", "demoPuzzlePanel");
+    });
+  });
+
+  leaderboardsButton.addEventListener("click", () => leaderboardsDialog.showModal());
+  leaderboardsDialog.querySelector("[data-close-demo-leaderboards]").addEventListener("click", () => leaderboardsDialog.close());
+  leaderboardsDialog.addEventListener("click", (event) => {
+    if (event.target === leaderboardsDialog) leaderboardsDialog.close();
+  });
 }
 
 function punctuateSentenceEnding(value) {
@@ -1131,6 +1176,7 @@ async function initialise() {
     easterPuzzle = buildDailyPuzzle(dateKey, maps);
     wordPuzzle = buildDailyWordPuzzle(dateKey, wordEntries);
     updateCommunityDemo();
+    initialiseDemoLeaderboards();
     dayState = loadDayState();
     advanceButton.addEventListener("click", advanceDay);
     document.addEventListener("keydown", (event) => {

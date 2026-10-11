@@ -2,6 +2,196 @@
   cursor: default;
 }
 
+.demo-leaderboard-dialog {
+  overflow: hidden;
+}
+
+.demo-leaderboard-dialog .demo-leaderboard-intro {
+  margin-bottom: 1rem;
+}
+
+.demo-leaderboard-overview {
+  margin-bottom: 0.45rem;
+}
+
+.demo-official-note {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid rgb(103 232 255 / 22%);
+  border-radius: 999px;
+  background: rgb(103 232 255 / 6%);
+  color: rgb(199 216 233 / 68%);
+  font: 700 0.58rem/1 var(--font-display);
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+
+.demo-puzzle-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin-bottom: 0.55rem;
+}
+
+.demo-puzzle-tabs button {
+  display: grid;
+  min-width: 0;
+  gap: 0.16rem;
+  min-height: 3.25rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid rgb(156 181 223 / 18%);
+  border-radius: 0.65rem;
+  background: rgb(5 9 17 / 52%);
+  color: var(--muted-strong);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
+}
+
+.demo-puzzle-tabs button span {
+  overflow: hidden;
+  color: rgb(168 178 199 / 58%);
+  font: 700 0.55rem/1 var(--font-display);
+  letter-spacing: 0.09em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.demo-puzzle-tabs button strong {
+  overflow: hidden;
+  font: 800 0.86rem/1 var(--font-display);
+  letter-spacing: 0.025em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.demo-puzzle-tabs button[aria-selected="true"] {
+  border-color: rgb(103 232 255 / 58%);
+  background: linear-gradient(120deg, rgb(103 232 255 / 15%), rgb(153 113 255 / 9%));
+  color: #fff;
+  box-shadow: inset 0.16rem 0 var(--aether), 0 0.55rem 1.2rem rgb(0 0 0 / 14%);
+}
+
+.demo-puzzle-tabs button[aria-selected="true"] span {
+  color: var(--aether);
+}
+
+.demo-puzzle-tabs button:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+.demo-leaderboard-answer {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0 0 0.5rem;
+  padding: 0.45rem 0.65rem;
+  border-left: 2px solid rgb(103 232 255 / 55%);
+  background: linear-gradient(90deg, rgb(103 232 255 / 7%), transparent 72%);
+}
+
+.demo-leaderboard-answer span {
+  flex: 0 0 auto;
+  color: rgb(168 178 199 / 62%);
+  font: 700 0.58rem/1 var(--font-display);
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+
+.demo-leaderboard-answer strong {
+  overflow: hidden;
+  color: var(--text);
+  font: 800 0.86rem/1.15 var(--font-display);
+  letter-spacing: 0.025em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.demo-puzzle-leaderboard[hidden] {
+  display: none;
+}
+
+.demo-leaderboard-player {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.demo-leaderboard-player .leaderboard-player {
+  min-width: 0;
+}
+
+.demo-all-time-heading {
+  min-height: auto;
+  margin: 0 0 0.55rem;
+  padding: 0.35rem 0.25rem;
+}
+
+.demo-all-time-solves {
+  padding: 0 !important;
+  background: none !important;
+  color: var(--muted) !important;
+  font-size: 0.58rem !important;
+  letter-spacing: 0.04em !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .demo-puzzle-tabs button:hover {
+    transform: translateY(-1px);
+    border-color: rgb(103 232 255 / 40%);
+  }
+}
+
+@media (max-width: 35rem) {
+  .demo-leaderboard-dialog h2 {
+    font-size: 2rem;
+  }
+
+  .demo-leaderboard-dialog .demo-leaderboard-intro {
+    margin-bottom: 0.7rem;
+    padding-right: 1.6rem;
+    font-size: 0.84rem;
+  }
+
+  .demo-puzzle-tabs button {
+    min-height: 3rem;
+    padding-inline: 0.55rem;
+  }
+
+  .demo-leaderboard-answer {
+    gap: 0.35rem;
+    padding-inline: 0.5rem;
+  }
+
+  .demo-leaderboard-answer span {
+    font-size: 0.52rem;
+  }
+
+  .demo-leaderboard-answer strong {
+    font-size: 0.78rem;
+  }
+
+  .demo-leaderboard-player {
+    gap: 0.45rem;
+  }
+
+  .demo-leaderboard-dialog .leaderboard-entry {
+    min-height: 3.8rem;
+  }
+
+  .demo-all-time-solves {
+    max-width: 9.5rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 .community-stats-demo {
   display: grid;
   grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
