@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#070a12">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <meta name="description" content="Staging prototype for The Daily Undead multi-puzzle daily game.">
+    <meta name="description" content="Staging prototype for The Daily Undead alternating daily Zombies challenge.">
     <title>The Daily Undead</title>
     <link rel="icon" href="./assets/favicon.png" type="image/png" sizes="128x128">
     <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" sizes="180x180">
@@ -40,10 +40,8 @@
     </header>
 
     <main id="demo-app" class="app-shell">
-      <section class="panel loading-panel"><h2>Loading today’s puzzles…</h2></section>
+      <section class="panel loading-panel"><h2>Loading today’s challenge…</h2></section>
     </main>
-
-    <div class="community-section-divider" aria-hidden="true"></div>
 
     <section class="community-stats community-stats-demo" aria-label="Daily Undead community statistics" aria-live="polite">
       <div class="community-overview">
@@ -57,21 +55,17 @@
         </p>
       </div>
       <div class="community-yesterday">
-        <div class="community-yesterday-heading">
-          <p>Yesterday’s puzzles</p>
-          <span>Answer and solve rate</span>
-        </div>
         <div class="community-result-grid">
-          <article class="community-result">
+          <article class="community-result" data-community-puzzle="word">
             <div class="community-result-copy">
-              <span>Last Words</span>
+              <div class="community-result-title"><span>Last Words · Yesterday</span><em data-yesterday-round-badge hidden>· Scored puzzle</em></div>
               <strong id="demo-yesterday-word-answer">—</strong>
             </div>
             <div class="community-result-rate"><strong>74%</strong><span>solved</span></div>
           </article>
-          <article class="community-result">
+          <article class="community-result" data-community-puzzle="easter">
             <div class="community-result-copy">
-              <span>Quest Steps</span>
+              <div class="community-result-title"><span>Quest Steps · Yesterday</span><em data-yesterday-round-badge hidden>· Scored puzzle</em></div>
               <strong id="demo-yesterday-easter-answer">—</strong>
             </div>
             <div class="community-result-rate"><strong>82%</strong><span>solved</span></div>
@@ -119,53 +113,45 @@
           </p>
         </div>
 
-        <div class="demo-puzzle-filter-row">
-          <span>Filter</span>
-          <div class="demo-puzzle-filters" aria-label="Filter today’s leaderboard by puzzle">
-            <button type="button" aria-pressed="false" data-demo-puzzle-filter="word">Last Words</button>
-            <button type="button" aria-pressed="false" data-demo-puzzle-filter="easter">Quest Steps</button>
-          </div>
-        </div>
-
         <ol class="leaderboard-list demo-today-list">
           <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="word">
-            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="richtofen" aria-hidden="true"></span><div class="leaderboard-player"><strong>AWildReen</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Last Words</span><small class="leaderboard-result is-elite">Perfect solve</small></span></div></div>
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="richtofen" aria-hidden="true"></span><div class="leaderboard-player"><strong>AWildReen</strong><span class="demo-result-meta"><small class="leaderboard-result is-elite">Perfect solve</small></span></div></div>
             <div class="leaderboard-score"><strong>100</strong><small>PTS</small></div>
           </li>
           <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="easter">
-            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="samantha" aria-hidden="true"></span><div class="leaderboard-player"><strong>NovaHunter</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Quest Steps</span><small class="leaderboard-result is-elite">1 clue <span class="leaderboard-result-accent">+ bonus</span></small></span></div></div>
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="samantha" aria-hidden="true"></span><div class="leaderboard-player"><strong>NovaHunter</strong><span class="demo-result-meta"><small class="leaderboard-result is-elite">1 clue <span class="leaderboard-result-accent">+ bonus</span></small></span></div></div>
             <div class="leaderboard-score"><strong>100</strong><small>PTS</small></div>
           </li>
           <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="word">
-            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="dempsey" aria-hidden="true"></span><div class="leaderboard-player"><strong>Basti_TTV</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Last Words</span><small class="leaderboard-result is-elite">Perfect solve</small></span></div></div>
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="dempsey" aria-hidden="true"></span><div class="leaderboard-player"><strong>Basti_TTV</strong><span class="demo-result-meta"><small class="leaderboard-result is-elite">Perfect solve</small></span></div></div>
             <div class="leaderboard-score"><strong>100</strong><small>PTS</small></div>
           </li>
           <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="easter">
-            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="dr-maxis" aria-hidden="true"></span><div class="leaderboard-player"><strong>115Seeker</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Quest Steps</span><small class="leaderboard-result is-correct">1 clue</small></span></div></div>
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="dr-maxis" aria-hidden="true"></span><div class="leaderboard-player"><strong>115Seeker</strong><span class="demo-result-meta"><small class="leaderboard-result is-correct">1 clue</small></span></div></div>
             <div class="leaderboard-score"><strong>50</strong><small>PTS</small></div>
           </li>
           <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="word">
-            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="takeo" aria-hidden="true"></span><div class="leaderboard-player"><strong>Bongomon</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Last Words</span><small class="leaderboard-result is-correct">1 miss</small></span></div></div>
-            <div class="leaderboard-score"><strong>50</strong><small>PTS</small></div>
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="takeo" aria-hidden="true"></span><div class="leaderboard-player"><strong>Bongomon</strong><span class="demo-result-meta"><small class="leaderboard-result is-correct">1 miss</small></span></div></div>
+            <div class="leaderboard-score"><strong>80</strong><small>PTS</small></div>
           </li>
           <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="word">
-            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="nikolai" aria-hidden="true"></span><div class="leaderboard-player"><strong>Exp188</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Last Words</span><small class="leaderboard-result is-correct">1 miss</small></span></div></div>
-            <div class="leaderboard-score"><strong>50</strong><small>PTS</small></div>
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="nikolai" aria-hidden="true"></span><div class="leaderboard-player"><strong>Exp188</strong><span class="demo-result-meta"><small class="leaderboard-result is-correct">1 miss</small></span></div></div>
+            <div class="leaderboard-score"><strong>80</strong><small>PTS</small></div>
           </li>
           <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="easter">
-            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="warden" aria-hidden="true"></span><div class="leaderboard-player"><strong>DarkAether</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Quest Steps</span><small class="leaderboard-result is-correct">2 clues + bonus</small></span></div></div>
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="warden" aria-hidden="true"></span><div class="leaderboard-player"><strong>DarkAether</strong><span class="demo-result-meta"><small class="leaderboard-result is-correct">2 clues + bonus</small></span></div></div>
             <div class="leaderboard-score"><strong>40</strong><small>PTS</small></div>
           </li>
           <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="word">
-            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="misty" aria-hidden="true"></span><div class="leaderboard-player"><strong>Lone</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Last Words</span><small class="leaderboard-result is-correct">2 misses</small></span></div></div>
-            <div class="leaderboard-score"><strong>40</strong><small>PTS</small></div>
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="misty" aria-hidden="true"></span><div class="leaderboard-player"><strong>Lone</strong><span class="demo-result-meta"><small class="leaderboard-result is-correct">2 misses</small></span></div></div>
+            <div class="leaderboard-score"><strong>60</strong><small>PTS</small></div>
           </li>
           <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="easter">
-            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="weaver" aria-hidden="true"></span><div class="leaderboard-player"><strong>RoundRobbin</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Quest Steps</span><small class="leaderboard-result is-correct">2 clues</small></span></div></div>
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="weaver" aria-hidden="true"></span><div class="leaderboard-player"><strong>RoundRobbin</strong><span class="demo-result-meta"><small class="leaderboard-result is-correct">2 clues</small></span></div></div>
             <div class="leaderboard-score"><strong>20</strong><small>PTS</small></div>
           </li>
           <li class="leaderboard-entry leaderboard-today-entry" data-demo-puzzle-entry="easter">
-            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="marlton" aria-hidden="true"></span><div class="leaderboard-player"><strong>PerkCola</strong><span class="demo-result-meta"><span class="demo-puzzle-tag">Quest Steps</span><small class="leaderboard-result is-correct">3 clues</small></span></div></div>
+            <div class="demo-leaderboard-player"><span class="zombie-avatar zombie-avatar-small" data-avatar="marlton" aria-hidden="true"></span><div class="leaderboard-player"><strong>PerkCola</strong><span class="demo-result-meta"><small class="leaderboard-result is-correct">3 clues</small></span></div></div>
             <div class="leaderboard-score"><strong>10</strong><small>PTS</small></div>
           </li>
         </ol>

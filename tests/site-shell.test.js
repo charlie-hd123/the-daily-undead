@@ -546,14 +546,35 @@ test("the clue count stays editable until a map is confirmed", async () => {
   assert.doesNotMatch(app, /phase: "clue-review"/);
 });
 
-test("the guessing screen uses hard clues and the ordering bonus uses full clues", async () => {
+test("Quest Steps uses hard clues first, a full third clue and full bonus steps", async () => {
   const app = await readProjectFile("js/app.js");
   const clueCard = app.match(/function createClueCard\(step, index\) \{[\s\S]*?\n\}/)[0];
   const bonus = app.match(/function renderBonus\(\) \{[\s\S]*?\n\}/)[0];
 
-  assert.match(clueCard, /textContent = step\.hardClue/);
+  assert.match(clueCard, /index === 2 \? step\.clue : step\.hardClue/);
   assert.match(bonus, /escapeHtml\(step\.clue\)/);
   assert.doesNotMatch(bonus, /step\.hardClue/);
+});
+
+test("the staging daily round is date-assigned and the extra puzzle unlocks afterward", async () => {
+  const [html, app] = await Promise.all([
+    readProjectFile("staging-demo.html"),
+    readProjectFile("js/staging-demo.js"),
+  ]);
+
+  assert.match(app, /officialType: getOfficialPuzzleType\(dateKey\)/);
+  assert.match(app, /startPuzzle\(dayState\.officialType, "official"\)/);
+  assert.match(app, /getOtherPuzzleType\(dayState\.officialType\)/);
+  assert.match(app, /index === 2 \? step\.clue : step\.hardClue/);
+  assert.match(app, /puzzleStats: \{[\s\S]*?word: loadPuzzleStats\("word"\)[\s\S]*?easter: loadPuzzleStats\("easter"\)/);
+  assert.doesNotMatch(app, /lockOfficialChoice/);
+  assert.doesNotMatch(app, /Choose your daily puzzle/);
+  assert.doesNotMatch(html, /data-demo-puzzle-filter/);
+  assert.match(html, /data-yesterday-round-badge/);
+  assert.match(html, /Last Words · Yesterday/);
+  assert.match(html, /Quest Steps · Yesterday/);
+  assert.match(html, /Scored puzzle/);
+  assert.doesNotMatch(html, /Yesterday’s puzzles|Answer and solve rate|Scored round/);
 });
 
 test("community statistics are placed near the bottom and contain no frontend credentials", async () => {

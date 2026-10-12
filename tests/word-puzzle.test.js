@@ -47,6 +47,18 @@ test("answers without an eligible vowel still never reveal their first letter", 
   assert.equal(puzzle.initialLetters.includes("A"), false);
 });
 
+test("starting letters minimise exposed positions in repetition-heavy answers", () => {
+  const puzzle = buildDailyWordPuzzle("2026-10-07", [
+    { id: "der-riese", category: "Maps", answer: "Der Riese", familiarity: WORD_FAMILIARITY.WELL_KNOWN, availableFrom: "2026-01-01" },
+  ]);
+  const exposedPositions = getAnswerLetters(puzzle.entry.answer).filter(
+    (letter) => puzzle.initialLetters.includes(letter),
+  );
+
+  assert.deepEqual(puzzle.initialLetters, ["I", "S"]);
+  assert.equal(exposedPositions.length, 2);
+});
+
 test("a returning word can receive a different pair of starting letters", () => {
   const repeatedWord = [entries[1]];
   const startingPairs = new Set();
@@ -62,7 +74,7 @@ test("a returning word can receive a different pair of starting letters", () => 
 test("word points follow the configured ladder and reach zero on the fifth mistake", () => {
   assert.deepEqual(
     [0, 1, 2, 3, 4, 5, 6].map(calculateWordPoints),
-    [100, 50, 40, 20, 10, 0, 0],
+    [100, 80, 60, 40, 20, 0, 0],
   );
 });
 
@@ -146,6 +158,36 @@ test("the daily rotation selects four well-known words for every less-known word
   }
 });
 
+test("reshuffled familiarity pools keep answers at least 30 days apart", () => {
+  const weightedEntries = [
+    ...Array.from({ length: 64 }, (_, index) => ({
+      id: `green-cooldown-${index}`,
+      category: "Test",
+      answer: `Green Cooldown ${String.fromCharCode(65 + (index % 26))}${index}`,
+      familiarity: WORD_FAMILIARITY.WELL_KNOWN,
+      availableFrom: "2026-01-01",
+    })),
+    ...Array.from({ length: 16 }, (_, index) => ({
+      id: `orange-cooldown-${index}`,
+      category: "Test",
+      answer: `Orange Cooldown ${String.fromCharCode(65 + index)}`,
+      familiarity: WORD_FAMILIARITY.LESS_KNOWN,
+      availableFrom: "2026-01-01",
+    })),
+  ];
+  const lastSeen = new Map();
+  const start = new Date("2026-10-01T00:00:00Z");
+
+  for (let offset = 0; offset < 500; offset += 1) {
+    const date = new Date(start);
+    date.setUTCDate(start.getUTCDate() + offset);
+    const entry = buildDailyWordPuzzle(date.toISOString().slice(0, 10), weightedEntries).entry;
+    const previousOffset = lastSeen.get(entry.id);
+    if (previousOffset != null) assert.equal(offset - previousOffset >= 30, true);
+    lastSeen.set(entry.id, offset);
+  }
+});
+
 test("the staging catalogue gives every word permanent scheduling metadata", async () => {
   const source = JSON.parse(await fs.readFile(
     new URL("../data/word-puzzle-demo.json", import.meta.url),
@@ -157,14 +199,28 @@ test("the staging catalogue gives every word permanent scheduling metadata", asy
 
   const familiarity = source.words.map((entry) => entry.familiarity);
 
-  assert.equal(source.words.length, 551);
-  assert.equal(categories.size, 10);
-  assert.equal(new Set(answers).size, 551);
-  assert.equal(new Set(ids).size, 551);
-  assert.equal(familiarity.filter((value) => value === WORD_FAMILIARITY.WELL_KNOWN).length, 164);
-  assert.equal(familiarity.filter((value) => value === WORD_FAMILIARITY.LESS_KNOWN).length, 387);
+  assert.equal(source.words.length, 562);
+  assert.equal(categories.size, 18);
+  assert.equal(new Set(answers).size, 562);
+  assert.equal(new Set(ids).size, 562);
+  assert.equal(familiarity.filter((value) => value === WORD_FAMILIARITY.WELL_KNOWN).length, 171);
+  assert.equal(familiarity.filter((value) => value === WORD_FAMILIARITY.LESS_KNOWN).length, 391);
   assert.equal(source.words.every(isPlayableWordEntry), true);
+  assert.equal(source.words.every((entry) => typeof entry.description === "string" && entry.description.length > 0), true);
   assert.equal(source.words.find((entry) => entry.id === "lw-0001")?.answer, "Edward Richtofen");
-  assert.equal(source.words.find((entry) => entry.id === "lw-0551")?.answer, "Eternal Perks");
+  assert.equal(source.words.find((entry) => entry.id === "lw-0562")?.answer, "Eternal Perks");
   assert.deepEqual(source.excluded, []);
+});
+
+test("the completed Last Words view carries the entry description below the answer", async () => {
+  const source = await fs.readFile(
+    new URL("../js/staging-demo.js", import.meta.url),
+    "utf8",
+  );
+  const answerIndex = source.indexOf('<h2 class="final-map-name">');
+  const descriptionIndex = source.indexOf('<p class="word-result-description">');
+
+  assert.equal(answerIndex >= 0, true);
+  assert.equal(descriptionIndex > answerIndex, true);
+  assert.match(source, /description: wordPuzzle\.entry\.description/);
 });

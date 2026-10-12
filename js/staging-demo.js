@@ -19,6 +19,10 @@ import {
   isWordSolved,
   normalizeLetter,
 } from "./word-puzzle-core.js";
+import {
+  getOfficialPuzzleType,
+  getOtherPuzzleType,
+} from "./daily-challenge-core.js";
 
 const app = document.querySelector("#demo-app");
 const dateLabel = document.querySelector("#demo-date");
@@ -29,6 +33,7 @@ const roundLabel = document.querySelector("#demo-round");
 const advanceButton = document.querySelector("#advance-demo-day");
 const yesterdayEasterAnswerLabel = document.querySelector("#demo-yesterday-easter-answer");
 const yesterdayWordAnswerLabel = document.querySelector("#demo-yesterday-word-answer");
+const yesterdayCommunityResults = [...document.querySelectorAll("[data-community-puzzle]")];
 const leaderboardsButton = document.querySelector("#leaderboards-button");
 const leaderboardsDialog = document.querySelector("#demo-leaderboards-dialog");
 
@@ -92,6 +97,7 @@ function getPreviousDateKey(value) {
 
 function updateCommunityDemo() {
   const yesterdayDateKey = getPreviousDateKey(dateKey);
+  const yesterdayOfficialType = getOfficialPuzzleType(yesterdayDateKey);
   const yesterdayEasterPuzzle = buildDailyPuzzle(yesterdayDateKey, maps);
   const yesterdayWordPuzzle = buildDailyWordPuzzle(yesterdayDateKey, wordEntries);
   yesterdayEasterAnswerLabel.textContent = getAnswerDisplayTitle(
@@ -99,12 +105,17 @@ function updateCommunityDemo() {
     catalog.answerEquivalents,
   );
   yesterdayWordAnswerLabel.textContent = yesterdayWordPuzzle.entry.answer;
+  yesterdayCommunityResults.forEach((result) => {
+    const official = result.dataset.communityPuzzle === yesterdayOfficialType;
+    result.classList.toggle("is-official", official);
+    const badge = result.querySelector("[data-yesterday-round-badge]");
+    if (badge) badge.hidden = !official;
+  });
 }
 
 function initialiseDemoLeaderboards() {
   const periodTabs = [...document.querySelectorAll("[data-demo-leaderboard-period]")];
   const periodPanels = [...document.querySelectorAll("[data-demo-leaderboard-panel]")];
-  const filterButtons = [...document.querySelectorAll("[data-demo-puzzle-filter]")];
   const todayEntries = [...document.querySelectorAll("[data-demo-puzzle-entry]")];
 
   const selectTab = (tabs, panels, value, tabAttribute, panelAttribute) => {
@@ -123,21 +134,9 @@ function initialiseDemoLeaderboards() {
       selectTab(periodTabs, periodPanels, tab.dataset.demoLeaderboardPeriod, "demoLeaderboardPeriod", "demoLeaderboardPanel");
     });
   });
-  filterButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const selectedFilter = button.getAttribute("aria-pressed") === "true"
-        ? null
-        : button.dataset.demoPuzzleFilter;
-      filterButtons.forEach((filterButton) => {
-        filterButton.setAttribute(
-          "aria-pressed",
-          String(filterButton.dataset.demoPuzzleFilter === selectedFilter),
-        );
-      });
-      todayEntries.forEach((entry) => {
-        entry.hidden = Boolean(selectedFilter && entry.dataset.demoPuzzleEntry !== selectedFilter);
-      });
-    });
+  const officialType = getOfficialPuzzleType(dateKey);
+  todayEntries.forEach((entry) => {
+    entry.hidden = entry.dataset.demoPuzzleEntry !== officialType;
   });
 
   leaderboardsButton.addEventListener("click", () => leaderboardsDialog.showModal());
@@ -176,19 +175,37 @@ function saveJson(key, value) {
 
 function loadProfile() {
   const saved = loadJson(profileStorageKey, {});
+  const savedPuzzleStats = saved.puzzleStats && typeof saved.puzzleStats === "object"
+    ? saved.puzzleStats
+    : {};
+  const loadPuzzleStats = (type) => ({
+    score: Number.isInteger(savedPuzzleStats[type]?.score) && savedPuzzleStats[type].score >= 0
+      ? savedPuzzleStats[type].score
+      : 0,
+    solves: Number.isInteger(savedPuzzleStats[type]?.solves) && savedPuzzleStats[type].solves >= 0
+      ? savedPuzzleStats[type].solves
+      : 0,
+    plays: Number.isInteger(savedPuzzleStats[type]?.plays) && savedPuzzleStats[type].plays >= 0
+      ? savedPuzzleStats[type].plays
+      : 0,
+  });
   return {
     score: Number.isInteger(saved.score) && saved.score >= 0 ? saved.score : 0,
     solves: Number.isInteger(saved.solves) && saved.solves >= 0 ? saved.solves : 0,
     round: Number.isInteger(saved.round) && saved.round >= 1 ? saved.round : 1,
     bestRound: Number.isInteger(saved.bestRound) && saved.bestRound >= 1 ? saved.bestRound : 1,
+    puzzleStats: {
+      word: loadPuzzleStats("word"),
+      easter: loadPuzzleStats("easter"),
+    },
   };
 }
 
 function createDayState() {
   return {
-    version: 3,
+    version: 4,
     dateKey,
-    officialType: null,
+    officialType: getOfficialPuzzleType(dateKey),
     officialCompleted: false,
     officialResult: null,
     progressionApplied: false,
@@ -199,10 +216,11 @@ function createDayState() {
 
 function loadDayState() {
   const saved = loadJson(`${dayStoragePrefix}${dateKey}`, null);
-  if (saved?.version !== 3 || saved?.dateKey !== dateKey) return createDayState();
+  if (saved?.version !== 4 || saved?.dateKey !== dateKey) return createDayState();
   return {
     ...createDayState(),
     ...saved,
+    officialType: getOfficialPuzzleType(dateKey),
     sessions: { easter: null, word: null, ...(saved.sessions || {}) },
   };
 }
@@ -290,14 +308,6 @@ function ensureSession(type) {
   return session;
 }
 
-function lockOfficialChoice(type) {
-  if (!type || dayState.officialType) return;
-  dayState.officialType = type;
-  ensureSession(type);
-  persist();
-  startPuzzle(type, "official");
-}
-
 function startPuzzle(type, mode) {
   activePlay = { type, mode };
   ensureSession(type);
@@ -307,17 +317,14 @@ function startPuzzle(type, mode) {
 
 function getCardAction(type) {
   const session = dayState.sessions[type];
-  if (!dayState.officialType) {
-    return { label: "Play puzzle", disabled: false, action: "choose" };
-  }
   if (dayState.officialType === type) {
     if (!dayState.officialCompleted) {
-      return { label: session ? "Continue official puzzle" : "Play official puzzle", disabled: false, action: "official" };
+      return { label: session ? "Continue today’s round" : "Play today’s round", disabled: false, action: "official" };
     }
-    return { label: "Official puzzle complete", disabled: true, action: null };
+    return { label: "Today’s round complete", disabled: true, action: null };
   }
   if (!dayState.officialCompleted) {
-    return { label: "Finish official puzzle first", disabled: true, action: null };
+    return { label: "Finish today’s round first", disabled: true, action: null };
   }
   if (session?.complete) {
     return { label: "Puzzle complete", disabled: true, action: null };
@@ -327,10 +334,9 @@ function getCardAction(type) {
 
 function getCardStatus(type) {
   const session = dayState.sessions[type];
-  if (!dayState.officialType) return "";
   if (dayState.officialType === type) {
-    if (!dayState.officialCompleted) return "Your official choice · In progress";
-    return "Today’s puzzle is complete";
+    if (!dayState.officialCompleted) return "Today’s round · In progress";
+    return "Today’s round is complete";
   }
   if (!dayState.officialCompleted) return "Locked until the official result is complete";
   if (session?.complete) return "Completed just for fun";
@@ -380,13 +386,11 @@ function areAllPuzzlesCompleted() {
 function renderHub() {
   activePlay = null;
   const allPuzzlesCompleted = areAllPuzzlesCompleted();
-  const guidance = !dayState.officialType
-    ? "Pick one puzzle for today’s scored round. Play the others afterwards for fun, risk-free."
-    : allPuzzlesCompleted
-      ? "You have completed all of today’s puzzles."
+  const guidance = allPuzzlesCompleted
+    ? "You have completed both of today’s puzzles."
     : dayState.officialCompleted
-      ? "Your official round is complete. Other puzzles are available if you would like to play just for fun."
-      : `Finish ${puzzleTypes[dayState.officialType].name} to unlock the other puzzle just for fun.`;
+      ? `Today’s round is complete. You can now play ${puzzleTypes[getOtherPuzzleType(dayState.officialType)].name} just for fun, with no effect on your stats.`
+      : `Finish today’s ${puzzleTypes[dayState.officialType].name} round to unlock the other puzzle just for fun.`;
   app.innerHTML = `
     <section class="panel puzzle-hub-panel">
       <div class="puzzle-hub-hero">
@@ -395,7 +399,7 @@ function renderHub() {
             ? "Today’s puzzles are complete"
             : dayState.officialCompleted
               ? "Play another puzzle"
-              : "Choose your daily puzzle",
+              : "Today’s round",
           guidance,
           allPuzzlesCompleted
             ? "All puzzles"
@@ -419,8 +423,7 @@ function renderHub() {
     button.addEventListener("click", () => {
       const type = button.dataset.puzzleType;
       const action = button.dataset.cardAction;
-      if (action === "choose") lockOfficialChoice(type);
-      else startPuzzle(type, action);
+      startPuzzle(type, action);
     });
   });
   app.querySelectorAll("[data-see-result]").forEach((button) => {
@@ -439,27 +442,36 @@ function applyOfficialEasterMapProgression(session) {
   profile.solves += 1;
   profile.round += 1;
   profile.bestRound = Math.max(profile.bestRound, profile.round);
+  profile.puzzleStats.easter.score += session.mapPoints;
+  profile.puzzleStats.easter.solves += 1;
+  profile.puzzleStats.easter.plays += 1;
   session.mapProgressionApplied = true;
   dayState.progressionApplied = true;
   return true;
 }
 
 function applyOfficialProgression(type, success, points) {
-  if (dayState.officialCompleted) return;
+  if (dayState.officialCompleted || type !== dayState.officialType) return;
   const session = ensureSession(type);
   if (type === "easter" && success && session.mapProgressionApplied) {
-    profile.score += Math.max(0, points - session.mapPoints);
+    const bonusPoints = Math.max(0, points - session.mapPoints);
+    profile.score += bonusPoints;
+    profile.puzzleStats.easter.score += bonusPoints;
   } else if (success) {
     profile.score += points;
     profile.solves += 1;
     profile.round += 1;
     profile.bestRound = Math.max(profile.bestRound, profile.round);
+    profile.puzzleStats[type].score += points;
+    profile.puzzleStats[type].solves += 1;
+    profile.puzzleStats[type].plays += 1;
   } else {
     profile.round = 1;
+    profile.puzzleStats[type].plays += 1;
   }
   dayState.progressionApplied = true;
   dayState.officialCompleted = true;
-  dayState.officialResult = { type, success, points };
+  dayState.officialResult = { type, puzzleType: type, success, points };
 }
 
 function finishPuzzle(type, { success, points, summary }) {
@@ -562,6 +574,7 @@ function renderCompletion(type, session, mode) {
       <section class="bonus-panel">
         <p class="word-result-category">${escapeHtml(session.summary?.label || "Uncategorised")}</p>
         <h2 class="final-map-name">${escapeHtml(answer)}</h2>
+        <p class="word-result-description">${escapeHtml(session.summary?.description || wordPuzzle.entry.description || "")}</p>
       </section>
     `;
   app.innerHTML = `
@@ -636,7 +649,7 @@ function renderNextRoundScreen() {
   return `
     <section class="next-round-screen" aria-labelledby="next-round-screen-title" aria-live="off">
       <p class="kicker">Next round</p>
-      <h3 id="next-round-screen-title">New puzzles in</h3>
+      <h3 id="next-round-screen-title">New challenge in</h3>
       <strong id="end-screen-countdown" class="end-screen-countdown" aria-label="Time until the new puzzles">--:--:--</strong>
       <p class="next-round-motivation">${motivation}</p>
     </section>
@@ -712,6 +725,7 @@ function finishPendingWordResult(session) {
       summary: {
         label: wordPuzzle.entry.category,
         answer: wordPuzzle.entry.answer,
+        description: wordPuzzle.entry.description,
         detail: success
           ? session.wrongGuesses === 0 ? "Perfect solve" : formatWordMisses(session.wrongGuesses)
           : "5 misses",
@@ -764,7 +778,7 @@ function renderWordPuzzle({
       ${renderHeading(
         "Which Zombies word is it?",
         "Try to solve the Zombies word or phrase by revealing its letters.",
-        official ? "Official puzzle" : "Just for fun",
+        official ? "Today’s round" : "Just for fun",
         official ? "" : "Playing just for fun. This result will not change your stats.",
       )}
       <div class="word-scoreboard${official ? "" : " is-single"}" aria-label="Word puzzle progress">
@@ -869,7 +883,7 @@ function submitLetter(value) {
 
 function renderClueCards(session, newlyRevealedIndex = -1) {
   return easterPuzzle.displayedSteps.map((step, index) => index < session.cluesRevealed
-    ? `<article class="clue-card${index === newlyRevealedIndex ? " is-newly-revealed" : ""}"><p class="clue-number">Clue ${index + 1}</p><p class="clue-text">${escapeHtml(step.hardClue)}</p></article>`
+    ? `<article class="clue-card${index === newlyRevealedIndex ? " is-newly-revealed" : ""}"><p class="clue-number">Clue ${index + 1}</p><p class="clue-text">${escapeHtml(index === 2 ? step.clue : step.hardClue)}</p></article>`
     : `<article class="clue-card is-hidden">Clue ${index + 1} hidden</article>`).join("");
 }
 
@@ -895,7 +909,7 @@ function renderEasterClues(session, { newlyRevealedIndex = -1, scoreChanged = fa
         official
           ? "Identify the map from its main quest steps. Reveal as few clues as possible to earn more points."
           : "Identify the map from its main quest steps. Reveal another clue if you need it.",
-        official ? "Official puzzle" : "Just for fun",
+        official ? "Today’s round" : "Just for fun",
         official ? "" : "Playing just for fun. This result will not change your stats.",
       )}
       <div class="quest-intel-status${official ? "" : " is-single"}" aria-label="Quest puzzle progress">
@@ -1195,7 +1209,7 @@ async function initialise() {
     updateStats();
     updateCountdown();
     window.setInterval(updateCountdown, 1000);
-    renderHub();
+    startPuzzle(dayState.officialType, "official");
   } catch (error) {
     console.error(error);
     app.innerHTML = `<section class="panel error-panel"><h2>The prototype couldn’t load</h2><p>Refresh the staging page and try again.</p></section>`;

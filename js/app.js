@@ -1096,7 +1096,7 @@ function renderHeading(title, description, kicker = "Today’s round") {
 function createClueCard(step, index) {
   const card = clueTemplate.content.firstElementChild.cloneNode(true);
   card.querySelector(".clue-number").textContent = `Clue ${index + 1}`;
-  card.querySelector(".clue-text").textContent = step.hardClue;
+  card.querySelector(".clue-text").textContent = index === 2 ? step.clue : step.hardClue;
   return card;
 }
 
