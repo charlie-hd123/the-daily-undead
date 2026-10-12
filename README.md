@@ -138,6 +138,8 @@ Maps in `selectionOnlyMaps` inside `data/maps/index.json` appear in the answer g
 
 ## Publish with GitHub Pages
 
+Staging must run the same application code that will be published to production, with only staging configuration, warning UI, and test data differing. User-facing changes must not exist only in the staging demo renderer. Promote the exact commit approved on staging rather than manually recreating its changes on `main`; verify representative mobile and desktop puzzle states before and after deployment, and retain the previous production commit as the rollback point. The detailed agent-facing release checklist is in [`AGENTS.md`](AGENTS.md).
+
 Once this folder is pushed to a GitHub repository:
 
 1. Open the repository's **Settings → Pages**.
