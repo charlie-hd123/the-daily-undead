@@ -12,18 +12,18 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261013-1";
+} from "./game-core.js?v=20261013-2";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
-} from "./word-puzzle-core.js?v=20261013-1";
+} from "./word-puzzle-core.js?v=20261013-2";
 import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261013-1";
+} from "./daily-challenge-core.js?v=20261013-2";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -31,23 +31,23 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261013-1";
+} from "./progression.js?v=20261013-2";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261013-1";
+} from "./account.js?v=20261013-2";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261013-1";
+} from "./community-stats.js?v=20261013-2";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261013-1";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261013-1";
+} from "./leaderboards.js?v=20261013-2";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261013-2";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -134,6 +134,7 @@ let clockOffset = 0;
 let liveDateKey;
 let activeScreenKey = null;
 let pendingFocusSelector = null;
+let bonusSubmissionPending = false;
 let accountController = {
   canSync: false,
   resultSubmissionRequiresSignIn: false,
@@ -1653,10 +1654,12 @@ function createClueCard(step, index) {
   return card;
 }
 
-function renderClueCards(container, visibleCount = 3, showHidden = false) {
+function renderClueCards(container, visibleCount = 3, showHidden = false, newlyRevealedIndex = -1) {
   puzzle.displayedSteps.forEach((step, index) => {
     if (index < visibleCount) {
-      container.append(createClueCard(step, index));
+      const card = createClueCard(step, index);
+      if (index === newlyRevealedIndex) card.classList.add("is-newly-revealed");
+      container.append(card);
       return;
     }
 
@@ -1669,7 +1672,7 @@ function renderClueCards(container, visibleCount = 3, showHidden = false) {
   });
 }
 
-function renderClues() {
+function renderClues({ newlyRevealedIndex = -1, scoreChanged = false } = {}) {
   const official = isOfficialPlay("easter");
   const potentialPoints = calculateMapPoints(state.cluesRevealed);
   app.innerHTML = `
@@ -1683,29 +1686,40 @@ function renderClues() {
       )}
       ${official ? "" : '<p class="puzzle-mode-note">Playing just for fun. This result will not change your stats.</p>'}
       <div class="quest-intel-status${official ? "" : " is-single"}" aria-label="Quest puzzle progress">
-        <div><span>Clues revealed</span><strong class="quest-clue-count">${state.cluesRevealed} / 3</strong></div>
-        ${official ? `<div><span>Potential score</span><strong class="quest-score-value">${potentialPoints}</strong></div>` : ""}
+        <div><span>Clues revealed</span><strong class="quest-clue-count${newlyRevealedIndex >= 0 ? " is-changing" : ""}">${state.cluesRevealed} / 3</strong></div>
+        ${official ? `<div><span>Potential score</span><strong class="quest-score-value${scoreChanged ? " is-changing" : ""}">${potentialPoints}</strong></div>` : ""}
       </div>
       <div id="clue-list" class="clue-list"></div>
       <div class="actions">
-        <button id="reveal-clue" class="button" type="button" ${state.cluesRevealed >= 3 ? "disabled" : ""}>
+        <button id="reveal-clue" class="button quest-reveal-button" type="button" ${state.cluesRevealed >= 3 ? "disabled" : ""}>
           ${state.cluesRevealed >= 3 ? "All clues revealed" : "Reveal next clue"}
         </button>
-        <button id="lock-answer" class="button primary" type="button">
+        <button id="lock-answer" class="button primary quest-select-map${newlyRevealedIndex >= 0 ? " is-ready-cue" : ""}" type="button">
           Select map
         </button>
       </div>
     </section>
   `;
 
-  renderClueCards(app.querySelector("#clue-list"), state.cluesRevealed, true);
+  renderClueCards(app.querySelector("#clue-list"), state.cluesRevealed, true, newlyRevealedIndex);
   focusAfterRender("clues");
-  app.querySelector("#reveal-clue")?.addEventListener("click", () => {
-    const cluesRevealed = Math.min(3, state.cluesRevealed + 1);
-    setState(
-      { cluesRevealed },
-      cluesRevealed === 3 ? "#lock-answer" : "#reveal-clue",
-    );
+  app.querySelector("#reveal-clue")?.addEventListener("click", (event) => {
+    const button = event.currentTarget;
+    if (button.classList.contains("is-activating")) return;
+    const revealClue = () => {
+      const cluesRevealed = Math.min(3, state.cluesRevealed + 1);
+      state = { ...state, cluesRevealed };
+      saveState();
+      pendingFocusSelector = cluesRevealed === 3 ? "#lock-answer" : "#reveal-clue";
+      renderClues({ newlyRevealedIndex: cluesRevealed - 1, scoreChanged: official });
+    };
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      revealClue();
+      return;
+    }
+    button.classList.add("is-activating");
+    button.setAttribute("aria-disabled", "true");
+    window.setTimeout(revealClue, 180);
   });
   app.querySelector("#lock-answer").addEventListener("click", () => {
     setState({ phase: "game", lockedClues: null });
@@ -1716,13 +1730,13 @@ function renderGameSelection() {
   const games = [...catalog.games].sort((left, right) => left.releaseOrder - right.releaseOrder);
 
   app.innerHTML = `
-    <section class="panel">
+    <section class="panel answer-selection-panel">
       ${renderHeading("Choose the game", `You have revealed ${state.cluesRevealed} ${state.cluesRevealed === 1 ? "clue" : "clues"}.`, isOfficialPlay("easter") ? "Lock in your answer" : "Just for fun")}
-      <ul class="card-grid">
+      <ul class="card-grid is-entering">
         ${games
           .map(
-            (game) => `
-              <li>
+            (game, index) => `
+              <li style="--card-index: ${index}">
                 <button class="card-button" type="button" data-game-id="${escapeHtml(game.id)}">
                   <span class="game-label">Call of Duty</span>
                   <span class="card-title">${escapeHtml(game.title)}</span>
@@ -1762,13 +1776,13 @@ function renderMapSelection() {
   );
 
   app.innerHTML = `
-    <section class="panel">
+    <section class="panel answer-selection-panel">
       ${renderHeading(`Choose a ${game.title} map`, "Tap a map, then confirm your final answer.", isOfficialPlay("easter") ? "Lock in your answer" : "Just for fun")}
-      <ul class="card-grid">
+      <ul class="card-grid is-entering">
         ${gameMaps
           .map(
-            (map) => `
-              <li>
+            (map, index) => `
+              <li style="--card-index: ${index}">
                 <button
                   class="card-button"
                   type="button"
@@ -1796,10 +1810,14 @@ function renderMapSelection() {
   app.querySelectorAll("[data-map-id]").forEach((button) => {
     button.addEventListener("click", () => {
       const mapId = button.dataset.mapId;
-      setState(
-        { selectedMapId: mapId },
-        `[data-map-id="${CSS.escape(mapId)}"]`,
-      );
+      state = { ...state, selectedMapId: mapId };
+      saveState();
+      app.querySelectorAll("[data-map-id]").forEach((candidate) => {
+        candidate.setAttribute("aria-pressed", String(candidate === button));
+        candidate.classList.remove("is-newly-selected");
+      });
+      button.classList.add("is-newly-selected");
+      app.querySelector("#confirm-map").disabled = false;
     });
   });
   app.querySelector("#back-to-games").addEventListener("click", () => {
@@ -1868,16 +1886,16 @@ function getPuzzleAnswerTitle() {
   return getAnswerDisplayTitle(puzzle.map, catalog.answerEquivalents);
 }
 
-function renderCorrectStepOrder(showTicks = false) {
+function renderCorrectStepOrder(showTicks = false, correction = false) {
   return `
-    <ol class="steps-order">
+    <ol class="steps-order${showTicks ? " is-confirmed" : ""}${correction ? " is-correction" : ""}">
       ${puzzle.chronologicalSteps
         .map(
           (step, index) => `
-            <li>
+            <li style="--step-index: ${index}">
               <span class="order-rank">${index + 1}</span>
               <span>${escapeHtml(step.clue)}</span>
-              ${showTicks ? '<span class="step-tick" aria-label="Correct">✓</span>' : ""}
+              ${showTicks ? `<span class="step-tick" style="--step-index: ${index}" aria-label="Correct">✓</span>` : ""}
             </li>
           `,
         )
@@ -1904,16 +1922,22 @@ function renderBonus() {
         <p class="helper-text">The steps were not in the correct order.</p>
         <p class="kicker">Map</p>
         <h2 class="final-map-name">${escapeHtml(getPuzzleAnswerTitle())}</h2>
-        ${renderCorrectStepOrder()}
+        ${renderCorrectStepOrder(false, true)}
       </section>
     `;
   }
 
+  const selectedCount = state.bonusOrder.length;
   return `
     <section class="bonus-panel">
-      <h3>Bonus Objective: Put the steps in order</h3>
-      <p class="helper-text">Select the steps in the order they occur to earn Double Points. Tap a selected step again to remove it and revise your order.</p>
-      <p class="selection-progress">Selected: ${state.bonusOrder.length} of 3</p>
+      <h3>Bonus: Put the steps in order</h3>
+      <p class="helper-text">${isOfficialPlay("easter") ? "Order the steps to earn Double Points. Tap a selected step to remove it." : "Order the steps correctly. Tap a selected step to remove it."}</p>
+      <div class="bonus-order-status">
+        <p class="selection-progress${selectedCount === 3 ? " is-ready" : ""}" aria-live="polite">${selectedCount === 3 ? "Ready to submit" : `Selected: ${selectedCount} of 3`}</p>
+        <div class="order-chain${selectedCount === 3 ? " is-ready" : ""}" aria-hidden="true">
+          ${[0, 1, 2].map((index) => `<i class="${index < selectedCount ? "is-active" : ""}"></i>`).join("")}
+        </div>
+      </div>
       <ul class="order-choice-list">
         ${puzzle.displayedSteps
           .map(
@@ -1939,12 +1963,54 @@ function renderBonus() {
           .join("")}
       </ul>
       <div class="actions">
-        <button id="submit-order" class="button primary" type="button" ${state.bonusOrder.length === 3 ? "" : "disabled"}>
+        <button id="submit-order" class="button primary" type="button" ${selectedCount === 3 ? "" : "disabled"}>
           Submit order · One attempt only
         </button>
       </div>
     </section>
   `;
+}
+
+function updateBonusSelection(changedButton = null) {
+  const selectedCount = state.bonusOrder.length;
+  const ready = selectedCount === 3;
+  const progress = app.querySelector(".selection-progress");
+  if (progress) {
+    progress.textContent = ready ? "Ready to submit" : `Selected: ${selectedCount} of 3`;
+    progress.classList.toggle("is-ready", ready);
+  }
+  const chain = app.querySelector(".order-chain");
+  chain?.classList.toggle("is-ready", ready);
+  chain?.querySelectorAll("i").forEach((segment, index) => {
+    segment.classList.toggle("is-active", index < selectedCount);
+  });
+  app.querySelectorAll("[data-bonus-step-id]").forEach((button) => {
+    const selectedIndex = state.bonusOrder.indexOf(button.dataset.bonusStepId);
+    button.setAttribute("aria-pressed", String(selectedIndex >= 0));
+    button.setAttribute("aria-label", `${selectedIndex >= 0 ? `Selected ${selectedIndex + 1}` : "Unselected"}: ${button.querySelector(".order-text")?.textContent || ""}`);
+    button.classList.remove("is-newly-ranked");
+    button.querySelector(".order-rank").textContent = selectedIndex >= 0 ? String(selectedIndex + 1) : "+";
+  });
+  if (changedButton && state.bonusOrder.includes(changedButton.dataset.bonusStepId)) {
+    void changedButton.offsetWidth;
+    changedButton.classList.add("is-newly-ranked");
+  }
+  app.querySelector("#submit-order").disabled = !ready;
+}
+
+function showBonusSubmissionFeedback(bonusCorrect) {
+  bonusSubmissionPending = true;
+  const list = app.querySelector(".order-choice-list");
+  list?.classList.toggle("is-order-correct", bonusCorrect);
+  list?.classList.toggle("is-order-incorrect", !bonusCorrect);
+  app.querySelectorAll("[data-bonus-step-id]").forEach((button) => { button.disabled = true; });
+  const progress = app.querySelector(".selection-progress");
+  if (progress) {
+    progress.textContent = bonusCorrect ? "Order correct" : "Order incorrect";
+    progress.classList.toggle("is-correct", bonusCorrect);
+    progress.classList.toggle("is-incorrect", !bonusCorrect);
+  }
+  app.querySelector("#submit-order").disabled = true;
 }
 
 function renderNextRoundScreen() {
@@ -2053,6 +2119,38 @@ async function shareScore(button, status) {
   }
 }
 
+function finaliseBonusSubmission(official, bonusCorrect) {
+  const bonusPoints = calculateBonusPoints(state.mapPoints, bonusCorrect);
+  bonusSubmissionPending = false;
+  if (bonusCorrect) {
+    if (official && !state.bonusPointsRecorded) {
+      awardPoints(bonusPoints);
+      puzzleStats.easter.score += bonusPoints;
+      savePuzzleStats();
+    }
+    if (official) {
+      dayState.officialCompleted = true;
+      dayState.officialResult = { type: "easter", puzzleType: "easter", success: true, points: state.mapPoints + bonusPoints };
+    }
+    dayState.lastCompleted = { type: "easter", mode: activePlay?.mode || "for_fun", success: true, points: state.mapPoints + bonusPoints };
+    setState({
+      bonusComplete: true,
+      bonusPoints,
+      bonusPointsRecorded: true,
+      complete: true,
+      success: true,
+      points: state.mapPoints + bonusPoints,
+    });
+    return;
+  }
+  if (official) {
+    dayState.officialCompleted = true;
+    dayState.officialResult = { type: "easter", puzzleType: "easter", success: true, points: state.mapPoints };
+  }
+  dayState.lastCompleted = { type: "easter", mode: activePlay?.mode || "for_fun", success: true, points: state.mapPoints };
+  setState({ bonusFailed: true, bonusPoints: 0, bonusPointsRecorded: true, complete: true, success: true, points: state.mapPoints });
+}
+
 function renderResult() {
   const official = isOfficialPlay("easter");
   const selectedMap = selectableMaps.find((map) => map.id === state.selectedMapId);
@@ -2062,7 +2160,11 @@ function renderResult() {
   const clueLabel = state.lockedClues === 1 ? "clue" : "clues";
   const endedRound = Math.max(1, state.roundsSurvivedBeforeLoss);
   const resultTitle = !official
-    ? failedBonus || !state.isCorrect ? "Not quite" : "Puzzle Complete!"
+    ? failedBonus || !state.isCorrect
+      ? "Not quite"
+      : perfectResult
+        ? "Puzzle Complete!"
+        : "Map Identified!"
     : failedBonus
       ? "Not quite"
       : perfectResult
@@ -2070,36 +2172,44 @@ function renderResult() {
         : state.isCorrect
           ? "Round Survived!"
           : "Run ended";
-  const answerMarkup = `<strong class="result-answer-name">${escapeHtml(answerTitle)}</strong>`;
+  const answerMarkup = `<strong class="result-answer-name identified-map-name">${escapeHtml(answerTitle)}</strong>`;
   const resultCopy = failedBonus
     ? official
-      ? `You identified ${answerMarkup}, but the step order was incorrect. You still earned ${state.mapPoints} points this round.`
+      ? `You identified ${answerMarkup}, but the step order was incorrect.`
       : `You identified ${answerMarkup}, but the step order was incorrect. This result did not affect your stats.`
     : perfectResult
       ? official
-        ? `You found ${answerMarkup} using ${state.lockedClues} ${clueLabel} and got the steps in the correct order. You earned ${state.mapPoints + state.bonusPoints} points this round.`
+        ? `You found ${answerMarkup} using ${state.lockedClues} ${clueLabel} and got the steps in the correct order.`
         : `You found ${answerMarkup} using ${state.lockedClues} ${clueLabel} and got the steps in the correct order. This result did not affect your stats.`
       : state.isCorrect
         ? official
           ? `You identified ${answerMarkup} using ${state.lockedClues} ${clueLabel}. You earned ${state.mapPoints} points this round.`
-          : `You identified ${answerMarkup} using ${state.lockedClues} ${clueLabel}. This result did not affect your stats.`
+          : `You identified ${answerMarkup} using ${state.lockedClues} ${clueLabel}. Now try the bonus objective.`
         : `You chose <strong class="result-answer-name">${escapeHtml(selectedMap?.title ?? "an unknown map")}</strong>. Today’s answer was ${answerMarkup}. ${official ? "Your permanent Score and Solves are safe." : "This result did not affect your stats."}`;
   const resultClass = failedBonus
       ? "partial"
-      : perfectResult
-        ? "perfect"
-        : state.isCorrect
+      : state.isCorrect
           ? "correct"
           : "failed";
-  const animateResult = resultClass !== lastResultClass;
-  lastResultClass = resultClass;
   const isFinished = !state.isCorrect || state.bonusComplete || state.bonusFailed;
+  const resultAnimationKey = `${resultClass}:${isFinished ? "finished" : "bonus"}:${perfectResult ? "perfect" : "standard"}`;
+  const animateResult = resultAnimationKey !== lastResultClass;
+  lastResultClass = resultAnimationKey;
+  const resultScore = state.mapPoints + state.bonusPoints;
+  const resultVariantClasses = [
+    animateResult ? "animate" : "",
+    perfectResult && official ? "double-points-result" : "",
+    failedBonus ? "bonus-correction-result" : "",
+    state.isCorrect && !isFinished ? "map-identification-banner" : "",
+  ].filter(Boolean).join(" ");
 
   app.innerHTML = `
-    <section class="panel">
-      <div class="result-banner ${resultClass}${animateResult ? " animate" : ""}">
+    <section class="panel${state.isCorrect && !isFinished ? " easter-bonus-panel" : ""}">
+      ${state.isCorrect && !isFinished && !official ? '<p class="kicker">Just for fun</p>' : ""}
+      <div class="result-banner ${resultClass}${resultVariantClasses ? ` ${resultVariantClasses}` : ""}">
         <h2>${resultTitle}</h2>
         <p>${resultCopy}</p>
+        ${official && state.isCorrect && isFinished ? `<div class="result-score-total"><span>Round score</span><strong data-count-to="${resultScore}">0</strong></div>` : ""}
         ${
           official && !state.isCorrect
             ? `<p class="survival-summary">Your run ended at <strong>Round ${endedRound}</strong>. Your next game starts at <strong>Round 1</strong>.</p>`
@@ -2121,11 +2231,12 @@ function renderResult() {
   `;
 
   updateNextRoundCountdown();
+  animatePointTotal(app.querySelector("[data-count-to]"), resultScore);
 
   if (!state.isCorrect) {
     renderClueCards(app.querySelector("#clue-list"), 3);
   }
-  focusAfterRender(`result:${resultClass}:${isFinished ? "finished" : "bonus"}`);
+  focusAfterRender(`result:${resultAnimationKey}`);
   app.querySelector("#share-score")?.addEventListener("click", (event) => {
     shareScore(event.currentTarget, app.querySelector("#share-score-status"));
   });
@@ -2134,14 +2245,15 @@ function renderResult() {
 
   app.querySelectorAll("[data-bonus-step-id]").forEach((button) => {
     button.addEventListener("click", () => {
+      if (bonusSubmissionPending) return;
       const stepId = button.dataset.bonusStepId;
-      setState(
-        { bonusOrder: toggleOrderedSelection(state.bonusOrder, stepId) },
-        `[data-bonus-step-id="${CSS.escape(stepId)}"]`,
-      );
+      state = { ...state, bonusOrder: toggleOrderedSelection(state.bonusOrder, stepId) };
+      saveState();
+      updateBonusSelection(button);
     });
   });
   app.querySelector("#submit-order").addEventListener("click", () => {
+    if (bonusSubmissionPending) return;
     if (official && !confirmAccountResultSubmission(accountController)) return;
     const bonusCorrect = isCorrectOrder(state.bonusOrder, puzzle.chronologicalSteps);
     if (official) {
@@ -2150,34 +2262,9 @@ function renderResult() {
         bonusOrder: state.bonusOrder,
       });
     }
-    const bonusPoints = calculateBonusPoints(state.mapPoints, bonusCorrect);
-    if (bonusCorrect) {
-      if (official && !state.bonusPointsRecorded) {
-        awardPoints(bonusPoints);
-        puzzleStats.easter.score += bonusPoints;
-        savePuzzleStats();
-      }
-      if (official) {
-        dayState.officialCompleted = true;
-        dayState.officialResult = { type: "easter", puzzleType: "easter", success: true, points: state.mapPoints + bonusPoints };
-      }
-      dayState.lastCompleted = { type: "easter", mode: activePlay?.mode || "for_fun", success: true, points: state.mapPoints + bonusPoints };
-      setState({
-        bonusComplete: true,
-        bonusPoints,
-        bonusPointsRecorded: true,
-        complete: true,
-        success: true,
-        points: state.mapPoints + bonusPoints,
-      });
-      return;
-    }
-    if (official) {
-      dayState.officialCompleted = true;
-      dayState.officialResult = { type: "easter", puzzleType: "easter", success: true, points: state.mapPoints };
-    }
-    dayState.lastCompleted = { type: "easter", mode: activePlay?.mode || "for_fun", success: true, points: state.mapPoints };
-    setState({ bonusFailed: true, bonusPoints: 0, bonusPointsRecorded: true, complete: true, success: true, points: state.mapPoints });
+    showBonusSubmissionFeedback(bonusCorrect);
+    const delay = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ? 120 : bonusCorrect ? 800 : 950;
+    window.setTimeout(() => finaliseBonusSubmission(official, bonusCorrect), delay);
   });
 }
 

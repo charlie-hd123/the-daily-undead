@@ -105,7 +105,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261013-1"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261013-2"]));
 });
 
 test("production Supabase Auth accepts both staging and production OTP lengths", async () => {
@@ -521,16 +521,45 @@ test("survivor profiles hide an empty favourite memory section", async () => {
   assert.match(css, /\.public-profile-favourite \{/);
 });
 
-test("Double Points uses the Score reward yellow", async () => {
-  const [app, css] = await Promise.all([
+test("Double Points uses the animated blue success treatment", async () => {
+  const [app, demoCss] = await Promise.all([
     readProjectFile("js/app.js"),
-    readProjectFile("styles.css"),
+    readProjectFile("staging-demo.css"),
   ]);
 
   assert.match(app, /"Double Points!"/);
-  assert.match(css, /--essence: #f7c85c;/);
-  assert.match(css, /--perfect: var\(--essence\);/);
-  assert.match(css, /\.result-banner\.perfect \{[\s\S]*?color: var\(--perfect\);/);
+  assert.match(app, /perfectResult && official \? "double-points-result"/);
+  assert.match(app, /const resultClass = failedBonus[\s\S]*?: state\.isCorrect[\s\S]*?\? "correct"/);
+  assert.match(demoCss, /\.double-points-result h2 \{[\s\S]*?animation: quest-double-points/);
+});
+
+test("production Quest Steps renders every approved staging presentation hook", async () => {
+  const app = await readProjectFile("js/app.js");
+
+  for (const presentationHook of [
+    "answer-selection-panel",
+    "is-entering",
+    "quest-reveal-button",
+    "quest-select-map",
+    "is-newly-selected",
+    "easter-bonus-panel",
+    "map-identification-banner",
+    "identified-map-name",
+    "bonus-order-status",
+    "order-chain",
+    "is-newly-ranked",
+    "is-order-correct",
+    "is-order-incorrect",
+    "double-points-result",
+    "result-score-total",
+    "is-confirmed",
+    "is-correction",
+  ]) {
+    assert.match(app, new RegExp(presentationHook));
+  }
+
+  assert.match(app, /<h3>Bonus: Put the steps in order<\/h3>/);
+  assert.match(app, /Order the steps to earn Double Points\. Tap a selected step to remove it\./);
 });
 
 test("the clue count stays editable until a map is confirmed", async () => {
