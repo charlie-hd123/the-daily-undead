@@ -21,15 +21,15 @@ The frontend API address is the public metadata value in `index.html`; it is not
 The Worker exposes:
 
 - `GET /health` for a simple health check.
-- `GET /api/stats?date=YYYY-MM-DD` for players today, total games, and yesterday's result.
-- `GET /api/leaderboards?date=YYYY-MM-DD` for the day's verified map-and-bonus elite list, community player count, and all-time account progress.
+- `GET /api/stats?date=YYYY-MM-DD` for unique players today, total puzzles, and yesterday's per-puzzle results.
+- `GET /api/leaderboards?date=YYYY-MM-DD` for the day's verified official-puzzle solves, community player count, and unchanged all-time account progress.
 - `GET /api/game-dates?from=YYYY-MM-DD&to=YYYY-MM-DD` for protected Round dates.
-- `POST /api/attempts` for a completed current-day map guess.
+- `POST /api/attempts` for a completed current-day Last Words or Quest Steps attempt.
 - `GET /api/account?date=YYYY-MM-DD` for a signed-in player's profile and save.
 - `POST /api/account/register` to reserve a username and optionally import local progress.
 - `PUT /api/account/username` to change a signed-in player's unique public username.
 - `PUT /api/account/save` to synchronise personal progress and the current daily state.
-- `POST /api/account/results/map` and `POST /api/account/results/bonus` for server-verified daily results.
+- `POST /api/account/results/map`, `POST /api/account/results/bonus`, and `POST /api/account/results/word` for server-verified official daily results.
 
 All `/api/account` routes require a Clerk bearer token. The Worker verifies the RS256 signature against Clerk's published JWKS, then checks the issuer and authorized browser origin (`azp`).
 
@@ -37,9 +37,9 @@ Account saves may include the last cloud revision seen by the browser. D1 increm
 
 ## What counts and what is stored
 
-A play is recorded only when the player confirms a map. Visiting, refreshing, revealing clues, choosing a game, or completing the bonus order does not create a new attempt.
+A Quest Steps play is recorded when the player confirms a map. A Last Words play is recorded when its answer is solved or its fifth miss is made. Visiting or refreshing does not create a new attempt, and the bonus order does not create a second Quest Steps attempt.
 
-The browser creates a random local identifier. The Worker hashes it with SHA-256 before D1 storage. D1's `UNIQUE (puzzle_date, player_hash)` rule is the final protection against repeat submissions from one browser on one UTC date. Another browser or device can count separately.
+The browser creates a random local identifier. The Worker hashes it with SHA-256 before D1 storage. D1's `UNIQUE (puzzle_date, player_hash, puzzle_type)` rule is the final protection against repeat submissions from one browser for the same puzzle on one UTC date. Another browser or device can count separately.
 
 The anonymous tables store the puzzle/date, answer map, correct/incorrect map result, hashed browser identifier, and submission time. Account tables store an opaque Clerk user ID, public username, permanent Score and Solves, Round and Highest Round, daily save state, and verified daily results. Verified result awards are idempotent, so a retried request cannot add Score twice. Email addresses, passwords, and verification codes stay with Clerk and are never stored in D1. Worker invocation logs are a separate Cloudflare operational feature and can contain normal request metadata.
 
@@ -57,6 +57,9 @@ The schema is versioned in:
 - `migrations/0006_scoring_progression_redesign.sql` — permanent Score, idempotent awards and protected game dates.
 - `migrations/0007_add_round_reconstruction_anchor.sql` — pre-redesign Round anchor for later reconstruction.
 - `migrations/0008_make_result_awards_atomic.sql` — atomic, retry-safe application of verified progression.
+- `migrations/0009_round_starts_at_one.sql` — normalises Round numbering.
+- `migrations/0010_create_account_identities.sql` — stable app-owned account identities.
+- `migrations/0011_add_multi_puzzle_results.sql` — additive puzzle attribution, Last Words misses, and per-puzzle community aggregates.
 
 D1 contains these application tables:
 
@@ -67,6 +70,8 @@ D1 contains these application tables:
 - `player_saves` — cross-device progression totals and missed-day state.
 - `player_daily_saves` — resumable per-day game state.
 - `player_daily_results` — one independently verified result per player and UTC date.
+- `puzzle_attempts` — one anonymous browser attempt per date and puzzle type.
+- `puzzle_daily_stats` — separate daily aggregates and answers for both puzzles.
 - `game_dates` — canonical UTC dates that are protected from Round continuity when `counts_for_round = 0`.
 
 The legacy `points_balance` and `revive_count` columns remain private and unused

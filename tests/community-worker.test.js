@@ -119,6 +119,35 @@ test("account usernames and uploaded local saves are tightly validated", () => {
     "clues",
   );
   assert.equal(sanitizeDailyState({ phase: "cheat", puzzleKey: `${today}:x` }, today), null);
+  const multiPuzzleState = sanitizeDailyState({
+    dayStateVersion: 1,
+    dateKey: today,
+    officialType: "word",
+    officialCompleted: true,
+    officialResult: { type: "word", success: true, points: 80 },
+    sessions: {
+      word: {
+        key: `${today}:word:lw-0001`,
+        guesses: ["A", "B", "B", "invalid"],
+        wrongGuesses: 1,
+        complete: true,
+        success: true,
+      },
+    },
+  }, today);
+  assert.equal(multiPuzzleState.officialType, "word");
+  assert.deepEqual(multiPuzzleState.sessions.word.guesses, ["A", "B"]);
+  assert.equal(multiPuzzleState.sessions.word.wrongGuesses, 1);
+});
+
+test("the multi-puzzle migration preserves legacy statistics and adds puzzle attribution", async () => {
+  const migration = await readProjectFile("worker/migrations/0011_add_multi_puzzle_results.sql");
+  assert.match(migration, /ADD COLUMN puzzle_type TEXT NOT NULL DEFAULT 'easter'/);
+  assert.match(migration, /ADD COLUMN word_misses INTEGER NOT NULL DEFAULT 0/);
+  assert.match(migration, /CREATE TABLE IF NOT EXISTS puzzle_attempts/);
+  assert.match(migration, /UNIQUE \(puzzle_date, player_hash, puzzle_type\)/);
+  assert.match(migration, /SELECT\s+puzzle_date, 'easter', attempts, correct/s);
+  assert.match(migration, /UPDATE community_totals\s+SET total_games = total_games \+ 1/s);
 });
 
 test("account request bodies report malformed and oversized JSON as client errors", async () => {

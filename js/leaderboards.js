@@ -133,7 +133,7 @@ function renderTodayEntries(list, entries, currentUsername, documentObject) {
   if (!entries.length) {
     const empty = documentObject.createElement("li");
     empty.className = "leaderboard-empty";
-    empty.textContent = "No signed-in players have solved today’s map yet.";
+    empty.textContent = "No signed-in players have solved today’s puzzle yet.";
     list.append(empty);
     return;
   }
@@ -142,14 +142,22 @@ function renderTodayEntries(list, entries, currentUsername, documentObject) {
     const item = documentObject.createElement("li");
     item.className = "leaderboard-entry leaderboard-today-entry";
     markCurrentPlayer(item, entry.username, currentUsername);
-    const clueLabel = `${entry.cluesUsed} ${entry.cluesUsed === 1 ? "Clue" : "Clues"}`;
+    const isWordResult = entry.puzzleType === "word";
+    const resultLabel = isWordResult
+      ? entry.wordMisses === 0
+        ? "Perfect Solve"
+        : `${entry.wordMisses} ${entry.wordMisses === 1 ? "Miss" : "Misses"}`
+      : `${entry.cluesUsed} ${entry.cluesUsed === 1 ? "Clue" : "Clues"}${entry.bonusCorrect ? " + Bonus" : ""}`;
+    const isPerfect = isWordResult
+      ? entry.wordMisses === 0
+      : entry.cluesUsed === 1 && entry.bonusCorrect;
     item.append(
       makePlayer(
         documentObject,
         entry.username,
-        entry.bonusCorrect ? `${clueLabel} +` : clueLabel,
-        "correct",
-        entry.bonusCorrect ? "Bonus" : null,
+        resultLabel,
+        isPerfect ? "elite" : "correct",
+        null,
         entry.avatarId,
       ),
       makePoints(documentObject, entry.points),

@@ -17,12 +17,13 @@
     <link rel="canonical" href="https://thedailyundead.com/">
     <meta
       name="description"
-      content="The Daily Undead — your daily Treyarch Zombies challenge. Reveal clues, identify the map, and put the steps in order."
+      content="The Daily Undead — your daily Treyarch Zombies challenge. Solve Last Words or identify a map from its Quest Steps."
     >
     <title>The Daily Undead</title>
-    <link rel="icon" href="./assets/favicon.png?v=20261007-4" type="image/png" sizes="128x128">
+    <link rel="icon" href="./assets/favicon.png?v=20261013-1" type="image/png" sizes="128x128">
     <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png" sizes="180x180">
-    <link rel="stylesheet" href="./styles.css?v=20261007-4">
+    <link rel="stylesheet" href="./styles.css?v=20261013-1">
+    <link rel="stylesheet" href="./staging-demo.css?v=20261013-1">
   </head>
   <body>
     <header class="site-header">
@@ -68,19 +69,29 @@
       </section>
     </main>
 
-    <section class="community-stats" aria-label="Daily Undead community statistics" aria-live="polite">
-      <p class="community-stat">
-        <strong id="community-players-today">—</strong>
-        <span>players today</span>
-      </p>
-      <p class="community-stat">
-        <strong id="community-games-total">—</strong>
-        <span>total games played all-time</span>
-      </p>
-      <p class="community-stat community-stat-yesterday">
-        <strong id="community-yesterday-solved">—</strong>
-        <span>solved <span id="community-yesterday-map">yesterday’s map</span> yesterday</span>
-      </p>
+    <section class="community-stats community-stats-demo" aria-label="Daily Undead community statistics" aria-live="polite">
+      <div class="community-overview">
+        <p class="community-stat"><strong id="community-players-today">—</strong><span>players today</span></p>
+        <p class="community-stat"><strong id="community-games-total">—</strong><span>total puzzles played all time</span></p>
+      </div>
+      <div class="community-yesterday">
+        <div class="community-result-grid">
+          <article class="community-result" data-community-puzzle="word">
+            <div class="community-result-copy">
+              <div class="community-result-title"><span>Last Words · Yesterday</span><em data-yesterday-round-badge hidden>· Scored puzzle</em></div>
+              <strong id="community-yesterday-word-answer">—</strong>
+            </div>
+            <div class="community-result-rate"><strong id="community-yesterday-word-solved">—</strong><span>solved</span></div>
+          </article>
+          <article class="community-result" data-community-puzzle="easter">
+            <div class="community-result-copy">
+              <div class="community-result-title"><span>Quest Steps · Yesterday</span><em data-yesterday-round-badge hidden>· Scored puzzle</em></div>
+              <strong id="community-yesterday-easter-answer">—</strong>
+            </div>
+            <div class="community-result-rate"><strong id="community-yesterday-easter-solved">—</strong><span>solved</span></div>
+          </article>
+        </div>
+      </div>
     </section>
 
     <footer class="site-footer">
@@ -387,7 +398,7 @@
       <div data-public-profile-content></div>
     </dialog>
 
-    <script type="module" src="./js/app.js?v=20261007-4"></script>
+    <script type="module" src="./js/app.js?v=20261013-1"></script>
 
     <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "4eeb20e1411c4e7baf24969ced969c88"}'></script><!-- End Cloudflare Web Analytics -->
 

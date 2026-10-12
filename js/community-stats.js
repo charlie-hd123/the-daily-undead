@@ -53,21 +53,24 @@ export function resolveCommunityStatsApiUrl({
     : getCommunityStatsApiUrl(documentObject);
 }
 
-function submittedPuzzleKey(puzzleDate) {
-  return `${submittedPuzzleStoragePrefix}${puzzleDate}`;
+function submittedPuzzleKey(puzzleDate, puzzleType = "easter") {
+  return `${submittedPuzzleStoragePrefix}${puzzleDate}:${puzzleType}`;
 }
 
-function hasSubmittedPuzzle(storage, puzzleDate, puzzleId) {
+function hasSubmittedPuzzle(storage, puzzleDate, puzzleId, puzzleType) {
   try {
-    return storage.getItem(submittedPuzzleKey(puzzleDate)) === puzzleId;
+    const current = storage.getItem(submittedPuzzleKey(puzzleDate, puzzleType));
+    if (current === puzzleId) return true;
+    return puzzleType === "easter"
+      && storage.getItem(`${submittedPuzzleStoragePrefix}${puzzleDate}`) === puzzleId;
   } catch {
     return false;
   }
 }
 
-function rememberSubmittedPuzzle(storage, puzzleDate, puzzleId) {
+function rememberSubmittedPuzzle(storage, puzzleDate, puzzleId, puzzleType) {
   try {
-    storage.setItem(submittedPuzzleKey(puzzleDate), puzzleId);
+    storage.setItem(submittedPuzzleKey(puzzleDate, puzzleType), puzzleId);
   } catch {
     // D1's unique constraint remains the final duplicate guard.
   }
@@ -102,6 +105,7 @@ export async function fetchCommunityStats({ apiUrl, puzzleDate, fetchImpl }) {
 export async function submitCommunityAttempt({
   apiUrl,
   puzzleDate,
+  puzzleType = "easter",
   puzzleId,
   mapId,
   mapName,
@@ -110,7 +114,7 @@ export async function submitCommunityAttempt({
   cryptoApi = globalThis.crypto,
   fetchImpl,
 }) {
-  if (hasSubmittedPuzzle(storage, puzzleDate, puzzleId)) return null;
+  if (hasSubmittedPuzzle(storage, puzzleDate, puzzleId, puzzleType)) return null;
 
   const playerId = getOrCreateAnonymousPlayerId(storage, cryptoApi);
   if (!playerId) return null;
@@ -123,6 +127,7 @@ export async function submitCommunityAttempt({
       body: JSON.stringify({
         playerId,
         puzzleDate,
+        puzzleType,
         puzzleId,
         mapId,
         mapName,
@@ -131,7 +136,7 @@ export async function submitCommunityAttempt({
     },
     fetchImpl,
   );
-  rememberSubmittedPuzzle(storage, puzzleDate, puzzleId);
+  rememberSubmittedPuzzle(storage, puzzleDate, puzzleId, puzzleType);
   return stats;
 }
 

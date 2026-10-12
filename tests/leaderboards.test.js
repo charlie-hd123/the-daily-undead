@@ -36,23 +36,27 @@ function createLeaderboardDb(dailyRows, todayStatsRows, allTimeRows) {
   };
 }
 
-test("today lists every verified correct map result with clue and bonus details", async () => {
+test("today lists every verified correct puzzle result with puzzle-specific details", async () => {
   const db = createLeaderboardDb(
     [
       {
         username: "Dempsey",
         clues_used: 1,
         bonus_status: "correct",
+        puzzle_type: "easter",
+        word_misses: 0,
         points: 100,
       },
       {
         username: "Takeo",
-        clues_used: 2,
-        bonus_status: "incorrect",
-        points: 20,
+        clues_used: 1,
+        bonus_status: "unavailable",
+        puzzle_type: "word",
+        word_misses: 2,
+        points: 60,
       },
     ],
-    [{ attempts: 42 }],
+    [{ players: 42 }],
     [
       {
         username: "Richtofen",
@@ -69,8 +73,8 @@ test("today lists every verified correct map result with clue and bonus details"
   assert.deepEqual(result.today, {
     playersToday: 42,
     elite: [
-      { username: "Dempsey", cluesUsed: 1, bonusCorrect: true, points: 100 },
-      { username: "Takeo", cluesUsed: 2, bonusCorrect: false, points: 20 },
+      { username: "Dempsey", cluesUsed: 1, bonusCorrect: true, points: 100, puzzleType: "easter", wordMisses: 0 },
+      { username: "Takeo", cluesUsed: 1, bonusCorrect: false, points: 60, puzzleType: "word", wordMisses: 2 },
     ],
   });
   assert.deepEqual(result.allTime, [
@@ -91,7 +95,7 @@ test("today lists every verified correct map result with clue and bonus details"
   assert.match(db.statements[0].sql, /points_earned DESC/);
   assert.doesNotMatch(db.statements[0].sql, /player_saves/);
   assert.deepEqual(db.statements[0].bindings, ["2026-09-20"]);
-  assert.match(db.statements[1].sql, /SELECT attempts FROM daily_stats/);
+  assert.match(db.statements[1].sql, /COUNT\(DISTINCT player_hash\).*puzzle_attempts/);
   assert.deepEqual(db.statements[1].bindings, ["2026-09-20"]);
   assert.match(db.statements[2].sql, /LEFT JOIN player_saves/);
   assert.match(db.statements[2].sql, /score DESC/);
@@ -181,7 +185,8 @@ test("the leaderboard uses player-facing introductory copy", async () => {
   const browserScript = await fs.readFile(new URL("js/leaderboards.js", projectRoot), "utf8");
 
   assert.match(browserScript, /See today’s correct players and the all-time leaders\./);
-  assert.match(browserScript, /No signed-in players have solved today’s map yet\./);
+  assert.match(browserScript, /No signed-in players have solved today’s puzzle yet\./);
+  assert.match(browserScript, /Perfect Solve/);
   assert.match(browserScript, /Puzzle Solves/);
   assert.match(browserScript, /Highest Round/);
   assert.match(browserScript, /Your Rank:/);

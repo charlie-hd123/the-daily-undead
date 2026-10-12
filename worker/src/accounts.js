@@ -8,11 +8,19 @@ import {
   isValidDateKey,
 } from "../../js/game-core.js";
 import {
+  buildDailyWordPuzzle,
+  calculateWordPoints,
+  isWordSolved,
+  normalizeLetter,
+} from "../../js/word-puzzle-core.js";
+import { getOfficialPuzzleType } from "../../js/daily-challenge-core.js";
+import {
   answerEquivalents,
   profileGames,
   profileMaps,
   workerMaps,
 } from "./generated-map-catalog.js";
+import { workerWords } from "./generated-word-catalog.js";
 
 const maximumCounter = 1_000_000_000;
 const allowedPhases = new Set(["clues", "game", "map", "result"]);
@@ -59,7 +67,7 @@ export function sanitizeProgress(value = {}) {
   };
 }
 
-export function sanitizeDailyState(value, puzzleDate) {
+function sanitizeEasterState(value, puzzleDate) {
   if (!value || typeof value !== "object" || !isValidDateKey(puzzleDate)) return null;
   if (!allowedPhases.has(value.phase)) return null;
   if (typeof value.puzzleKey !== "string" || !value.puzzleKey.startsWith(`${puzzleDate}:`)) {
@@ -95,6 +103,66 @@ export function sanitizeDailyState(value, puzzleDate) {
     bonusPoints: safeCounter(value.bonusPoints),
     pointsRecorded: Boolean(value.pointsRecorded),
     bonusPointsRecorded: Boolean(value.bonusPointsRecorded),
+  };
+}
+
+function sanitizeWordState(value, puzzleDate) {
+  if (!value || typeof value !== "object") return null;
+  if (typeof value.key !== "string" || !value.key.startsWith(`${puzzleDate}:word:`)) return null;
+  const guesses = Array.isArray(value.guesses)
+    ? [...new Set(value.guesses.filter((letter) => /^[A-Z]$/.test(letter)))].slice(0, 26)
+    : [];
+  return {
+    key: value.key.slice(0, 1024),
+    guesses,
+    wrongGuesses: Math.min(5, safeCounter(value.wrongGuesses)),
+    correctStreak: Math.min(26, safeCounter(value.correctStreak)),
+    lastGuess: typeof value.lastGuess === "string" && /^[A-Z]$/.test(value.lastGuess)
+      ? value.lastGuess
+      : null,
+    pendingResult: value.pendingResult === "success" || value.pendingResult === "failure"
+      ? value.pendingResult
+      : null,
+    complete: Boolean(value.complete),
+    success: typeof value.success === "boolean" ? value.success : null,
+    points: Math.min(100, safeCounter(value.points)),
+    roundsSurvivedBeforeLoss: safeCounter(value.roundsSurvivedBeforeLoss),
+    summary: value.summary && typeof value.summary === "object"
+      ? {
+          label: typeof value.summary.label === "string" ? value.summary.label.slice(0, 100) : "",
+          answer: typeof value.summary.answer === "string" ? value.summary.answer.slice(0, 160) : "",
+          description: typeof value.summary.description === "string" ? value.summary.description.slice(0, 1000) : "",
+          detail: typeof value.summary.detail === "string" ? value.summary.detail.slice(0, 100) : "",
+        }
+      : null,
+  };
+}
+
+export function sanitizeDailyState(value, puzzleDate) {
+  if (value?.dayStateVersion !== 1) return sanitizeEasterState(value, puzzleDate);
+  if (value.dateKey !== puzzleDate) return null;
+  const officialType = value.officialType === "word" || value.officialType === "easter"
+    ? value.officialType
+    : null;
+  if (!officialType) return null;
+  const easter = sanitizeEasterState(value.sessions?.easter, puzzleDate);
+  const word = sanitizeWordState(value.sessions?.word, puzzleDate);
+  return {
+    dayStateVersion: 1,
+    dateKey: puzzleDate,
+    officialType,
+    officialCompleted: Boolean(value.officialCompleted),
+    officialResult: value.officialResult && typeof value.officialResult === "object"
+      ? {
+          type: officialType,
+          puzzleType: officialType,
+          success: Boolean(value.officialResult.success),
+          points: Math.min(200, safeCounter(value.officialResult.points)),
+        }
+      : null,
+    progressionApplied: Boolean(value.progressionApplied),
+    lastCompleted: null,
+    sessions: { easter, word },
   };
 }
 
@@ -200,9 +268,99 @@ function rowToResult(row) {
         bonusStatus: row.bonus_status,
         bonusPoints: Number(row.bonus_points),
         pointsEarned: Number(row.points_earned),
+        puzzleType: row.puzzle_type || "easter",
+        wordMisses: Number(row.word_misses || 0),
         completedAt: row.completed_at || null,
       }
     : null;
+}
+
+export async function recordVerifiedWordResult(db, request, userId) {
+  const body = await readJsonBody(request, 8_000);
+  const today = getUtcDateKey();
+  if (body.puzzleDate !== today || getOfficialPuzzleType(today) !== "word") {
+    return { status: 400, body: { error: "Only today’s official Last Words result can be saved." } };
+  }
+  const puzzle = buildDailyWordPuzzle(today, workerWords);
+  if (body.puzzleId !== puzzle.key || !Array.isArray(body.guesses)) {
+    return { status: 400, body: { error: "The submitted word result is invalid." } };
+  }
+  const guesses = [...new Set(body.guesses.map(normalizeLetter).filter(Boolean))].slice(0, 26);
+  const answer = puzzle.entry.answer.toUpperCase();
+  const wrongGuesses = guesses.filter((letter) => !answer.includes(letter)).length;
+  const success = isWordSolved(puzzle.entry.answer, [...puzzle.initialLetters, ...guesses]);
+  if (!success && wrongGuesses < 5) {
+    return { status: 400, body: { error: "The Last Words attempt is not complete." } };
+  }
+  const points = success ? calculateWordPoints(wrongGuesses) : 0;
+
+  await db.batch([
+    db.prepare(
+      `INSERT OR IGNORE INTO player_daily_results (
+        user_id, puzzle_date, puzzle_id, selected_map_id, clues_used,
+        map_correct, map_points, bonus_status, points_earned, completed_at,
+        score_awarded, progression_applied, puzzle_type, word_misses
+      ) VALUES (?, ?, ?, ?, 1, ?, ?, 'unavailable', ?, ?, 0, 0, 'word', ?)`,
+    ).bind(
+      userId,
+      today,
+      puzzle.key,
+      puzzle.entry.id,
+      success ? 1 : 0,
+      points,
+      points,
+      new Date().toISOString(),
+      wrongGuesses,
+    ),
+    db.prepare(
+      `UPDATE player_saves SET
+        score = score + COALESCE((
+          SELECT points_earned - score_awarded
+          FROM player_daily_results
+          WHERE user_id = ? AND puzzle_date = ? AND progression_applied = 0
+        ), 0),
+        total_rounds = total_rounds + COALESCE((
+          SELECT map_correct
+          FROM player_daily_results
+          WHERE user_id = ? AND puzzle_date = ? AND progression_applied = 0
+        ), 0),
+        current_round = CASE
+          WHEN COALESCE((
+            SELECT map_correct
+            FROM player_daily_results
+            WHERE user_id = ? AND puzzle_date = ? AND progression_applied = 0
+          ), 1) = 1 THEN current_round
+          ELSE 1
+        END,
+        revision = revision + 1,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE user_id = ? AND EXISTS (
+        SELECT 1 FROM player_daily_results
+        WHERE user_id = ? AND puzzle_date = ? AND progression_applied = 0
+      )`,
+    ).bind(
+      userId, today,
+      userId, today,
+      userId, today,
+      userId,
+      userId, today,
+    ),
+    db.prepare(
+      `UPDATE player_daily_results SET
+        score_awarded = points_earned,
+        progression_applied = 1,
+        updated_at = CURRENT_TIMESTAMP
+      WHERE user_id = ? AND puzzle_date = ? AND progression_applied = 0`,
+    ).bind(userId, today),
+  ]);
+
+  const result = await db
+    .prepare("SELECT * FROM player_daily_results WHERE user_id = ? AND puzzle_date = ?")
+    .bind(userId, today)
+    .first();
+  const progress = await db.prepare("SELECT * FROM player_saves WHERE user_id = ?")
+    .bind(userId).first();
+  return { status: 200, body: { result: rowToResult(result), progress: rowToProgress(progress) } };
 }
 
 function followingDateKey(dateKey) {
@@ -613,6 +771,9 @@ export async function recordVerifiedMapResult(db, request, userId) {
   const today = getUtcDateKey();
   if (body.puzzleDate !== today || !isValidDateKey(body.puzzleDate)) {
     return { status: 400, body: { error: "Only today’s live result can be saved." } };
+  }
+  if (getOfficialPuzzleType(today) !== "easter") {
+    return { status: 400, body: { error: "Quest Steps is not today’s official puzzle." } };
   }
   if (
     typeof body.selectedMapId !== "string" ||

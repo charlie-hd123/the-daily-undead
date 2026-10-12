@@ -4,6 +4,7 @@ import {
   getPublicProfile,
   recordVerifiedBonusResult,
   recordVerifiedMapResult,
+  recordVerifiedWordResult,
   registerAccount,
   saveAccount,
   updateSocialProfile,
@@ -78,6 +79,9 @@ function textIsValid(value, maximumLength) {
 export function validateAttempt(payload, todayDateKey) {
   if (!payload || typeof payload !== "object") return "A JSON request body is required.";
   if (!textIsValid(payload.playerId, 128)) return "playerId is invalid.";
+  if (payload.puzzleType != null && !["easter", "word"].includes(payload.puzzleType)) {
+    return "puzzleType is invalid.";
+  }
   if (!isValidDateKey(payload.puzzleDate)) return "puzzleDate is invalid.";
   if (payload.puzzleDate !== todayDateKey) return "Only today’s live puzzle can be submitted.";
   if (!textIsValid(payload.puzzleId, 1024) || !payload.puzzleId.startsWith(`${payload.puzzleDate}:`)) {
@@ -100,38 +104,50 @@ async function hashPlayerId(playerId) {
 async function readStats(db, dateKey) {
   const yesterdayDateKey = getPreviousDateKey(dateKey);
   const [todayResult, totalResult, yesterdayResult] = await db.batch([
-    db.prepare("SELECT attempts FROM daily_stats WHERE puzzle_date = ?").bind(dateKey),
+    db.prepare("SELECT COUNT(DISTINCT player_hash) AS players FROM puzzle_attempts WHERE puzzle_date = ?").bind(dateKey),
     db.prepare("SELECT total_games FROM community_totals WHERE id = 1"),
     db
       .prepare(
         `SELECT
+          puzzle_type,
           attempts,
           correct,
-          answer_map_name AS map_name
-        FROM daily_stats
+          answer_name
+        FROM puzzle_daily_stats
         WHERE puzzle_date = ?`,
       )
       .bind(yesterdayDateKey),
   ]);
 
-  const playersToday = Number(todayResult.results?.[0]?.attempts || 0);
-  const totalGames = Number(totalResult.results?.[0]?.total_games || 0);
-  const yesterdayAttempts = Number(yesterdayResult.results?.[0]?.attempts || 0);
-  const yesterdayCorrect = Number(yesterdayResult.results?.[0]?.correct || 0);
+  const playersToday = Number(todayResult.results?.[0]?.players || 0);
+  const totalPuzzles = Number(totalResult.results?.[0]?.total_games || 0);
+  const rows = new Map((yesterdayResult.results || []).map((row) => [row.puzzle_type, row]));
+  const puzzleStat = (type) => {
+    const row = rows.get(type);
+    const attempts = Number(row?.attempts || 0);
+    const correct = Number(row?.correct || 0);
+    return {
+      attempts,
+      correct,
+      solvePercentage: attempts > 0 ? Math.round((correct / attempts) * 100) : null,
+      answerName: row?.answer_name || null,
+    };
+  };
+  const easter = puzzleStat("easter");
 
   return {
     date: dateKey,
     playersToday,
-    totalGames,
+    totalPuzzles,
+    totalGames: totalPuzzles,
     yesterday: {
       date: yesterdayDateKey,
-      attempts: yesterdayAttempts,
-      correct: yesterdayCorrect,
-      solvePercentage:
-        yesterdayAttempts > 0
-          ? Math.round((yesterdayCorrect / yesterdayAttempts) * 100)
-          : null,
-      mapName: yesterdayResult.results?.[0]?.map_name || null,
+      word: puzzleStat("word"),
+      easter,
+      attempts: easter.attempts,
+      correct: easter.correct,
+      solvePercentage: easter.solvePercentage,
+      mapName: easter.answerName,
     },
   };
 }
@@ -210,19 +226,22 @@ async function handleAttempt(request, env) {
   if (validationError) return errorResponse(request, env, validationError, 400);
 
   const playerHash = await hashPlayerId(payload.playerId);
+  const puzzleType = payload.puzzleType === "word" ? "word" : "easter";
   const insertResult = await env.DB
     .prepare(
-      `INSERT OR IGNORE INTO attempts (
+      `INSERT OR IGNORE INTO puzzle_attempts (
         puzzle_date,
+        puzzle_type,
         puzzle_id,
         player_hash,
-        answer_map_id,
-        answer_map_name,
+        answer_id,
+        answer_name,
         is_correct
-      ) VALUES (?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)`,
     )
     .bind(
       payload.puzzleDate,
+      puzzleType,
       payload.puzzleId,
       playerHash,
       payload.mapId.trim(),
@@ -282,6 +301,8 @@ async function handleAccountRequest(request, env, url) {
     result = await recordVerifiedMapResult(env.DB, request, identity.userId);
   } else if (url.pathname === "/api/account/results/bonus" && request.method === "POST") {
     result = await recordVerifiedBonusResult(env.DB, request, identity.userId);
+  } else if (url.pathname === "/api/account/results/word" && request.method === "POST") {
+    result = await recordVerifiedWordResult(env.DB, request, identity.userId);
   } else {
     return errorResponse(request, env, "Not found.", 404);
   }

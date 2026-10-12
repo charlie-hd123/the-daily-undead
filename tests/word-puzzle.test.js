@@ -24,6 +24,17 @@ test("the same UTC date produces the same word and starting letters", () => {
   assert.deepEqual(first, second);
 });
 
+test("the opening Last Words dates use a familiar curated sequence", async () => {
+  const source = JSON.parse(await fs.readFile(
+    new URL("../data/word-puzzle-demo.json", import.meta.url),
+    "utf8",
+  ));
+  assert.equal(buildDailyWordPuzzle("2026-10-13", source.words).entry.answer, "Edward Richtofen");
+  assert.equal(buildDailyWordPuzzle("2026-10-15", source.words).entry.answer, "Juggernog");
+  assert.equal(buildDailyWordPuzzle("2026-10-17", source.words).entry.answer, "Mystery Box");
+  assert.equal(buildDailyWordPuzzle("2026-10-19", source.words).entry.answer, "Pack-a-Punch");
+});
+
 test("a vowel and consonant start in the answer without revealing its first letter", () => {
   for (let day = 1; day <= 20; day += 1) {
     const dateKey = `2026-10-${String(day).padStart(2, "0")}`;

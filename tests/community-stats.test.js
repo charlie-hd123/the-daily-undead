@@ -94,6 +94,27 @@ test("a successful attempt is sent once per browser and puzzle", async () => {
   assert.equal(requests[0].body.isCorrect, true);
 });
 
+test("Quest Steps and Last Words attempts are independently counted on the same day", async () => {
+  const storage = createStorage();
+  const requests = [];
+  const shared = {
+    apiUrl: "https://stats.example.com",
+    puzzleDate: "2026-10-13",
+    isCorrect: true,
+    storage,
+    cryptoApi: { randomUUID: () => "07ce720f-48dd-470e-90d9-85650ff1edeb" },
+    fetchImpl: async (_url, options) => {
+      requests.push(JSON.parse(options.body));
+      return { ok: true, json: async () => ({ totalPuzzles: requests.length }) };
+    },
+  };
+
+  await submitCommunityAttempt({ ...shared, puzzleType: "word", puzzleId: "word-key", mapId: "lw-1", mapName: "Juggernog" });
+  await submitCommunityAttempt({ ...shared, puzzleType: "easter", puzzleId: "map-key", mapId: "map-1", mapName: "Origins" });
+
+  assert.deepEqual(requests.map(({ puzzleType }) => puzzleType), ["word", "easter"]);
+});
+
 test("community values use subtle placeholders for unavailable data", () => {
   assert.equal(formatCommunityCount(12527), new Intl.NumberFormat().format(12527));
   assert.equal(formatCommunityCount(null), "—");

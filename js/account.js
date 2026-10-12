@@ -340,7 +340,24 @@ export async function replaySavedAccountResult({
   puzzleDate,
   sendMapResult,
   sendBonusResult,
+  sendWordResult,
 }) {
+  if (dailyState?.dayStateVersion === 1 && dailyState.dateKey === puzzleDate) {
+    const officialType = dailyState.officialType;
+    const session = dailyState.sessions?.[officialType];
+    if (!dailyState.officialCompleted || !session?.complete) return null;
+    if (officialType === "word") {
+      const wordResult = await sendWordResult({
+        puzzleDate,
+        puzzleId: session.key,
+        guesses: Array.isArray(session.guesses) ? session.guesses : [],
+        misses: Number(session.wrongGuesses || 0),
+        success: Boolean(session.success),
+      });
+      return wordResult?.progress || null;
+    }
+    dailyState = session;
+  }
   if (
     dailyState?.phase !== "result" ||
     typeof dailyState.selectedMapId !== "string" ||
@@ -976,6 +993,11 @@ export async function initialiseAccount({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       }),
+      sendWordResult: (payload) => requestJson(clerk, apiUrl, "/api/account/results/word", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }),
     });
     if (replayedProgress) account.progress = replayedProgress;
   } catch {
@@ -1323,6 +1345,22 @@ export async function initialiseAccount({
     }
   }
 
+  async function recordWordResult(payload) {
+    try {
+      const result = await requestJson(clerk, apiUrl, "/api/account/results/word", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      currentRevision = Math.max(currentRevision, Number(result.progress?.revision || 0));
+      rememberAccount(globalThis.localStorage, { userId, revision: currentRevision });
+      scheduleSave();
+      return result;
+    } catch {
+      return null;
+    }
+  }
+
   const controller = {
     available: true,
     signedIn: true,
@@ -1333,6 +1371,7 @@ export async function initialiseAccount({
     scheduleSave,
     recordMapResult,
     recordBonusResult,
+    recordWordResult,
     openPlayerProfile,
   };
 
@@ -1369,6 +1408,7 @@ function createUnavailableController({
     scheduleSave,
     async recordMapResult() { return null; },
     async recordBonusResult() { return null; },
+    async recordWordResult() { return null; },
     openPlayerProfile,
   };
 }

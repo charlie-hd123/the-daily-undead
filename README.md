@@ -2,7 +2,9 @@
 
 **Your daily Treyarch Zombies challenge**
 
-Players reveal one to three hard clues, select a game and map without typing, then optionally put the three selected main-quest steps into chronological order using their full clue wording for Double Points.
+Each UTC day assigns one official puzzle to every player, alternating between **Last Words** and **Quest Steps**. The site opens directly on that puzzle. Completing it unlocks the other game for an unscored, risk-free play.
+
+In Last Words, players reveal a Zombies word or phrase one letter at a time. One vowel and one consonant start revealed, the first character is protected, and official scores follow the 100/80/60/40/20 ladder across zero to four misses. In Quest Steps, players reveal one to three hard clues, select a game and map without typing, then optionally put the three selected main-quest steps into chronological order using their full clue wording for Double Points. The third clue always uses its fuller, easier wording.
 
 The bonus ordering round uses tap-to-rank cards: tapping steps assigns 1, 2, and 3 in sequence, while tapping a selected card removes it and renumbers the remainder. Submission allows one attempt, and an incorrect order cannot be retried.
 
@@ -16,7 +18,7 @@ The permanent player stats are **Score** and **Solves**. Puzzle rewards are stil
 
 The game is a dependency-free static site designed to work on GitHub Pages. Players can remain guests with browser-local progress, or optionally sign in with a one-time email code to keep progress across devices. The catalogue contains 320 ordered steps across 38 answer maps from World at War through Black Ops 7. Nine additional maps without full Easter eggs are selectable but excluded from the answer rotation.
 
-Community statistics appear above the footer: unique players today, total games played all-time, and yesterday's map solve percentage. They are served by a Cloudflare Worker and D1 database. A play is counted when a map is confirmed; the bonus order does not affect the count or solve result. A browser-local anonymous ID and a database uniqueness constraint prevent refreshes and repeat submissions from increasing the same daily puzzle more than once. The game remains fully playable if the statistics API is unavailable. See [worker/README.md](worker/README.md) for the live configuration, database queries, deployment, and recovery guide.
+Community statistics appear above the footer: unique players today, total puzzles played all-time, and yesterday's separate Last Words and Quest Steps solve rates. Both official and just-for-fun attempts count, while each player contributes only once to the daily player total. A browser-local anonymous ID and per-puzzle database uniqueness constraint prevent refreshes from creating duplicates. The game remains fully playable if the statistics API is unavailable. See [worker/README.md](worker/README.md) for the live configuration, database queries, deployment, and recovery guide.
 
 ## Prepare the daily marketing pack
 

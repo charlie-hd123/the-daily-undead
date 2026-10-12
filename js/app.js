@@ -12,7 +12,18 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261007-4";
+} from "./game-core.js?v=20261013-1";
+import {
+  buildDailyWordPuzzle,
+  calculateWordPoints,
+  isWordSolved,
+  normalizeLetter,
+} from "./word-puzzle-core.js?v=20261013-1";
+import {
+  getOfficialPuzzleType,
+  getOtherPuzzleType,
+  MULTI_PUZZLE_LAUNCH_DATE,
+} from "./daily-challenge-core.js?v=20261013-1";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -20,23 +31,23 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261007-4";
+} from "./progression.js?v=20261013-1";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261007-4";
+} from "./account.js?v=20261013-1";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261007-4";
+} from "./community-stats.js?v=20261013-1";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261007-4";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261007-4";
+} from "./leaderboards.js?v=20261013-1";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261013-1";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -55,8 +66,11 @@ const clueTemplate = document.querySelector("#clue-template");
 const communityStatsContainer = document.querySelector(".community-stats");
 const communityPlayersTodayLabel = document.querySelector("#community-players-today");
 const communityGamesTotalLabel = document.querySelector("#community-games-total");
-const communityYesterdaySolvedLabel = document.querySelector("#community-yesterday-solved");
-const communityYesterdayMapLabel = document.querySelector("#community-yesterday-map");
+const communityYesterdayWordSolvedLabel = document.querySelector("#community-yesterday-word-solved");
+const communityYesterdayEasterSolvedLabel = document.querySelector("#community-yesterday-easter-solved");
+const communityYesterdayWordAnswerLabel = document.querySelector("#community-yesterday-word-answer");
+const communityYesterdayEasterAnswerLabel = document.querySelector("#community-yesterday-easter-answer");
+const yesterdayCommunityResults = [...document.querySelectorAll("[data-community-puzzle]")];
 const isLocalDevelopment = isLocalDevelopmentHostname(window.location.hostname);
 const socialDemoEnabled = isLocalDevelopment && new URLSearchParams(window.location.search).get("socialDemo") === "1";
 const communityStatsApiUrl = resolveCommunityStatsApiUrl({ isLocalDevelopment });
@@ -67,11 +81,13 @@ const solvesStorageKey = "the-daily-undead:total-rounds";
 const scoreStorageKey = "the-daily-undead:score";
 const legacyPointsStorageKey = "the-daily-undead:total-points";
 const legacyScoreMigrationStorageKey = "the-daily-undead:legacy-score-migration";
+const puzzleStatsStorageKey = "the-daily-undead:puzzle-stats-v1";
+const multiPuzzleDayStoragePrefix = "the-daily-undead:multi-puzzle-day:";
 const progressionUpdateStorageKey = "the-daily-undead:progression-update-v2";
 const statExplainers = {
   round: {
     title: "Round",
-    copy: "Your current survival run. It advances after each solve and ends if you miss a day or choose the wrong map.",
+    copy: "Your current survival run. It advances after each solve and ends if you miss a day or answer incorrectly.",
   },
   score: {
     title: "Score",
@@ -101,6 +117,10 @@ let catalog;
 let maps;
 let selectableMaps;
 let puzzle;
+let wordEntries;
+let wordPuzzle;
+let dayState;
+let activePlay = null;
 let state;
 let streakCount = 0;
 let bestRound = 0;
@@ -121,6 +141,22 @@ let accountController = {
   scheduleSave() {},
   async recordMapResult() { return null; },
   async recordBonusResult() { return null; },
+  async recordWordResult() { return null; },
+};
+
+const puzzleTypes = {
+  easter: {
+    name: "Quest Steps",
+    kicker: "Easter egg puzzle",
+    description: "Can you identify the Zombies map from its Easter egg steps?",
+    image: "./assets/quest-steps-card.svg",
+  },
+  word: {
+    name: "Last Words",
+    kicker: "Letter puzzle",
+    description: "Can you identify the Zombies word or phrase by revealing its letters?",
+    image: "./assets/dead-letters-card.svg",
+  },
 };
 
 function escapeHtml(value) {
@@ -130,6 +166,16 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function punctuateSentenceEnding(value) {
+  const text = String(value || "");
+  return /[.!?]$/.test(text) ? text : `${text}.`;
+}
+
+function formatWordMisses(count) {
+  if (count === 0) return "no misses";
+  return `${count} ${count === 1 ? "miss" : "misses"}`;
 }
 
 function getDateKey() {
@@ -266,8 +312,13 @@ function getPreviousDateKey(dateKey) {
 
 function updateCommunityStatsDisplay(stats) {
   communityPlayersTodayLabel.textContent = formatCommunityCount(stats?.playersToday);
-  communityGamesTotalLabel.textContent = formatCommunityCount(stats?.totalGames);
-  communityYesterdaySolvedLabel.textContent = formatSolvePercentage(stats?.yesterday?.solvePercentage);
+  communityGamesTotalLabel.textContent = formatCommunityCount(stats?.totalPuzzles ?? stats?.totalGames);
+  communityYesterdayWordSolvedLabel.textContent = formatSolvePercentage(stats?.yesterday?.word?.solvePercentage);
+  communityYesterdayEasterSolvedLabel.textContent = formatSolvePercentage(stats?.yesterday?.easter?.solvePercentage ?? stats?.yesterday?.solvePercentage);
+  if (stats?.yesterday?.word?.answerName) communityYesterdayWordAnswerLabel.textContent = stats.yesterday.word.answerName;
+  if (stats?.yesterday?.easter?.answerName || stats?.yesterday?.mapName) {
+    communityYesterdayEasterAnswerLabel.textContent = stats.yesterday.easter?.answerName || stats.yesterday.mapName;
+  }
   communityStatsContainer.dataset.status = stats ? "ready" : "unavailable";
 }
 
@@ -276,13 +327,25 @@ function prepareCommunityStatsDisplay() {
 
   try {
     const yesterdayPuzzle = buildDailyPuzzle(yesterdayDateKey, maps);
-    communityYesterdayMapLabel.textContent = getAnswerDisplayTitle(
+    communityYesterdayEasterAnswerLabel.textContent = getAnswerDisplayTitle(
       yesterdayPuzzle.map,
       catalog.answerEquivalents,
     );
+    communityYesterdayWordAnswerLabel.textContent = buildDailyWordPuzzle(
+      yesterdayDateKey,
+      wordEntries,
+    ).entry.answer;
   } catch {
-    communityYesterdayMapLabel.textContent = "yesterday’s map";
+    communityYesterdayEasterAnswerLabel.textContent = "—";
+    communityYesterdayWordAnswerLabel.textContent = "—";
   }
+  const yesterdayOfficialType = getOfficialPuzzleType(yesterdayDateKey);
+  yesterdayCommunityResults.forEach((result) => {
+    const official = result.dataset.communityPuzzle === yesterdayOfficialType;
+    result.classList.toggle("is-official", official);
+    const badge = result.querySelector("[data-yesterday-round-badge]");
+    if (badge) badge.hidden = !official;
+  });
 
   if (!communityStatsApiUrl) {
     updateCommunityStatsDisplay(null);
@@ -297,16 +360,20 @@ function prepareCommunityStatsDisplay() {
     .catch(() => updateCommunityStatsDisplay(null));
 }
 
-function recordCommunityAttempt(isCorrect) {
+function recordCommunityAttemptFor(type, isCorrect) {
   // Preview puzzles never contribute to the live community totals.
   if (!communityStatsApiUrl || puzzle.dateKey !== liveDateKey) return;
 
+  const puzzleId = type === "word" ? wordPuzzle.key : puzzle.key;
+  const answerId = type === "word" ? wordPuzzle.entry.id : puzzle.map.id;
+  const answerName = type === "word" ? wordPuzzle.entry.answer : getPuzzleAnswerTitle();
   submitCommunityAttempt({
     apiUrl: communityStatsApiUrl,
     puzzleDate: puzzle.dateKey,
-    puzzleId: puzzle.key,
-    mapId: puzzle.map.id,
-    mapName: getPuzzleAnswerTitle(),
+    puzzleType: type,
+    puzzleId,
+    mapId: answerId,
+    mapName: answerName,
     isCorrect,
   })
     .then((stats) => {
@@ -388,12 +455,17 @@ function validateMap(map, source) {
 }
 
 async function loadData() {
-  const indexResponse = await fetch("./data/maps/index.json", { cache: "no-store" });
-  if (!indexResponse.ok) {
-    throw new Error("Could not load the map index.");
+  const [indexResponse, wordResponse] = await Promise.all([
+    fetch("./data/maps/index.json", { cache: "no-store" }),
+    fetch("./data/word-puzzle-demo.json", { cache: "no-store" }),
+  ]);
+  if (!indexResponse.ok || !wordResponse.ok) {
+    throw new Error("Could not load the puzzle catalogues.");
   }
 
   catalog = await indexResponse.json();
+  const wordBank = await wordResponse.json();
+  wordEntries = Array.isArray(wordBank.words) ? wordBank.words : [];
   if (!Array.isArray(catalog.games) || !Array.isArray(catalog.maps)) {
     throw new Error("The map index is invalid.");
   }
@@ -532,6 +604,125 @@ function createInitialState() {
 
 function storageKey() {
   return `dead-drop:${puzzle.dateKey}`;
+}
+
+function createWordSession() {
+  return {
+    key: wordPuzzle.key,
+    guesses: [],
+    wrongGuesses: 0,
+    correctStreak: 0,
+    lastGuess: null,
+    pendingResult: null,
+    complete: false,
+    success: null,
+    points: 0,
+    summary: null,
+  };
+}
+
+function createDayState(easterSession = createInitialState()) {
+  const legacyFinished = easterSession.phase === "result"
+    && (!easterSession.isCorrect || easterSession.bonusComplete || easterSession.bonusFailed);
+  const legacyPoints = Number(easterSession.mapPoints || 0) + Number(easterSession.bonusPoints || 0);
+  return {
+    dayStateVersion: 1,
+    dateKey: puzzle.dateKey,
+    officialType: getOfficialPuzzleType(puzzle.dateKey),
+    officialCompleted: legacyFinished,
+    officialResult: legacyFinished
+      ? { type: "easter", puzzleType: "easter", success: Boolean(easterSession.isCorrect), points: legacyPoints }
+      : null,
+    progressionApplied: Boolean(easterSession.streakRecorded),
+    lastCompleted: legacyFinished
+      ? { type: "easter", mode: "official", success: Boolean(easterSession.isCorrect), points: legacyPoints }
+      : null,
+    sessions: {
+      easter: easterSession,
+      word: null,
+    },
+  };
+}
+
+function isMultiPuzzleDayState(value) {
+  return value?.dayStateVersion === 1 && value.dateKey === puzzle.dateKey;
+}
+
+function normalizeWordSession(value) {
+  if (!value || value.key !== wordPuzzle.key) return null;
+  return {
+    ...createWordSession(),
+    ...value,
+    guesses: Array.isArray(value.guesses)
+      ? value.guesses.map(normalizeLetter).filter(Boolean).slice(0, 26)
+      : [],
+    wrongGuesses: Math.min(5, Math.max(0, Number(value.wrongGuesses) || 0)),
+  };
+}
+
+function normalizeDayState(value, fallbackEaster = createInitialState()) {
+  if (!isMultiPuzzleDayState(value)) return createDayState(fallbackEaster);
+  const easterSession = value.sessions?.easter?.puzzleKey === puzzle.key
+    ? { ...createInitialState(), ...value.sessions.easter, stateVersion: currentStateVersion }
+    : fallbackEaster;
+  return {
+    ...createDayState(easterSession),
+    ...value,
+    officialType: getOfficialPuzzleType(puzzle.dateKey),
+    sessions: {
+      easter: easterSession,
+      word: normalizeWordSession(value.sessions?.word),
+    },
+  };
+}
+
+function loadPuzzleStats() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(puzzleStatsStorageKey));
+    const safe = (type) => ({
+      score: Math.max(0, Number(saved?.[type]?.score) || 0),
+      solves: Math.max(0, Number(saved?.[type]?.solves) || 0),
+      plays: Math.max(0, Number(saved?.[type]?.plays) || 0),
+    });
+    return { easter: safe("easter"), word: safe("word") };
+  } catch {
+    return {
+      easter: { score: 0, solves: 0, plays: 0 },
+      word: { score: 0, solves: 0, plays: 0 },
+    };
+  }
+}
+
+let puzzleStats = {
+  easter: { score: 0, solves: 0, plays: 0 },
+  word: { score: 0, solves: 0, plays: 0 },
+};
+
+function savePuzzleStats() {
+  try {
+    localStorage.setItem(puzzleStatsStorageKey, JSON.stringify(puzzleStats));
+  } catch {
+    // Per-puzzle attribution is supplementary; permanent progression remains intact.
+  }
+}
+
+function loadMultiPuzzleDayState(legacyEasterState) {
+  try {
+    const saved = JSON.parse(localStorage.getItem(`${multiPuzzleDayStoragePrefix}${puzzle.dateKey}`));
+    return normalizeDayState(saved, legacyEasterState);
+  } catch {
+    return createDayState(legacyEasterState);
+  }
+}
+
+function ensureSession(type) {
+  if (type === "easter") {
+    dayState.sessions.easter = state;
+    return state;
+  }
+  const session = normalizeWordSession(dayState.sessions.word) || createWordSession();
+  dayState.sessions.word = session;
+  return session;
 }
 
 function loadStreak() {
@@ -967,8 +1158,15 @@ function loadState() {
 }
 
 function saveState() {
+  if (dayState) dayState.sessions.easter = state;
   try {
     localStorage.setItem(storageKey(), JSON.stringify(state));
+    if (dayState) {
+      localStorage.setItem(
+        `${multiPuzzleDayStoragePrefix}${puzzle.dateKey}`,
+        JSON.stringify(dayState),
+      );
+    }
   } catch {
     // The game remains playable when storage is disabled.
   }
@@ -985,7 +1183,7 @@ function getLocalAccountSnapshot() {
       lastPlayedDate,
       missedDayState,
     },
-    dailyState: state,
+    dailyState: dayState || state,
   };
 }
 
@@ -1013,18 +1211,20 @@ function applyRemoteAccount(account) {
     }
   }
 
-  if (
-    account?.dailyState &&
-    supportedStateVersions.has(account.dailyState.stateVersion) &&
-    account.dailyState.puzzleKey === puzzle.key
-  ) {
-    state = { ...createInitialState(), ...account.dailyState, stateVersion: currentStateVersion };
-  } else {
-    state = createInitialState();
-  }
+  const legacyRemoteState = account?.dailyState
+    && supportedStateVersions.has(account.dailyState.stateVersion)
+    && account.dailyState.puzzleKey === puzzle.key
+      ? { ...createInitialState(), ...account.dailyState, stateVersion: currentStateVersion }
+      : createInitialState();
+  dayState = normalizeDayState(account?.dailyState, legacyRemoteState);
+  state = dayState.sessions.easter;
 
   try {
     localStorage.setItem(storageKey(), JSON.stringify(state));
+    localStorage.setItem(
+      `${multiPuzzleDayStoragePrefix}${puzzle.dateKey}`,
+      JSON.stringify(dayState),
+    );
   } catch {
     // The remote daily state remains available for this session.
   }
@@ -1093,6 +1293,359 @@ function renderHeading(title, description, kicker = "Today’s round") {
   `;
 }
 
+function isOfficialPlay(type = activePlay?.type) {
+  return activePlay?.mode === "official" && dayState?.officialType === type;
+}
+
+function isMultiPuzzleLaunchActive() {
+  return Boolean(puzzle?.dateKey && puzzle.dateKey >= MULTI_PUZZLE_LAUNCH_DATE);
+}
+
+function startPuzzle(type, mode) {
+  activePlay = { type, mode };
+  ensureSession(type);
+  render();
+}
+
+function hasPuzzleStarted(type, session) {
+  if (!session) return false;
+  if (type === "word") {
+    return session.complete || session.pendingResult || (session.guesses?.length || 0) > 0;
+  }
+  return session.complete
+    || session.phase !== "clues"
+    || session.cluesRevealed > 1
+    || Boolean(session.selectedGameId || session.selectedMapId);
+}
+
+function getPuzzleCardAction(type) {
+  const session = dayState.sessions[type];
+  if (dayState.officialType === type) {
+    if (!dayState.officialCompleted) {
+      return { label: session ? "Continue today’s round" : "Play today’s round", action: "official" };
+    }
+    return { label: "Today’s round complete", action: null };
+  }
+  if (!dayState.officialCompleted) return { label: "Finish today’s round first", action: null };
+  if (session?.complete) return { label: "Puzzle complete", action: null };
+  return { label: hasPuzzleStarted(type, session) ? "Continue just for fun" : "Play just for fun", action: "for_fun" };
+}
+
+function getPuzzleCardStatus(type) {
+  const session = dayState.sessions[type];
+  if (dayState.officialType === type) {
+    return dayState.officialCompleted ? "Today’s round is complete" : "Today’s round · In progress";
+  }
+  if (!dayState.officialCompleted) return "Locked until today’s round is complete";
+  if (session?.complete) return "Completed just for fun";
+  return "Play risk-free. No effect on your stats.";
+}
+
+function renderPuzzleCard(type) {
+  const details = puzzleTypes[type];
+  const action = getPuzzleCardAction(type);
+  const official = dayState.officialType === type;
+  const completed = Boolean(dayState.sessions[type]?.complete);
+  return `
+    <article class="puzzle-choice-card${official ? " is-official" : ""}" data-puzzle-card="${type}">
+      <img class="puzzle-choice-art" src="${details.image}" alt="" width="512" height="512">
+      <div class="puzzle-choice-copy">
+        <p class="kicker">${escapeHtml(details.kicker)}</p>
+        <h3>${escapeHtml(details.name)}</h3>
+        <p>${escapeHtml(details.description)}</p>
+      </div>
+      <div class="puzzle-choice-status-row">
+        <div class="puzzle-choice-status-copy"><p class="puzzle-choice-status${completed ? " is-complete" : ""}">${escapeHtml(getPuzzleCardStatus(type))}</p></div>
+        ${completed ? `<button class="puzzle-result-link" type="button" data-see-result="${type}" data-result-mode="${official ? "official" : "for_fun"}">See result</button>` : ""}
+      </div>
+      <div class="puzzle-choice-actions">
+        <button class="button primary" type="button" data-card-action="${action.action || ""}" data-puzzle-type="${type}" ${action.action ? "" : "disabled"}>${escapeHtml(action.label)}</button>
+      </div>
+    </article>
+  `;
+}
+
+function areAllPuzzlesCompleted() {
+  return Object.keys(puzzleTypes).every((type) => dayState.sessions[type]?.complete);
+}
+
+function renderHub() {
+  if (!isMultiPuzzleLaunchActive()) {
+    startPuzzle("easter", "official");
+    return;
+  }
+  activePlay = null;
+  const allComplete = areAllPuzzlesCompleted();
+  const otherType = getOtherPuzzleType(dayState.officialType);
+  const guidance = allComplete
+    ? "You have completed both of today’s puzzles."
+    : `Today’s round is complete. You can now play ${puzzleTypes[otherType].name} just for fun, with no effect on your stats.`;
+  app.innerHTML = `
+    <section class="panel puzzle-hub-panel">
+      <div class="puzzle-hub-hero">
+        ${renderHeading(
+          allComplete ? "Today’s puzzles are complete" : "Play another puzzle",
+          guidance,
+          allComplete ? "All puzzles" : "Just for fun",
+        )}
+      </div>
+      <div class="puzzle-choice-grid">
+        ${renderPuzzleCard("word")}
+        ${renderPuzzleCard("easter")}
+      </div>
+    </section>
+    ${renderNextRoundScreen()}
+  `;
+  updateNextRoundCountdown();
+  app.querySelectorAll("[data-card-action]").forEach((button) => {
+    if (button.disabled) return;
+    button.addEventListener("click", () => startPuzzle(button.dataset.puzzleType, button.dataset.cardAction));
+  });
+  app.querySelectorAll("[data-see-result]").forEach((button) => {
+    button.addEventListener("click", () => startPuzzle(button.dataset.seeResult, button.dataset.resultMode));
+  });
+  focusAfterRender("puzzle-hub");
+}
+
+function renderWordSlots(answer, revealedLetters, { revealLetter = "", finalReveal = false } = {}) {
+  const revealed = new Set(revealedLetters);
+  const newlyRevealedLetter = normalizeLetter(revealLetter);
+  let revealIndex = 0;
+  let letterIndex = 0;
+  return answer.split(" ").map((word, wordIndex) => `
+    <span class="word-token${finalReveal ? " is-completing" : ""}"${finalReveal ? ` style="--word-index: ${wordIndex}"` : ""}>
+      ${[...word].map((character) => {
+        const letter = normalizeLetter(character);
+        if (!letter) return `<span class="word-literal">${escapeHtml(character)}</span>`;
+        const visible = revealed.has(letter);
+        const newlyRevealed = visible && letter === newlyRevealedLetter;
+        const animationIndexes = [`--letter-index: ${letterIndex++}`];
+        if (newlyRevealed) animationIndexes.push(`--reveal-index: ${revealIndex++}`);
+        return `<span class="word-letter${visible ? " is-visible" : ""}${newlyRevealed ? " is-newly-revealed" : ""}" style="${animationIndexes.join("; ")}" aria-label="${visible ? letter : "Hidden letter"}">${visible ? letter : ""}</span>`;
+      }).join("")}
+    </span>
+  `).join('<span class="word-space" aria-hidden="true"></span>');
+}
+
+function getWordCompletionDelay(success) {
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return success ? 1000 : 120;
+  if (!success) return 850;
+  const wordCount = wordPuzzle.entry.answer.trim().split(/\s+/).length;
+  const letterCount = [...wordPuzzle.entry.answer].filter((character) => /[A-Z]/i.test(character)).length;
+  return Math.min(3600, Math.max(1900 + ((wordCount - 1) * 180), 1250 + (letterCount * 55)));
+}
+
+function applyOfficialWordProgression(session, success, points) {
+  if (!isOfficialPlay("word") || dayState.officialCompleted) return;
+  const roundsSurvivedBeforeLoss = success ? 0 : streakCount;
+  const newBestRound = recordMapResult(success);
+  if (success) awardPoints(points);
+  recordDailyParticipation(puzzle.dateKey);
+  puzzleStats.word.plays += 1;
+  if (success) {
+    puzzleStats.word.score += points;
+    puzzleStats.word.solves += 1;
+  }
+  savePuzzleStats();
+  session.roundsSurvivedBeforeLoss = roundsSurvivedBeforeLoss;
+  session.newBestRound = newBestRound;
+  dayState.progressionApplied = true;
+  dayState.officialCompleted = true;
+  dayState.officialResult = { type: "word", puzzleType: "word", success, points };
+  accountController.recordWordResult({
+    puzzleDate: puzzle.dateKey,
+    puzzleId: wordPuzzle.key,
+    guesses: session.guesses,
+    misses: session.wrongGuesses,
+    success,
+  });
+}
+
+function finishWordPuzzle(session, success) {
+  const points = success ? calculateWordPoints(session.wrongGuesses) : 0;
+  session.pendingResult = null;
+  session.complete = true;
+  session.success = success;
+  session.points = points;
+  session.summary = {
+    label: wordPuzzle.entry.category,
+    answer: wordPuzzle.entry.answer,
+    description: wordPuzzle.entry.description,
+    detail: success
+      ? session.wrongGuesses === 0 ? "Perfect solve" : formatWordMisses(session.wrongGuesses)
+      : "5 misses",
+  };
+  if (isOfficialPlay("word")) applyOfficialWordProgression(session, success, points);
+  dayState.lastCompleted = {
+    type: "word",
+    mode: activePlay?.mode || "for_fun",
+    success,
+    points,
+    summary: session.summary,
+  };
+  saveState();
+  recordCommunityAttemptFor("word", success);
+  renderWordResult(session, activePlay?.mode || "for_fun");
+}
+
+function finishPendingWordResult(session) {
+  const pending = session.pendingResult;
+  if (!pending || session.complete) return;
+  window.setTimeout(() => {
+    if (session.complete || session.pendingResult !== pending) return;
+    finishWordPuzzle(session, pending === "success");
+  }, getWordCompletionDelay(pending === "success"));
+}
+
+function animatePointTotal(element, total) {
+  if (!element) return;
+  if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+    element.textContent = String(total);
+    return;
+  }
+  const startedAt = performance.now();
+  const duration = 720;
+  const tick = (now) => {
+    const progress = Math.min(1, (now - startedAt) / duration);
+    element.textContent = String(Math.round(total * (1 - ((1 - progress) ** 3))));
+    if (progress < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+function renderWordResult(session, mode) {
+  const official = mode === "official";
+  const answer = session.summary?.answer || wordPuzzle.entry.answer;
+  const answerWithPunctuation = punctuateSentenceEnding(answer);
+  const answerMarkup = `<strong class="result-answer-name">${escapeHtml(answer)}</strong>`;
+  const copy = session.success
+    ? `You revealed ${answerMarkup} with ${formatWordMisses(session.wrongGuesses)}.${official ? "" : " This result did not affect your stats."}`
+    : `You did not reveal the answer. Today’s answer was <strong class="result-answer-name">${escapeHtml(answerWithPunctuation)}</strong>${official ? " Your permanent Score and Solves are safe." : " This result did not affect your stats."}`;
+  const allComplete = areAllPuzzlesCompleted();
+  app.innerHTML = `
+    <section class="panel">
+      <div class="result-banner ${session.success ? "correct" : "failed"} animate">
+        <h2>${official ? session.success ? "Round Survived!" : "Run ended" : session.success ? "Puzzle Complete!" : "Not quite"}</h2>
+        <p>${copy}</p>
+        ${official && session.success ? `<div class="result-score-total"><span>Round score</span><strong data-count-to="${session.points}">0</strong></div>` : ""}
+        ${official && !session.success ? `<p class="survival-summary">${Math.max(1, session.roundsSurvivedBeforeLoss || 1) === 1 ? "Your Round remains at <strong>Round 1</strong>." : `Your run ended at <strong>Round ${session.roundsSurvivedBeforeLoss}</strong>. Your next game starts at <strong>Round 1</strong>.`}</p>` : ""}
+      </div>
+      <section class="bonus-panel">
+        <p class="word-result-category">${escapeHtml(session.summary?.label || wordPuzzle.entry.category)}</p>
+        <h2 class="final-map-name">${escapeHtml(answer)}</h2>
+        <p class="word-result-description">${escapeHtml(session.summary?.description || wordPuzzle.entry.description || "")}</p>
+      </section>
+      <div class="actions share-score-actions">
+        ${official ? '<button id="share-score" class="button share-score-button" type="button">Share with your squad</button>' : ""}
+        ${isMultiPuzzleLaunchActive() ? `<button id="return-to-puzzle-home" class="button" type="button">${allComplete ? "View puzzles" : "Play another puzzle"}</button>` : ""}
+      </div>
+      ${official ? '<p id="share-score-status" class="share-score-status" aria-live="polite"></p>' : ""}
+    </section>
+    ${renderNextRoundScreen()}
+  `;
+  updateNextRoundCountdown();
+  animatePointTotal(app.querySelector("[data-count-to]"), session.points);
+  app.querySelector("#return-to-puzzle-home")?.addEventListener("click", renderHub);
+  app.querySelector("#share-score")?.addEventListener("click", (event) => {
+    shareScore(event.currentTarget, app.querySelector("#share-score-status"));
+  });
+  focusAfterRender(`word-result:${session.success ? "correct" : "failed"}`);
+}
+
+function renderWordPuzzle({ scoreChanged = false, revealLetter = "", feedbackLetter = "", statusMessage = "", statusType = "" } = {}) {
+  const session = ensureSession("word");
+  if (session.complete) {
+    renderWordResult(session, activePlay?.mode || "for_fun");
+    return;
+  }
+  const official = isOfficialPlay("word");
+  const finalReveal = session.pendingResult === "success";
+  const resultPending = Boolean(session.pendingResult);
+  const answerLetters = wordPuzzle.entry.answer.toUpperCase();
+  const guesses = new Set(session.guesses);
+  const initialLetters = new Set(wordPuzzle.initialLetters);
+  const revealed = new Set(wordPuzzle.initialLetters);
+  session.guesses.forEach((letter) => { if (answerLetters.includes(letter)) revealed.add(letter); });
+  const potentialPoints = calculateWordPoints(session.wrongGuesses);
+  const displayedStatus = statusMessage || (finalReveal ? "Answer revealed!" : session.pendingResult === "failure" ? "No guesses remaining." : "Choose a letter.");
+  const displayedStatusType = statusType || (finalReveal ? "complete" : "");
+  const animatedLetter = revealLetter || (finalReveal ? session.lastGuess : "");
+  const activeFeedbackLetter = normalizeLetter(feedbackLetter);
+  const correctFeedback = Boolean(normalizeLetter(revealLetter)) && !finalReveal;
+  const mistakeFeedback = scoreChanged && !finalReveal;
+  const longestWordLength = Math.max(...wordPuzzle.entry.answer.split(/\s+/).map((word) => [...word].filter((character) => /[A-Z]/i.test(character)).length));
+  const keyboardRows = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
+  app.innerHTML = `
+    <section class="panel word-puzzle-panel">
+      ${renderHeading("Which Zombies word is it?", "Try to solve the Zombies word or phrase by revealing its letters.", official ? "Today’s round" : "Just for fun")}
+      ${official ? "" : '<p class="puzzle-mode-note">Playing just for fun. This result will not change your stats.</p>'}
+      <div class="word-scoreboard${official ? "" : " is-single"}" aria-label="Word puzzle progress">
+        <div class="word-mistakes danger-level-${session.wrongGuesses}"><span>Misses</span><strong>${session.wrongGuesses} / 5</strong><div class="word-danger-meter" aria-hidden="true">${[1, 2, 3, 4, 5].map((stage) => `<i class="${stage <= session.wrongGuesses ? "is-active" : ""}${scoreChanged && stage === session.wrongGuesses ? " is-new" : ""}"></i>`).join("")}</div></div>
+        ${official ? `<div><span>Potential score</span><strong class="word-score-value${scoreChanged ? " is-changing" : ""}">${potentialPoints}</strong></div>` : ""}
+      </div>
+      <div class="word-answer${longestWordLength >= 11 ? " has-long-word" : ""}${correctFeedback ? " is-correct-feedback" : ""}${mistakeFeedback ? " is-mistake-feedback" : ""}${finalReveal ? " is-final-reveal" : ""}" aria-label="Partially revealed answer">
+        <div class="word-answer-display">${renderWordSlots(wordPuzzle.entry.answer, revealed, { revealLetter: animatedLetter, finalReveal })}</div>
+        <p class="word-category-hint">Hint: ${escapeHtml(wordPuzzle.entry.category)}</p>
+      </div>
+      <div class="word-keyboard" aria-label="Letter keyboard">
+        ${keyboardRows.map((row) => `<div class="word-keyboard-row">${[...row].map((letter) => {
+          const used = guesses.has(letter) || initialLetters.has(letter);
+          const correct = answerLetters.includes(letter);
+          const feedbackClass = letter === activeFeedbackLetter ? correct ? " is-newly-correct" : " is-newly-incorrect" : "";
+          const stateClass = initialLetters.has(letter) ? " is-revealed" : used && correct ? " is-correct" : used ? " is-incorrect" : "";
+          const stateLabel = initialLetters.has(letter) ? "Starting letter" : !used ? "Unused" : correct ? "Correct" : "Miss";
+          return `<button class="word-key${stateClass}${feedbackClass}" type="button" data-letter="${letter}" aria-label="${letter}: ${stateLabel}" ${used || resultPending ? "disabled" : ""}>${letter}</button>`;
+        }).join("")}</div>`).join("")}
+      </div>
+      <p id="word-game-status" class="word-game-status${displayedStatusType ? ` is-${displayedStatusType}` : ""}" aria-live="polite">${escapeHtml(displayedStatus)}</p>
+    </section>
+  `;
+  app.querySelectorAll("[data-letter]").forEach((button) => button.addEventListener("click", () => submitLetter(button.dataset.letter)));
+  if (resultPending) finishPendingWordResult(session);
+  focusAfterRender("word-puzzle");
+}
+
+function submitLetter(value) {
+  if (activePlay?.type !== "word") return;
+  const official = isOfficialPlay("word");
+  const letter = normalizeLetter(value);
+  const session = ensureSession("word");
+  if (!letter || session.complete || session.pendingResult || session.guesses.includes(letter) || wordPuzzle.initialLetters.includes(letter)) return;
+  const correct = wordPuzzle.entry.answer.toUpperCase().includes(letter);
+  const nextGuesses = [...session.guesses, letter];
+  const nextWrongGuesses = session.wrongGuesses + (correct ? 0 : 1);
+  const solved = isWordSolved(wordPuzzle.entry.answer, [...wordPuzzle.initialLetters, ...nextGuesses]);
+  if (official && (solved || nextWrongGuesses >= 5) && !confirmAccountResultSubmission(accountController)) return;
+  session.guesses = nextGuesses;
+  session.lastGuess = letter;
+  if (correct) session.correctStreak = (session.correctStreak || 0) + 1;
+  else {
+    session.wrongGuesses = nextWrongGuesses;
+    session.correctStreak = 0;
+  }
+  if (solved) {
+    session.pendingResult = "success";
+    saveState();
+    renderWordPuzzle({ revealLetter: letter, feedbackLetter: letter, statusMessage: "Answer revealed!", statusType: "complete" });
+    return;
+  }
+  if (session.wrongGuesses >= 5) {
+    session.pendingResult = "failure";
+    saveState();
+    renderWordPuzzle({ scoreChanged: true, feedbackLetter: letter, statusMessage: "No guesses remaining." });
+    return;
+  }
+  saveState();
+  const streakMessage = session.correctStreak >= 2 ? `${session.correctStreak} correct letters in a row!` : `${letter} is in the answer.`;
+  renderWordPuzzle({
+    scoreChanged: !correct,
+    revealLetter: correct ? letter : "",
+    feedbackLetter: letter,
+    statusMessage: correct ? streakMessage : official ? `${letter} is not in the answer. Potential score is now ${calculateWordPoints(session.wrongGuesses)}.` : `${letter} is not in the answer.`,
+    statusType: correct && session.correctStreak >= 2 ? "streak" : "",
+  });
+}
+
 function createClueCard(step, index) {
   const card = clueTemplate.content.firstElementChild.cloneNode(true);
   card.querySelector(".clue-number").textContent = `Clue ${index + 1}`;
@@ -1117,19 +1670,29 @@ function renderClueCards(container, visibleCount = 3, showHidden = false) {
 }
 
 function renderClues() {
+  const official = isOfficialPlay("easter");
+  const potentialPoints = calculateMapPoints(state.cluesRevealed);
   app.innerHTML = `
-    <section class="panel">
+    <section class="panel quest-clue-panel">
       ${renderHeading(
         "Which Zombies map is it?",
-        "Identify the map from its main quest steps. Reveal as few clues as possible to earn more points.",
+        official
+          ? "Identify the map from its main quest steps. Reveal as few clues as possible to earn more points."
+          : "Identify the map from its main quest steps. Reveal another clue if you need it.",
+        official ? "Today’s round" : "Just for fun",
       )}
+      ${official ? "" : '<p class="puzzle-mode-note">Playing just for fun. This result will not change your stats.</p>'}
+      <div class="quest-intel-status${official ? "" : " is-single"}" aria-label="Quest puzzle progress">
+        <div><span>Clues revealed</span><strong class="quest-clue-count">${state.cluesRevealed} / 3</strong></div>
+        ${official ? `<div><span>Potential score</span><strong class="quest-score-value">${potentialPoints}</strong></div>` : ""}
+      </div>
       <div id="clue-list" class="clue-list"></div>
       <div class="actions">
         <button id="reveal-clue" class="button" type="button" ${state.cluesRevealed >= 3 ? "disabled" : ""}>
           ${state.cluesRevealed >= 3 ? "All clues revealed" : "Reveal next clue"}
         </button>
         <button id="lock-answer" class="button primary" type="button">
-          Select map · ${state.cluesRevealed} ${state.cluesRevealed === 1 ? "clue" : "clues"}
+          Select map
         </button>
       </div>
     </section>
@@ -1154,7 +1717,7 @@ function renderGameSelection() {
 
   app.innerHTML = `
     <section class="panel">
-      ${renderHeading("Choose the game", `You have revealed ${state.cluesRevealed} ${state.cluesRevealed === 1 ? "clue" : "clues"}.`, "Lock in your answer")}
+      ${renderHeading("Choose the game", `You have revealed ${state.cluesRevealed} ${state.cluesRevealed === 1 ? "clue" : "clues"}.`, isOfficialPlay("easter") ? "Lock in your answer" : "Just for fun")}
       <ul class="card-grid">
         ${games
           .map(
@@ -1200,7 +1763,7 @@ function renderMapSelection() {
 
   app.innerHTML = `
     <section class="panel">
-      ${renderHeading(`Choose a ${game.title} map`, "Tap a map, then confirm your final answer.", "Lock in your answer")}
+      ${renderHeading(`Choose a ${game.title} map`, "Tap a map, then confirm your final answer.", isOfficialPlay("easter") ? "Lock in your answer" : "Just for fun")}
       <ul class="card-grid">
         ${gameMaps
           .map(
@@ -1243,24 +1806,38 @@ function renderMapSelection() {
     setState({ phase: "game", selectedGameId: null, selectedMapId: null });
   });
   app.querySelector("#confirm-map").addEventListener("click", () => {
-    if (!confirmAccountResultSubmission(accountController)) return;
+    const official = isOfficialPlay("easter");
+    if (official && !confirmAccountResultSubmission(accountController)) return;
     const isCorrect = isAcceptedMapSelection(
       state.selectedMapId,
       puzzle.map.id,
       catalog.answerEquivalents,
     );
     const mapPoints = isCorrect ? calculateMapPoints(state.cluesRevealed) : 0;
-    const roundsSurvivedBeforeLoss = isCorrect ? 0 : streakCount;
-    const newBestRound = recordMapResult(isCorrect);
-    if (!state.pointsRecorded) awardPoints(mapPoints);
-    if (isCorrect) recordDailyParticipation();
-    recordCommunityAttempt(isCorrect);
-    accountController.recordMapResult({
-      puzzleDate: puzzle.dateKey,
-      puzzleId: puzzle.key,
-      selectedMapId: state.selectedMapId,
-      cluesUsed: state.cluesRevealed,
-    });
+    const roundsSurvivedBeforeLoss = official && !isCorrect ? streakCount : 0;
+    const newBestRound = official ? recordMapResult(isCorrect) : false;
+    if (official && !state.pointsRecorded) awardPoints(mapPoints);
+    if (official) {
+      recordDailyParticipation();
+      puzzleStats.easter.plays += 1;
+      if (isCorrect) {
+        puzzleStats.easter.score += mapPoints;
+        puzzleStats.easter.solves += 1;
+      }
+      savePuzzleStats();
+      dayState.progressionApplied = true;
+      if (!isCorrect) {
+        dayState.officialCompleted = true;
+        dayState.officialResult = { type: "easter", puzzleType: "easter", success: false, points: 0 };
+      }
+      accountController.recordMapResult({
+        puzzleDate: puzzle.dateKey,
+        puzzleId: puzzle.key,
+        selectedMapId: state.selectedMapId,
+        cluesUsed: state.cluesRevealed,
+      });
+    }
+    recordCommunityAttemptFor("easter", isCorrect);
     setState({
       phase: "result",
       isCorrect,
@@ -1272,7 +1849,18 @@ function renderMapSelection() {
       roundsSurvivedBeforeLoss,
       mapPoints,
       pointsRecorded: true,
+      complete: !isCorrect,
+      success: isCorrect,
+      points: mapPoints,
+      summary: {
+        label: "Map",
+        answer: getPuzzleAnswerTitle(),
+      },
     });
+    if (!isCorrect) {
+      dayState.lastCompleted = { type: "easter", mode: activePlay?.mode || "for_fun", success: false, points: 0 };
+      saveState();
+    }
   });
 }
 
@@ -1363,7 +1951,7 @@ function renderNextRoundScreen() {
   return `
     <section class="next-round-screen" aria-labelledby="next-round-screen-title" aria-live="off">
       <p class="kicker">Next round</p>
-      <h3 id="next-round-screen-title">Next map in</h3>
+      <h3 id="next-round-screen-title">New puzzle in</h3>
       <strong id="end-screen-countdown" class="end-screen-countdown" aria-label="Time until the next round">--:--:--</strong>
       <p class="next-round-motivation">Return tomorrow to keep your Round alive.</p>
     </section>
@@ -1372,8 +1960,8 @@ function renderNextRoundScreen() {
 
 function renderMissedDay() {
   const missedMapCopy = missedDayState.missedDays === 1
-    ? "You missed yesterday’s map."
-    : `You missed ${missedDayState.missedDays} daily maps.`;
+    ? "You missed yesterday’s puzzle."
+    : `You missed ${missedDayState.missedDays} daily puzzles.`;
   app.innerHTML = `
     <section class="panel missed-day-panel">
       <div class="result-banner failed animate">
@@ -1382,7 +1970,7 @@ function renderMissedDay() {
         <p class="survival-summary">Your run ended at <strong>Round ${missedDayState.roundsBeforeLoss}</strong>. Today starts a new run at <strong>Round 1</strong>.</p>
       </div>
       <div class="actions">
-        <button id="continue-after-missed-day" class="button primary" type="button">Play today’s map</button>
+        <button id="continue-after-missed-day" class="button primary" type="button">Play today’s puzzle</button>
       </div>
     </section>
   `;
@@ -1398,8 +1986,10 @@ function renderMissedDay() {
 }
 
 function buildScoreSharePayload() {
-  const shareRound = !state.isCorrect
-    ? Math.max(1, state.roundsSurvivedBeforeLoss)
+  const activeSession = activePlay?.type === "word" ? dayState?.sessions?.word : state;
+  const isCorrect = activePlay?.type === "word" ? activeSession?.success : state.isCorrect;
+  const shareRound = !isCorrect
+    ? Math.max(1, activeSession?.roundsSurvivedBeforeLoss || 1)
     : Math.max(1, streakCount);
   const shareUrl = document.querySelector('link[rel="canonical"]')?.href || window.location.href;
 
@@ -1464,26 +2054,36 @@ async function shareScore(button, status) {
 }
 
 function renderResult() {
+  const official = isOfficialPlay("easter");
   const selectedMap = selectableMaps.find((map) => map.id === state.selectedMapId);
   const answerTitle = getPuzzleAnswerTitle();
   const failedBonus = state.isCorrect && state.bonusFailed;
   const perfectResult = state.isCorrect && state.bonusComplete;
   const clueLabel = state.lockedClues === 1 ? "clue" : "clues";
   const endedRound = Math.max(1, state.roundsSurvivedBeforeLoss);
-  const resultTitle = failedBonus
+  const resultTitle = !official
+    ? failedBonus || !state.isCorrect ? "Not quite" : "Puzzle Complete!"
+    : failedBonus
       ? "Not quite"
       : perfectResult
         ? "Double Points!"
         : state.isCorrect
           ? "Round Survived!"
           : "Run ended";
+  const answerMarkup = `<strong class="result-answer-name">${escapeHtml(answerTitle)}</strong>`;
   const resultCopy = failedBonus
-      ? `You identified ${answerTitle}, but the step order was incorrect. You still earned ${state.mapPoints} points this round.`
-      : perfectResult
-        ? `You found ${answerTitle} using ${state.lockedClues} ${clueLabel} and got the steps in the correct order. You earned ${state.mapPoints + state.bonusPoints} points this round.`
-        : state.isCorrect
-          ? `You identified ${answerTitle} using ${state.lockedClues} ${clueLabel}. You earned ${state.mapPoints} points this round.`
-          : `You chose ${selectedMap?.title ?? "an unknown map"}. Today’s answer was ${answerTitle}. Your permanent Score and Solves are safe.`;
+    ? official
+      ? `You identified ${answerMarkup}, but the step order was incorrect. You still earned ${state.mapPoints} points this round.`
+      : `You identified ${answerMarkup}, but the step order was incorrect. This result did not affect your stats.`
+    : perfectResult
+      ? official
+        ? `You found ${answerMarkup} using ${state.lockedClues} ${clueLabel} and got the steps in the correct order. You earned ${state.mapPoints + state.bonusPoints} points this round.`
+        : `You found ${answerMarkup} using ${state.lockedClues} ${clueLabel} and got the steps in the correct order. This result did not affect your stats.`
+      : state.isCorrect
+        ? official
+          ? `You identified ${answerMarkup} using ${state.lockedClues} ${clueLabel}. You earned ${state.mapPoints} points this round.`
+          : `You identified ${answerMarkup} using ${state.lockedClues} ${clueLabel}. This result did not affect your stats.`
+        : `You chose <strong class="result-answer-name">${escapeHtml(selectedMap?.title ?? "an unknown map")}</strong>. Today’s answer was ${answerMarkup}. ${official ? "Your permanent Score and Solves are safe." : "This result did not affect your stats."}`;
   const resultClass = failedBonus
       ? "partial"
       : perfectResult
@@ -1499,9 +2099,9 @@ function renderResult() {
     <section class="panel">
       <div class="result-banner ${resultClass}${animateResult ? " animate" : ""}">
         <h2>${resultTitle}</h2>
-        <p>${escapeHtml(resultCopy)}</p>
+        <p>${resultCopy}</p>
         ${
-          !state.isCorrect
+          official && !state.isCorrect
             ? `<p class="survival-summary">Your run ended at <strong>Round ${endedRound}</strong>. Your next game starts at <strong>Round 1</strong>.</p>`
             : ""
         }
@@ -1509,10 +2109,11 @@ function renderResult() {
       ${state.isCorrect ? renderBonus() : '<h3>Today’s three clues</h3><div id="clue-list" class="clue-list"></div>'}
       ${
         isFinished
-          ? `<div class="actions share-score-actions">
-              <button id="share-score" class="button share-score-button" type="button">Share with your squad</button>
+            ? `<div class="actions share-score-actions">
+              ${official ? '<button id="share-score" class="button share-score-button" type="button">Share with your squad</button>' : ""}
+              ${isMultiPuzzleLaunchActive() ? `<button id="return-to-puzzle-home" class="button" type="button">${areAllPuzzlesCompleted() ? "View puzzles" : "Play another puzzle"}</button>` : ""}
             </div>
-            <p id="share-score-status" class="share-score-status" aria-live="polite"></p>`
+            ${official ? '<p id="share-score-status" class="share-score-status" aria-live="polite"></p>' : ""}`
           : ""
       }
     </section>
@@ -1528,6 +2129,7 @@ function renderResult() {
   app.querySelector("#share-score")?.addEventListener("click", (event) => {
     shareScore(event.currentTarget, app.querySelector("#share-score-status"));
   });
+  app.querySelector("#return-to-puzzle-home")?.addEventListener("click", renderHub);
   if (!state.isCorrect || state.bonusComplete || state.bonusFailed) return;
 
   app.querySelectorAll("[data-bonus-step-id]").forEach((button) => {
@@ -1540,27 +2142,54 @@ function renderResult() {
     });
   });
   app.querySelector("#submit-order").addEventListener("click", () => {
-    if (!confirmAccountResultSubmission(accountController)) return;
-    accountController.recordBonusResult({
-      puzzleDate: puzzle.dateKey,
-      bonusOrder: state.bonusOrder,
-    });
-    if (isCorrectOrder(state.bonusOrder, puzzle.chronologicalSteps)) {
-      const bonusPoints = calculateBonusPoints(state.mapPoints, true);
-      if (!state.bonusPointsRecorded) awardPoints(bonusPoints);
+    if (official && !confirmAccountResultSubmission(accountController)) return;
+    const bonusCorrect = isCorrectOrder(state.bonusOrder, puzzle.chronologicalSteps);
+    if (official) {
+      accountController.recordBonusResult({
+        puzzleDate: puzzle.dateKey,
+        bonusOrder: state.bonusOrder,
+      });
+    }
+    const bonusPoints = calculateBonusPoints(state.mapPoints, bonusCorrect);
+    if (bonusCorrect) {
+      if (official && !state.bonusPointsRecorded) {
+        awardPoints(bonusPoints);
+        puzzleStats.easter.score += bonusPoints;
+        savePuzzleStats();
+      }
+      if (official) {
+        dayState.officialCompleted = true;
+        dayState.officialResult = { type: "easter", puzzleType: "easter", success: true, points: state.mapPoints + bonusPoints };
+      }
+      dayState.lastCompleted = { type: "easter", mode: activePlay?.mode || "for_fun", success: true, points: state.mapPoints + bonusPoints };
       setState({
         bonusComplete: true,
         bonusPoints,
         bonusPointsRecorded: true,
+        complete: true,
+        success: true,
+        points: state.mapPoints + bonusPoints,
       });
       return;
     }
-
-    setState({ bonusFailed: true, bonusPoints: 0, bonusPointsRecorded: true });
+    if (official) {
+      dayState.officialCompleted = true;
+      dayState.officialResult = { type: "easter", puzzleType: "easter", success: true, points: state.mapPoints };
+    }
+    dayState.lastCompleted = { type: "easter", mode: activePlay?.mode || "for_fun", success: true, points: state.mapPoints };
+    setState({ bonusFailed: true, bonusPoints: 0, bonusPointsRecorded: true, complete: true, success: true, points: state.mapPoints });
   });
 }
 
 function render() {
+  if (!activePlay) {
+    startPuzzle(dayState.officialType, "official");
+    return;
+  }
+  if (activePlay.type === "word") {
+    renderWordPuzzle();
+    return;
+  }
   if (state.phase !== "result") {
     lastResultClass = null;
   }
@@ -1602,16 +2231,20 @@ async function initialise() {
     saveBestRound();
     solves = loadSolves();
     score = loadScore();
+    puzzleStats = loadPuzzleStats();
     lastPlayedDate = loadLastPlayedDate();
     puzzle = buildDailyPuzzle(dateKey, maps);
-    state = loadState();
+    wordPuzzle = buildDailyWordPuzzle(dateKey, wordEntries);
+    const legacyEasterState = loadState();
+    dayState = loadMultiPuzzleDayState(legacyEasterState);
+    state = dayState.sessions.easter;
     score = migrateLegacyLocalScore(localStorage, {
       scoreKey: scoreStorageKey,
       legacyPointsKey: legacyPointsStorageKey,
       markerKey: legacyScoreMigrationStorageKey,
       currentScore: score,
       solves,
-      dailyState: state,
+      dailyState: legacyEasterState,
     }).score;
     accountController = socialDemoEnabled
       ? initialiseSocialDemo()
@@ -1621,14 +2254,16 @@ async function initialise() {
           getLocalSnapshot: getLocalAccountSnapshot,
           applyRemoteAccount,
         });
+    document.addEventListener("keydown", (event) => {
+      if (activePlay?.type !== "word") return;
+      const letter = normalizeLetter(event.key);
+      if (letter) submitLetter(letter);
+    });
     protectedDates = await loadProtectedDates(lastPlayedDate, dateKey);
     prepareCommunityStatsDisplay();
     migrateCompletedScore();
     clearTemporaryLocalProgress();
-    if (state.phase === "result" && typeof state.isCorrect === "boolean") {
-      recordCommunityAttempt(state.isCorrect);
-    }
-    if (state.phase === "result" && state.isCorrect) {
+    if (dayState.officialCompleted && dayState.officialResult?.success) {
       recordDailyParticipation(dateKey);
     } else if (!lastPlayedDate && (streakCount > 0 || score > 0)) {
       // Preserve existing players' progress when missed-day tracking is first introduced.
@@ -1645,7 +2280,7 @@ async function initialise() {
     if (missedDayState && !missedDayState.resolved) {
       renderMissedDay();
     } else {
-      render();
+      startPuzzle(dayState.officialType, "official");
     }
   } catch (error) {
     console.error(error);

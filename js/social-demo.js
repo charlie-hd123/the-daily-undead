@@ -373,7 +373,7 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
 
   return {
     available: true, signedIn: true, canSync: false, profile: state.profile,
-    scheduleSave() {}, async recordMapResult() { return null; }, async recordBonusResult() { return null; },
+    scheduleSave() {}, async recordMapResult() { return null; }, async recordBonusResult() { return null; }, async recordWordResult() { return null; },
     openPlayerProfile,
   };
 }

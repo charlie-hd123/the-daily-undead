@@ -105,7 +105,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261007-4"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261013-1"]));
 });
 
 test("production Supabase Auth accepts both staging and production OTP lengths", async () => {
@@ -235,7 +235,7 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(html, /Your existing cloud save is safe\./);
   assert.match(html, /id="account-progress-conflict-dialog"/);
   assert.match(account, /accountButton\.textContent = "Session expired";/);
-  assert.equal((appScript.match(/confirmAccountResultSubmission\(accountController\)/g) || []).length, 2);
+  assert.equal((appScript.match(/confirmAccountResultSubmission\(accountController\)/g) || []).length, 3);
   assert.match(account, /await replaySavedAccountResult/);
   assert.match(account, /readRememberedAccount/);
   assert.match(account, /readPendingProgress/);
@@ -406,7 +406,7 @@ test("player stat pills expose dismissible explainers", async () => {
   assert.match(html, /id="player-stat-explainer"[^>]*role="status"[^>]*hidden/);
   assert.match(
     app,
-    /Your current survival run\. It advances after each solve and ends if you miss a day or choose the wrong map\./,
+    /Your current survival run\. It advances after each solve and ends if you miss a day or answer incorrectly\./,
   );
   assert.match(app, /recordNotice\.textContent = "This is your highest round!"/);
   assert.doesNotMatch(app, /unless you use a Revive/);
@@ -490,7 +490,7 @@ test("the progression update auto-opens for two days and remains in leaderboards
   assert.match(app, /progressionUpdateButton\.addEventListener\("click", openProgressionUpdate\)/);
   assert.match(
     app,
-    /state = loadState\(\);[\s\S]*?migrateLegacyLocalScore\(localStorage,[\s\S]*?initialiseAccount\([\s\S]*?initialiseProgressionUpdate\(\);/,
+    /legacyEasterState = loadState\(\);[\s\S]*?migrateLegacyLocalScore\(localStorage,[\s\S]*?initialiseAccount\([\s\S]*?initialiseProgressionUpdate\(\);/,
   );
   assert.match(css, /\.progression-update-button \{/);
   assert.match(css, /\.progression-update-dialog \.progression-update-benefit \{/);
@@ -586,12 +586,14 @@ test("community statistics are placed near the bottom and contain no frontend cr
 
   assert.match(
     html,
-    /<\/main>[\s\S]*class="community-stats"[\s\S]*class="site-footer"/,
+    /<\/main>[\s\S]*class="community-stats community-stats-demo"[\s\S]*class="site-footer"/,
   );
   assert.match(html, /id="community-players-today"/);
   assert.match(html, /id="community-games-total"/);
-  assert.match(html, /id="community-yesterday-solved"/);
-  assert.match(app, /recordCommunityAttempt\(isCorrect\)/);
+  assert.match(html, /id="community-yesterday-word-solved"/);
+  assert.match(html, /id="community-yesterday-easter-solved"/);
+  assert.match(app, /recordCommunityAttemptFor\("easter", isCorrect\)/);
+  assert.match(app, /recordCommunityAttemptFor\("word", success\)/);
   assert.doesNotMatch(`${html}\n${app}`, /(?:api[_-]?token|account[_-]?token|database[_-]?id)/i);
   assert.match(workerConfig, /"binding": "DB"/);
 });

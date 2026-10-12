@@ -9,6 +9,12 @@ const LESS_KNOWN_INTERVAL_DAYS = 5;
 const LESS_KNOWN_CADENCE_SLOT = LESS_KNOWN_INTERVAL_DAYS - 1;
 const REPEAT_COOLDOWN_DAYS = 30;
 const ROTATION_EPOCH_DAY_NUMBER = Math.floor(Date.parse("2026-01-01T00:00:00Z") / 86400000);
+const LAUNCH_WORD_IDS = Object.freeze({
+  "2026-10-13": "lw-0001", // Edward Richtofen
+  "2026-10-15": "lw-0253", // Juggernog
+  "2026-10-17": "lw-0376", // Mystery Box
+  "2026-10-19": "lw-0375", // Pack-a-Punch
+});
 
 export function normalizeLetter(value) {
   const letter = String(value || "").toUpperCase();
@@ -140,11 +146,15 @@ export function buildDailyWordPuzzle(dateKey, entries) {
     .sort((left, right) => left.id.localeCompare(right.id));
   if (!playable.length) throw new Error("No playable word entries are available.");
 
+  const launchWordId = LAUNCH_WORD_IDS[dateKey];
+  const launchEntry = launchWordId
+    ? playable.find((candidate) => candidate.id === launchWordId)
+    : null;
   const { pool, selectionIndex, targetFamiliarity } = getFamiliaritySelection(dateKey, playable);
   const cycle = Math.floor(selectionIndex / pool.length);
   const position = positiveModulo(selectionIndex, pool.length);
   const ordered = getCycleOrder(pool, cycle, targetFamiliarity);
-  const entry = ordered[position];
+  const entry = launchEntry || ordered[position];
   const letters = getAnswerLetters(entry.answer);
   const firstLetter = letters[0];
   const revealCandidates = getDistinctAnswerLetters(entry.answer).filter(

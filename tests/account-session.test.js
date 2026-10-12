@@ -107,3 +107,38 @@ test("saved map and bonus results replay sequentially and return current server 
   assert.deepEqual(calls.map(([type]) => type), ["map", "bonus"]);
   assert.deepEqual(progress, { score: 140, solves: 4 });
 });
+
+test("a completed official Last Words result replays with its guesses and server totals", async () => {
+  const calls = [];
+  const progress = await replaySavedAccountResult({
+    puzzleDate: "2026-10-13",
+    dailyState: {
+      dayStateVersion: 1,
+      dateKey: "2026-10-13",
+      officialType: "word",
+      officialCompleted: true,
+      sessions: {
+        word: {
+          key: "2026-10-13:word:lw-0001",
+          guesses: ["C", "H", "O"],
+          wrongGuesses: 1,
+          complete: true,
+          success: true,
+        },
+      },
+    },
+    sendWordResult: async (payload) => {
+      calls.push(payload);
+      return { progress: { score: 180, solves: 5 } };
+    },
+  });
+
+  assert.deepEqual(calls, [{
+    puzzleDate: "2026-10-13",
+    puzzleId: "2026-10-13:word:lw-0001",
+    guesses: ["C", "H", "O"],
+    misses: 1,
+    success: true,
+  }]);
+  assert.deepEqual(progress, { score: 180, solves: 5 });
+});
