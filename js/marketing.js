@@ -199,7 +199,7 @@ function layoutWordPattern(answer, fontSize, maximumWidth) {
 }
 
 function fitWordPattern(answer) {
-  for (let fontSize = 66; fontSize >= 42; fontSize -= 2) {
+  for (let fontSize = 84; fontSize >= 42; fontSize -= 2) {
     const layout = layoutWordPattern(answer, fontSize, 840);
     const lineHeight = Math.round(fontSize * 1.62);
     if (layout.lines.length <= 3 && layout.lines.length * lineHeight <= 300) {
@@ -261,7 +261,7 @@ async function drawLastWordsImage(answer, initialLetters, category) {
     document.fonts.load("800 66px Barlow Condensed"),
     document.fonts.load("500 44px Barlow"),
   ]);
-  const template = await loadImage("./assets/marketing-last-words-template.jpg?v=20261013-1");
+  const template = await loadImage("./assets/marketing-last-words-template.jpg?v=20261013-2");
   const context = canvas.getContext("2d", { alpha: false });
   context.drawImage(template, 0, 0, canvas.width, canvas.height);
 
