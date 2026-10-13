@@ -13,7 +13,10 @@ import {
   isWordSolved,
   normalizeLetter,
 } from "../../js/word-puzzle-core.js";
-import { getOfficialPuzzleType } from "../../js/daily-challenge-core.js";
+import {
+  getOfficialPuzzleType,
+  isPuzzleSessionComplete,
+} from "../../js/daily-challenge-core.js";
 import {
   answerEquivalents,
   profileGames,
@@ -103,6 +106,7 @@ function sanitizeEasterState(value, puzzleDate) {
     bonusPoints: safeCounter(value.bonusPoints),
     pointsRecorded: Boolean(value.pointsRecorded),
     bonusPointsRecorded: Boolean(value.bonusPointsRecorded),
+    complete: isPuzzleSessionComplete("easter", value),
   };
 }
 

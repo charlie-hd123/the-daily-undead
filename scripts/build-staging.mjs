@@ -76,7 +76,7 @@ async function writeStagingHtml(filename, { banner = false, outputFilename = fil
   await writeFile(path.join(output, outputFilename), html);
 }
 
-await writeStagingHtml("staging-demo.html", { banner: true, outputFilename: "index.html" });
+await writeStagingHtml("index.html", { banner: true });
 await writeStagingHtml("marketing.html");
 await writeStagingHtml("maintenance.html");
 

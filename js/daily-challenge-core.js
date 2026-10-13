@@ -22,3 +22,18 @@ export function getOtherPuzzleType(type) {
   if (type === OFFICIAL_PUZZLE_TYPES.EASTER) return OFFICIAL_PUZZLE_TYPES.WORD;
   throw new Error("A recognised puzzle type is required.");
 }
+
+export function isPuzzleSessionComplete(type, session) {
+  if (!session) return false;
+  if (type === OFFICIAL_PUZZLE_TYPES.WORD) return Boolean(session.complete);
+  if (type === OFFICIAL_PUZZLE_TYPES.EASTER) {
+    return Boolean(
+      session.phase === "result" && (
+        session.isCorrect === false ||
+        session.bonusComplete ||
+        session.bonusFailed
+      ),
+    );
+  }
+  return false;
+}

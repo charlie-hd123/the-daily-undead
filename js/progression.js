@@ -2,6 +2,36 @@ export function isLocalDevelopmentHostname(hostname) {
   return ["localhost", "127.0.0.1", "::1", "[::1]"].includes(hostname);
 }
 
+export function isLocalPreviewHostname(hostname) {
+  const normalizedHostname = String(hostname || "")
+    .trim()
+    .toLowerCase()
+    .replace(/^\[|\]$/g, "")
+    .replace(/\.$/, "");
+
+  if (isLocalDevelopmentHostname(normalizedHostname) || normalizedHostname === "0.0.0.0") {
+    return true;
+  }
+
+  if (normalizedHostname.endsWith(".local")) return true;
+
+  const ipv4Parts = normalizedHostname.split(".").map(Number);
+  const isIpv4Address =
+    ipv4Parts.length === 4 &&
+    ipv4Parts.every((part) => Number.isInteger(part) && part >= 0 && part <= 255);
+  if (isIpv4Address) {
+    const [first, second] = ipv4Parts;
+    return (
+      first === 10 ||
+      (first === 172 && second >= 16 && second <= 31) ||
+      (first === 192 && second === 168) ||
+      (first === 169 && second === 254)
+    );
+  }
+
+  return /^f[cd][0-9a-f:]*$/.test(normalizedHostname) || /^fe[89ab][0-9a-f:]*$/.test(normalizedHostname);
+}
+
 export function migrateStoredRoundNumbering(storage, { streakKey, bestRoundKey, versionKey }) {
   try {
     if (storage.getItem(versionKey) === "starts-at-one") return false;

@@ -126,6 +126,15 @@ test("account usernames and uploaded local saves are tightly validated", () => {
     officialCompleted: true,
     officialResult: { type: "word", success: true, points: 80 },
     sessions: {
+      easter: {
+        stateVersion: 10,
+        puzzleKey: `${today}:map:steps`,
+        phase: "result",
+        cluesRevealed: 3,
+        lockedClues: 3,
+        selectedMapId: "wrong-map",
+        isCorrect: false,
+      },
       word: {
         key: `${today}:word:lw-0001`,
         guesses: ["A", "B", "B", "invalid"],
@@ -138,6 +147,7 @@ test("account usernames and uploaded local saves are tightly validated", () => {
   assert.equal(multiPuzzleState.officialType, "word");
   assert.deepEqual(multiPuzzleState.sessions.word.guesses, ["A", "B"]);
   assert.equal(multiPuzzleState.sessions.word.wrongGuesses, 1);
+  assert.equal(multiPuzzleState.sessions.easter.complete, true);
 });
 
 test("the multi-puzzle migration preserves legacy statistics and adds puzzle attribution", async () => {

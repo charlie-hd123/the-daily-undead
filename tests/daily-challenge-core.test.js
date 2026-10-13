@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
+  isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
   OFFICIAL_PUZZLE_TYPES,
 } from "../js/daily-challenge-core.js";
@@ -23,4 +24,32 @@ test("the unscored puzzle is always the other game", () => {
 test("official puzzle assignment rejects invalid dates and puzzle types", () => {
   assert.throws(() => getOfficialPuzzleType("today"), /valid UTC date/);
   assert.throws(() => getOtherPuzzleType("unknown"), /recognised puzzle type/);
+});
+
+test("Quest Steps completion is recovered from persisted result fields", () => {
+  assert.equal(isPuzzleSessionComplete("easter", {
+    phase: "result",
+    isCorrect: false,
+  }), true);
+  assert.equal(isPuzzleSessionComplete("easter", {
+    phase: "result",
+    isCorrect: true,
+    bonusComplete: true,
+  }), true);
+  assert.equal(isPuzzleSessionComplete("easter", {
+    phase: "result",
+    isCorrect: true,
+    bonusFailed: true,
+  }), true);
+  assert.equal(isPuzzleSessionComplete("easter", {
+    phase: "result",
+    isCorrect: true,
+    bonusComplete: false,
+    bonusFailed: false,
+  }), false);
+  assert.equal(isPuzzleSessionComplete("easter", {
+    phase: "clues",
+    complete: true,
+  }), false);
+  assert.equal(isPuzzleSessionComplete("word", { complete: true }), true);
 });

@@ -12,42 +12,44 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261013-2";
+} from "./game-core.js?v=20261013-4";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
-} from "./word-puzzle-core.js?v=20261013-2";
+} from "./word-puzzle-core.js?v=20261013-4";
 import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
+  isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261013-2";
+} from "./daily-challenge-core.js?v=20261013-4";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
   isLocalDevelopmentHostname,
+  isLocalPreviewHostname,
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261013-2";
+} from "./progression.js?v=20261013-4";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261013-2";
+} from "./account.js?v=20261013-4";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261013-2";
+} from "./community-stats.js?v=20261013-4";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261013-2";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261013-2";
+} from "./leaderboards.js?v=20261013-4";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261013-4";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -72,6 +74,7 @@ const communityYesterdayWordAnswerLabel = document.querySelector("#community-yes
 const communityYesterdayEasterAnswerLabel = document.querySelector("#community-yesterday-easter-answer");
 const yesterdayCommunityResults = [...document.querySelectorAll("[data-community-puzzle]")];
 const isLocalDevelopment = isLocalDevelopmentHostname(window.location.hostname);
+const isLocalPreview = isLocalPreviewHostname(window.location.hostname);
 const socialDemoEnabled = isLocalDevelopment && new URLSearchParams(window.location.search).get("socialDemo") === "1";
 const communityStatsApiUrl = resolveCommunityStatsApiUrl({ isLocalDevelopment });
 const leaderboardsApiUrl = resolveLeaderboardsApiUrl({ isLocalDevelopment });
@@ -189,7 +192,7 @@ function getDateKey() {
   try {
     const savedAuthorization = JSON.parse(sessionStorage.getItem(devPreviewStorageKey));
     isAuthorized =
-      isLocalDevelopment &&
+      isLocalPreview &&
       savedAuthorization?.dateKey === previewDate &&
       savedAuthorization?.token === searchParams.get("devPreview");
   } catch {
@@ -403,7 +406,7 @@ function advanceSimulatedDay() {
   window.location.search = searchParams.toString();
 }
 
-if (isLocalDevelopment) {
+if (isLocalPreview) {
   advanceDevDayButton.hidden = false;
   advanceDevDayButton.addEventListener("click", advanceSimulatedDay);
 } else {
@@ -600,6 +603,10 @@ function createInitialState() {
     bonusPoints: 0,
     pointsRecorded: false,
     bonusPointsRecorded: false,
+    complete: false,
+    success: null,
+    points: 0,
+    summary: null,
   };
 }
 
@@ -1328,7 +1335,7 @@ function getPuzzleCardAction(type) {
     return { label: "Today’s round complete", action: null };
   }
   if (!dayState.officialCompleted) return { label: "Finish today’s round first", action: null };
-  if (session?.complete) return { label: "Puzzle complete", action: null };
+  if (isPuzzleSessionComplete(type, session)) return { label: "Puzzle complete", action: null };
   return { label: hasPuzzleStarted(type, session) ? "Continue just for fun" : "Play just for fun", action: "for_fun" };
 }
 
@@ -1338,7 +1345,7 @@ function getPuzzleCardStatus(type) {
     return dayState.officialCompleted ? "Today’s round is complete" : "Today’s round · In progress";
   }
   if (!dayState.officialCompleted) return "Locked until today’s round is complete";
-  if (session?.complete) return "Completed just for fun";
+  if (isPuzzleSessionComplete(type, session)) return "Completed just for fun";
   return "Play risk-free. No effect on your stats.";
 }
 
@@ -1346,7 +1353,7 @@ function renderPuzzleCard(type) {
   const details = puzzleTypes[type];
   const action = getPuzzleCardAction(type);
   const official = dayState.officialType === type;
-  const completed = Boolean(dayState.sessions[type]?.complete);
+  const completed = isPuzzleSessionComplete(type, dayState.sessions[type]);
   return `
     <article class="puzzle-choice-card${official ? " is-official" : ""}" data-puzzle-card="${type}">
       <img class="puzzle-choice-art" src="${details.image}" alt="" width="512" height="512">
@@ -1367,7 +1374,8 @@ function renderPuzzleCard(type) {
 }
 
 function areAllPuzzlesCompleted() {
-  return Object.keys(puzzleTypes).every((type) => dayState.sessions[type]?.complete);
+  return Object.keys(puzzleTypes).every((type) =>
+    isPuzzleSessionComplete(type, dayState.sessions[type]));
 }
 
 function renderHub() {

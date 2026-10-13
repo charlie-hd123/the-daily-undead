@@ -7,6 +7,7 @@ import {
   rememberAccount,
   writePendingProgress,
 } from "./account-session.js?v=20261007-4";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261013-4";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -345,7 +346,7 @@ export async function replaySavedAccountResult({
   if (dailyState?.dayStateVersion === 1 && dailyState.dateKey === puzzleDate) {
     const officialType = dailyState.officialType;
     const session = dailyState.sessions?.[officialType];
-    if (!dailyState.officialCompleted || !session?.complete) return null;
+    if (!dailyState.officialCompleted || !isPuzzleSessionComplete(officialType, session)) return null;
     if (officialType === "word") {
       const wordResult = await sendWordResult({
         puzzleDate,

@@ -58,7 +58,7 @@ To preview another daily puzzle without waiting for tomorrow, add a date:
 http://localhost:8080/?date=2026-07-29
 ```
 
-During local development, the **Dev button – advance a day** control at the bottom of the site advances this preview date by one day while preserving the current time-of-day. The control is enabled only on `localhost` and is removed on the public website.
+During local development, the **Dev button – advance a day** control at the bottom of the site advances this preview date by one day while preserving the current time-of-day. The control is enabled on `localhost` and private LAN addresses (including `.local` Mac hostnames) so it can be used from a phone on the same network, and is removed on the public website.
 
 Localhost uses a local Worker at `http://localhost:8787`; it never submits attempts to the production community database. If the local Worker is not running, the game still works and the community figures show `—`. Future-date previews are also rejected by the Worker, so **Advance a day** cannot affect live totals.
 

@@ -105,7 +105,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261013-2"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261013-4"]));
 });
 
 test("production Supabase Auth accepts both staging and production OTP lengths", async () => {
@@ -560,6 +560,16 @@ test("production Quest Steps renders every approved staging presentation hook", 
 
   assert.match(app, /<h3>Bonus: Put the steps in order<\/h3>/);
   assert.match(app, /Order the steps to earn Double Points\. Tap a selected step to remove it\./);
+});
+
+test("the staging build publishes the production application renderer", async () => {
+  const buildScript = await readProjectFile("scripts/build-staging.mjs");
+
+  assert.match(buildScript, /writeStagingHtml\("index\.html", \{ banner: true \}\)/);
+  assert.doesNotMatch(
+    buildScript,
+    /writeStagingHtml\("staging-demo\.html", \{ banner: true, outputFilename: "index\.html" \}\)/,
+  );
 });
 
 test("the clue count stays editable until a map is confirmed", async () => {

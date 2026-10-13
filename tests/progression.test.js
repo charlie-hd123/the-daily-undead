@@ -6,6 +6,7 @@ import {
   getProgressionUpdateVisibility,
   getRequiredMissedDates,
   isLocalDevelopmentHostname,
+  isLocalPreviewHostname,
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
@@ -188,6 +189,21 @@ test("developer controls are enabled only on local hostnames", () => {
   assert.equal(isLocalDevelopmentHostname("::1"), true);
   assert.equal(isLocalDevelopmentHostname("[::1]"), true);
   assert.equal(isLocalDevelopmentHostname("thedailyundead.com"), false);
+});
+
+test("day preview controls also support private mobile LAN addresses", () => {
+  assert.equal(isLocalPreviewHostname("localhost"), true);
+  assert.equal(isLocalPreviewHostname("192.168.1.42"), true);
+  assert.equal(isLocalPreviewHostname("10.0.0.12"), true);
+  assert.equal(isLocalPreviewHostname("172.16.0.5"), true);
+  assert.equal(isLocalPreviewHostname("172.31.255.255"), true);
+  assert.equal(isLocalPreviewHostname("169.254.10.20"), true);
+  assert.equal(isLocalPreviewHostname("charlies-macbook.local"), true);
+  assert.equal(isLocalPreviewHostname("[fd12:3456::1]"), true);
+  assert.equal(isLocalPreviewHostname("[fe80::1]"), true);
+  assert.equal(isLocalPreviewHostname("172.32.0.5"), false);
+  assert.equal(isLocalPreviewHostname("8.8.8.8"), false);
+  assert.equal(isLocalPreviewHostname("thedailyundead.com"), false);
 });
 
 test("playing on the following UTC day keeps the Round", () => {

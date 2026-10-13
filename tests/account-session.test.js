@@ -142,3 +142,40 @@ test("a completed official Last Words result replays with its guesses and server
   }]);
   assert.deepEqual(progress, { score: 180, solves: 5 });
 });
+
+test("a completed Quest Steps result replays after cloud sanitizing removed its complete flag", async () => {
+  const calls = [];
+  const progress = await replaySavedAccountResult({
+    puzzleDate: "2026-10-14",
+    dailyState: {
+      dayStateVersion: 1,
+      dateKey: "2026-10-14",
+      officialType: "easter",
+      officialCompleted: true,
+      sessions: {
+        easter: {
+          phase: "result",
+          puzzleKey: "2026-10-14:map:steps",
+          selectedMapId: "wrong-map",
+          lockedClues: 3,
+          isCorrect: false,
+        },
+      },
+    },
+    sendMapResult: async (payload) => {
+      calls.push(["map", payload]);
+      return { progress: { score: 80, solves: 4 } };
+    },
+    sendBonusResult: async (payload) => {
+      calls.push(["bonus", payload]);
+      return { progress: { score: 80, solves: 4 } };
+    },
+    sendWordResult: async (payload) => {
+      calls.push(["word", payload]);
+      return { progress: { score: 80, solves: 4 } };
+    },
+  });
+
+  assert.deepEqual(calls.map(([type]) => type), ["map"]);
+  assert.deepEqual(progress, { score: 80, solves: 4 });
+});
