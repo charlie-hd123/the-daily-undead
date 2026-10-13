@@ -3,6 +3,8 @@ import { readFile, stat } from "node:fs/promises";
 import test from "node:test";
 import {
   buildMarketingCopy,
+  buildWordMarketingCopy,
+  buildWordPattern,
   formatDiscordDate,
   getDailyPostNumber,
   getPreviousDateKey,
@@ -26,19 +28,20 @@ test("marketing copy fills daily data but leaves usernames blank", () => {
   const copy = buildMarketingCopy({
     dateKey: "2026-09-10",
     clue: "Defeat the boss, then defend your ally as he carries the warhead into the portal.",
-    yesterdayAnswer: "Liberty Falls",
+    yesterdayAnswer: "Juggernog",
+    yesterdayPuzzleName: "Last Words",
     solvePercentage: 67,
   });
 
-  assert.equal(copy.redditTitle, "Can you guess the map from the main quest step? — 10 Sept");
-  assert.match(copy.redditBody, /Yesterday’s answer: Liberty Falls 🧟/);
-  assert.match(copy.redditBody, /Yesterday’s solve rate: 67% 🔎/);
-  assert.match(copy.redditBody, /First correct Redditors:/);
+  assert.equal(copy.redditTitle, "Can you solve today’s Quest Steps puzzle? — 10 Sept");
+  assert.match(copy.redditBody, /Yesterday’s Last Words answer: Juggernog 🧟/);
+  assert.match(copy.redditBody, /Yesterday’s Last Words solve rate: 67% 🔎/);
+  assert.match(copy.redditBody, /First correct Last Words Redditors:/);
   assert.match(copy.redditBody, /u\/____, u\/____, u\/____/);
-  assert.match(copy.redditBody, /Today’s main quest step:\nDefeat the boss/);
+  assert.match(copy.redditBody, /Today’s Quest Steps clue:\nDefeat the boss/);
   assert.doesNotMatch(copy.redditBody, /\*Defeat the boss/);
   assert.match(copy.discordBody, /🧟 The Daily Undead · 10 Sept/);
-  assert.match(copy.discordBody, /First correct guesses here:/);
+  assert.match(copy.discordBody, /First correct Last Words guesses here:/);
   assert.match(copy.discordBody, /The Daily Undead website/);
   assert.match(copy.discordBody, /@____, @____, @____/);
   assert.match(copy.discordBody, /🔗 <https:\/\/thedailyundead\.com\/>$/);
@@ -59,6 +62,31 @@ test("missing statistics are visibly left incomplete", () => {
   assert.match(copy.discordBody, /—%/);
 });
 
+test("Last Words marketing copy reveals only the daily starting letters", () => {
+  assert.equal(
+    buildWordPattern("Edward Richtofen", ["C", "O"]),
+    "______ __C__O___",
+  );
+  assert.equal(buildWordPattern("Pack-a-Punch", ["A", "P"]), "PA__-A-P____");
+
+  const copy = buildWordMarketingCopy({
+    dateKey: "2026-10-13",
+    answer: "Edward Richtofen",
+    initialLetters: ["C", "O"],
+    category: "Character",
+    yesterdayAnswer: "Der Riese / The Giant",
+    solvePercentage: 72,
+  });
+
+  assert.equal(copy.redditTitle, "Can you solve today’s Last Words puzzle? — 13 Oct");
+  assert.equal(copy.pattern, "______ __C__O___");
+  assert.match(copy.redditBody, /Today’s Last Words puzzle:\n______ __C__O___\nHint: Character/);
+  assert.match(copy.redditBody, /Yesterday’s Quest Steps answer: Der Riese \/ The Giant/);
+  assert.match(copy.discordBody, /Think you know the word or phrase/);
+  assert.doesNotMatch(copy.redditBody, /Edward Richtofen/);
+  assert.doesNotMatch(copy.discordBody, /Edward Richtofen/);
+});
+
 test("Apple mobile devices are detected for the Photos save flow", () => {
   assert.equal(isAppleMobileDevice({ userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)" }), true);
   assert.equal(isAppleMobileDevice({ platform: "MacIntel", maxTouchPoints: 5 }), true);
@@ -77,8 +105,13 @@ test("marketing page keeps its source and controls wired", async () => {
   assert.match(html, /\.\/js\/marketing\.js/);
 });
 
-test("the supplied marketing image template is available", async () => {
-  const template = await stat(new URL("../assets/marketing-template.jpg", import.meta.url));
-  assert.equal(template.isFile(), true);
-  assert.equal(template.size > 0, true);
+test("the supplied marketing image templates are available", async () => {
+  const templates = await Promise.all([
+    stat(new URL("../assets/marketing-template.jpg", import.meta.url)),
+    stat(new URL("../assets/marketing-last-words-template.jpg", import.meta.url)),
+  ]);
+  templates.forEach((template) => {
+    assert.equal(template.isFile(), true);
+    assert.equal(template.size > 0, true);
+  });
 });

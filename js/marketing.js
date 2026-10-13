@@ -3,14 +3,17 @@ import {
   getAnswerDisplayTitle,
   getUtcDateKey,
 } from "./game-core.js?v=20260920-3";
+import { getOfficialPuzzleType } from "./daily-challenge-core.js?v=20261013-4";
+import { buildDailyWordPuzzle } from "./word-puzzle-core.js?v=20261013-4";
 import { fetchCommunityStats } from "./community-stats.js?v=20260817-1";
 import {
   buildMarketingCopy,
+  buildWordMarketingCopy,
   formatPackDate,
   getDailyPostNumber,
   getPreviousDateKey,
   isAppleMobileDevice,
-} from "./marketing-core.js?v=20261002-2";
+} from "./marketing-core.js?v=20261013-3";
 
 const pack = document.querySelector("#marketing-pack");
 const packDate = document.querySelector("#pack-date");
@@ -44,10 +47,17 @@ async function getTrustedNow() {
 }
 
 async function loadPuzzleData() {
-  const indexResponse = await fetch("./data/maps/index.json", { cache: "no-store" });
-  if (!indexResponse.ok) throw new Error("Could not load the map index.");
+  const [indexResponse, wordResponse] = await Promise.all([
+    fetch("./data/maps/index.json", { cache: "no-store" }),
+    fetch("./data/word-puzzle-demo.json", { cache: "no-store" }),
+  ]);
+  if (!indexResponse.ok || !wordResponse.ok) {
+    throw new Error("Could not load the puzzle catalogues.");
+  }
   const catalog = await indexResponse.json();
+  const wordBank = await wordResponse.json();
   if (!Array.isArray(catalog.maps)) throw new Error("The map index is invalid.");
+  if (!Array.isArray(wordBank.words)) throw new Error("The word catalogue is invalid.");
 
   const maps = await Promise.all(
     catalog.maps.map(async (filename) => {
@@ -56,7 +66,7 @@ async function loadPuzzleData() {
       return response.json();
     }),
   );
-  return { catalog, maps };
+  return { catalog, maps, wordEntries: wordBank.words };
 }
 
 function loadImage(source) {
@@ -128,9 +138,9 @@ function fitClue(context, clue) {
   return { fontSize: 31, lineHeight: 46, lines: wrapText(context, clue, 1010).slice(0, 3) };
 }
 
-async function drawDailyImage(clue) {
+async function drawQuestStepsImage(clue) {
   await document.fonts.load("500 45px Barlow");
-  const template = await loadImage("./assets/marketing-template.jpg?v=20260910-1");
+  const template = await loadImage("./assets/marketing-template.jpg?v=20261013-1");
   const context = canvas.getContext("2d", { alpha: false });
   context.drawImage(template, 0, 0, canvas.width, canvas.height);
   erasePreviousClue(context);
@@ -145,6 +155,142 @@ async function drawDailyImage(clue) {
   fitted.lines.forEach((line, index) => {
     context.fillText(line, 122, blockTop + index * fitted.lineHeight);
   });
+}
+
+function getPatternCharacterWidth(character, fontSize) {
+  if (/^[A-Z]$/i.test(character)) return Math.round(fontSize * 0.76);
+  if (/['’“”]/.test(character)) return Math.round(fontSize * 0.28);
+  if (character === "-") return Math.round(fontSize * 0.42);
+  return Math.round(fontSize * 0.52);
+}
+
+function measurePatternWord(word, fontSize) {
+  const gap = Math.max(5, Math.round(fontSize * 0.13));
+  const characters = [...word];
+  return characters.reduce(
+    (width, character, index) => width + getPatternCharacterWidth(character, fontSize) +
+      (index === characters.length - 1 ? 0 : gap),
+    0,
+  );
+}
+
+function layoutWordPattern(answer, fontSize, maximumWidth) {
+  const wordGap = Math.round(fontSize * 0.72);
+  const words = answer.trim().split(/\s+/);
+  const lines = [];
+  let current = [];
+  let currentWidth = 0;
+
+  words.forEach((word) => {
+    const width = measurePatternWord(word, fontSize);
+    const candidateWidth = current.length ? currentWidth + wordGap + width : width;
+    if (current.length && candidateWidth > maximumWidth) {
+      lines.push({ words: current, width: currentWidth });
+      current = [word];
+      currentWidth = width;
+    } else {
+      current.push(word);
+      currentWidth = candidateWidth;
+    }
+  });
+  if (current.length) lines.push({ words: current, width: currentWidth });
+
+  return { lines, wordGap };
+}
+
+function fitWordPattern(answer) {
+  for (let fontSize = 66; fontSize >= 42; fontSize -= 2) {
+    const layout = layoutWordPattern(answer, fontSize, 840);
+    const lineHeight = Math.round(fontSize * 1.62);
+    if (layout.lines.length <= 3 && layout.lines.length * lineHeight <= 300) {
+      return { ...layout, fontSize, lineHeight };
+    }
+  }
+
+  const fontSize = 40;
+  return {
+    ...layoutWordPattern(answer, fontSize, 840),
+    fontSize,
+    lineHeight: 66,
+  };
+}
+
+function drawPatternLine(context, words, totalWidth, wordGap, y, fontSize, revealedLetters) {
+  const characterGap = Math.max(5, Math.round(fontSize * 0.13));
+  const slotInset = Math.max(4, Math.round(fontSize * 0.08));
+  const underlineY = y + Math.round(fontSize * 1.08);
+  let x = (canvas.width - totalWidth) / 2;
+
+  context.font = `800 ${fontSize}px "Barlow Condensed"`;
+  context.textAlign = "center";
+  context.textBaseline = "alphabetic";
+  context.lineCap = "round";
+
+  words.forEach((word, wordIndex) => {
+    [...word].forEach((character, characterIndex) => {
+      const width = getPatternCharacterWidth(character, fontSize);
+      const letter = /^[A-Z]$/i.test(character) ? character.toUpperCase() : null;
+      if (letter) {
+        context.strokeStyle = "#cbd5e9";
+        context.lineWidth = Math.max(4, Math.round(fontSize * 0.075));
+        context.beginPath();
+        context.moveTo(x + slotInset, underlineY);
+        context.lineTo(x + width - slotInset, underlineY);
+        context.stroke();
+
+        if (revealedLetters.has(letter)) {
+          context.fillStyle = "#f7f9ff";
+          context.shadowColor = "rgb(103 232 255 / 35%)";
+          context.shadowBlur = 12;
+          context.fillText(letter, x + width / 2, y + Math.round(fontSize * 0.86));
+          context.shadowBlur = 0;
+        }
+      } else {
+        context.fillStyle = "#b9c5dc";
+        context.fillText(character, x + width / 2, y + Math.round(fontSize * 0.86));
+      }
+      x += width;
+      if (characterIndex < [...word].length - 1) x += characterGap;
+    });
+    if (wordIndex < words.length - 1) x += wordGap;
+  });
+}
+
+async function drawLastWordsImage(answer, initialLetters, category) {
+  await Promise.all([
+    document.fonts.load("800 66px Barlow Condensed"),
+    document.fonts.load("500 44px Barlow"),
+  ]);
+  const template = await loadImage("./assets/marketing-last-words-template.jpg?v=20261013-1");
+  const context = canvas.getContext("2d", { alpha: false });
+  context.drawImage(template, 0, 0, canvas.width, canvas.height);
+
+  const revealedLetters = new Set(initialLetters.map((letter) => letter.toUpperCase()));
+  const fitted = fitWordPattern(answer);
+  const patternHeight = fitted.lines.length * fitted.lineHeight;
+  const blockTop = 720 - patternHeight / 2;
+  fitted.lines.forEach((line, index) => {
+    drawPatternLine(
+      context,
+      line.words,
+      line.width,
+      fitted.wordGap,
+      blockTop + index * fitted.lineHeight,
+      fitted.fontSize,
+      revealedLetters,
+    );
+  });
+
+  let hintFontSize = 44;
+  do {
+    context.font = `500 ${hintFontSize}px Barlow`;
+    if (context.measureText(`Hint: ${category}`).width <= 820) break;
+    hintFontSize -= 2;
+  } while (hintFontSize > 30);
+  context.fillStyle = "#48dff5";
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.fillText(`Hint: ${category}`, canvas.width / 2, 958);
 }
 
 async function copyText(button, target) {
@@ -247,12 +393,24 @@ function enableActions() {
 
 async function initialise() {
   try {
-    const [now, { catalog, maps }] = await Promise.all([getTrustedNow(), loadPuzzleData()]);
+    const [now, { catalog, maps, wordEntries }] = await Promise.all([
+      getTrustedNow(),
+      loadPuzzleData(),
+    ]);
     const dateKey = getUtcDateKey(now);
+    const yesterdayDateKey = getPreviousDateKey(dateKey);
+    const puzzleType = getOfficialPuzzleType(dateKey);
+    const yesterdayPuzzleType = getOfficialPuzzleType(yesterdayDateKey);
+    const yesterdayPuzzleName = yesterdayPuzzleType === "word" ? "Last Words" : "Quest Steps";
     const postNumber = getDailyPostNumber(dateKey);
     const puzzle = buildDailyPuzzle(dateKey, maps);
-    const yesterdayPuzzle = buildDailyPuzzle(getPreviousDateKey(dateKey), maps);
-    const yesterdayAnswer = getAnswerDisplayTitle(yesterdayPuzzle.map, catalog.answerEquivalents);
+    const wordPuzzle = buildDailyWordPuzzle(dateKey, wordEntries);
+    const yesterdayAnswer = yesterdayPuzzleType === "word"
+      ? buildDailyWordPuzzle(yesterdayDateKey, wordEntries).entry.answer
+      : getAnswerDisplayTitle(
+        buildDailyPuzzle(yesterdayDateKey, maps).map,
+        catalog.answerEquivalents,
+      );
     const clue = puzzle.displayedSteps[0].hardClue;
     let solvePercentage = null;
     let statsWarning = "";
@@ -262,7 +420,10 @@ async function initialise() {
         apiUrl: document.querySelector('meta[name="daily-undead-stats-api"]').content,
         puzzleDate: dateKey,
       });
-      solvePercentage = stats?.yesterday?.solvePercentage;
+      solvePercentage = stats?.yesterday?.[yesterdayPuzzleType]?.solvePercentage;
+      if (yesterdayPuzzleType === "easter" && !Number.isInteger(solvePercentage)) {
+        solvePercentage = stats?.yesterday?.solvePercentage;
+      }
       if (!Number.isInteger(solvePercentage)) {
         statsWarning = "Yesterday’s solve percentage is not available yet, so the text shows —%.";
       }
@@ -270,20 +431,40 @@ async function initialise() {
       statsWarning = "The statistics service could not be reached, so the text shows —%. Refresh before posting.";
     }
 
-    const copy = buildMarketingCopy({
-      dateKey,
-      clue,
-      yesterdayAnswer,
-      solvePercentage,
-    });
-    await drawDailyImage(clue);
+    const copy = puzzleType === "word"
+      ? buildWordMarketingCopy({
+        dateKey,
+        answer: wordPuzzle.entry.answer,
+        initialLetters: wordPuzzle.initialLetters,
+        category: wordPuzzle.entry.category,
+        yesterdayAnswer,
+        yesterdayPuzzleName,
+        solvePercentage,
+      })
+      : buildMarketingCopy({
+        dateKey,
+        clue,
+        yesterdayAnswer,
+        yesterdayPuzzleName,
+        solvePercentage,
+      });
+    if (puzzleType === "word") {
+      await drawLastWordsImage(
+        wordPuzzle.entry.answer,
+        wordPuzzle.initialLetters,
+        wordPuzzle.entry.category,
+      );
+    } else {
+      await drawQuestStepsImage(clue);
+    }
 
     packDate.textContent = formatPackDate(dateKey);
     roundBadge.textContent = `#${postNumber}`;
     redditTitle.value = copy.redditTitle;
     redditBody.value = copy.redditBody;
     discordBody.value = copy.discordBody;
-    downloadFilename = `daily-undead-${dateKey}.png`;
+    const puzzleSlug = puzzleType === "word" ? "last-words" : "quest-steps";
+    downloadFilename = `daily-undead-${puzzleSlug}-${dateKey}.png`;
     packStatus.textContent = statsWarning || "Today’s image and text are ready.";
     packStatus.dataset.tone = statsWarning ? "warning" : "ready";
     pack.setAttribute("aria-busy", "false");
