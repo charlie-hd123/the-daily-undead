@@ -75,6 +75,7 @@ test("the page's local release assets exist", async () => {
     "assets/fonts/barlow-condensed-700.ttf",
     "assets/fonts/barlow-condensed-800.ttf",
     "assets/fonts/barlow-condensed-900.ttf",
+    "release.json",
     "styles.css",
     "js/app.js",
     "js/account.js",
@@ -83,6 +84,7 @@ test("the page's local release assets exist", async () => {
     "js/game-core.js",
     "js/leaderboards.js",
     "js/progression.js",
+    "js/release.js",
     "js/social-demo.js",
   ];
 
@@ -105,7 +107,26 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261013-4"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261013-5"]));
+});
+
+test("the page exposes the same release build as the update manifest", async () => {
+  const [html, manifest] = await Promise.all([
+    readProjectFile("index.html"),
+    readProjectFile("release.json"),
+  ]);
+  const build = html.match(/name="daily-undead-build" content="([^"]+)"/)?.[1];
+
+  assert.equal(build, JSON.parse(manifest).build);
+});
+
+test("release recovery never clears cookies, storage, or player progress", async () => {
+  const releaseScript = await readProjectFile("js/release.js");
+
+  assert.doesNotMatch(releaseScript, /localStorage|\.clear\s*\(/);
+  assert.doesNotMatch(releaseScript, /cookies|"storage"|Clear-Site-Data/i);
+  assert.match(releaseScript, /beforeReload/);
+  assert.match(releaseScript, /cache:\s*"no-store"/);
 });
 
 test("production Supabase Auth accepts both staging and production OTP lengths", async () => {

@@ -12,19 +12,19 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261013-4";
+} from "./game-core.js?v=20261013-5";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
-} from "./word-puzzle-core.js?v=20261013-4";
+} from "./word-puzzle-core.js?v=20261013-5";
 import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261013-4";
+} from "./daily-challenge-core.js?v=20261013-5";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -33,23 +33,24 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261013-4";
+} from "./progression.js?v=20261013-5";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261013-4";
+} from "./account.js?v=20261013-5";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261013-4";
+} from "./community-stats.js?v=20261013-5";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261013-4";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261013-4";
+} from "./leaderboards.js?v=20261013-5";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261013-5";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261013-5";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -76,6 +77,7 @@ const yesterdayCommunityResults = [...document.querySelectorAll("[data-community
 const isLocalDevelopment = isLocalDevelopmentHostname(window.location.hostname);
 const isLocalPreview = isLocalPreviewHostname(window.location.hostname);
 const socialDemoEnabled = isLocalDevelopment && new URLSearchParams(window.location.search).get("socialDemo") === "1";
+const currentBuild = readCurrentBuild();
 const communityStatsApiUrl = resolveCommunityStatsApiUrl({ isLocalDevelopment });
 const leaderboardsApiUrl = resolveLeaderboardsApiUrl({ isLocalDevelopment });
 const streakStorageKey = "the-daily-undead:streak";
@@ -138,6 +140,7 @@ let liveDateKey;
 let activeScreenKey = null;
 let pendingFocusSelector = null;
 let bonusSubmissionPending = false;
+let releaseMonitoringStarted = false;
 let accountController = {
   canSync: false,
   resultSubmissionRequiresSignIn: false,
@@ -147,6 +150,33 @@ let accountController = {
   async recordBonusResult() { return null; },
   async recordWordResult() { return null; },
 };
+
+function preserveProgressBeforeReleaseReload() {
+  if (puzzle && state) saveState();
+}
+
+const releaseMonitor = createReleaseMonitor({
+  currentBuild,
+  currentUrl: window.location.href,
+  beforeReload: preserveProgressBeforeReleaseReload,
+});
+
+function checkForReleaseUpdate({ force = false } = {}) {
+  if (isLocalDevelopment || bonusSubmissionPending) return Promise.resolve(false);
+  return releaseMonitor.check({ force });
+}
+
+function initialiseReleaseMonitoring() {
+  if (releaseMonitoringStarted || isLocalDevelopment) return;
+  releaseMonitoringStarted = true;
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") void checkForReleaseUpdate();
+  });
+  window.addEventListener("pageshow", (event) => {
+    if (event.persisted) void checkForReleaseUpdate({ force: true });
+  });
+  window.setInterval(() => void checkForReleaseUpdate(), 30 * 60 * 1000);
+}
 
 const puzzleTypes = {
   easter: {
@@ -2308,6 +2338,7 @@ function render() {
 async function initialise() {
   try {
     initialiseStatExplainers();
+    if (await checkForReleaseUpdate({ force: true })) return;
     await synchroniseClock();
     await loadData();
     populateProfileDropdowns();
@@ -2372,6 +2403,7 @@ async function initialise() {
     initialiseProgressionUpdate();
     updateNextRoundCountdown();
     window.setInterval(updateNextRoundCountdown, 1000);
+    initialiseReleaseMonitoring();
     if (missedDayState && !missedDayState.resolved) {
       renderMissedDay();
     } else {

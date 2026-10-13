@@ -17,7 +17,7 @@ for (const directory of ["assets", "data", "js"]) {
   await cp(path.join(root, directory), path.join(output, directory), { recursive: true });
 }
 
-for (const filename of ["styles.css", "marketing.css", "staging-demo.css"]) {
+for (const filename of ["styles.css", "marketing.css", "staging-demo.css", "release.json"]) {
   await cp(path.join(root, filename), path.join(output, filename));
 }
 
