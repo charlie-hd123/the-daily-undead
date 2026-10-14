@@ -821,6 +821,7 @@ export async function initialiseAccount({
       clerk,
       signedIn: false,
       openPlayerProfile,
+      openAccountAccess: () => openDialog(accessDialog),
       scheduleSave: remembered
         ? () => persistPendingProgress(remembered.userId, remembered.revision)
         : () => {},
@@ -1371,6 +1372,7 @@ export async function initialiseAccount({
     signedIn: true,
     canSync: true,
     resultSubmissionRequiresSignIn: false,
+    openAccountAccess: () => openDialog(accessDialog),
     requestResultSignIn: showExpiredSession,
     profile,
     scheduleSave,
@@ -1402,12 +1404,14 @@ function createUnavailableController({
   scheduleSave = () => {},
   resultSubmissionRequiresSignIn = false,
   requestResultSignIn = () => {},
+  openAccountAccess = () => {},
 } = {}) {
   return {
     available: Boolean(clerk),
     signedIn,
     canSync: false,
     resultSubmissionRequiresSignIn,
+    openAccountAccess,
     requestResultSignIn,
     profile: null,
     scheduleSave,

@@ -18,7 +18,7 @@ The permanent player stats are **Score** and **Solves**. Puzzle rewards are stil
 
 The game is a dependency-free static site designed to work on GitHub Pages. Players can remain guests with browser-local progress, or optionally sign in with a one-time email code to keep progress across devices. The catalogue contains 320 ordered steps across 38 answer maps from World at War through Black Ops 7. Nine additional maps without full Easter eggs are selectable but excluded from the answer rotation.
 
-Community statistics appear above the footer: unique players today, total puzzles played all-time, and yesterday's separate Last Words and Quest Steps solve rates. Both official and just-for-fun attempts count, while each player contributes only once to the daily player total. A browser-local anonymous ID and per-puzzle database uniqueness constraint prevent refreshes from creating duplicates. The game remains fully playable if the statistics API is unavailable. See [worker/README.md](worker/README.md) for the live configuration, database queries, deployment, and recovery guide.
+Community statistics appear above the footer: unique players today, total puzzles played all-time, and the answer and solve rate for yesterday's official scored puzzle. Both official and just-for-fun attempts still contribute to the underlying totals, while each player contributes only once to the daily player total. A browser-local anonymous ID and per-puzzle database uniqueness constraint prevent refreshes from creating duplicates. The game remains fully playable if the statistics API is unavailable. See [worker/README.md](worker/README.md) for the live configuration, database queries, deployment, and recovery guide.
 
 ## Prepare the daily marketing pack
 

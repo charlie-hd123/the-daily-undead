@@ -107,7 +107,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261014-2"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261014-3"]));
 });
 
 test("the page exposes the same release build as the update manifest", async () => {
@@ -636,10 +636,28 @@ test("the staging daily round is date-assigned and the extra puzzle unlocks afte
   assert.doesNotMatch(app, /Choose your daily puzzle/);
   assert.doesNotMatch(html, /data-demo-puzzle-filter/);
   assert.match(html, /data-yesterday-round-badge/);
-  assert.match(html, /Last Words · Yesterday/);
-  assert.match(html, /Quest Steps · Yesterday/);
-  assert.match(html, /Scored puzzle/);
+  assert.match(html, /Last Words ·<\/span><em data-yesterday-round-badge>Yesterday’s scored puzzle/);
+  assert.match(html, /Quest Steps ·<\/span><em data-yesterday-round-badge>Yesterday’s scored puzzle/);
+  assert.equal((html.match(/data-community-puzzle="(?:word|easter)" hidden/g) || []).length, 2);
+  assert.match(app, /result\.hidden = !official/);
   assert.doesNotMatch(html, /Yesterday’s puzzles|Answer and solve rate|Scored round/);
+});
+
+test("official result actions link signed-out players to accounts and signed-in players to leaderboards", async () => {
+  const [app, account, css, staging] = await Promise.all([
+    readProjectFile("js/app.js"),
+    readProjectFile("js/account.js"),
+    readProjectFile("styles.css"),
+    readProjectFile("js/staging-demo.js"),
+  ]);
+
+  assert.match(app, /accountController\.signedIn[\s\S]*?Save your progress/);
+  assert.match(app, /accountController\.signedIn[\s\S]*?leaderboardsButton\?\.click\(\)[\s\S]*?openAccountAccess/);
+  assert.equal((app.match(/official \? renderResultAccountAction\(\) : ""/g) || []).length, 2);
+  assert.match(account, /signedIn: false,[\s\S]*?openAccountAccess: \(\) => openDialog\(accessDialog\)/);
+  assert.match(css, /\.result-account-button\.is-save-progress \{[\s\S]*?#ffc85c/);
+  assert.match(css, /\.result-account-button\.is-leaderboards \{[\s\S]*?background: linear-gradient\(135deg, #fff, #eef5fb\)/);
+  assert.match(staging, /result-account-action[\s\S]*?is-leaderboards[\s\S]*?Leaderboards/);
 });
 
 test("community statistics are placed near the bottom and contain no frontend credentials", async () => {

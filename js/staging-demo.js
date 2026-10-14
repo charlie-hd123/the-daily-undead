@@ -107,6 +107,7 @@ function updateCommunityDemo() {
   yesterdayWordAnswerLabel.textContent = yesterdayWordPuzzle.entry.answer;
   yesterdayCommunityResults.forEach((result) => {
     const official = result.dataset.communityPuzzle === yesterdayOfficialType;
+    result.hidden = !official;
     result.classList.toggle("is-official", official);
     const badge = result.querySelector("[data-yesterday-round-badge]");
     if (badge) badge.hidden = !official;
@@ -592,6 +593,7 @@ function renderCompletion(type, session, mode) {
       ${resultDetail}
       <div class="actions share-score-actions">
         ${official ? '<button id="share-demo-score" class="button share-score-button" type="button">Share with your squad</button>' : ""}
+        ${official ? '<button id="result-account-action" class="button result-account-button is-leaderboards" type="button">Leaderboards</button>' : ""}
         <button id="return-to-puzzle-home" class="button" type="button">${allPuzzlesCompleted ? "View puzzles" : "Play another puzzle"}</button>
       </div>
       ${official ? '<p id="share-demo-score-status" class="share-score-status" aria-live="polite"></p>' : ""}
@@ -605,6 +607,7 @@ function renderCompletion(type, session, mode) {
   app.querySelector("#share-demo-score")?.addEventListener("click", (event) => {
     shareDemoScore(event.currentTarget, app.querySelector("#share-demo-score-status"), type, session);
   });
+  app.querySelector("#result-account-action")?.addEventListener("click", () => leaderboardsButton.click());
 }
 
 function renderCorrectStepOrder(showTicks = false, correction = false) {

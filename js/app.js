@@ -12,19 +12,19 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261014-2";
+} from "./game-core.js?v=20261014-3";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
-} from "./word-puzzle-core.js?v=20261014-2";
+} from "./word-puzzle-core.js?v=20261014-3";
 import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261014-2";
+} from "./daily-challenge-core.js?v=20261014-3";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -33,24 +33,24 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261014-2";
+} from "./progression.js?v=20261014-3";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261014-2";
+} from "./account.js?v=20261014-3";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261014-2";
+} from "./community-stats.js?v=20261014-3";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261014-2";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261014-2";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261014-2";
+} from "./leaderboards.js?v=20261014-3";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261014-3";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261014-3";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -142,8 +142,10 @@ let pendingFocusSelector = null;
 let bonusSubmissionPending = false;
 let releaseMonitoringStarted = false;
 let accountController = {
+  signedIn: false,
   canSync: false,
   resultSubmissionRequiresSignIn: false,
+  openAccountAccess() {},
   requestResultSignIn() {},
   scheduleSave() {},
   async recordMapResult() { return null; },
@@ -376,6 +378,7 @@ function prepareCommunityStatsDisplay() {
   const yesterdayOfficialType = getOfficialPuzzleType(yesterdayDateKey);
   yesterdayCommunityResults.forEach((result) => {
     const official = result.dataset.communityPuzzle === yesterdayOfficialType;
+    result.hidden = !official;
     result.classList.toggle("is-official", official);
     const badge = result.querySelector("[data-yesterday-round-badge]");
     if (badge) badge.hidden = !official;
@@ -1552,6 +1555,22 @@ function animatePointTotal(element, total) {
   requestAnimationFrame(tick);
 }
 
+function renderResultAccountAction() {
+  return accountController.signedIn
+    ? '<button id="result-account-action" class="button result-account-button is-leaderboards" type="button">Leaderboards</button>'
+    : '<button id="result-account-action" class="button result-account-button is-save-progress" type="button">Save your progress</button>';
+}
+
+function bindResultAccountAction() {
+  app.querySelector("#result-account-action")?.addEventListener("click", () => {
+    if (accountController.signedIn) {
+      leaderboardsButton?.click();
+      return;
+    }
+    accountController.openAccountAccess?.();
+  });
+}
+
 function renderWordResult(session, mode) {
   const official = mode === "official";
   const answer = session.summary?.answer || wordPuzzle.entry.answer;
@@ -1576,6 +1595,7 @@ function renderWordResult(session, mode) {
       </section>
       <div class="actions share-score-actions">
         ${official ? '<button id="share-score" class="button share-score-button" type="button">Share with your squad</button>' : ""}
+        ${official ? renderResultAccountAction() : ""}
         ${isMultiPuzzleLaunchActive() ? `<button id="return-to-puzzle-home" class="button" type="button">${allComplete ? "View puzzles" : "Play another puzzle"}</button>` : ""}
       </div>
       ${official ? '<p id="share-score-status" class="share-score-status" aria-live="polite"></p>' : ""}
@@ -1588,6 +1608,7 @@ function renderWordResult(session, mode) {
   app.querySelector("#share-score")?.addEventListener("click", (event) => {
     shareScore(event.currentTarget, app.querySelector("#share-score-status"));
   });
+  bindResultAccountAction();
   focusAfterRender(`word-result:${session.success ? "correct" : "failed"}`);
 }
 
@@ -2259,6 +2280,7 @@ function renderResult() {
         isFinished
             ? `<div class="actions share-score-actions">
               ${official ? '<button id="share-score" class="button share-score-button" type="button">Share with your squad</button>' : ""}
+              ${official ? renderResultAccountAction() : ""}
               ${isMultiPuzzleLaunchActive() ? `<button id="return-to-puzzle-home" class="button" type="button">${areAllPuzzlesCompleted() ? "View puzzles" : "Play another puzzle"}</button>` : ""}
             </div>
             ${official ? '<p id="share-score-status" class="share-score-status" aria-live="polite"></p>' : ""}`
@@ -2278,6 +2300,7 @@ function renderResult() {
   app.querySelector("#share-score")?.addEventListener("click", (event) => {
     shareScore(event.currentTarget, app.querySelector("#share-score-status"));
   });
+  bindResultAccountAction();
   app.querySelector("#return-to-puzzle-home")?.addEventListener("click", renderHub);
   if (!state.isCorrect || state.bonusComplete || state.bonusFailed) return;
 

@@ -202,7 +202,7 @@
 .community-result-grid {
   display: grid;
   width: 100%;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 0;
 }
 
@@ -218,6 +218,10 @@
   border-radius: 0;
   background: transparent;
   box-shadow: none;
+}
+
+.community-result[hidden] {
+  display: none;
 }
 
 .community-result + .community-result {

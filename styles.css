@@ -2582,10 +2582,36 @@ h1 {
   box-shadow: 0 0.7rem 1.8rem rgb(103 232 255 / 8%);
 }
 
+.result-account-button.is-save-progress {
+  border-color: rgb(255 218 107 / 88%);
+  background: linear-gradient(110deg, #ffe58f 0%, #ffc85c 52%, #ffad54 100%);
+  color: #171006;
+  box-shadow: 0 0.7rem 1.8rem rgb(255 200 92 / 14%), inset 0 1px 0 rgb(255 255 255 / 48%);
+}
+
+.result-account-button.is-leaderboards {
+  border-color: rgb(255 255 255 / 88%);
+  background: linear-gradient(135deg, #fff, #eef5fb);
+  color: #111827;
+  box-shadow: 0 0.7rem 1.8rem rgb(255 255 255 / 10%), inset 0 1px 0 #fff;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .share-score-button:hover {
     border-color: rgb(103 232 255 / 72%);
     background: linear-gradient(120deg, rgb(103 232 255 / 19%), rgb(158 119 255 / 18%));
+  }
+
+  .result-account-button.is-save-progress:hover {
+    border-color: #ffe58f;
+    background: linear-gradient(110deg, #fff1b2 0%, #ffd36f 52%, #ffbb68 100%);
+    box-shadow: 0 0 0 1px rgb(255 229 143 / 30%), 0 0.9rem 2.2rem rgb(255 200 92 / 20%);
+  }
+
+  .result-account-button.is-leaderboards:hover {
+    border-color: #fff;
+    background: #fff;
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 28%), 0 0.9rem 2.2rem rgb(255 255 255 / 14%);
   }
 }
 
