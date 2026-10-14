@@ -12,19 +12,19 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261014-4";
+} from "./game-core.js?v=20261014-5";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
-} from "./word-puzzle-core.js?v=20261014-4";
+} from "./word-puzzle-core.js?v=20261014-5";
 import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261014-4";
+} from "./daily-challenge-core.js?v=20261014-5";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -33,24 +33,24 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261014-4";
+} from "./progression.js?v=20261014-5";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261014-4";
+} from "./account.js?v=20261014-5";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261014-4";
+} from "./community-stats.js?v=20261014-5";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261014-4";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261014-4";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261014-4";
+} from "./leaderboards.js?v=20261014-5";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261014-5";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261014-5";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -1599,8 +1599,8 @@ function renderWordResult(session, mode) {
         <p class="word-result-description">${escapeHtml(session.summary?.description || wordPuzzle.entry.description || "")}</p>
       </section>
       <div class="actions share-score-actions">
-        ${official ? '<button id="share-score" class="button share-score-button" type="button">Share with your squad</button>' : ""}
         ${official ? renderResultAccountAction() : ""}
+        ${official ? '<button id="share-score" class="button share-score-button" type="button">Share with your squad</button>' : ""}
         ${isMultiPuzzleLaunchActive() ? `<button id="return-to-puzzle-home" class="button" type="button">${allComplete ? "View puzzles" : "Play another puzzle"}</button>` : ""}
       </div>
       ${official ? '<p id="share-score-status" class="share-score-status" aria-live="polite"></p>' : ""}
@@ -2288,8 +2288,8 @@ function renderResult() {
       ${
         isFinished
             ? `<div class="actions share-score-actions">
-              ${official ? '<button id="share-score" class="button share-score-button" type="button">Share with your squad</button>' : ""}
               ${official ? renderResultAccountAction() : ""}
+              ${official ? '<button id="share-score" class="button share-score-button" type="button">Share with your squad</button>' : ""}
               ${isMultiPuzzleLaunchActive() ? `<button id="return-to-puzzle-home" class="button" type="button">${areAllPuzzlesCompleted() ? "View puzzles" : "Play another puzzle"}</button>` : ""}
             </div>
             ${official ? '<p id="share-score-status" class="share-score-status" aria-live="polite"></p>' : ""}`

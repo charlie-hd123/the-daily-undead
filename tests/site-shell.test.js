@@ -107,7 +107,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261014-4"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261014-5"]));
 });
 
 test("the page exposes the same release build as the update manifest", async () => {
@@ -654,6 +654,7 @@ test("official result actions link signed-out players to accounts and signed-in 
   assert.match(app, /accountController\.signedIn[\s\S]*?Save your progress/);
   assert.match(app, /accountController\.signedIn[\s\S]*?leaderboardsButton\?\.click\(\)[\s\S]*?openAccountAccess/);
   assert.equal((app.match(/official \? renderResultAccountAction\(\) : ""/g) || []).length, 2);
+  assert.equal((app.match(/renderResultAccountAction\(\)[\s\S]*?id="share-score"/g) || []).length, 2);
   assert.match(account, /signedIn: false,[\s\S]*?openAccountAccess: \(\) => openDialog\(accessDialog\)/);
   assert.match(css, /\.result-account-button\.is-save-progress \{[\s\S]*?border-color: rgb\(247 200 92 \/ 58%\);[\s\S]*?color: #f7c85c/);
   assert.doesNotMatch(css, /\.result-account-button\.is-leaderboards \{/);
