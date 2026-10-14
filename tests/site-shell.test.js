@@ -107,7 +107,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261013-5"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261014-1"]));
 });
 
 test("the page exposes the same release build as the update manifest", async () => {
@@ -145,6 +145,7 @@ test("production Supabase Auth accepts both staging and production OTP lengths",
   );
   assert.doesNotMatch(html, /sb_secret_/);
   assert.match(html, /<span>Verification code<\/span>/);
+  assert.match(html, /<p class="supabase-junk-reminder">CHECK YOUR JUNK FOLDER\.<\/p>/);
   assert.match(html, /pattern="\[0-9\]\{6\}\|\[0-9\]\{8\}"/);
   assert.match(html, /maxlength="8"/);
   assert.match(supabaseAuth, /\^\(\?:\\d\{6\}\|\\d\{8\}\)\$/);

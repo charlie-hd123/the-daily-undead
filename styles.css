@@ -1295,6 +1295,15 @@ h1 {
   margin-top: 1rem;
 }
 
+.supabase-junk-reminder {
+  margin: 1.15rem 0 0;
+  color: #ffc46b;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
 .supabase-auth-dialog .account-error:empty {
   display: none;
 }
