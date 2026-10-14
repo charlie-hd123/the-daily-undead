@@ -107,7 +107,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261014-1"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261014-2"]));
 });
 
 test("the page exposes the same release build as the update manifest", async () => {
@@ -185,6 +185,10 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(account, /label: "Napalm", requiredMaps: 250/);
   assert.match(account, /label: "Blood", requiredMaps: 500/);
   assert.match(account, /label: "Aether", requiredMaps: 1000/);
+  assert.match(account, /submitButton\.textContent = "Finishing setup…"/);
+  assert.match(account, /submitButton\.setAttribute\("aria-busy", "true"\)/);
+  assert.match(account, /submitButton\.textContent = "Finish setup"/);
+  assert.match(account, /submitButton\.removeAttribute\("aria-busy"\)/);
   assert.match(appScript, /initialiseLeaderboards\(\{/);
   assert.match(appScript, /getCurrentUsername: getLeaderboardUsername/);
   assert.match(appScript, /get\("leaderboardUser"\)/);

@@ -6,8 +6,8 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261014-1";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261014-1";
+} from "./account-session.js?v=20261014-2";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261014-2";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -878,6 +878,8 @@ export async function initialiseAccount({
       const username = onboardingForm.elements.username.value.trim();
       const importLocalProgress = onboardingForm.elements.importLocalProgress.checked;
       submitButton.disabled = true;
+      submitButton.textContent = "Finishing setup…";
+      submitButton.setAttribute("aria-busy", "true");
       onboardingError.textContent = "";
 
       try {
@@ -897,6 +899,8 @@ export async function initialiseAccount({
       } catch (error) {
         onboardingError.textContent = error.message;
         submitButton.disabled = false;
+        submitButton.textContent = "Finish setup";
+        submitButton.removeAttribute("aria-busy");
       }
     });
 
