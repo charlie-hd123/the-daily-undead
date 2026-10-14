@@ -107,7 +107,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261014-3"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261014-4"]));
 });
 
 test("the page exposes the same release build as the update manifest", async () => {
@@ -655,9 +655,11 @@ test("official result actions link signed-out players to accounts and signed-in 
   assert.match(app, /accountController\.signedIn[\s\S]*?leaderboardsButton\?\.click\(\)[\s\S]*?openAccountAccess/);
   assert.equal((app.match(/official \? renderResultAccountAction\(\) : ""/g) || []).length, 2);
   assert.match(account, /signedIn: false,[\s\S]*?openAccountAccess: \(\) => openDialog\(accessDialog\)/);
-  assert.match(css, /\.result-account-button\.is-save-progress \{[\s\S]*?#ffc85c/);
-  assert.match(css, /\.result-account-button\.is-leaderboards \{[\s\S]*?background: linear-gradient\(135deg, #fff, #eef5fb\)/);
+  assert.match(css, /\.result-account-button\.is-save-progress \{[\s\S]*?border-color: rgb\(247 200 92 \/ 58%\);[\s\S]*?color: #f7c85c/);
+  assert.doesNotMatch(css, /\.result-account-button\.is-leaderboards \{/);
   assert.match(staging, /result-account-action[\s\S]*?is-leaderboards[\s\S]*?Leaderboards/);
+  assert.equal((app.match(/snapPageToTop\(\);/g) || []).length, 5);
+  assert.equal((staging.match(/snapPageToTop\(\);/g) || []).length, 3);
 });
 
 test("community statistics are placed near the bottom and contain no frontend credentials", async () => {

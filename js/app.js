@@ -12,19 +12,19 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261014-3";
+} from "./game-core.js?v=20261014-4";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
-} from "./word-puzzle-core.js?v=20261014-3";
+} from "./word-puzzle-core.js?v=20261014-4";
 import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261014-3";
+} from "./daily-challenge-core.js?v=20261014-4";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -33,24 +33,24 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261014-3";
+} from "./progression.js?v=20261014-4";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261014-3";
+} from "./account.js?v=20261014-4";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261014-3";
+} from "./community-stats.js?v=20261014-4";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261014-3";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261014-3";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261014-3";
+} from "./leaderboards.js?v=20261014-4";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261014-4";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261014-4";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -1561,8 +1561,13 @@ function renderResultAccountAction() {
     : '<button id="result-account-action" class="button result-account-button is-save-progress" type="button">Save your progress</button>';
 }
 
+function snapPageToTop() {
+  window.scrollTo(0, 0);
+}
+
 function bindResultAccountAction() {
   app.querySelector("#result-account-action")?.addEventListener("click", () => {
+    snapPageToTop();
     if (accountController.signedIn) {
       leaderboardsButton?.click();
       return;
@@ -1604,8 +1609,12 @@ function renderWordResult(session, mode) {
   `;
   updateNextRoundCountdown();
   animatePointTotal(app.querySelector("[data-count-to]"), session.points);
-  app.querySelector("#return-to-puzzle-home")?.addEventListener("click", renderHub);
+  app.querySelector("#return-to-puzzle-home")?.addEventListener("click", () => {
+    renderHub();
+    snapPageToTop();
+  });
   app.querySelector("#share-score")?.addEventListener("click", (event) => {
+    snapPageToTop();
     shareScore(event.currentTarget, app.querySelector("#share-score-status"));
   });
   bindResultAccountAction();
@@ -2298,10 +2307,14 @@ function renderResult() {
   }
   focusAfterRender(`result:${resultAnimationKey}`);
   app.querySelector("#share-score")?.addEventListener("click", (event) => {
+    snapPageToTop();
     shareScore(event.currentTarget, app.querySelector("#share-score-status"));
   });
   bindResultAccountAction();
-  app.querySelector("#return-to-puzzle-home")?.addEventListener("click", renderHub);
+  app.querySelector("#return-to-puzzle-home")?.addEventListener("click", () => {
+    renderHub();
+    snapPageToTop();
+  });
   if (!state.isCorrect || state.bonusComplete || state.bonusFailed) return;
 
   app.querySelectorAll("[data-bonus-step-id]").forEach((button) => {

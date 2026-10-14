@@ -603,11 +603,19 @@ function renderCompletion(type, session, mode) {
   updateCountdown();
   const pointTotal = app.querySelector("[data-count-to]");
   if (pointTotal) animatePointTotal(pointTotal, Number(pointTotal.dataset.countTo));
-  app.querySelector("#return-to-puzzle-home")?.addEventListener("click", renderHub);
+  const snapPageToTop = () => window.scrollTo(0, 0);
+  app.querySelector("#return-to-puzzle-home")?.addEventListener("click", () => {
+    renderHub();
+    snapPageToTop();
+  });
   app.querySelector("#share-demo-score")?.addEventListener("click", (event) => {
+    snapPageToTop();
     shareDemoScore(event.currentTarget, app.querySelector("#share-demo-score-status"), type, session);
   });
-  app.querySelector("#result-account-action")?.addEventListener("click", () => leaderboardsButton.click());
+  app.querySelector("#result-account-action")?.addEventListener("click", () => {
+    snapPageToTop();
+    leaderboardsButton.click();
+  });
 }
 
 function renderCorrectStepOrder(showTicks = false, correction = false) {
