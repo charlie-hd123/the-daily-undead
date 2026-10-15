@@ -140,7 +140,7 @@ function fitClue(context, clue) {
 
 async function drawQuestStepsImage(clue) {
   await document.fonts.load("500 45px Barlow");
-  const template = await loadImage("./assets/marketing-template.jpg?v=20261013-1");
+  const template = await loadImage("./assets/marketing-template.jpg?v=20261015-2");
   const context = canvas.getContext("2d", { alpha: false });
   context.drawImage(template, 0, 0, canvas.width, canvas.height);
   erasePreviousClue(context);
