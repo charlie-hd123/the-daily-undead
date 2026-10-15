@@ -13,6 +13,7 @@ import {
 } from "../js/account-session.js";
 import {
   confirmAccountResultSubmission,
+  requestJson,
   replaySavedAccountResult,
 } from "../js/account.js";
 
@@ -78,6 +79,55 @@ test("expired accounts must sign in before submitting a scored result", () => {
   assert.equal(prompted, 1);
   assert.equal(confirmAccountResultSubmission({ resultSubmissionRequiresSignIn: false }), true);
   assert.equal(confirmAccountResultSubmission(null), true);
+});
+
+test("account API requests time out instead of blocking game startup forever", async () => {
+  const clerk = {
+    session: { getToken: async () => "signed-token" },
+  };
+
+  await assert.rejects(
+    requestJson(
+      clerk,
+      "https://api.example.test",
+      "/api/account",
+      {},
+      {
+        timeoutMs: 5,
+        fetchImpl: async (_url, { signal }) => new Promise((resolve, reject) => {
+          signal.addEventListener("abort", () => {
+            reject(Object.assign(new Error("aborted"), { name: "AbortError" }));
+          }, { once: true });
+        }),
+      },
+    ),
+    /Account sync took too long\. Your cloud save is safe\./,
+  );
+});
+
+test("account API requests retain authentication and parse successful responses", async () => {
+  let request;
+  const result = await requestJson(
+    { session: { getToken: async () => "signed-token" } },
+    "https://api.example.test",
+    "/api/account?date=2026-10-15",
+    {},
+    {
+      timeoutMs: 50,
+      fetchImpl: async (url, options) => {
+        request = { url, options };
+        return {
+          ok: true,
+          async json() { return { profile: { username: "Takeo" } }; },
+        };
+      },
+    },
+  );
+
+  assert.equal(request.url.href, "https://api.example.test/api/account?date=2026-10-15");
+  assert.equal(request.options.headers.Authorization, "Bearer signed-token");
+  assert.equal(request.options.signal.aborted, false);
+  assert.deepEqual(result, { profile: { username: "Takeo" } });
 });
 
 test("saved map and bonus results replay sequentially and return current server totals", async () => {

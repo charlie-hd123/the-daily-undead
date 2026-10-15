@@ -107,7 +107,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261014-5"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261015-1"]));
 });
 
 test("the page exposes the same release build as the update manifest", async () => {
@@ -307,7 +307,7 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(html, /id="account-sign-out-dialog"/);
   assert.match(account, /action === "profile"[\s\S]*?openDialog\(accountDetailsDialog\)/);
   assert.match(account, /action === "security"[\s\S]*?openDialog\(accountSecurityDialog\)/);
-  assert.match(account, /action === "sign-out"[\s\S]*?openDialog\(accountSignOutDialog\)/);
+  assert.match(account, /action === "sign-out"[\s\S]*?openSignOutDialog\(\)/);
   assert.match(
     html,
     /data-account-action="game-profile"[\s\S]*?data-account-action="username"[\s\S]*?data-account-action="profile"[\s\S]*?data-account-action="security"[\s\S]*?data-account-action="sign-out"/,

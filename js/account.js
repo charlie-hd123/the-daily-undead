@@ -308,19 +308,39 @@ async function loadClerk(publishableKey) {
   return globalThis.Clerk;
 }
 
-async function requestJson(clerk, apiUrl, path, options = {}) {
+export async function requestJson(
+  clerk,
+  apiUrl,
+  path,
+  options = {},
+  { fetchImpl = globalThis.fetch, timeoutMs = 8_000 } = {},
+) {
   const token = await clerk.session?.getToken();
   if (!token) throw new Error("Please sign in again.");
 
-  const response = await fetch(new URL(path, apiUrl), {
-    ...options,
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${token}`,
-      ...options.headers,
-    },
-  });
-  const result = await response.json().catch(() => ({}));
+  const controller = new AbortController();
+  const timeout = globalThis.setTimeout(() => controller.abort(), timeoutMs);
+  let response;
+  let result;
+  try {
+    response = await fetchImpl(new URL(path, apiUrl), {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${token}`,
+        ...options.headers,
+      },
+    });
+    result = await response.json().catch(() => ({}));
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error("Account sync took too long. Your cloud save is safe.");
+    }
+    throw error;
+  } finally {
+    globalThis.clearTimeout(timeout);
+  }
   if (!response.ok) {
     const error = new Error(result.error || `Account request failed (${response.status}).`);
     error.status = response.status;
@@ -766,6 +786,14 @@ export async function initialiseAccount({
     if (signedOutMemory) rememberAccount(globalThis.localStorage, signedOutMemory);
     signedOutMemory = null;
   };
+  const openSignOutDialog = () => {
+    if (signOutError) signOutError.textContent = "";
+    if (signOutButton) {
+      signOutButton.disabled = false;
+      signOutButton.textContent = "Sign out";
+    }
+    openDialog(accountSignOutDialog);
+  };
   const waitForConflictChoice = () => new Promise((resolve) => {
     const choose = (choice) => {
       closeDialog(conflictDialog);
@@ -784,6 +812,26 @@ export async function initialiseAccount({
 
   documentObject.querySelectorAll("[data-close-account-dialog]").forEach((button) => {
     button.addEventListener("click", () => closeDialog(button.closest("dialog")));
+  });
+  documentObject.querySelector("[data-cancel-sign-out]")?.addEventListener(
+    "click",
+    () => closeDialog(accountSignOutDialog),
+  );
+  signOutButton?.addEventListener("click", async () => {
+    signOutButton.disabled = true;
+    signOutButton.textContent = "Signing out…";
+    if (signOutError) signOutError.textContent = "";
+    try {
+      beforeSignOut();
+      await clerk.signOut({
+        redirectUrl: `${window.location.origin}${window.location.pathname}`,
+      });
+    } catch {
+      afterSignOutFailure();
+      signOutButton.disabled = false;
+      signOutButton.textContent = "Sign out";
+      if (signOutError) signOutError.textContent = "Could not sign out. Please try again.";
+    }
   });
   documentObject.querySelector("#account-create")?.addEventListener("click", () => {
     closeDialog(accessDialog);
@@ -854,9 +902,7 @@ export async function initialiseAccount({
     const remembered = rememberedAccount();
     accountButton.disabled = false;
     accountButton.textContent = "Account sync offline";
-    accountButton.addEventListener("click", () =>
-      clerk.openUserProfile(createUserProfileOptions(clerk, { beforeSignOut, afterSignOutFailure })),
-    );
+    accountButton.addEventListener("click", openSignOutDialog);
     return createUnavailableController({
       clerk,
       signedIn: true,
@@ -1221,27 +1267,6 @@ export async function initialiseAccount({
     "click",
     () => openClerkPage("security"),
   );
-  documentObject.querySelector("[data-cancel-sign-out]")?.addEventListener(
-    "click",
-    () => closeDialog(accountSignOutDialog),
-  );
-  signOutButton?.addEventListener("click", async () => {
-    signOutButton.disabled = true;
-    signOutButton.textContent = "Signing out…";
-    if (signOutError) signOutError.textContent = "";
-    try {
-      beforeSignOut();
-      await clerk.signOut({
-        redirectUrl: `${window.location.origin}${window.location.pathname}`,
-      });
-    } catch {
-      afterSignOutFailure();
-      signOutButton.disabled = false;
-      signOutButton.textContent = "Sign out";
-      if (signOutError) signOutError.textContent = "Could not sign out. Please try again.";
-    }
-  });
-
   accountMenuDialog?.addEventListener("click", (event) => {
     const action = event.target.closest("[data-account-action]")?.dataset.accountAction;
     if (!action) return;
@@ -1263,12 +1288,7 @@ export async function initialiseAccount({
       if (email) email.textContent = primaryEmail();
       openDialog(accountSecurityDialog);
     } else if (action === "sign-out") {
-      if (signOutError) signOutError.textContent = "";
-      if (signOutButton) {
-        signOutButton.disabled = false;
-        signOutButton.textContent = "Sign out";
-      }
-      openDialog(accountSignOutDialog);
+      openSignOutDialog();
     }
   });
 
