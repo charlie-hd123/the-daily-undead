@@ -108,7 +108,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261015-2"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261015-3"]));
 });
 
 test("the page exposes the same release build as the update manifest", async () => {
@@ -644,7 +644,7 @@ test("the staging daily round is date-assigned and the extra puzzle unlocks afte
   assert.doesNotMatch(html, /Yesterday’s puzzles|Answer and solve rate|Scored round/);
 });
 
-test("official result actions link signed-out players to accounts and signed-in players to leaderboards", async () => {
+test("official result actions link signed-out players to accounts and omit the action when signed in", async () => {
   const [app, account, css, staging] = await Promise.all([
     readProjectFile("js/app.js"),
     readProjectFile("js/account.js"),
@@ -652,16 +652,17 @@ test("official result actions link signed-out players to accounts and signed-in 
     readProjectFile("js/staging-demo.js"),
   ]);
 
-  assert.match(app, /accountController\.signedIn[\s\S]*?Save your progress/);
-  assert.match(app, /accountController\.signedIn[\s\S]*?leaderboardsButton\?\.click\(\)[\s\S]*?openAccountAccess/);
+  assert.match(app, /accountController\.signedIn\s*\? ""\s*: '[^']*Save your progress/);
+  assert.doesNotMatch(app, /result-account-action[^\n]*Leaderboards/);
+  assert.doesNotMatch(app, /leaderboardsButton\?\.click\(\)/);
   assert.equal((app.match(/official \? renderResultAccountAction\(\) : ""/g) || []).length, 2);
   assert.equal((app.match(/renderResultAccountAction\(\)[\s\S]*?id="share-score"/g) || []).length, 2);
   assert.match(account, /signedIn: false,[\s\S]*?openAccountAccess: \(\) => openDialog\(accessDialog\)/);
   assert.match(css, /\.result-account-button\.is-save-progress \{[\s\S]*?border-color: rgb\(247 200 92 \/ 58%\);[\s\S]*?color: #f7c85c/);
   assert.doesNotMatch(css, /\.result-account-button\.is-leaderboards \{/);
-  assert.match(staging, /result-account-action[\s\S]*?is-leaderboards[\s\S]*?Leaderboards/);
+  assert.doesNotMatch(staging, /result-account-action|is-leaderboards/);
   assert.equal((app.match(/snapPageToTop\(\);/g) || []).length, 5);
-  assert.equal((staging.match(/snapPageToTop\(\);/g) || []).length, 3);
+  assert.equal((staging.match(/snapPageToTop\(\);/g) || []).length, 2);
 });
 
 test("community statistics are placed near the bottom and contain no frontend credentials", async () => {

@@ -12,19 +12,19 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261015-2";
+} from "./game-core.js?v=20261015-3";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
-} from "./word-puzzle-core.js?v=20261015-2";
+} from "./word-puzzle-core.js?v=20261015-3";
 import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261015-2";
+} from "./daily-challenge-core.js?v=20261015-3";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -33,25 +33,25 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261015-2";
+} from "./progression.js?v=20261015-3";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261015-2";
+} from "./account.js?v=20261015-3";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261015-2";
+} from "./community-stats.js?v=20261015-3";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261015-2";
-import { fetchWithTimeout } from "./network.js?v=20261015-2";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261015-2";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261015-2";
+} from "./leaderboards.js?v=20261015-3";
+import { fetchWithTimeout } from "./network.js?v=20261015-3";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261015-3";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261015-3";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -1564,7 +1564,7 @@ function animatePointTotal(element, total) {
 
 function renderResultAccountAction() {
   return accountController.signedIn
-    ? '<button id="result-account-action" class="button result-account-button is-leaderboards" type="button">Leaderboards</button>'
+    ? ""
     : '<button id="result-account-action" class="button result-account-button is-save-progress" type="button">Save your progress</button>';
 }
 
@@ -1575,10 +1575,6 @@ function snapPageToTop() {
 function bindResultAccountAction() {
   app.querySelector("#result-account-action")?.addEventListener("click", () => {
     snapPageToTop();
-    if (accountController.signedIn) {
-      leaderboardsButton?.click();
-      return;
-    }
     accountController.openAccountAccess?.();
   });
 }

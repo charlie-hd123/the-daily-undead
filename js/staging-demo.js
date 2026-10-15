@@ -592,7 +592,6 @@ function renderCompletion(type, session, mode) {
       </div>
       ${resultDetail}
       <div class="actions share-score-actions">
-        ${official ? '<button id="result-account-action" class="button result-account-button is-leaderboards" type="button">Leaderboards</button>' : ""}
         ${official ? '<button id="share-demo-score" class="button share-score-button" type="button">Share with your squad</button>' : ""}
         <button id="return-to-puzzle-home" class="button" type="button">${allPuzzlesCompleted ? "View puzzles" : "Play another puzzle"}</button>
       </div>
@@ -611,10 +610,6 @@ function renderCompletion(type, session, mode) {
   app.querySelector("#share-demo-score")?.addEventListener("click", (event) => {
     snapPageToTop();
     shareDemoScore(event.currentTarget, app.querySelector("#share-demo-score-status"), type, session);
-  });
-  app.querySelector("#result-account-action")?.addEventListener("click", () => {
-    snapPageToTop();
-    leaderboardsButton.click();
   });
 }
 
