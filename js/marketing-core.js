@@ -68,14 +68,11 @@ export function buildMarketingCopy({
   const cleanClue = clue.trim();
   const cleanAnswer = yesterdayAnswer.trim();
   const cleanYesterdayPuzzleName = String(yesterdayPuzzleName || "Quest Steps").trim();
-  const redditTitle = `Can you solve today’s Quest Steps puzzle? — ${formatDiscordDate(dateKey)}`;
+  const redditTitle = `Which Zombies map is it? — ${formatDiscordDate(dateKey)}`;
   const redditBody = [
-    `Yesterday’s ${cleanYesterdayPuzzleName} answer: ${cleanAnswer} 🧟`,
-    `Yesterday’s ${cleanYesterdayPuzzleName} solve rate: ${solved} 🔎`,
-    `First correct ${cleanYesterdayPuzzleName} Redditors: u/____, u/____, u/____ 👏`,
-    "",
-    "Today’s Quest Steps clue:",
-    cleanClue,
+    `Yesterday’s answer: ${cleanAnswer} 🧟`,
+    `Yesterday’s solve rate: ${solved} 🔎`,
+    "First correct here: u/____, u/____, u/____ 👏",
     "",
     "Which Treyarch Zombies map is it from?",
     "",
@@ -85,16 +82,15 @@ export function buildMarketingCopy({
   ].join("\n");
   const discordBody = [
     `🧟 The Daily Undead · ${formatDiscordDate(dateKey)}`,
-    `Yesterday’s ${cleanYesterdayPuzzleName} answer: ${cleanAnswer} 🧟`,
-    `Yesterday’s ${cleanYesterdayPuzzleName} solve rate: ${solved} 🔎`,
+    `Yesterday’s answer: ${cleanAnswer} 🧟`,
+    `Yesterday’s solve rate: ${solved} 🔎`,
     `First correct ${cleanYesterdayPuzzleName} guesses here: @____, @____, @____ 👏`,
     "",
-    "Today’s Quest Steps clue:",
-    cleanClue,
-    "",
-    "**Think you know the map?** Drop your guess below 👇",
+    "**Think you know the map?**",
+    "Drop your guess below 👇",
     "",
     "Need another clue, or want to lock in your answer on The Daily Undead website?",
+    "",
     "🔗 <https://thedailyundead.com/>",
   ].join("\n");
 
@@ -143,18 +139,13 @@ export function buildWordMarketingCopy({
     ? `${solvePercentage}%`
     : "—%";
   const pattern = buildWordPattern(answer, initialLetters);
-  const cleanCategory = category.trim();
   const cleanAnswer = yesterdayAnswer.trim();
   const cleanYesterdayPuzzleName = String(yesterdayPuzzleName || "Quest Steps").trim();
-  const redditTitle = `Can you solve today’s Last Words puzzle? — ${formatDiscordDate(dateKey)}`;
+  const redditTitle = `Which Zombies word is it? — ${formatDiscordDate(dateKey)}`;
   const redditBody = [
-    `Yesterday’s ${cleanYesterdayPuzzleName} answer: ${cleanAnswer} 🧟`,
-    `Yesterday’s ${cleanYesterdayPuzzleName} solve rate: ${solved} 🔎`,
-    `First correct ${cleanYesterdayPuzzleName} Redditors: u/____, u/____, u/____ 👏`,
-    "",
-    "Today’s Last Words puzzle:",
-    pattern,
-    `Hint: ${cleanCategory}`,
+    `Yesterday’s answer: ${cleanAnswer} 🧟`,
+    `Yesterday’s solve rate: ${solved} 🔎`,
+    "First correct here: u/____, u/____, u/____ 👏",
     "",
     "Which Zombies word or phrase is it?",
     "",
@@ -164,17 +155,15 @@ export function buildWordMarketingCopy({
   ].join("\n");
   const discordBody = [
     `🧟 The Daily Undead · ${formatDiscordDate(dateKey)}`,
-    `Yesterday’s ${cleanYesterdayPuzzleName} answer: ${cleanAnswer} 🧟`,
-    `Yesterday’s ${cleanYesterdayPuzzleName} solve rate: ${solved} 🔎`,
+    `Yesterday’s answer: ${cleanAnswer} 🧟`,
+    `Yesterday’s solve rate: ${solved} 🔎`,
     `First correct ${cleanYesterdayPuzzleName} guesses here: @____, @____, @____ 👏`,
     "",
-    "Today’s Last Words puzzle:",
-    pattern,
-    `Hint: ${cleanCategory}`,
-    "",
-    "**Think you know the word or phrase?** Drop your guess below 👇",
+    "**Think you know the word or phrase?**",
+    "Drop your guess below 👇",
     "",
     "Want to reveal another letter or lock in your answer on The Daily Undead website?",
+    "",
     "🔗 <https://thedailyundead.com/>",
   ].join("\n");
 

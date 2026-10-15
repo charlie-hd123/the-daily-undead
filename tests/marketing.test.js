@@ -33,15 +33,34 @@ test("marketing copy fills daily data but leaves usernames blank", () => {
     solvePercentage: 67,
   });
 
-  assert.equal(copy.redditTitle, "Can you solve today’s Quest Steps puzzle? — 10 Sept");
-  assert.match(copy.redditBody, /Yesterday’s Last Words answer: Juggernog 🧟/);
-  assert.match(copy.redditBody, /Yesterday’s Last Words solve rate: 67% 🔎/);
-  assert.match(copy.redditBody, /First correct Last Words Redditors:/);
-  assert.match(copy.redditBody, /u\/____, u\/____, u\/____/);
-  assert.match(copy.redditBody, /Today’s Quest Steps clue:\nDefeat the boss/);
-  assert.doesNotMatch(copy.redditBody, /\*Defeat the boss/);
-  assert.match(copy.discordBody, /🧟 The Daily Undead · 10 Sept/);
-  assert.match(copy.discordBody, /First correct Last Words guesses here:/);
+  assert.equal(copy.redditTitle, "Which Zombies map is it? — 10 Sept");
+  assert.equal(copy.redditBody, [
+    "Yesterday’s answer: Juggernog 🧟",
+    "Yesterday’s solve rate: 67% 🔎",
+    "First correct here: u/____, u/____, u/____ 👏",
+    "",
+    "Which Treyarch Zombies map is it from?",
+    "",
+    "Try to get it before reading the comments 👀",
+    "",
+    "Drop your guess below.",
+  ].join("\n"));
+  assert.doesNotMatch(copy.redditBody, /Today’s Quest Steps clue|Defeat the boss/);
+  assert.match(copy.redditBody, /Which Treyarch Zombies map is it from\?/);
+  assert.equal(copy.discordBody, [
+    "🧟 The Daily Undead · 10 Sept",
+    "Yesterday’s answer: Juggernog 🧟",
+    "Yesterday’s solve rate: 67% 🔎",
+    "First correct Last Words guesses here: @____, @____, @____ 👏",
+    "",
+    "**Think you know the map?**",
+    "Drop your guess below 👇",
+    "",
+    "Need another clue, or want to lock in your answer on The Daily Undead website?",
+    "",
+    "🔗 <https://thedailyundead.com/>",
+  ].join("\n"));
+  assert.doesNotMatch(copy.discordBody, /Today’s Quest Steps clue|Defeat the boss/);
   assert.match(copy.discordBody, /The Daily Undead website/);
   assert.match(copy.discordBody, /@____, @____, @____/);
   assert.match(copy.discordBody, /🔗 <https:\/\/thedailyundead\.com\/>$/);
@@ -70,19 +89,42 @@ test("Last Words marketing copy reveals only the daily starting letters", () => 
   assert.equal(buildWordPattern("Pack-a-Punch", ["A", "P"]), "PA__-A-P____");
 
   const copy = buildWordMarketingCopy({
-    dateKey: "2026-10-13",
+    dateKey: "2026-10-15",
     answer: "Edward Richtofen",
     initialLetters: ["C", "O"],
     category: "Character",
-    yesterdayAnswer: "Der Riese / The Giant",
-    solvePercentage: 72,
+    yesterdayAnswer: "Call of the Dead",
+    solvePercentage: 76,
   });
 
-  assert.equal(copy.redditTitle, "Can you solve today’s Last Words puzzle? — 13 Oct");
+  assert.equal(copy.redditTitle, "Which Zombies word is it? — 15 Oct");
   assert.equal(copy.pattern, "______ __C__O___");
-  assert.match(copy.redditBody, /Today’s Last Words puzzle:\n______ __C__O___\nHint: Character/);
-  assert.match(copy.redditBody, /Yesterday’s Quest Steps answer: Der Riese \/ The Giant/);
-  assert.match(copy.discordBody, /Think you know the word or phrase/);
+  assert.equal(copy.redditBody, [
+    "Yesterday’s answer: Call of the Dead 🧟",
+    "Yesterday’s solve rate: 76% 🔎",
+    "First correct here: u/____, u/____, u/____ 👏",
+    "",
+    "Which Zombies word or phrase is it?",
+    "",
+    "Try to get it before reading the comments 👀",
+    "",
+    "Drop your guess below.",
+  ].join("\n"));
+  assert.doesNotMatch(copy.redditBody, /Today’s Last Words puzzle|Hint: Character|______ __C__O___/);
+  assert.equal(copy.discordBody, [
+    "🧟 The Daily Undead · 15 Oct",
+    "Yesterday’s answer: Call of the Dead 🧟",
+    "Yesterday’s solve rate: 76% 🔎",
+    "First correct Quest Steps guesses here: @____, @____, @____ 👏",
+    "",
+    "**Think you know the word or phrase?**",
+    "Drop your guess below 👇",
+    "",
+    "Want to reveal another letter or lock in your answer on The Daily Undead website?",
+    "",
+    "🔗 <https://thedailyundead.com/>",
+  ].join("\n"));
+  assert.doesNotMatch(copy.discordBody, /Today’s Last Words puzzle|Hint: Character|______ __C__O___/);
   assert.doesNotMatch(copy.redditBody, /Edward Richtofen/);
   assert.doesNotMatch(copy.discordBody, /Edward Richtofen/);
 });

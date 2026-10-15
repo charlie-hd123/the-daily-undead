@@ -13,7 +13,7 @@ import {
   getDailyPostNumber,
   getPreviousDateKey,
   isAppleMobileDevice,
-} from "./marketing-core.js?v=20261013-3";
+} from "./marketing-core.js?v=20261015-1";
 
 const pack = document.querySelector("#marketing-pack");
 const packDate = document.querySelector("#pack-date");
