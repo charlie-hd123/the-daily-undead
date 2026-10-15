@@ -83,3 +83,15 @@ test("the release monitor does not reload a matching build or repeat an attempte
   assert.equal(await guardedMonitor.check({ force: true }), false);
   assert.equal(replacements, 0);
 });
+
+test("the release monitor fails open when the update request stalls", async () => {
+  const monitor = createReleaseMonitor({
+    currentBuild: "20261015-1",
+    currentUrl: "https://thedailyundead.com/",
+    timeoutMs: 5,
+    fetchImpl: async () => new Promise(() => {}),
+    locationObject: { replace() { throw new Error("must not reload"); } },
+  });
+
+  assert.equal(await monitor.check({ force: true }), false);
+});

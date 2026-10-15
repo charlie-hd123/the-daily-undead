@@ -12,19 +12,19 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261015-1";
+} from "./game-core.js?v=20261015-2";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
-} from "./word-puzzle-core.js?v=20261015-1";
+} from "./word-puzzle-core.js?v=20261015-2";
 import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261015-1";
+} from "./daily-challenge-core.js?v=20261015-2";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -33,24 +33,25 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261015-1";
+} from "./progression.js?v=20261015-2";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261015-1";
+} from "./account.js?v=20261015-2";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261015-1";
+} from "./community-stats.js?v=20261015-2";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261015-1";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261015-1";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261015-1";
+} from "./leaderboards.js?v=20261015-2";
+import { fetchWithTimeout } from "./network.js?v=20261015-2";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261015-2";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261015-2";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -264,10 +265,10 @@ async function synchroniseClock() {
   const requestStarted = Date.now();
 
   try {
-    const response = await fetch(`./index.html?clock=${requestStarted}`, {
-      method: "HEAD",
-      cache: "no-store",
-    });
+    const response = await fetchWithTimeout(
+      `./index.html?clock=${requestStarted}`,
+      { method: "HEAD", cache: "no-store" },
+    );
     const serverTime = Date.parse(response.headers.get("Date"));
     if (!response.ok || Number.isNaN(serverTime)) return;
 
@@ -493,8 +494,8 @@ function validateMap(map, source) {
 
 async function loadData() {
   const [indexResponse, wordResponse] = await Promise.all([
-    fetch("./data/maps/index.json", { cache: "no-store" }),
-    fetch("./data/word-puzzle-demo.json", { cache: "no-store" }),
+    fetchWithTimeout("./data/maps/index.json", { cache: "no-store" }, { timeoutMs: 8_000 }),
+    fetchWithTimeout("./data/word-puzzle-demo.json", { cache: "no-store" }, { timeoutMs: 8_000 }),
   ]);
   if (!indexResponse.ok || !wordResponse.ok) {
     throw new Error("Could not load the puzzle catalogues.");
@@ -514,7 +515,11 @@ async function loadData() {
 
   const responses = await Promise.all(
     catalog.maps.map(async (filename) => {
-      const response = await fetch(`./data/maps/${filename}`, { cache: "no-store" });
+      const response = await fetchWithTimeout(
+        `./data/maps/${filename}`,
+        { cache: "no-store" },
+        { timeoutMs: 8_000 },
+      );
       if (!response.ok) {
         throw new Error(`Could not load ${filename}.`);
       }
@@ -937,7 +942,9 @@ async function loadProtectedDates(fromDateKey, toDateKey) {
     const url = new URL("/api/game-dates", leaderboardsApiUrl);
     url.searchParams.set("from", fromDateKey);
     url.searchParams.set("to", toDateKey);
-    const response = await fetch(url, { headers: { Accept: "application/json" } });
+    const response = await fetchWithTimeout(url, {
+      headers: { Accept: "application/json" },
+    });
     if (!response.ok) return [];
     const result = await response.json();
     return (result.protectedDates || []).map((entry) => entry.date).filter(isValidDateKey);

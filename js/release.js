@@ -1,3 +1,5 @@
+import { fetchWithTimeout } from "./network.js?v=20261015-2";
+
 const buildVersionPattern = /^\d{8}-\d+$/;
 
 export const RELEASE_CHECK_INTERVAL_MS = 30 * 60 * 1000;
@@ -30,6 +32,7 @@ export function createReleaseMonitor({
   beforeReload = () => {},
   now = () => Date.now(),
   intervalMs = RELEASE_CHECK_INTERVAL_MS,
+  timeoutMs = 5_000,
 } = {}) {
   let lastCheckedAt = 0;
   let pendingCheck = null;
@@ -44,10 +47,14 @@ export function createReleaseMonitor({
       try {
         const manifestUrl = new URL("./release.json", currentUrl);
         manifestUrl.searchParams.set("check", String(checkedAt));
-        const response = await fetchImpl(manifestUrl.href, {
-          cache: "no-store",
-          headers: { Accept: "application/json" },
-        });
+        const response = await fetchWithTimeout(
+          manifestUrl.href,
+          {
+            cache: "no-store",
+            headers: { Accept: "application/json" },
+          },
+          { fetchImpl, timeoutMs },
+        );
         if (!response.ok) return false;
 
         const nextBuild = normalizeBuildVersion((await response.json())?.build);

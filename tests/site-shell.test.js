@@ -83,6 +83,7 @@ test("the page's local release assets exist", async () => {
     "js/community-stats.js",
     "js/game-core.js",
     "js/leaderboards.js",
+    "js/network.js",
     "js/progression.js",
     "js/release.js",
     "js/social-demo.js",
@@ -107,7 +108,7 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261015-1"]));
+  assert.deepEqual(new Set(versionTokens), new Set(["20261015-2"]));
 });
 
 test("the page exposes the same release build as the update manifest", async () => {
