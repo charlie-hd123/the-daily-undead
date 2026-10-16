@@ -67,7 +67,6 @@ export function buildMarketingCopy({
     : "—%";
   const cleanClue = clue.trim();
   const cleanAnswer = yesterdayAnswer.trim();
-  const cleanYesterdayPuzzleName = String(yesterdayPuzzleName || "Quest Steps").trim();
   const redditTitle = `Which Zombies map is it? — ${formatDiscordDate(dateKey)}`;
   const redditBody = [
     `Yesterday’s answer: ${cleanAnswer} 🧟`,
@@ -79,13 +78,13 @@ export function buildMarketingCopy({
     "",
     "Try to get it before reading the comments 👀",
     "",
-    "Drop your guess below. 👇",
+    "Drop your guess below👇",
   ].join("\n");
   const discordBody = [
     `🧟 __The Daily Undead · ${formatDiscordDate(dateKey)}__`,
     `Yesterday’s answer: ${cleanAnswer} 🧟`,
     `Yesterday’s solve rate: ${solved} 🔎`,
-    `First correct ${cleanYesterdayPuzzleName} guesses here: @____, @____, @____ 👏`,
+    "First correct here: @____, @____, @____ 👏",
     "",
     "Today’s puzzle:",
     "**Think you know the map?**",

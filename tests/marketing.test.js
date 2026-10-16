@@ -44,7 +44,7 @@ test("marketing copy fills daily data but leaves usernames blank", () => {
     "",
     "Try to get it before reading the comments 👀",
     "",
-    "Drop your guess below. 👇",
+    "Drop your guess below👇",
   ].join("\n"));
   assert.doesNotMatch(copy.redditBody, /Today’s Quest Steps clue|Defeat the boss/);
   assert.match(copy.redditBody, /Which Treyarch Zombies map is it\?/);
@@ -52,7 +52,7 @@ test("marketing copy fills daily data but leaves usernames blank", () => {
     "🧟 __The Daily Undead · 10 Sept__",
     "Yesterday’s answer: Juggernog 🧟",
     "Yesterday’s solve rate: 67% 🔎",
-    "First correct Last Words guesses here: @____, @____, @____ 👏",
+    "First correct here: @____, @____, @____ 👏",
     "",
     "Today’s puzzle:",
     "**Think you know the map?**",
