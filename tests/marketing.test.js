@@ -55,7 +55,7 @@ test("marketing copy fills daily data but leaves usernames blank", () => {
     "First correct here: @____, @____, @____ 👏",
     "",
     "Today’s puzzle:",
-    "**Think you know the map?**",
+    "**Which Zombies map is it?**",
     "",
     "Drop your guess below 👇",
     "",
