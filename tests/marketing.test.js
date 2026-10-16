@@ -122,7 +122,7 @@ test("Last Words marketing copy reveals only the daily starting letters", () => 
     "First correct here: @____, @____, @____ 👏",
     "",
     "Today’s puzzle:",
-    "**Think you know the word or phrase?**",
+    "**Which Zombies word or phrase is it?**",
     "",
     "Drop your guess below 👇",
     "",

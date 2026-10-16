@@ -162,7 +162,7 @@ export function buildWordMarketingCopy({
     "First correct here: @____, @____, @____ 👏",
     "",
     "Today’s puzzle:",
-    "**Think you know the word or phrase?**",
+    "**Which Zombies word or phrase is it?**",
     "",
     "Drop your guess below 👇",
     "",
