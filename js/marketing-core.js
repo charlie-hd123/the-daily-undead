@@ -87,7 +87,7 @@ export function buildMarketingCopy({
     "First correct here: @____, @____, @____ 👏",
     "",
     "Today’s puzzle:",
-    "**Which Zombies map is it?**",
+    "**Which Treyarch Zombies map is it?**",
     "",
     "Drop your guess below 👇",
     "",
