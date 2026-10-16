@@ -39,29 +39,32 @@ test("marketing copy fills daily data but leaves usernames blank", () => {
     "Yesterday’s solve rate: 67% 🔎",
     "First correct here: u/____, u/____, u/____ 👏",
     "",
-    "Which Treyarch Zombies map is it from?",
+    "Today’s puzzle:",
+    "Which Treyarch Zombies map is it?",
     "",
     "Try to get it before reading the comments 👀",
     "",
-    "Drop your guess below.",
+    "Drop your guess below. 👇",
   ].join("\n"));
   assert.doesNotMatch(copy.redditBody, /Today’s Quest Steps clue|Defeat the boss/);
-  assert.match(copy.redditBody, /Which Treyarch Zombies map is it from\?/);
+  assert.match(copy.redditBody, /Which Treyarch Zombies map is it\?/);
   assert.equal(copy.discordBody, [
-    "🧟 The Daily Undead · 10 Sept",
+    "🧟 __The Daily Undead · 10 Sept__",
     "Yesterday’s answer: Juggernog 🧟",
     "Yesterday’s solve rate: 67% 🔎",
     "First correct Last Words guesses here: @____, @____, @____ 👏",
     "",
+    "Today’s puzzle:",
     "**Think you know the map?**",
+    "",
     "Drop your guess below 👇",
     "",
-    "Need another clue, or want to lock in your answer on The Daily Undead website?",
+    "Need another clue, or want to lock in your answer on the website?",
     "",
     "🔗 <https://thedailyundead.com/>",
   ].join("\n"));
   assert.doesNotMatch(copy.discordBody, /Today’s Quest Steps clue|Defeat the boss/);
-  assert.match(copy.discordBody, /The Daily Undead website/);
+  assert.match(copy.discordBody, /on the website\?/);
   assert.match(copy.discordBody, /@____, @____, @____/);
   assert.match(copy.discordBody, /🔗 <https:\/\/thedailyundead\.com\/>$/);
   assert.doesNotMatch(copy.discordBody, /in-app browser|rounds, points and progress/);
