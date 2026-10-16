@@ -92,38 +92,41 @@ test("Last Words marketing copy reveals only the daily starting letters", () => 
   assert.equal(buildWordPattern("Pack-a-Punch", ["A", "P"]), "PA__-A-P____");
 
   const copy = buildWordMarketingCopy({
-    dateKey: "2026-10-15",
+    dateKey: "2026-10-17",
     answer: "Edward Richtofen",
     initialLetters: ["C", "O"],
     category: "Character",
-    yesterdayAnswer: "Call of the Dead",
+    yesterdayAnswer: "Tag der Toten",
     solvePercentage: 76,
   });
 
-  assert.equal(copy.redditTitle, "Which Zombies word is it? — 15 Oct");
+  assert.equal(copy.redditTitle, "Which Zombies word is it? — 17 Oct");
   assert.equal(copy.pattern, "______ __C__O___");
   assert.equal(copy.redditBody, [
-    "Yesterday’s answer: Call of the Dead 🧟",
+    "Yesterday’s answer: Tag der Toten 🧟",
     "Yesterday’s solve rate: 76% 🔎",
     "First correct here: u/____, u/____, u/____ 👏",
     "",
+    "Today’s puzzle:",
     "Which Zombies word or phrase is it?",
     "",
     "Try to get it before reading the comments 👀",
     "",
-    "Drop your guess below.",
+    "Drop your guess below👇",
   ].join("\n"));
   assert.doesNotMatch(copy.redditBody, /Today’s Last Words puzzle|Hint: Character|______ __C__O___/);
   assert.equal(copy.discordBody, [
-    "🧟 The Daily Undead · 15 Oct",
-    "Yesterday’s answer: Call of the Dead 🧟",
+    "🧟 __The Daily Undead · 17 Oct__",
+    "Yesterday’s answer: Tag der Toten 🧟",
     "Yesterday’s solve rate: 76% 🔎",
-    "First correct Quest Steps guesses here: @____, @____, @____ 👏",
+    "First correct here: @____, @____, @____ 👏",
     "",
+    "Today’s puzzle:",
     "**Think you know the word or phrase?**",
+    "",
     "Drop your guess below 👇",
     "",
-    "Want to reveal another letter or lock in your answer on The Daily Undead website?",
+    "Need another letter, or want to lock in your answer on the website?",
     "",
     "🔗 <https://thedailyundead.com/>",
   ].join("\n"));

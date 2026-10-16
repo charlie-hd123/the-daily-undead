@@ -142,29 +142,31 @@ export function buildWordMarketingCopy({
     : "—%";
   const pattern = buildWordPattern(answer, initialLetters);
   const cleanAnswer = yesterdayAnswer.trim();
-  const cleanYesterdayPuzzleName = String(yesterdayPuzzleName || "Quest Steps").trim();
   const redditTitle = `Which Zombies word is it? — ${formatDiscordDate(dateKey)}`;
   const redditBody = [
     `Yesterday’s answer: ${cleanAnswer} 🧟`,
     `Yesterday’s solve rate: ${solved} 🔎`,
     "First correct here: u/____, u/____, u/____ 👏",
     "",
+    "Today’s puzzle:",
     "Which Zombies word or phrase is it?",
     "",
     "Try to get it before reading the comments 👀",
     "",
-    "Drop your guess below.",
+    "Drop your guess below👇",
   ].join("\n");
   const discordBody = [
-    `🧟 The Daily Undead · ${formatDiscordDate(dateKey)}`,
+    `🧟 __The Daily Undead · ${formatDiscordDate(dateKey)}__`,
     `Yesterday’s answer: ${cleanAnswer} 🧟`,
     `Yesterday’s solve rate: ${solved} 🔎`,
-    `First correct ${cleanYesterdayPuzzleName} guesses here: @____, @____, @____ 👏`,
+    "First correct here: @____, @____, @____ 👏",
     "",
+    "Today’s puzzle:",
     "**Think you know the word or phrase?**",
+    "",
     "Drop your guess below 👇",
     "",
-    "Want to reveal another letter or lock in your answer on The Daily Undead website?",
+    "Need another letter, or want to lock in your answer on the website?",
     "",
     "🔗 <https://thedailyundead.com/>",
   ].join("\n");
