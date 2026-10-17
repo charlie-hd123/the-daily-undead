@@ -6,9 +6,9 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261017-4";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261017-4";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261017-4";
+} from "./account-session.js?v=20261017-5";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261017-5";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261017-5";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -734,7 +734,7 @@ export async function initialiseAccount({
   try {
     clerk = await withTimeout(
       supabaseConfigured
-        ? import("./supabase-auth.js?v=20261017-4").then(({ loadSupabaseAuth }) => (
+        ? import("./supabase-auth.js?v=20261017-5").then(({ loadSupabaseAuth }) => (
           loadSupabaseAuth(documentObject)
         ))
         : loadClerk(publishableKey),
@@ -1256,6 +1256,7 @@ export async function initialiseAccount({
   initialiseAccountSettings({
     documentObject,
     clerk,
+    userIds: [userId, legacyUserId].filter(Boolean),
     requestDelete: () => requestJson(clerk, apiUrl, "/api/account", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },

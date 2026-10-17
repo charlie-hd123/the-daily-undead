@@ -1,3 +1,5 @@
+import { readJsonBody } from "./accounts.js";
+
 function deletionKey(env) {
   return env.SUPABASE_SECRET_KEY || env.SUPABASE_HEARTBEAT_SECRET_KEY;
 }
@@ -32,7 +34,7 @@ export async function retryAuthDeletions(env) {
 }
 
 export async function deleteAccount(request, env, identity, fetchImpl = fetch) {
-  const payload = await request.json().catch(() => null);
+  const payload = await readJsonBody(request, 1_000);
   if (payload?.confirmation !== "DELETE") {
     return { status: 400, body: { error: "Type DELETE to confirm account deletion." } };
   }

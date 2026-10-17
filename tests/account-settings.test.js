@@ -28,8 +28,8 @@ test("email verification only completes once the auth service confirms the new a
 });
 
 test("account deletion clears game progress without erasing unrelated site storage", () => {
-  const values = new Map([["the-daily-undead:account-memory", "account"], ["the-daily-undead:account-pending:acct_123", "save"], ["dead-drop:2026-10-17", "puzzle"], ["unrelated", "keep"], ["sb-project-auth-token", "session"]]);
+  const values = new Map([["the-daily-undead:account-memory", "account"], ["the-daily-undead:account-pending:acct_123", "save"], ["the-daily-undead:account-pending:acct_other", "other player's offline save"], ["dead-drop:2026-10-17", "puzzle"], ["unrelated", "keep"], ["sb-project-auth-token", "session"]]);
   const storage = { get length() { return values.size; }, key: (index) => [...values.keys()][index], removeItem: (key) => values.delete(key) };
-  clearDeletedAccountStorage(storage);
-  assert.deepEqual([...values.keys()], ["unrelated", "sb-project-auth-token"]);
+  clearDeletedAccountStorage(storage, ["acct_123"]);
+  assert.deepEqual([...values.keys()], ["the-daily-undead:account-pending:acct_other", "unrelated", "sb-project-auth-token"]);
 });

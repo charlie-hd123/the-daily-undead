@@ -17,13 +17,15 @@ export async function verifyEmailChange(auth, email, code, expectedEmail) {
   return Boolean(result.data?.user?.email?.toLowerCase() === expectedEmail.toLowerCase());
 }
 
-export function clearDeletedAccountStorage(storage) {
+export function clearDeletedAccountStorage(storage, userIds = []) {
   const keys = Array.from({ length: storage.length }, (_, index) => storage.key(index));
-  keys.filter((key) => key?.startsWith("the-daily-undead:") || key?.startsWith("dead-drop:"))
+  keys.filter((key) => key?.startsWith("the-daily-undead:account-pending:")
+    ? userIds.some((id) => key === `the-daily-undead:account-pending:${id}`)
+    : key?.startsWith("the-daily-undead:") || key?.startsWith("dead-drop:"))
     .forEach((key) => storage.removeItem(key));
 }
 
-export function initialiseAccountSettings({ documentObject, clerk, requestDelete, beforeDelete, afterDeleteFailure }) {
+export function initialiseAccountSettings({ documentObject, clerk, userIds, requestDelete, beforeDelete, afterDeleteFailure }) {
   const emailDialog = documentObject.querySelector("#account-email-dialog");
   const emailForm = documentObject.querySelector("#account-email-form");
   const codeForm = documentObject.querySelector("#account-email-code-form");
@@ -148,8 +150,9 @@ export function initialiseAccountSettings({ documentObject, clerk, requestDelete
     try {
       beforeDelete();
       const result = await requestDelete();
+      if (result.deleted !== true) throw new Error("Could not confirm deletion. Please try again.");
       deleted = true;
-      try { clearDeletedAccountStorage(globalThis.localStorage); } catch { /* Storage may be disabled. */ }
+      try { clearDeletedAccountStorage(globalThis.localStorage, userIds); } catch { /* Storage may be disabled. */ }
       try { await clerk.signOut(); } catch { /* The auth user may already be gone. */ }
       clerk.forgetDeletedSession?.();
       deleteForm.hidden = true;
