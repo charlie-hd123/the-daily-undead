@@ -38,8 +38,14 @@ the saved **Player lookup** query, or paste `supabase/player-lookup.sql` and sav
 it under that name. It shows email, username, Supabase ID, account ID and dates
 in one table. A query can be added to Favorites from its actions menu.
 
+The normal **Authentication → Users** page also shows each linked player's
+username in its **Display name** column. Refresh that list after syncing.
+
 The Worker copies `daily_undead_username` and `daily_undead_account_id` into
 server-managed `app_metadata` after account reads, registration and renaming.
+It also sets `user_metadata.name`, the field used by the native **Display name**
+column. That display field is user-editable through Supabase and is never used
+as an authoritative game username or for authorisation.
 Other auth metadata is preserved by the Auth Admin API. Cloudflare remains the
 source of truth; this copy is only for identification, never authentication or
 gameplay decisions. Metadata is also visible in an auth user's Raw JSON.
@@ -64,3 +70,8 @@ result or save rows. Staging deployment applies it only to staging D1.
 Production application of this migration and metadata backfill still requires
 explicit review/authorisation under `AGENTS.md`, followed by exact promotion.
 No Supabase schema migration is needed for the saved lookup query.
+
+Migration `0014_refresh_auth_display_names.sql` requeues existing sync
+checkpoints so previously synced players also receive the native display name.
+It does not change player profiles or progress. Its production application
+requires the same explicit migration review/authorisation.

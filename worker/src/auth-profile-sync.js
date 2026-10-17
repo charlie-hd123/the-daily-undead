@@ -29,10 +29,15 @@ export async function syncAuthProfile(env, subject, fetchImpl = fetch) {
     const response = await fetchImpl(`${env.SUPABASE_ISSUER.replace(/\/$/, "")}/admin/users/${encodeURIComponent(subject)}`, {
       method: "PUT",
       headers: { apikey: syncKey(env), Authorization: `Bearer ${syncKey(env)}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ app_metadata: {
-        daily_undead_username: profile.username,
-        daily_undead_account_id: profile.account_id,
-      } }),
+      body: JSON.stringify({
+        app_metadata: {
+          daily_undead_username: profile.username,
+          daily_undead_account_id: profile.account_id,
+        },
+        // Supabase's Authentication > Users display-name column reads this
+        // field. It is informational only; D1 still owns the actual username.
+        user_metadata: { name: profile.username },
+      }),
       signal: AbortSignal.timeout(5_000),
     });
     await response.body?.cancel();

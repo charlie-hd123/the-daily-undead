@@ -101,18 +101,26 @@ test("Supabase username sync retries outages, catches concurrent renames and cas
   await retryAuthProfileSync(env, fetchImpl);
   assert.equal(db.sqlite.prepare("SELECT synced_username FROM auth_profile_sync").get().synced_username, "BeforeSync");
   await retryAuthProfileSync(env, fetchImpl);
-  assert.deepEqual(calls.at(-1), { app_metadata: { daily_undead_username: "AfterSync", daily_undead_account_id: "acct_sync" } });
+  assert.deepEqual(calls.at(-1), {
+    app_metadata: { daily_undead_username: "AfterSync", daily_undead_account_id: "acct_sync" },
+    user_metadata: { name: "AfterSync" },
+  });
   await syncAuthProfile(env, "supabase-sync-test", fetchImpl);
   assert.equal(calls.length, 3, "unchanged account does not make another admin request");
+  // Upgrade accounts that were already synced before the display-name change.
+  db.sqlite.exec(await readFile(new URL("../worker/migrations/0014_refresh_auth_display_names.sql", import.meta.url), "utf8"));
+  await retryAuthProfileSync(env, fetchImpl);
+  assert.equal(calls.length, 4);
+  assert.deepEqual(calls.at(-1).user_metadata, { name: "AfterSync" });
   // Periodic refresh also repairs manual metadata edits or overlapping writes.
   db.sqlite.exec("UPDATE auth_profile_sync SET last_synced_at=datetime('now','-2 days')");
   await retryAuthProfileSync(env, fetchImpl);
-  assert.equal(calls.length, 4);
+  assert.equal(calls.length, 5);
   assert.equal(db.sqlite.prepare("SELECT score FROM player_saves").get().score, 321);
   db.sqlite.exec("DELETE FROM player_profiles WHERE account_id='acct_sync'");
   assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS n FROM auth_profile_sync").get().n, 0);
   await retryAuthProfileSync(env, fetchImpl);
-  assert.equal(calls.length, 4, "deleted accounts are not sent back to Supabase");
+  assert.equal(calls.length, 5, "deleted accounts are not sent back to Supabase");
 });
 
 test("metadata backfills are bounded and failed accounts do not starve remaining players", async (t) => {
@@ -221,7 +229,9 @@ test("real account routes save profiles, verify puzzle rewards, reject stale sav
   globalThis.fetch = async (url, options) => {
     if (options?.method === "PUT") {
       assert.equal(url, `${issuer}/admin/users/c6ca42ae-f94f-4f44-80d3-bd08d52fd724`);
-      metadataUpdates.push(JSON.parse(options.body).app_metadata);
+      const metadata = JSON.parse(options.body);
+      assert.equal(metadata.user_metadata.name, metadata.app_metadata.daily_undead_username);
+      metadataUpdates.push(metadata.app_metadata);
       return Response.json({});
     }
     assert.equal(url, `${issuer}/.well-known/jwks.json`);

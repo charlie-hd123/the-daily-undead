@@ -53,6 +53,8 @@ Account settings support verified email changes and permanent self-service delet
 
 Player administration is documented in [PLAYER-ADMIN.md](PLAYER-ADMIN.md). Migration `0013_player_admin_views.sql` adds read-only views with usernames beside IDs, progress and daily records, plus a cascading auth-metadata sync checkpoint. The Worker copies usernames/account IDs to Supabase app metadata after account reads, registration and renaming; its 12-hour schedule backfills/retries up to 20 linked players. Local development cannot update shared auth metadata. `supabase/player-lookup.sql` provides the admin-only Supabase lookup without a public view or schema change. Production application of migration 0013 and metadata backfill requires explicit review and authorization before promotion.
 
+The same sync also writes `user_metadata.name` so usernames appear in **Authentication → Users → Display name**. Migration `0014_refresh_auth_display_names.sql` requeues prior sync checkpoints for this additional display field without changing player profiles or progress. Production application requires explicit review and authorization too.
+
 ## Promote all approved work
 
 Only after the user explicitly requests live publication:
