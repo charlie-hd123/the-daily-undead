@@ -28,6 +28,9 @@ export async function buildSite({ root = projectRoot, environment = "staging", r
   const environments = JSON.parse(files.get("config/environments.json").toString());
   const config = environments[environment];
   if (environment !== "production" && (config.apiUrl === environments.production.apiUrl || config.supabaseUrl === environments.production.supabaseUrl)) throw new Error("Non-production builds must use isolated services.");
+  const worker = JSON.parse(files.get(config.workerConfig).toString());
+  if (worker.vars.SUPABASE_ISSUER !== `${config.supabaseUrl}/auth/v1` || !worker.vars.ALLOWED_ORIGINS.split(",").includes(config.siteUrl) || worker.d1_databases[0].database_name !== config.database) throw new Error("Website, authentication, CORS and database configuration must describe the same environment.");
+  if (environment === "production" && worker.vars.STAGING_FIXTURES) throw new Error("Production must never enable fictional staging activity.");
   const manifest = { ...sourceManifest(files, working ? null : commitFor(root, ref)), environment, apiConfigurationDigest: digest(files.get(config.workerConfig)) };
   output ||= path.join(root, environment === "staging" ? ".staging-dist" : `.${environment}-dist`);
   if (path.resolve(output) !== path.resolve(root, `.${environment}-dist`)) throw new Error("Build output must be the environment's dedicated dist directory.");

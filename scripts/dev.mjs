@@ -34,6 +34,7 @@ const server = createServer(async (request, response) => {
     response.end(await readFile(target));
   } catch { response.writeHead(404); response.end("Not found"); }
 });
+server.on("error", (error) => { console.error(error.message); worker.kill(); process.exitCode = 1; });
 await build();
 server.listen(8080, "127.0.0.1", () => console.log("Full local app: http://localhost:8080 · API/D1: localhost:8787 · staging authentication · no production writes"));
 function close() { worker.kill(); server.close(); }

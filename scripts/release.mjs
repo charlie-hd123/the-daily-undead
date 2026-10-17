@@ -17,7 +17,8 @@ function jsonUrl(url) {
 }
 const readJson = async (name) => JSON.parse(await readFile(name, "utf8"));
 function optionalCommit(ref) {
-  try { return commitFor(root, ref); } catch { return null; }
+  const result = spawnSync("git", ["rev-parse", "--verify", "--end-of-options", `${ref}^{commit}`], { cwd: root, encoding: "utf8" });
+  return result.status === 0 ? result.stdout.trim() : null;
 }
 function syncReferences() { git(root, "fetch", "origin"); }
 function ensureCurrentStaging() {
@@ -153,7 +154,7 @@ async function sync() {
 async function prepare() {
   if (git(root, "branch", "--show-current") !== "staging") throw new Error("Prepare changes on staging.");
   const changed = git(root, "diff", "HEAD", "--name-only").split("\n").filter(Boolean);
-  const gameChanged = changed.some((name) => /^(index\.html|styles\.css|staging-demo\.css|js\/(?!marketing|vendor\/))/.test(name));
+  const gameChanged = changed.some((name) => /^(assets\/|data\/|index\.html|styles\.css|staging-demo\.css|js\/(?!marketing|vendor\/))/.test(name));
   const marketingChanged = changed.some((name) => /^(marketing\.|js\/marketing)/.test(name));
   if (!gameChanged && !marketingChanged) { console.log("No browser cache update required."); return; }
   const current = await readJson(path.join(root, "release.json"));
@@ -166,6 +167,7 @@ async function prepare() {
     const filename = path.join(root, name);
     let content = await readFile(filename, "utf8");
     content = content.replace(/\?v=\d{8}-\d+/g, `?v=${next}`);
+    if (gameChanged) content = content.replace(/((?:\.\/|\.\.\/)?assets\/[^\s"'()?#]+\.(?:png|svg|jpg|jpeg|webp|ttf))(?=["')])/g, `$1?v=${next}`);
     if (name === "index.html") content = content.replace(/(name="daily-undead-build" content=")[^"]+/, `$1${next}`);
     await writeFile(filename, content);
   }
