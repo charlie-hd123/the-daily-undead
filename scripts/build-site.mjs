@@ -15,7 +15,7 @@ export function configureHtml(source, config, environment) {
   if (environment !== "production") {
     html = html.replace("</head>", '  <meta name="robots" content="noindex, nofollow">\n  </head>');
     if (html.includes('id="app"')) {
-      html = html.replace("<body>", `<body>\n    <aside data-environment-badge style="position:fixed;bottom:8px;right:8px;z-index:10000;padding:5px 9px;border-radius:5px;background:#f7c85c;color:#171006;font:700 11px/1.2 sans-serif;pointer-events:none">${environment === "staging" ? "STAGING" : "LOCAL"} · TEST DATA</aside>`);
+      html = html.replace("<body>", `<body>\n    <aside data-environment-badge style="position:absolute;top:3px;right:8px;z-index:10000;padding:5px 9px;border-radius:5px;background:#f7c85c;color:#171006;font:700 11px/1.2 sans-serif;pointer-events:none">${environment === "staging" ? "STAGING" : "LOCAL"} · TEST DATA</aside>`);
       html = html.replace("<title>The Daily Undead</title>", `<title>${environment === "staging" ? "Staging" : "Local"} · The Daily Undead</title>`);
     }
   }

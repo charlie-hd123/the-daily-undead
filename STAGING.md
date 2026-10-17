@@ -35,7 +35,7 @@ npm run deploy:staging
 
 The command refuses dirty tracked files or stale/divergent branches. It snapshots the commit, runs the complete automated suite once, builds production and staging from the same tracked source, applies only staging migrations, deploys the matching staging Worker when code/configuration changed, backs up the source to GitHub staging and deploys the full website. Unrelated untracked diagrams/drafts are excluded.
 
-A release manifest identifies the source commit, application asset hashes, API source hash, environment-specific API configuration hash and migration checksums. HTML differences are limited to environment configuration, noindex metadata and a fixed environment badge; browser JavaScript, CSS, data and rendering are shared. The obsolete `/staging-demo.html` redirects to the real app.
+A release manifest identifies the source commit, application asset hashes, API source hash, environment-specific API configuration hash and migration checksums. HTML differences are limited to environment configuration, noindex metadata and a small environment badge; browser JavaScript, CSS, data and rendering are shared. The obsolete `/staging-demo.html` redirects to the real app.
 
 After upload, the command verifies the hosted release identity, API identity, current-day community activity, both yesterday statistics, current/all-time leaderboards, public profiles and unauthenticated account protection. `.releases/staging.json` stores the result locally. `npm run release:status` reports local/GitHub/deployed status and every pending commit.
 

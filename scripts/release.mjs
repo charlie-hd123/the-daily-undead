@@ -192,10 +192,11 @@ async function promote(approved) {
   if (migrationChanges.split("\n").some((line) => /^[MD]\s/.test(line))) throw new Error("Existing production migrations were modified. Restore them and use additive reviewed migrations.");
   const productionConfig = await readJson(path.join(root, "config/environments.json"));
   const priorHealth = jsonUrl(`${productionConfig.production.apiUrl}/health`);
+  const previousApiDeployments = JSON.parse(wrangler(["deployments", "list", "--config", config, "--json"]));
   const tag = `rollback-production-${new Date().toISOString().replace(/[:.]/g, "-")}`;
   git(root, "tag", tag, previous);
   git(root, "push", "origin", `refs/tags/${tag}`);
-  await saveJson(path.join(root, ".releases/production-pending.json"), { commit: sha, previous, rollbackTag: tag, previousApi: priorHealth, manifest: build.production.manifest });
+  await saveJson(path.join(root, ".releases/production-pending.json"), { commit: sha, previous, rollbackTag: tag, previousApi: priorHealth, previousApiDeployments, manifest: build.production.manifest });
   if (priorHealth.apiDigest !== build.staging.manifest.apiDigest || priorHealth.configurationDigest !== build.production.manifest.apiConfigurationDigest) {
     const upload = wrangler(["versions", "upload", "--config", config, "--message", `Approved staging ${sha}`]);
     const version = upload.match(/Worker Version ID:\s*([a-f0-9-]{36})/i)?.[1];
@@ -204,7 +205,7 @@ async function promote(approved) {
   }
   // A normal fast-forward push promotes every approved commit; never force or cherry-pick.
   git(root, "push", "origin", `${sha}:refs/heads/main`);
-  await saveJson(path.join(root, ".releases/production-pending.json"), { commit: sha, previous, rollbackTag: tag, previousApi: priorHealth, manifest: build.production.manifest });
+  await saveJson(path.join(root, ".releases/production-pending.json"), { commit: sha, previous, rollbackTag: tag, previousApi: priorHealth, previousApiDeployments, manifest: build.production.manifest });
   console.log(`Promoted ${sha}. Rollback source: ${tag}.\nGitHub Pages is deploying. Run release:verify-live after it finishes; a push alone is not verified completion.`);
 }
 
