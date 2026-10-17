@@ -21,6 +21,7 @@
     "release:verify-live": "node scripts/release.mjs verify-live",
     "deploy:staging": "node scripts/release.mjs stage",
     "generate:worker-catalog": "node scripts/generate-worker-catalog.js",
+    "generate:browser-catalogues": "node scripts/generate-browser-catalogues.mjs",
     "test": "node --test tests/*.test.js"
   },
   "dependencies": {

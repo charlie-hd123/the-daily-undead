@@ -25,6 +25,8 @@ Use Node 24 and `pnpm install --frozen-lockfile`. Wrangler is pinned in the lock
 
 The local server is a developer preview and can stop whenever you like. Hosted staging/live do not depend on it. `npm start` remains a lightweight static-only option; without the API it is not a full staging check. The legacy social demo and read-only leaderboard commands remain optional development tools, not release environments.
 
+Browser puzzle data is packaged from the existing map index, map JSON and word bank into two content-addressed files in `data/catalogues/`. Run `npm run generate:browser-catalogues` after editing those sources and add the newly generated files plus `js/puzzle-catalogue-assets.js` deliberately before local preview. `release:prepare` also regenerates them; automated checks reject stale or missing packages. Keep previously released catalogue hashes so older open pages can still load their matching data. Browser caching applies only to these public, content-addressed catalogues; account saves and release checks retain their existing behaviour.
+
 ## Put a complete candidate on staging
 
 ```sh

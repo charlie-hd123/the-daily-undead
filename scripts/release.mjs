@@ -3,6 +3,7 @@ import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildSite, projectRoot as root } from "./build-site.mjs";
+import { generateBrowserCatalogues } from "./generate-browser-catalogues.mjs";
 import { assertClean, assertPromotion, classifyChanges, commitFor, digest, git, isAncestor, isWebsiteFile, saveJson, sourceFiles, trackedFiles } from "./lib/release-tools.mjs";
 
 function run(command, args, cwd = root) {
@@ -153,6 +154,7 @@ async function sync() {
 
 async function prepare() {
   if (git(root, "branch", "--show-current") !== "staging") throw new Error("Prepare changes on staging.");
+  await generateBrowserCatalogues(root);
   const changed = git(root, "diff", "HEAD", "--name-only").split("\n").filter(Boolean);
   const gameChanged = changed.some((name) => /^(assets\/|data\/|index\.html|styles\.css|staging-demo\.css|js\/(?!marketing|vendor\/))/.test(name));
   const marketingChanged = changed.some((name) => /^(marketing\.|js\/marketing)/.test(name));

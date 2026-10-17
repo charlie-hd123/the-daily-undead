@@ -12,19 +12,19 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261017-5";
+} from "./game-core.js?v=20261017-6";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
-} from "./word-puzzle-core.js?v=20261017-5";
+} from "./word-puzzle-core.js?v=20261017-6";
 import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261017-5";
+} from "./daily-challenge-core.js?v=20261017-6";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -33,26 +33,27 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261017-5";
+} from "./progression.js?v=20261017-6";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261017-5";
+} from "./account.js?v=20261017-6";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261017-5";
+} from "./community-stats.js?v=20261017-6";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261017-5";
-import { fetchWithTimeout } from "./network.js?v=20261017-5";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261017-5";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261017-5";
-import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261017-5";
+} from "./leaderboards.js?v=20261017-6";
+import { fetchWithTimeout } from "./network.js?v=20261017-6";
+import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261017-6";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261017-6";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261017-6";
+import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261017-6";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -190,13 +191,13 @@ const puzzleTypes = {
     name: "Quest Steps",
     kicker: "Easter egg puzzle",
     description: "Can you identify the Zombies map from its Easter egg steps?",
-    image: "./assets/quest-steps-card.svg?v=20261017-5",
+    image: "./assets/quest-steps-card.svg?v=20261017-6",
   },
   word: {
     name: "Last Words",
     kicker: "Letter puzzle",
     description: "Can you identify the Zombies word or phrase by revealing its letters?",
-    image: "./assets/dead-letters-card.svg?v=20261017-5",
+    image: "./assets/dead-letters-card.svg?v=20261017-6",
   },
 };
 
@@ -508,16 +509,9 @@ function validateMap(map, source) {
 }
 
 async function loadData() {
-  const [indexResponse, wordResponse] = await Promise.all([
-    fetchWithTimeout("./data/maps/index.json", { cache: "no-store" }, { timeoutMs: 8_000 }),
-    fetchWithTimeout("./data/word-puzzle-demo.json", { cache: "no-store" }, { timeoutMs: 8_000 }),
-  ]);
-  if (!indexResponse.ok || !wordResponse.ok) {
-    throw new Error("Could not load the puzzle catalogues.");
-  }
-
-  catalog = await indexResponse.json();
-  const wordBank = await wordResponse.json();
+  const loaded = await loadPuzzleCatalogues();
+  catalog = loaded.catalog;
+  const wordBank = loaded.wordBank;
   wordEntries = Array.isArray(wordBank.words) ? wordBank.words : [];
   if (!Array.isArray(catalog.games) || !Array.isArray(catalog.maps)) {
     throw new Error("The map index is invalid.");
@@ -528,21 +522,7 @@ async function loadData() {
     throw new Error("The map index contains a duplicate game id.");
   }
 
-  const responses = await Promise.all(
-    catalog.maps.map(async (filename) => {
-      const response = await fetchWithTimeout(
-        `./data/maps/${filename}`,
-        { cache: "no-store" },
-        { timeoutMs: 8_000 },
-      );
-      if (!response.ok) {
-        throw new Error(`Could not load ${filename}.`);
-      }
-      return validateMap(await response.json(), filename);
-    }),
-  );
-
-  maps = responses;
+  maps = loaded.maps.map((map, index) => validateMap(map, catalog.maps[index]));
   for (const map of maps) {
     if (gameTitles.get(map.gameId) !== map.gameTitle) {
       throw new Error(`Invalid game details for ${map.id}.`);
