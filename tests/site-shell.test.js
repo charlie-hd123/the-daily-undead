@@ -20,12 +20,7 @@ test("the published page uses local fonts and privacy-safe external links", asyn
     html,
     /href="https:\/\/tally\.so\/r\/q4XeD7"[^>]*rel="noopener noreferrer"[^>]*referrerpolicy="no-referrer"/,
   );
-  assert.match(html, /id="advance-dev-day"[^>]*hidden/);
-  assert.match(html, /id="advance-dev-day"[^>]*>ADVANCE A DAY<\/button>/);
-  assert.match(
-    html,
-    /trademarks of their respective owners\.[\s\S]*id="advance-dev-day"[\s\S]*<\/p>/,
-  );
+  assert.doesNotMatch(html, /advance-dev-day|return-dev-today/);
 });
 
 test("the launch package includes a restrained maintenance page", async () => {

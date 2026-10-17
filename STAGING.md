@@ -43,6 +43,8 @@ Review the normal staging address. Use the cumulative diff to select browser che
 
 ## Persistent, current fictional activity
 
+The footer's **Advance a day** and **Return to today** controls are injected only into staging/local builds. Production source and output omit their HTML, and shared JavaScript additionally requires a local host or the exact staging host with staging metadata. A preview uses isolated per-day browser progress and disables account progress/result uploads; the normal staging account stays intact. Server result-date validation still rejects future results. Return to today restores the ordinary game and account sync. Future-day community statistics can legitimately be unavailable until that real UTC day.
+
 The real API runs `worker/src/staging-fixtures.js` only with explicit staging/local environment flags and the staging authentication issuer. Reserved `stage_demo_*` players populate real profile, save, verified-result and anonymous-attempt tables. The API uses the same deterministic catalogue to show the correct answers for today/yesterday. Unique database constraints keep seeding idempotent. Activity refreshes on the first request of each UTC day, with the scheduled task also warming it.
 
 The user's actual staging login/account is never reset or overwritten by fixtures. Deployments do not reset the database. Production lacks fixture flags and its issuer is rejected by the fixture guard. The integration tests apply every real migration to SQLite and exercise rollover, deduplication, both puzzle types, accounts, profile saves, signed result verification and revision conflicts. The old fixed-date SQL is retired.

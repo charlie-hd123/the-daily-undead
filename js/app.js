@@ -12,19 +12,19 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261017-1";
+} from "./game-core.js?v=20261017-2";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
-} from "./word-puzzle-core.js?v=20261017-1";
+} from "./word-puzzle-core.js?v=20261017-2";
 import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261017-1";
+} from "./daily-challenge-core.js?v=20261017-2";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -33,25 +33,26 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261017-1";
+} from "./progression.js?v=20261017-2";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261017-1";
+} from "./account.js?v=20261017-2";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261017-1";
+} from "./community-stats.js?v=20261017-2";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261017-1";
-import { fetchWithTimeout } from "./network.js?v=20261017-1";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261017-1";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261017-1";
+} from "./leaderboards.js?v=20261017-2";
+import { fetchWithTimeout } from "./network.js?v=20261017-2";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261017-2";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261017-2";
+import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261017-2";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -64,6 +65,7 @@ const statExplainer = document.querySelector("#player-stat-explainer");
 const progressionUpdateButton = document.querySelector("#progression-update-button");
 const progressionUpdateDialog = document.querySelector("#progression-update-dialog");
 const advanceDevDayButton = document.querySelector("#advance-dev-day");
+const returnDevTodayButton = document.querySelector("#return-dev-today");
 const leaderboardsButton = document.querySelector("#leaderboards-button");
 const leaderboardsDialog = document.querySelector("#leaderboards-dialog");
 const clueTemplate = document.querySelector("#clue-template");
@@ -76,7 +78,9 @@ const communityYesterdayWordAnswerLabel = document.querySelector("#community-yes
 const communityYesterdayEasterAnswerLabel = document.querySelector("#community-yesterday-easter-answer");
 const yesterdayCommunityResults = [...document.querySelectorAll("[data-community-puzzle]")];
 const isLocalDevelopment = isLocalDevelopmentHostname(window.location.hostname);
-const isLocalPreview = isLocalPreviewHostname(window.location.hostname);
+const isLocalPreview = canPreviewDays(window.location.hostname, document.querySelector('meta[name="daily-undead-environment"]')?.content, isLocalPreviewHostname(window.location.hostname));
+let dayPreviewEnabled = false;
+let localStorage = window.localStorage;
 const socialDemoEnabled = isLocalDevelopment && new URLSearchParams(window.location.search).get("socialDemo") === "1";
 const currentBuild = readCurrentBuild();
 const communityStatsApiUrl = resolveCommunityStatsApiUrl({ isLocalDevelopment });
@@ -186,13 +190,13 @@ const puzzleTypes = {
     name: "Quest Steps",
     kicker: "Easter egg puzzle",
     description: "Can you identify the Zombies map from its Easter egg steps?",
-    image: "./assets/quest-steps-card.svg",
+    image: "./assets/quest-steps-card.svg?v=20261017-2",
   },
   word: {
     name: "Last Words",
     kicker: "Letter puzzle",
     description: "Can you identify the Zombies word or phrase by revealing its letters?",
-    image: "./assets/dead-letters-card.svg",
+    image: "./assets/dead-letters-card.svg?v=20261017-2",
   },
 };
 
@@ -440,11 +444,22 @@ function advanceSimulatedDay() {
   window.location.search = searchParams.toString();
 }
 
-if (isLocalPreview) {
+if (isLocalPreview && advanceDevDayButton) {
   advanceDevDayButton.hidden = false;
   advanceDevDayButton.addEventListener("click", advanceSimulatedDay);
+  if (returnDevTodayButton) {
+    returnDevTodayButton.hidden = !new URLSearchParams(window.location.search).has("date");
+    returnDevTodayButton.addEventListener("click", () => {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("date");
+      url.searchParams.delete("devPreview");
+      sessionStorage.removeItem(devPreviewStorageKey);
+      window.location.assign(url.href);
+    });
+  }
 } else {
-  advanceDevDayButton.remove();
+  advanceDevDayButton?.remove();
+  returnDevTodayButton?.remove();
 }
 
 function validateMap(map, source) {
@@ -2384,6 +2399,8 @@ async function initialise() {
     initialiseProfileScrollbars();
     const dateKey = getDateKey();
     liveDateKey = getUtcDateKey(getCurrentTime());
+    dayPreviewEnabled = isLocalPreview && dateKey !== liveDateKey;
+    localStorage = createDayPreviewStorage(window.localStorage, dateKey, dayPreviewEnabled);
     migrateStoredRoundNumbering(localStorage, {
       streakKey: streakStorageKey,
       bestRoundKey: bestRoundStorageKey,
@@ -2416,8 +2433,9 @@ async function initialise() {
       : await initialiseAccount({
           apiUrl: leaderboardsApiUrl,
           puzzleDate: dateKey,
+          readOnlyProgress: dayPreviewEnabled,
           getLocalSnapshot: getLocalAccountSnapshot,
-          applyRemoteAccount,
+          applyRemoteAccount: dayPreviewEnabled ? () => {} : applyRemoteAccount,
         });
     document.addEventListener("keydown", (event) => {
       if (activePlay?.type !== "word") return;

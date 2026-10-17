@@ -13,8 +13,9 @@ export function configureHtml(source, config, environment) {
     "daily-undead-supabase-publishable-key": config.supabasePublishableKey,
   })) html = html.replace(new RegExp(`(name="${name}" content=")[^"]*(")`), (_, before, after) => `${before}${value}${after}`);
   if (environment !== "production") {
-    html = html.replace("</head>", '  <meta name="robots" content="noindex, nofollow">\n  </head>');
+    html = html.replace("</head>", `  <meta name="robots" content="noindex, nofollow">\n    <meta name="daily-undead-environment" content="${environment}">\n  </head>`);
     if (html.includes('id="app"')) {
+      html = html.replace("</footer>", '<p class="day-preview-controls"><button id="advance-dev-day" class="button" type="button" hidden>Advance a day</button> <button id="return-dev-today" class="button" type="button" hidden>Return to today</button></p>\n    </footer>');
       html = html.replace("<body>", `<body>\n    <aside data-environment-badge style="position:absolute;top:1px;right:8px;z-index:10000;padding:2px 7px;border-radius:5px;background:#f7c85c;color:#171006;font:700 10px/1 sans-serif;pointer-events:none">${environment === "staging" ? "STAGING" : "LOCAL"} · TEST DATA</aside>`);
       html = html.replace("<title>The Daily Undead</title>", `<title>${environment === "staging" ? "Staging" : "Local"} · The Daily Undead</title>`);
     }

@@ -209,6 +209,9 @@ test("reproducible releases exclude uncommitted files and use identical applicat
     assert.doesNotMatch(stagedHtml, /bhqhfxwdcpujfxxvcoeo\.supabase\.co/);
     assert.match(stagedHtml, /src="\.\/js\/app\.js/);
     assert.doesNotMatch(stagedHtml, /staging-demo\.js/);
+    assert.match(stagedHtml, /id="advance-dev-day"/);
+    assert.match(stagedHtml, /id="return-dev-today"/);
+    assert.doesNotMatch(await readFile(path.join(production.output, "index.html"), "utf8"), /advance-dev-day|return-dev-today|daily-undead-environment/);
     assert.equal(sourceManifest(await sourceFiles(folder, { ref: "HEAD" }), git("rev-parse", "HEAD")).applicationDigest, staging.manifest.applicationDigest);
   } finally { await rm(folder, { recursive: true, force: true }); }
 });

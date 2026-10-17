@@ -6,8 +6,8 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261017-1";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261017-1";
+} from "./account-session.js?v=20261017-2";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261017-2";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -596,6 +596,7 @@ export async function initialiseAccount({
   puzzleDate,
   getLocalSnapshot,
   applyRemoteAccount,
+  readOnlyProgress = false,
   documentObject = document,
 }) {
   const accountButton = documentObject.querySelector("#account-button");
@@ -731,7 +732,7 @@ export async function initialiseAccount({
   try {
     clerk = await withTimeout(
       supabaseConfigured
-        ? import("./supabase-auth.js?v=20261017-1").then(({ loadSupabaseAuth }) => (
+        ? import("./supabase-auth.js?v=20261017-2").then(({ loadSupabaseAuth }) => (
           loadSupabaseAuth(documentObject)
         ))
         : loadClerk(publishableKey),
@@ -756,7 +757,7 @@ export async function initialiseAccount({
   };
 
   const rememberedAccount = () => readRememberedAccount(globalThis.localStorage);
-  const persistPendingProgress = (userId, revision) => writePendingProgress(
+  const persistPendingProgress = (userId, revision) => !readOnlyProgress && writePendingProgress(
     globalThis.localStorage,
     {
       userId,
@@ -896,7 +897,7 @@ export async function initialiseAccount({
   let account;
   try {
     const url = new URL("/api/account", apiUrl);
-    url.searchParams.set("date", puzzleDate);
+    url.searchParams.set("date", readOnlyProgress ? new Date().toISOString().slice(0, 10) : puzzleDate);
     account = await requestJson(clerk, apiUrl, `${url.pathname}${url.search}`);
   } catch (error) {
     const remembered = rememberedAccount();
@@ -957,8 +958,8 @@ export async function initialiseAccount({
   profile = account.profile;
   const userId = account.accountId || clerk.user.id;
   const legacyUserId = account.legacyUserId;
-  let pendingProgress = readPendingProgress(globalThis.localStorage, userId);
-  if (!pendingProgress && legacyUserId && legacyUserId !== userId) {
+  let pendingProgress = readOnlyProgress ? null : readPendingProgress(globalThis.localStorage, userId);
+  if (!readOnlyProgress && !pendingProgress && legacyUserId && legacyUserId !== userId) {
     const legacyPending = readPendingProgress(globalThis.localStorage, legacyUserId);
     if (legacyPending) {
       writePendingProgress(globalThis.localStorage, { ...legacyPending, userId });
@@ -970,7 +971,7 @@ export async function initialiseAccount({
       rememberAccount(globalThis.localStorage, { ...remembered, userId });
     }
   }
-  if (!pendingProgress) {
+  if (!readOnlyProgress && !pendingProgress) {
     try {
       if (globalThis.localStorage.getItem(legacyDirtyStorageKey) === userId) {
         writePendingProgress(globalThis.localStorage, {
@@ -1032,7 +1033,7 @@ export async function initialiseAccount({
   }
 
   try {
-    const replayedProgress = await replaySavedAccountResult({
+    const replayedProgress = !readOnlyProgress && await replaySavedAccountResult({
       dailyState: account.dailyState,
       puzzleDate,
       sendMapResult: (payload) => requestJson(clerk, apiUrl, "/api/account/results/map", {
@@ -1301,6 +1302,7 @@ export async function initialiseAccount({
   let currentRevision = Number(account.progress?.revision || 1);
 
   async function saveNow() {
+    if (readOnlyProgress) return;
     if (saveInFlight) {
       saveAgain = true;
       return;
@@ -1334,12 +1336,14 @@ export async function initialiseAccount({
   }
 
   function scheduleSave() {
+    if (readOnlyProgress) return;
     persistPendingProgress(userId, currentRevision);
     globalThis.clearTimeout(saveTimer);
     saveTimer = globalThis.setTimeout(saveNow, 350);
   }
 
   async function recordMapResult(payload) {
+    if (readOnlyProgress) return null;
     try {
       const result = await requestJson(clerk, apiUrl, "/api/account/results/map", {
         method: "POST",
@@ -1356,6 +1360,7 @@ export async function initialiseAccount({
   }
 
   async function recordBonusResult(payload) {
+    if (readOnlyProgress) return null;
     try {
       const result = await requestJson(clerk, apiUrl, "/api/account/results/bonus", {
         method: "POST",
@@ -1372,6 +1377,7 @@ export async function initialiseAccount({
   }
 
   async function recordWordResult(payload) {
+    if (readOnlyProgress) return null;
     try {
       const result = await requestJson(clerk, apiUrl, "/api/account/results/word", {
         method: "POST",
@@ -1390,7 +1396,7 @@ export async function initialiseAccount({
   const controller = {
     available: true,
     signedIn: true,
-    canSync: true,
+    canSync: !readOnlyProgress,
     resultSubmissionRequiresSignIn: false,
     openAccountAccess: () => openDialog(accessDialog),
     requestResultSignIn: showExpiredSession,
