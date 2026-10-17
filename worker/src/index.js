@@ -1,5 +1,6 @@
 import { verifyAccountRequest } from "./auth.js";
 import { deleteAccount, isAccountRevoked, retryAuthDeletions } from "./account-deletion.js";
+import { retryAuthProfileSync, syncAuthProfile } from "./auth-profile-sync.js";
 import { ensureStagingFixtures, fixturesEnabled } from "./staging-fixtures.js";
 import {
   getAccount,
@@ -259,7 +260,7 @@ async function handleAttempt(request, env) {
   });
 }
 
-async function handleAccountRequest(request, env, url) {
+async function handleAccountRequest(request, env, url, context) {
   let verifiedIdentity;
   try {
     verifiedIdentity = await verifyAccountRequest(request, env);
@@ -318,11 +319,17 @@ async function handleAccountRequest(request, env, url) {
     return errorResponse(request, env, "Not found.", 404);
   }
 
+  if (!deleting && verifiedIdentity.provider === "supabase" && result.status < 300
+    && (url.pathname === "/api/account" || url.pathname === "/api/account/register" || url.pathname === "/api/account/username")) {
+    const sync = syncAuthProfile(env, verifiedIdentity.subject);
+    if (context?.waitUntil) context.waitUntil(sync);
+    else await sync;
+  }
   return jsonResponse(request, env, result.body, result.status);
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, context) {
     if (!isAllowedOrigin(request, env)) {
       return errorResponse(request, env, "Origin is not allowed.", 403);
     }
@@ -341,7 +348,7 @@ export default {
         return jsonResponse(request, env, result.body, result.status);
       }
       if (url.pathname.startsWith("/api/account")) {
-        return await handleAccountRequest(request, env, url);
+        return await handleAccountRequest(request, env, url, context);
       }
       if (url.pathname === "/api/stats" && request.method === "GET") {
         return await handleStats(request, env, url);
@@ -381,6 +388,7 @@ export default {
   },
   async scheduled(_controller, env, context) {
     if (env.DB && env.DEPLOYMENT_ENVIRONMENT !== "local") context.waitUntil(retryAuthDeletions(env));
+    if (env.DB) context.waitUntil(retryAuthProfileSync(env));
     if (fixturesEnabled(env)) context.waitUntil(ensureStagingFixtures(env));
     if (!env.SUPABASE_HEARTBEAT_URL || !env.SUPABASE_HEARTBEAT_SECRET_KEY) return;
     context.waitUntil((async () => {

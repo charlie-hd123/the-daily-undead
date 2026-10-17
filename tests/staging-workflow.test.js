@@ -18,6 +18,7 @@ import { getOfficialPuzzleType } from "../js/daily-challenge-core.js";
 import { workerMaps } from "../worker/src/generated-map-catalog.js";
 import { workerWords } from "../worker/src/generated-word-catalog.js";
 import { deleteAccount, isAccountRevoked, retryAuthDeletions } from "../worker/src/account-deletion.js";
+import { retryAuthProfileSync, syncAuthProfile } from "../worker/src/auth-profile-sync.js";
 
 // Real SQLite schema, triggers and SQL, behind the same small D1 interface.
 async function database() {
@@ -54,6 +55,98 @@ async function database() {
   return db;
 }
 const stagingEnv = (DB) => ({ DB, DEPLOYMENT_ENVIRONMENT: "staging", STAGING_FIXTURES: "1", SUPABASE_ISSUER: "https://zsnnvzhimtlhpvwhwxpy.supabase.co/auth/v1", ALLOWED_ORIGINS: "https://daily-undead-staging.pages.dev", RELEASE_API_DIGEST: "api-tested", RELEASE_CONFIG_DIGEST: "config-tested" });
+
+test("admin views identify legacy and new players, track renames, and cannot edit progress", async (t) => {
+  const db = await database();
+  t.after(() => db.sqlite.close());
+  await ensureStagingFixtures(stagingEnv(db), "2026-10-17");
+  const fixture = db.sqlite.prepare("SELECT * FROM admin_player_overview LIMIT 1").get();
+  // Fictional/unlinked profiles are still visible; joins must not drop them.
+  assert.equal(fixture.supabase_user_id, null);
+  db.sqlite.prepare("INSERT INTO account_identities (provider,provider_subject,account_id) VALUES ('supabase','supabase-view-test',?),('clerk','user_legacy_view',?)").run(fixture.account_id, fixture.account_id);
+  const linked = db.sqlite.prepare("SELECT * FROM admin_player_overview WHERE account_id=?").get(fixture.account_id);
+  assert.equal(linked.supabase_user_id, "supabase-view-test");
+  assert.equal(linked.clerk_user_id, "user_legacy_view");
+  db.sqlite.prepare("INSERT OR IGNORE INTO player_daily_saves (user_id,puzzle_date,state_json) VALUES (?,'2026-10-17','{}')").run(fixture.user_id);
+  for (const view of ["admin_player_results", "admin_player_daily_saves"]) {
+    const row = db.sqlite.prepare(`SELECT * FROM ${view} WHERE account_id=? LIMIT 1`).get(fixture.account_id);
+    assert.equal(row.username, fixture.username);
+    assert.equal(row.supabase_user_id, "supabase-view-test");
+  }
+  db.sqlite.prepare("UPDATE player_profiles SET username='ViewRenamed' WHERE account_id=?").run(fixture.account_id);
+  for (const view of ["admin_player_overview", "admin_player_results", "admin_player_daily_saves"]) {
+    assert.equal(db.sqlite.prepare(`SELECT username FROM ${view} WHERE account_id=? LIMIT 1`).get(fixture.account_id).username, "ViewRenamed");
+    assert.throws(() => db.sqlite.exec(`DELETE FROM ${view}`), /view/);
+  }
+  assert.equal(db.sqlite.prepare("SELECT score FROM player_saves WHERE user_id=?").get(fixture.user_id).score, linked.score);
+});
+
+test("Supabase username sync retries outages, catches concurrent renames and cascades on deletion", async (t) => {
+  const db = await database();
+  t.after(() => db.sqlite.close());
+  db.sqlite.exec("INSERT INTO player_profiles (user_id,username,account_id) VALUES ('user_legacy_sync','BeforeSync','acct_sync'); INSERT INTO player_saves (user_id,score) VALUES ('user_legacy_sync',321); INSERT INTO account_identities (provider,provider_subject,account_id) VALUES ('supabase','supabase-sync-test','acct_sync')");
+  const env = { ...stagingEnv(db), SUPABASE_HEARTBEAT_SECRET_KEY: "test-secret" };
+  const calls = [];
+  const fetchImpl = async (url, options) => {
+    assert.equal(url, `${env.SUPABASE_ISSUER}/admin/users/supabase-sync-test`);
+    assert.equal(options.method, "PUT");
+    assert.equal(options.headers.apikey, "test-secret");
+    calls.push(JSON.parse(options.body));
+    if (calls.length === 1) return new Response(null, { status: 503 });
+    if (calls.length === 2) db.sqlite.exec("UPDATE player_profiles SET username='AfterSync' WHERE account_id='acct_sync'");
+    return Response.json({});
+  };
+  assert.equal(await syncAuthProfile(env, "supabase-sync-test", fetchImpl), false);
+  assert.equal(db.sqlite.prepare("SELECT synced_username FROM auth_profile_sync").get().synced_username, null);
+  await retryAuthProfileSync(env, fetchImpl);
+  assert.equal(db.sqlite.prepare("SELECT synced_username FROM auth_profile_sync").get().synced_username, "BeforeSync");
+  await retryAuthProfileSync(env, fetchImpl);
+  assert.deepEqual(calls.at(-1), { app_metadata: { daily_undead_username: "AfterSync", daily_undead_account_id: "acct_sync" } });
+  await syncAuthProfile(env, "supabase-sync-test", fetchImpl);
+  assert.equal(calls.length, 3, "unchanged account does not make another admin request");
+  // Periodic refresh also repairs manual metadata edits or overlapping writes.
+  db.sqlite.exec("UPDATE auth_profile_sync SET last_synced_at=datetime('now','-2 days')");
+  await retryAuthProfileSync(env, fetchImpl);
+  assert.equal(calls.length, 4);
+  assert.equal(db.sqlite.prepare("SELECT score FROM player_saves").get().score, 321);
+  db.sqlite.exec("DELETE FROM player_profiles WHERE account_id='acct_sync'");
+  assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS n FROM auth_profile_sync").get().n, 0);
+  await retryAuthProfileSync(env, fetchImpl);
+  assert.equal(calls.length, 4, "deleted accounts are not sent back to Supabase");
+});
+
+test("metadata backfills are bounded and failed accounts do not starve remaining players", async (t) => {
+  const db = await database();
+  t.after(() => db.sqlite.close());
+  for (let index = 0; index < 21; index++) {
+    const id = String(index).padStart(2, "0");
+    db.sqlite.prepare("INSERT INTO player_profiles (user_id,username,account_id) VALUES (?,?,?)").run(`user_${id}`, `Player${id}`, `acct_${id}`);
+    db.sqlite.prepare("INSERT INTO account_identities (provider,provider_subject,account_id) VALUES ('supabase',?,?)").run(`subject-${id}`, `acct_${id}`);
+  }
+  const env = { ...stagingEnv(db), SUPABASE_SECRET_KEY: "test-secret" };
+  const calls = [];
+  const fetchImpl = async (url) => { calls.push(url); return new Response(null, { status: url.endsWith('subject-00') ? 503 : 200 }); };
+  await retryAuthProfileSync(env, fetchImpl);
+  assert.equal(calls.length, 20);
+  await retryAuthProfileSync(env, fetchImpl);
+  assert.equal(calls.length, 22);
+  assert.ok(calls[20].endsWith("subject-20"));
+  assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS n FROM auth_profile_sync WHERE synced_username IS NOT NULL").get().n, 20);
+});
+
+test("local and unconfigured environments cannot mutate shared authentication metadata", async () => {
+  const DB = { prepare() { throw new Error("must not touch database"); } };
+  const fetchImpl = () => { throw new Error("must not contact Supabase"); };
+  for (const env of [
+    { ...stagingEnv(DB), DEPLOYMENT_ENVIRONMENT: "local", SUPABASE_SECRET_KEY: "secret" },
+    { ...stagingEnv(DB), DEPLOYMENT_ENVIRONMENT: undefined, SUPABASE_SECRET_KEY: "secret" },
+    stagingEnv(DB),
+    { ...stagingEnv(DB), SUPABASE_ISSUER: undefined, SUPABASE_SECRET_KEY: "secret" },
+  ]) {
+    assert.equal(await syncAuthProfile(env, "subject", fetchImpl), false);
+    await retryAuthProfileSync(env, fetchImpl);
+  }
+});
 
 test("fictional staging activity uses real SQL, remains idempotent and rolls over at UTC midnight", async () => {
   const db = await database();
@@ -124,18 +217,34 @@ test("real account routes save profiles, verify puzzle rewards, reject stale sav
   const signature = await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, keys.privateKey, new TextEncoder().encode(input));
   const token = `${input}.${Buffer.from(signature).toString("base64url")}`;
   const originalFetch = globalThis.fetch;
-  globalThis.fetch = async (url) => { assert.equal(url, `${issuer}/.well-known/jwks.json`); return Response.json({ keys: [jwk] }); };
+  const metadataUpdates = [];
+  globalThis.fetch = async (url, options) => {
+    if (options?.method === "PUT") {
+      assert.equal(url, `${issuer}/admin/users/c6ca42ae-f94f-4f44-80d3-bd08d52fd724`);
+      metadataUpdates.push(JSON.parse(options.body).app_metadata);
+      return Response.json({});
+    }
+    assert.equal(url, `${issuer}/.well-known/jwks.json`);
+    return Response.json({ keys: [jwk] });
+  };
   resetJwksCacheForTests();
   t.after(() => { globalThis.fetch = originalFetch; resetJwksCacheForTests(); db.sqlite.close(); });
   const today = new Date().toISOString().slice(0, 10);
   const request = async (route, method = "GET", body, status = 200) => {
-    const result = await worker.fetch(new Request(`https://api.test${route}`, { method, headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, ...(body ? { body: JSON.stringify(body) } : {}) }), { DB: db, SUPABASE_ISSUER: issuer });
+    const pendingTasks = [];
+    const result = await worker.fetch(new Request(`https://api.test${route}`, { method, headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" }, ...(body ? { body: JSON.stringify(body) } : {}) }), { DB: db, SUPABASE_ISSUER: issuer, DEPLOYMENT_ENVIRONMENT: "staging", SUPABASE_SECRET_KEY: "test-secret" }, { waitUntil: (task) => pendingTasks.push(task) });
+    await Promise.all(pendingTasks);
     const data = await result.json();
     assert.equal(result.status, status, `${route}: ${JSON.stringify(data)}`);
     return data;
   };
   assert.equal((await request(`/api/account?date=${today}`)).needsOnboarding, true);
   await request("/api/account/register", "POST", { username: "WorkflowTester", puzzleDate: today, importLocalProgress: false }, 201);
+  assert.equal(metadataUpdates.at(-1).daily_undead_username, "WorkflowTester");
+  assert.equal(metadataUpdates.at(-1).daily_undead_account_id, db.sqlite.prepare("SELECT account_id FROM player_profiles WHERE username='WorkflowTester'").get().account_id);
+  await request("/api/account/username", "PUT", { username: "WorkflowRenamed" });
+  assert.equal(metadataUpdates.at(-1).daily_undead_username, "WorkflowRenamed");
+  await request("/api/account/username", "PUT", { username: "WorkflowTester" });
   await request("/api/account/profile", "PUT", { avatarId: "richtofen", themeId: "default", favouriteGame: "Black Ops", favouriteMap: "Moon", bio: "Profile saved through the real API." });
   const profile = await worker.fetch(new Request("https://api.test/api/profiles/WorkflowTester"), { DB: db });
   assert.equal((await profile.json()).profile.bio, "Profile saved through the real API.");
