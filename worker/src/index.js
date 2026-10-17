@@ -1,4 +1,5 @@
 import { verifyAccountRequest } from "./auth.js";
+import { deleteAccount, isAccountRevoked, retryAuthDeletions } from "./account-deletion.js";
 import { ensureStagingFixtures, fixturesEnabled } from "./staging-fixtures.js";
 import {
   getAccount,
@@ -55,7 +56,7 @@ function corsHeaders(request, env) {
 
   return {
     "Access-Control-Allow-Origin": origin,
-    "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Authorization, Content-Type",
     "Access-Control-Max-Age": "86400",
     Vary: "Origin",
@@ -266,13 +267,22 @@ async function handleAccountRequest(request, env, url) {
     return errorResponse(request, env, error.message || "The account session is invalid.", 401);
   }
 
-  const identity = await resolveAccountIdentity(env.DB, verifiedIdentity);
+  const deleting = url.pathname === "/api/account" && request.method === "DELETE";
+  const revoked = await isAccountRevoked(env.DB, verifiedIdentity);
+  if (revoked && !deleting) {
+    return errorResponse(request, env, "This account has been deleted. Please sign out.", 401);
+  }
+  const identity = revoked
+    ? { ...verifiedIdentity, userId: null, accountId: null }
+    : await resolveAccountIdentity(env.DB, verifiedIdentity);
   if (!identity) {
     return errorResponse(request, env, "The account identity is invalid.", 401);
   }
 
   let result;
-  if (url.pathname === "/api/account" && request.method === "GET") {
+  if (deleting) {
+    result = await deleteAccount(request, env, identity);
+  } else if (url.pathname === "/api/account" && request.method === "GET") {
     result = identity.userId
       ? await getAccount(env.DB, identity.userId, url.searchParams.get("date"))
       : { status: 200, body: { needsOnboarding: true, accountId: null } };
@@ -370,6 +380,7 @@ export default {
     }
   },
   async scheduled(_controller, env, context) {
+    if (env.DB && env.DEPLOYMENT_ENVIRONMENT !== "local") context.waitUntil(retryAuthDeletions(env));
     if (fixturesEnabled(env)) context.waitUntil(ensureStagingFixtures(env));
     if (!env.SUPABASE_HEARTBEAT_URL || !env.SUPABASE_HEARTBEAT_SECRET_KEY) return;
     context.waitUntil((async () => {

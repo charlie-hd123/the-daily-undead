@@ -6,8 +6,9 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261017-3";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261017-3";
+} from "./account-session.js?v=20261017-4";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261017-4";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261017-4";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -313,7 +314,7 @@ export async function requestJson(
   apiUrl,
   path,
   options = {},
-  { fetchImpl = globalThis.fetch, timeoutMs = 8_000 } = {},
+  { fetchImpl = globalThis.fetch, timeoutMs = 8_000, timeoutMessage = "Account sync took too long. Your cloud save is safe." } = {},
 ) {
   const token = await clerk.session?.getToken();
   if (!token) throw new Error("Please sign in again.");
@@ -335,7 +336,7 @@ export async function requestJson(
     result = await response.json().catch(() => ({}));
   } catch (error) {
     if (controller.signal.aborted) {
-      throw new Error("Account sync took too long. Your cloud save is safe.");
+      throw new Error(timeoutMessage);
     }
     throw error;
   } finally {
@@ -631,6 +632,7 @@ export async function initialiseAccount({
   let saveInFlight = false;
   let saveAgain = false;
   let intentionalSignOut = false;
+  let deletingAccount = false;
   let signedOutMemory = null;
   const legacyDirtyStorageKey = "the-daily-undead:account-sync-pending";
 
@@ -732,7 +734,7 @@ export async function initialiseAccount({
   try {
     clerk = await withTimeout(
       supabaseConfigured
-        ? import("./supabase-auth.js?v=20261017-3").then(({ loadSupabaseAuth }) => (
+        ? import("./supabase-auth.js?v=20261017-4").then(({ loadSupabaseAuth }) => (
           loadSupabaseAuth(documentObject)
         ))
         : loadClerk(publishableKey),
@@ -1251,6 +1253,22 @@ export async function initialiseAccount({
   const primaryEmail = () => clerk.user?.primaryEmailAddress?.emailAddress
     || clerk.user?.emailAddresses?.[0]?.emailAddress
     || "Not available";
+  initialiseAccountSettings({
+    documentObject,
+    clerk,
+    requestDelete: () => requestJson(clerk, apiUrl, "/api/account", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ confirmation: "DELETE" }),
+    }, { timeoutMs: 15_000, timeoutMessage: "Could not confirm deletion. Please retry to check and finish removing your account." }),
+    beforeDelete: () => {
+      deletingAccount = true;
+      intentionalSignOut = true;
+      globalThis.clearTimeout(saveTimer);
+      saveAgain = false;
+    },
+    afterDeleteFailure: () => { deletingAccount = false; intentionalSignOut = false; },
+  });
   const openClerkPage = (initialPage) => {
     closeDialog(accountDetailsDialog);
     closeDialog(accountSecurityDialog);
@@ -1302,7 +1320,7 @@ export async function initialiseAccount({
   let currentRevision = Number(account.progress?.revision || 1);
 
   async function saveNow() {
-    if (readOnlyProgress) return;
+    if (readOnlyProgress || deletingAccount) return;
     if (saveInFlight) {
       saveAgain = true;
       return;
@@ -1321,6 +1339,7 @@ export async function initialiseAccount({
         }),
       });
       currentRevision = Number(saveResult.progress?.revision || currentRevision + 1);
+      if (deletingAccount) return;
       rememberAccount(globalThis.localStorage, { userId, revision: currentRevision });
       clearPendingProgress(globalThis.localStorage, userId);
     } catch (error) {
@@ -1336,14 +1355,14 @@ export async function initialiseAccount({
   }
 
   function scheduleSave() {
-    if (readOnlyProgress) return;
+    if (readOnlyProgress || deletingAccount) return;
     persistPendingProgress(userId, currentRevision);
     globalThis.clearTimeout(saveTimer);
     saveTimer = globalThis.setTimeout(saveNow, 350);
   }
 
   async function recordMapResult(payload) {
-    if (readOnlyProgress) return null;
+    if (readOnlyProgress || deletingAccount) return null;
     try {
       const result = await requestJson(clerk, apiUrl, "/api/account/results/map", {
         method: "POST",
@@ -1351,6 +1370,7 @@ export async function initialiseAccount({
         body: JSON.stringify(payload),
       });
       currentRevision = Math.max(currentRevision, Number(result.progress?.revision || 0));
+      if (deletingAccount) return null;
       rememberAccount(globalThis.localStorage, { userId, revision: currentRevision });
       scheduleSave();
       return result;
@@ -1360,7 +1380,7 @@ export async function initialiseAccount({
   }
 
   async function recordBonusResult(payload) {
-    if (readOnlyProgress) return null;
+    if (readOnlyProgress || deletingAccount) return null;
     try {
       const result = await requestJson(clerk, apiUrl, "/api/account/results/bonus", {
         method: "POST",
@@ -1368,6 +1388,7 @@ export async function initialiseAccount({
         body: JSON.stringify(payload),
       });
       currentRevision = Math.max(currentRevision, Number(result.progress?.revision || 0));
+      if (deletingAccount) return null;
       rememberAccount(globalThis.localStorage, { userId, revision: currentRevision });
       scheduleSave();
       return result;
@@ -1377,7 +1398,7 @@ export async function initialiseAccount({
   }
 
   async function recordWordResult(payload) {
-    if (readOnlyProgress) return null;
+    if (readOnlyProgress || deletingAccount) return null;
     try {
       const result = await requestJson(clerk, apiUrl, "/api/account/results/word", {
         method: "POST",
@@ -1385,6 +1406,7 @@ export async function initialiseAccount({
         body: JSON.stringify(payload),
       });
       currentRevision = Math.max(currentRevision, Number(result.progress?.revision || 0));
+      if (deletingAccount) return null;
       rememberAccount(globalThis.localStorage, { userId, revision: currentRevision });
       scheduleSave();
       return result;
@@ -1413,6 +1435,9 @@ export async function initialiseAccount({
     if (!wasSignedIn || user) return;
     wasSignedIn = false;
     controller.canSync = false;
+    globalThis.clearTimeout(saveTimer);
+    saveAgain = false;
+    if (!readRememberedAccount(globalThis.localStorage)) deletingAccount = true;
     if (!intentionalSignOut && readRememberedAccount(globalThis.localStorage)) {
       controller.resultSubmissionRequiresSignIn = true;
       persistPendingProgress(userId, currentRevision);

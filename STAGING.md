@@ -49,6 +49,8 @@ The real API runs `worker/src/staging-fixtures.js` only with explicit staging/lo
 
 The user's actual staging login/account is never reset or overwritten by fixtures. Deployments do not reset the database. Production lacks fixture flags and its issuer is rejected by the fixture guard. The integration tests apply every real migration to SQLite and exercise rollover, deduplication, both puzzle types, accounts, profile saves, signed result verification and revision conflicts. The old fixed-date SQL is retired.
 
+Account settings support verified email changes and permanent self-service deletion. Migration `0012_account_deletion.sql` adds revoked provider IDs (to block existing JWTs and legacy identity relinking) and a durable auth-deletion retry queue. Deletion atomically removes the player's profile and cascading saves/results/identities, then hard-deletes the Supabase auth user. Failed auth removals retry on the Worker schedule. Only provider IDs remain for session revocation; anonymous aggregate activity is unchanged. The server uses `SUPABASE_SECRET_KEY`, falling back to the existing server-only `SUPABASE_HEARTBEAT_SECRET_KEY` (both are Supabase project secret keys). No key is sent to the browser. Local deletion refuses to mutate the shared staging authentication project: exercise deletion with a disposable account on the normal staging website. Production application of migration 0012 requires explicit review and authorization before promotion.
+
 ## Promote all approved work
 
 Only after the user explicitly requests live publication:

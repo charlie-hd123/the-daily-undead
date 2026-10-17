@@ -38,7 +38,7 @@ export async function loadSupabaseAuth(documentObject = document) {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
-      detectSessionInUrl: false,
+      detectSessionInUrl: true,
       flowType: "pkce",
     },
   });
@@ -68,6 +68,7 @@ export async function loadSupabaseAuth(documentObject = document) {
       primaryEmailAddress: { emailAddress },
       emailAddresses: emailAddress ? [{ emailAddress }] : [],
       createdAt: user.created_at,
+      pendingEmail: user.new_email || "",
     };
   };
 
@@ -215,6 +216,16 @@ export async function loadSupabaseAuth(documentObject = document) {
       const result = await client.auth.signOut({ scope: "local" });
       if (result.error) throw result.error;
       if (redirectUrl) window.location.assign(redirectUrl);
+    },
+    forgetDeletedSession() {
+      const storageKey = `sb-${new URL(config.url).hostname.split(".")[0]}-auth-token`;
+      try {
+        localStorage.removeItem(storageKey);
+        localStorage.removeItem(`${storageKey}-code-verifier`);
+        localStorage.removeItem(`${storageKey}-user`);
+      } catch { /* Storage may be unavailable. */ }
+      currentSession = null;
+      listeners.forEach((listener) => listener({ user: null }));
     },
   };
   return facade;

@@ -17,6 +17,7 @@ import { buildDailyWordPuzzle } from "../js/word-puzzle-core.js";
 import { getOfficialPuzzleType } from "../js/daily-challenge-core.js";
 import { workerMaps } from "../worker/src/generated-map-catalog.js";
 import { workerWords } from "../worker/src/generated-word-catalog.js";
+import { deleteAccount, isAccountRevoked, retryAuthDeletions } from "../worker/src/account-deletion.js";
 
 // Real SQLite schema, triggers and SQL, behind the same small D1 interface.
 async function database() {
@@ -155,6 +156,64 @@ test("real account routes save profiles, verify puzzle rewards, reject stale sav
   assert.equal(saved.progress.solves, 1);
   await request("/api/account/save", "PUT", { puzzleDate: today, baseRevision: account.progress.revision, progress: account.progress }, 409);
   assert.equal((await request(`/api/account?date=${today}`)).progress.score, 100);
+  // Deletion must authenticate, validate confirmation, cascade all player data,
+  // preserve other players, and reject even the original unexpired token.
+  const deletionEnv = { DB: db, SUPABASE_ISSUER: issuer, SUPABASE_SECRET_KEY: "test-secret", DEPLOYMENT_ENVIRONMENT: "staging" };
+  db.sqlite.exec("INSERT INTO player_profiles (user_id, username, account_id) VALUES ('other', 'KeepMe', 'acct_other'); INSERT INTO player_saves (user_id, score) VALUES ('other', 77)");
+  const deleteRequest = (body, authorization = `Bearer ${token}`) => worker.fetch(new Request("https://api.test/api/account", { method: "DELETE", headers: { Authorization: authorization, "Content-Type": "application/json" }, body: JSON.stringify(body) }), deletionEnv);
+  assert.equal((await deleteRequest({ confirmation: "DELETE" }, "")).status, 401);
+  assert.equal((await deleteRequest({ confirmation: "wrong" })).status, 400);
+  const profileId = db.sqlite.prepare("SELECT user_id FROM player_profiles WHERE username='WorkflowTester'").get().user_id;
+  globalThis.fetch = async (url, options) => {
+    assert.equal(url, `${issuer}/admin/users/c6ca42ae-f94f-4f44-80d3-bd08d52fd724`);
+    assert.equal(options.method, "DELETE");
+    assert.equal(options.headers.apikey, "test-secret");
+    return new Response(null, { status: 200 });
+  };
+  const deletion = await deleteRequest({ confirmation: "DELETE", userId: "other" });
+  assert.equal(deletion.status, 200);
+  assert.equal((await deletion.json()).deleted, true);
+  for (const table of ["player_profiles", "player_saves", "player_daily_saves", "player_daily_results"]) {
+    assert.equal(db.sqlite.prepare(`SELECT COUNT(*) AS n FROM ${table} WHERE user_id=?`).get(profileId).n, 0, table);
+  }
+  assert.equal(db.sqlite.prepare("SELECT score FROM player_saves WHERE user_id='other'").get().score, 77);
+  assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS n FROM account_deletion_jobs").get().n, 0);
+  await request(`/api/account?date=${today}`, "GET", undefined, 401);
+  await request("/api/account/register", "POST", { username: "ComeBack", puzzleDate: today }, 401);
+  await request("/api/account/save", "PUT", { puzzleDate: today }, 401);
+  assert.equal((await deleteRequest({ confirmation: "DELETE" })).status, 200);
+});
+
+test("deletion is atomic, revokes linked legacy identities, and durably retries auth outages", async (t) => {
+  const db = await database();
+  t.after(() => db.sqlite.close());
+  db.sqlite.exec("INSERT INTO player_profiles (user_id,username,account_id) VALUES ('user_legacy','DeleteMe','acct_delete'); INSERT INTO player_saves (user_id, score) VALUES ('user_legacy',999); INSERT INTO account_identities (provider,provider_subject,account_id) VALUES ('clerk','user_legacy','acct_delete'),('supabase','test-subject','acct_delete')");
+  const identity = { provider: "supabase", subject: "test-subject", userId: "user_legacy", accountId: "acct_delete" };
+  const env = { DB: db, DEPLOYMENT_ENVIRONMENT: "staging", SUPABASE_ISSUER: "https://test.supabase.co/auth/v1", SUPABASE_HEARTBEAT_SECRET_KEY: "secret" };
+  const req = () => new Request("https://test/api/account", { method: "DELETE", body: JSON.stringify({ confirmation: "DELETE" }) });
+  assert.equal((await deleteAccount(req(), { ...env, DEPLOYMENT_ENVIRONMENT: "local" }, identity)).status, 409);
+  assert.equal((await deleteAccount(req(), { ...env, SUPABASE_HEARTBEAT_SECRET_KEY: undefined }, identity)).status, 503);
+  assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS n FROM player_profiles").get().n, 1);
+  // A transaction error must roll back revocation and the queued deletion too.
+  db.sqlite.exec("CREATE TRIGGER fail_deletion BEFORE DELETE ON player_profiles BEGIN SELECT RAISE(ABORT,'test failure'); END");
+  await assert.rejects(deleteAccount(req(), env, identity), /test failure/);
+  assert.equal(await isAccountRevoked(db, identity), false);
+  db.sqlite.exec("DROP TRIGGER fail_deletion");
+  const result = await deleteAccount(req(), env, identity, async () => new Response(null, { status: 503 }));
+  assert.equal(result.status, 202);
+  assert.equal(await isAccountRevoked(db, identity), true);
+  assert.equal(await isAccountRevoked(db, { provider: "clerk", subject: "user_legacy" }), true);
+  assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS n FROM player_profiles").get().n, 0);
+  assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS n FROM account_identities").get().n, 0);
+  assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS n FROM account_deletion_jobs").get().n, 1);
+  db.sqlite.exec("INSERT INTO player_profiles (user_id,username,account_id) VALUES ('new','New','acct_new')");
+  assert.throws(() => db.sqlite.prepare("INSERT INTO account_identities (provider,provider_subject,account_id) VALUES ('clerk','user_legacy','acct_new')").run(), /deleted/);
+  const originalFetch = globalThis.fetch;
+  t.after(() => { globalThis.fetch = originalFetch; });
+  globalThis.fetch = async () => new Response(null, { status: 404 });
+  await retryAuthDeletions(env);
+  assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS n FROM account_deletion_jobs").get().n, 0);
+  assert.equal(await isAccountRevoked(db, identity), true);
 });
 
 test("staging gateway protects the app and exposes only release identity", async () => {
