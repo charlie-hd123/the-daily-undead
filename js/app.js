@@ -12,19 +12,19 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261017-6";
+} from "./game-core.js?v=20261017-7";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
-} from "./word-puzzle-core.js?v=20261017-6";
+} from "./word-puzzle-core.js?v=20261017-7";
 import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261017-6";
+} from "./daily-challenge-core.js?v=20261017-7";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -33,27 +33,27 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261017-6";
+} from "./progression.js?v=20261017-7";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261017-6";
+} from "./account.js?v=20261017-7";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261017-6";
+} from "./community-stats.js?v=20261017-7";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261017-6";
-import { fetchWithTimeout } from "./network.js?v=20261017-6";
-import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261017-6";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261017-6";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261017-6";
-import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261017-6";
+} from "./leaderboards.js?v=20261017-7";
+import { fetchWithTimeout } from "./network.js?v=20261017-7";
+import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261017-7";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261017-7";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261017-7";
+import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261017-7";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -191,13 +191,13 @@ const puzzleTypes = {
     name: "Quest Steps",
     kicker: "Easter egg puzzle",
     description: "Can you identify the Zombies map from its Easter egg steps?",
-    image: "./assets/quest-steps-card.svg?v=20261017-6",
+    image: "./assets/quest-steps-card.svg?v=20261017-7",
   },
   word: {
     name: "Last Words",
     kicker: "Letter puzzle",
     description: "Can you identify the Zombies word or phrase by revealing its letters?",
-    image: "./assets/dead-letters-card.svg?v=20261017-6",
+    image: "./assets/dead-letters-card.svg?v=20261017-7",
   },
 };
 

@@ -1039,7 +1039,8 @@
   letter-spacing: 0.025em;
 }
 
-@media (min-width: 60.0625rem) {
+/* Keep the word puzzle's proportions consistent on tablets and desktops. */
+@media (min-width: 35.0625rem) {
   .word-puzzle-panel {
     padding-block: 1.35rem;
   }
@@ -1930,8 +1931,13 @@
 
   .word-answer {
     min-height: 6.5rem;
+    margin-top: 0.75rem;
     padding: 0.85rem 0.25rem;
     row-gap: 0.65rem;
+  }
+
+  .word-category-hint {
+    margin-top: 0.65rem;
   }
 
   .word-result-description {
@@ -2030,6 +2036,10 @@
 
   .puzzle-choice-actions {
     padding: 0 0.85rem 0.85rem 1.05rem;
+  }
+
+  .puzzle-choice-status-row {
+    margin-inline: 1.05rem 0.85rem;
   }
 
   .puzzle-choice-actions .button {
