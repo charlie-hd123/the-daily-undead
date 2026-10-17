@@ -34,50 +34,11 @@ The marketing page:
 
 If the statistics API is temporarily unavailable, the page still generates the image and copy but shows `—%` with a warning. Refresh before posting to obtain the percentage.
 
-## Run locally
+## Run locally and manage releases
 
-From this folder, start any static file server. Python is already available on most Macs:
+Use Node 24 and `pnpm install --frozen-lockfile`, then `npm run dev` for the complete local website, real API and local-only D1 database. Authentication uses the isolated staging Supabase project. Refresh the local page after edits; add new source files to Git's index before previewing. Hosted staging and live remain online independently of the local server.
 
-```sh
-python3 -m http.server 8080
-```
-
-Then open [http://localhost:8080](http://localhost:8080). Opening `index.html` directly will not work because browsers block local JSON requests.
-
-For an instant account/profile preview with no Clerk sign-in or Worker, open:
-
-```text
-http://localhost:8080/?socialDemo=1
-```
-
-This localhost-only demo seeds leaderboard players, public profiles, favourites and themes. Click the demo username to open the account menu, choose **Game profile** to edit it, or click any leaderboard name to view that player. Demo changes stay in browser local storage and the flag is ignored outside localhost.
-
-To preview another daily puzzle without waiting for tomorrow, add a date:
-
-```text
-http://localhost:8080/?date=2026-07-29
-```
-
-During local development, the **Dev button – advance a day** control at the bottom of the site advances this preview date by one day while preserving the current time-of-day. The control is enabled on `localhost` and private LAN addresses (including `.local` Mac hostnames) so it can be used from a phone on the same network, and is removed on the public website.
-
-Localhost uses a local Worker at `http://localhost:8787`; it never submits attempts to the production community database. If the local Worker is not running, the game still works and the community figures show `—`. Future-date previews are also rejected by the Worker, so **Advance a day** cannot affect live totals.
-
-To build and test profiles and leaderboards without deploying or touching production data, initialise the separate local profile database and start its Worker in another terminal:
-
-```sh
-npm run db:profiles
-npm run start:profiles
-```
-
-This Worker runs at `http://localhost:8788` and uses local-only D1 storage. The site never points these local profile writes at the production database.
-
-If you only need a read-only preview of existing production leaderboard data, use `npm run start:leaderboards` instead. Do not run both commands at once because they share port `8788`.
-
-Because local account sync stays isolated from production, append `?leaderboardUser=ExactUsername` to the local page URL to preview that account's blue highlighted row and **Find me** control. The comparison is case-sensitive and this preview parameter is ignored on the public site.
-
-Guest progress is saved in the browser separately for each date. Signed-in players also synchronise it through the account API. Every player receives the next puzzle at 00:00 UTC, and the header countdown shows the time remaining until that worldwide rollover. The site synchronises against its host's clock when possible and falls back to the device clock when offline.
-
-The browser stores current Round and Highest Round separately. On the first load after Highest Round tracking was introduced, an older save's current Round is immediately preserved as its initial Highest Round before a later loss can reset the current run.
+The normal path is local work → complete staging review → exact approved commit promoted to live. `main` is the live source; `staging` preserves every pending change. Start with `npm run release:sync` on staging. See [STAGING.md](STAGING.md) for deployment commands and [WEBSITE-WORKFLOW.md](WEBSITE-WORKFLOW.md) for example prompts. `npm start` remains a static-only preview; it does not start accounts or statistics.
 
 ## Run the tests
 
@@ -138,7 +99,7 @@ Maps in `selectionOnlyMaps` inside `data/maps/index.json` appear in the answer g
 
 ## Publish with GitHub Pages
 
-Staging must run the same application code that will be published to production, with only staging configuration, warning UI, and test data differing. User-facing changes must not exist only in the staging demo renderer. Promote the exact commit approved on staging rather than manually recreating its changes on `main`; verify representative mobile and desktop puzzle states before and after deployment, and retain the previous production commit as the rollback point. The detailed agent-facing release checklist is in [`AGENTS.md`](AGENTS.md).
+Use `npm run deploy:staging` to review a committed candidate and `npm run release:promote -- FULL_APPROVED_COMMIT_SHA` only after explicit publication approval. Promotion preserves the exact reviewed commit, all pending changes and a rollback point. Run `npm run release:verify-live` after GitHub Pages finishes. See [STAGING.md](STAGING.md) and the change-proportional review rules in [AGENTS.md](AGENTS.md).
 
 Once this folder is pushed to a GitHub repository:
 

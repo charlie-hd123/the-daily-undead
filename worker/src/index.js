@@ -1,4 +1,5 @@
 import { verifyAccountRequest } from "./auth.js";
+import { ensureStagingFixtures, fixturesEnabled } from "./staging-fixtures.js";
 import {
   getAccount,
   getPublicProfile,
@@ -323,6 +324,7 @@ export default {
     const url = new URL(request.url);
 
     try {
+      await ensureStagingFixtures(env);
       if (url.pathname.startsWith("/api/profiles/") && request.method === "GET") {
         const username = decodeURIComponent(url.pathname.slice("/api/profiles/".length));
         const result = await getPublicProfile(env.DB, username);
@@ -346,6 +348,11 @@ export default {
       if (url.pathname === "/health" && request.method === "GET") {
         return jsonResponse(request, env, {
           ok: true,
+          environment: env.DEPLOYMENT_ENVIRONMENT || "production",
+          commit: env.RELEASE_COMMIT || null,
+          apiDigest: env.RELEASE_API_DIGEST || null,
+          configurationDigest: env.RELEASE_CONFIG_DIGEST || null,
+          fixturesEnabled: fixturesEnabled(env),
           accountsConfigured: Boolean(env.CLERK_ISSUER || env.SUPABASE_ISSUER),
           accountProviders: {
             clerk: Boolean(env.CLERK_ISSUER),
@@ -363,6 +370,7 @@ export default {
     }
   },
   async scheduled(_controller, env, context) {
+    if (fixturesEnabled(env)) context.waitUntil(ensureStagingFixtures(env));
     if (!env.SUPABASE_HEARTBEAT_URL || !env.SUPABASE_HEARTBEAT_SECRET_KEY) return;
     context.waitUntil((async () => {
       const response = await fetch(env.SUPABASE_HEARTBEAT_URL, {

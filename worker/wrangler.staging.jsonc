@@ -8,6 +8,8 @@
     "crons": ["0 */12 * * *"]
   },
   "vars": {
+    "DEPLOYMENT_ENVIRONMENT": "staging",
+    "STAGING_FIXTURES": "1",
     "ALLOWED_ORIGINS": "https://daily-undead-staging.pages.dev",
     "CLERK_ISSUER": "https://rapid-pigeon-846.clerk.accounts.dev",
     "CLERK_AUTHORIZED_PARTIES": "https://daily-undead-staging.pages.dev",

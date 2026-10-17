@@ -6,8 +6,8 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261014-2";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261014-2";
+} from "./account-session.js?v=20261017-1";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261017-1";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -731,7 +731,7 @@ export async function initialiseAccount({
   try {
     clerk = await withTimeout(
       supabaseConfigured
-        ? import("./supabase-auth.js?v=20261007-4").then(({ loadSupabaseAuth }) => (
+        ? import("./supabase-auth.js?v=20261017-1").then(({ loadSupabaseAuth }) => (
           loadSupabaseAuth(documentObject)
         ))
         : loadClerk(publishableKey),

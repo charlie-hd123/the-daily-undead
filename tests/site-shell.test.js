@@ -108,7 +108,8 @@ test("browser-loaded code and styles share the current cache version", async () 
   );
 
   assert.equal(versionTokens.length >= 5, true);
-  assert.deepEqual(new Set(versionTokens), new Set(["20261015-3"]));
+  const manifest = JSON.parse(await readProjectFile("release.json"));
+  assert.deepEqual(new Set(versionTokens), new Set([manifest.build]));
 });
 
 test("the page exposes the same release build as the update manifest", async () => {
@@ -590,13 +591,10 @@ test("production Quest Steps renders every approved staging presentation hook", 
 });
 
 test("the staging build publishes the production application renderer", async () => {
-  const buildScript = await readProjectFile("scripts/build-staging.mjs");
-
-  assert.match(buildScript, /writeStagingHtml\("index\.html", \{ banner: true \}\)/);
-  assert.doesNotMatch(
-    buildScript,
-    /writeStagingHtml\("staging-demo\.html", \{ banner: true, outputFilename: "index\.html" \}\)/,
-  );
+  const [buildScript, html] = await Promise.all([readProjectFile("scripts/build-site.mjs"), readProjectFile("staging-demo.html")]);
+  assert.match(buildScript, /isWebsiteFile\(name\)/);
+  assert.match(html, /http-equiv="refresh" content="0;url=\.\/"/);
+  assert.doesNotMatch(html, /demo-app|staging-demo\.js/);
 });
 
 test("the clue count stays editable until a map is confirmed", async () => {
@@ -622,17 +620,16 @@ test("Quest Steps uses hard clues first, a full third clue and full bonus steps"
   assert.doesNotMatch(bonus, /step\.hardClue/);
 });
 
-test("the staging daily round is date-assigned and the extra puzzle unlocks afterward", async () => {
+test("the shared daily round is date-assigned and the extra puzzle unlocks afterward", async () => {
   const [html, app] = await Promise.all([
-    readProjectFile("staging-demo.html"),
-    readProjectFile("js/staging-demo.js"),
+    readProjectFile("index.html"),
+    readProjectFile("js/app.js"),
   ]);
 
-  assert.match(app, /officialType: getOfficialPuzzleType\(dateKey\)/);
+  assert.match(app, /officialType: getOfficialPuzzleType\(puzzle\.dateKey\)/);
   assert.match(app, /startPuzzle\(dayState\.officialType, "official"\)/);
   assert.match(app, /getOtherPuzzleType\(dayState\.officialType\)/);
   assert.match(app, /index === 2 \? step\.clue : step\.hardClue/);
-  assert.match(app, /puzzleStats: \{[\s\S]*?word: loadPuzzleStats\("word"\)[\s\S]*?easter: loadPuzzleStats\("easter"\)/);
   assert.doesNotMatch(app, /lockOfficialChoice/);
   assert.doesNotMatch(app, /Choose your daily puzzle/);
   assert.doesNotMatch(html, /data-demo-puzzle-filter/);
@@ -645,11 +642,10 @@ test("the staging daily round is date-assigned and the extra puzzle unlocks afte
 });
 
 test("official result actions link signed-out players to accounts and omit the action when signed in", async () => {
-  const [app, account, css, staging] = await Promise.all([
+  const [app, account, css] = await Promise.all([
     readProjectFile("js/app.js"),
     readProjectFile("js/account.js"),
     readProjectFile("styles.css"),
-    readProjectFile("js/staging-demo.js"),
   ]);
 
   assert.match(app, /accountController\.signedIn\s*\? ""\s*: '[^']*Save your progress/);
@@ -660,9 +656,7 @@ test("official result actions link signed-out players to accounts and omit the a
   assert.match(account, /signedIn: false,[\s\S]*?openAccountAccess: \(\) => openDialog\(accessDialog\)/);
   assert.match(css, /\.result-account-button\.is-save-progress \{[\s\S]*?border-color: rgb\(247 200 92 \/ 58%\);[\s\S]*?color: #f7c85c/);
   assert.doesNotMatch(css, /\.result-account-button\.is-leaderboards \{/);
-  assert.doesNotMatch(staging, /result-account-action|is-leaderboards/);
   assert.equal((app.match(/snapPageToTop\(\);/g) || []).length, 5);
-  assert.equal((staging.match(/snapPageToTop\(\);/g) || []).length, 2);
 });
 
 test("community statistics are placed near the bottom and contain no frontend credentials", async () => {

@@ -128,7 +128,7 @@ test("username tie-breaking preserves case-sensitive display and ordering", () =
 });
 
 test("the browser uses a separate local leaderboard service", () => {
-  assert.equal(resolveLeaderboardsApiUrl({ isLocalDevelopment: true }), "http://localhost:8788");
+  assert.equal(resolveLeaderboardsApiUrl({ isLocalDevelopment: true }), "http://localhost:8787");
   assert.equal(
     resolveLeaderboardsApiUrl({
       isLocalDevelopment: false,

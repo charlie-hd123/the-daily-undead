@@ -5,3 +5,7 @@ node_modules/
 worker/.wrangler/
 backups/
 .staging-dist/
+.production-dist/
+.local-dist/
+.releases/
+.release-work/

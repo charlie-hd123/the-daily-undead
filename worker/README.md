@@ -130,36 +130,15 @@ Use `SELECT` queries for routine inspection. Avoid the Studio **Add row** and **
 
 ## Local development
 
-Install a current Node.js release, then run these commands from the repository root.
-
-Apply the schema to local-only D1 storage:
+Use Node 24 and install the pinned dependencies with `pnpm install --frozen-lockfile`. From the repository root, run:
 
 ```sh
-npx wrangler@latest d1 migrations apply daily-undead-stats --local --config worker/wrangler.jsonc
+npm run dev
 ```
 
-Start the local Worker and D1 in terminal 1:
+This starts the complete website at http://localhost:8080 and the real API at http://localhost:8787, applies migrations to local-only `daily-undead-development`, and maintains fictional current-day players/results. Profiles, account saves, leaderboards and community stats share the same local database. Authentication uses the separate staging Supabase project; no writes go to production. Add new source files to Git's index before previewing and refresh the page after changes.
 
-```sh
-npx wrangler@latest dev --config worker/wrangler.jsonc
-```
-
-Start the static site in terminal 2:
-
-```sh
-python3 -m http.server 8080
-```
-
-Open [http://localhost:8080](http://localhost:8080). Localhost always uses `http://localhost:8787`, regardless of the production API URL in `index.html`. If the local Worker is unavailable, the game continues normally and community figures show `—`.
-
-Profiles use a second, local-only D1 database on port `8788`:
-
-```sh
-npm run db:profiles
-npm run start:profiles
-```
-
-The profile configuration authorises only local browser origins and does not declare a remote D1 binding. It is safe for avatar, favourite, theme, bio and public-profile testing without changing the live site.
+The old separate profile/read-only leaderboard configs are legacy development helpers. They are not used by the full local/staging workflow. See [../STAGING.md](../STAGING.md) for the release commands and environment boundaries.
 
 The **Advance a day** preview never writes to production. The frontend submits only when the puzzle date equals the real current UTC date, and the Worker independently rejects non-current dates.
 

@@ -225,7 +225,7 @@ test("the staging catalogue gives every word permanent scheduling metadata", asy
 
 test("the completed Last Words view carries the entry description below the answer", async () => {
   const source = await fs.readFile(
-    new URL("../js/staging-demo.js", import.meta.url),
+    new URL("../js/app.js", import.meta.url),
     "utf8",
   );
   const answerIndex = source.indexOf('<h2 class="final-map-name">');

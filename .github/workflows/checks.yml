@@ -1,0 +1,25 @@
+name: Candidate checks
+on:
+  push:
+    branches: [staging]
+  pull_request:
+    branches: [staging, main]
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Complete automated suite
+        run: node --test --test-reporter=spec
+      - name: Build both environments from the same commit
+        run: |
+          node scripts/build-site.mjs staging
+          node scripts/build-site.mjs production
+          node --input-type=module -e "import fs from 'node:fs'; const a=JSON.parse(fs.readFileSync('.staging-dist/release-manifest.json')); const b=JSON.parse(fs.readFileSync('.production-dist/release-manifest.json')); if(a.applicationDigest!==b.applicationDigest || a.apiDigest!==b.apiDigest) process.exit(1);"

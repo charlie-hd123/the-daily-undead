@@ -4,7 +4,7 @@ export function resolveLeaderboardsApiUrl({
   isLocalDevelopment,
   documentObject = globalThis.document,
 } = {}) {
-  if (isLocalDevelopment) return "http://localhost:8788";
+  if (isLocalDevelopment) return "http://localhost:8787";
 
   const configuredUrl = documentObject
     ?.querySelector('meta[name="daily-undead-stats-api"]')
