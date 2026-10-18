@@ -629,8 +629,8 @@ test("the shared daily round is date-assigned and the extra puzzle unlocks after
   assert.doesNotMatch(app, /Choose your daily puzzle/);
   assert.doesNotMatch(html, /data-demo-puzzle-filter/);
   assert.match(html, /data-yesterday-round-badge/);
-  assert.match(html, /Last Words ·<\/span><em data-yesterday-round-badge>Yesterday’s scored puzzle/);
-  assert.match(html, /Quest Steps ·<\/span><em data-yesterday-round-badge>Yesterday’s scored puzzle/);
+  assert.match(html, /Last Words ·<\/span><em data-yesterday-round-badge>Yesterday’s round/);
+  assert.match(html, /Quest Steps ·<\/span><em data-yesterday-round-badge>Yesterday’s round/);
   assert.equal((html.match(/data-community-puzzle="(?:word|easter)" hidden/g) || []).length, 2);
   assert.match(app, /result\.hidden = !official/);
   assert.doesNotMatch(html, /Yesterday’s puzzles|Answer and solve rate|Scored round/);

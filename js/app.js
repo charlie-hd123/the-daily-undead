@@ -12,19 +12,19 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261017-7";
+} from "./game-core.js?v=20261018-1";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
-} from "./word-puzzle-core.js?v=20261017-7";
+} from "./word-puzzle-core.js?v=20261018-1";
 import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261017-7";
+} from "./daily-challenge-core.js?v=20261018-1";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -33,27 +33,27 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261017-7";
+} from "./progression.js?v=20261018-1";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261017-7";
+} from "./account.js?v=20261018-1";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261017-7";
+} from "./community-stats.js?v=20261018-1";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261017-7";
-import { fetchWithTimeout } from "./network.js?v=20261017-7";
-import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261017-7";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261017-7";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261017-7";
-import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261017-7";
+} from "./leaderboards.js?v=20261018-1";
+import { fetchWithTimeout } from "./network.js?v=20261018-1";
+import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261018-1";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261018-1";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261018-1";
+import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261018-1";
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -65,8 +65,6 @@ const playerStats = document.querySelector(".player-stats");
 const statExplainer = document.querySelector("#player-stat-explainer");
 const progressionUpdateButton = document.querySelector("#progression-update-button");
 const progressionUpdateDialog = document.querySelector("#progression-update-dialog");
-const advanceDevDayButton = document.querySelector("#advance-dev-day");
-const returnDevTodayButton = document.querySelector("#return-dev-today");
 const leaderboardsButton = document.querySelector("#leaderboards-button");
 const leaderboardsDialog = document.querySelector("#leaderboards-dialog");
 const clueTemplate = document.querySelector("#clue-template");
@@ -80,6 +78,21 @@ const communityYesterdayEasterAnswerLabel = document.querySelector("#community-y
 const yesterdayCommunityResults = [...document.querySelectorAll("[data-community-puzzle]")];
 const isLocalDevelopment = isLocalDevelopmentHostname(window.location.hostname);
 const isLocalPreview = canPreviewDays(window.location.hostname, document.querySelector('meta[name="daily-undead-environment"]')?.content, isLocalPreviewHostname(window.location.hostname));
+// Direct local file servers skip the environment build that normally adds these links.
+if (isLocalPreview && !document.querySelector("#advance-dev-day")) {
+  const footerCopy = document.querySelector(".site-footer > p");
+  for (const [id, label] of [["advance-dev-day", "ADVANCE A DAY"], ["return-dev-today", "RETURN TO TODAY"]]) {
+    const button = document.createElement("button");
+    button.id = id;
+    button.className = "dev-day-button";
+    button.type = "button";
+    button.hidden = true;
+    button.textContent = label;
+    footerCopy?.append(document.createTextNode(" "), button);
+  }
+}
+const advanceDevDayButton = document.querySelector("#advance-dev-day");
+const returnDevTodayButton = document.querySelector("#return-dev-today");
 let dayPreviewEnabled = false;
 let localStorage = window.localStorage;
 const socialDemoEnabled = isLocalDevelopment && new URLSearchParams(window.location.search).get("socialDemo") === "1";
@@ -191,13 +204,13 @@ const puzzleTypes = {
     name: "Quest Steps",
     kicker: "Easter egg puzzle",
     description: "Can you identify the Zombies map from its Easter egg steps?",
-    image: "./assets/quest-steps-card.svg?v=20261017-7",
+    image: "./assets/quest-steps-card.svg?v=20261018-1",
   },
   word: {
     name: "Last Words",
     kicker: "Letter puzzle",
     description: "Can you identify the Zombies word or phrase by revealing its letters?",
-    image: "./assets/dead-letters-card.svg?v=20261017-7",
+    image: "./assets/dead-letters-card.svg?v=20261018-1",
   },
 };
 
@@ -2083,7 +2096,7 @@ function renderNextRoundScreen() {
   return `
     <section class="next-round-screen" aria-labelledby="next-round-screen-title" aria-live="off">
       <p class="kicker">Next round</p>
-      <h3 id="next-round-screen-title">New puzzle in</h3>
+      <h3 id="next-round-screen-title">Next round in</h3>
       <strong id="end-screen-countdown" class="end-screen-countdown" aria-label="Time until the next round">--:--:--</strong>
       <p class="next-round-motivation">Return tomorrow to keep your Round alive.</p>
     </section>

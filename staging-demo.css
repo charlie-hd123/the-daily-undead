@@ -143,9 +143,9 @@
   width: min(100% - 2rem, 70rem);
   grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
   gap: 1.15rem;
-  margin-top: 0.8rem;
-  margin-bottom: 1rem;
-  padding: 0.9rem 0 0.7rem;
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0.75rem 0 0.25rem;
   border: 0;
   background: transparent;
   box-shadow: none;
@@ -158,25 +158,36 @@
   left: 0;
   height: 1px;
   background: linear-gradient(90deg, transparent, rgb(103 232 255 / 26%) 18%, rgb(158 119 255 / 20%) 82%, transparent);
+  pointer-events: none;
   content: "";
 }
 
 .community-overview {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: center;
+  align-items: stretch;
 }
 
-.community-overview .community-stat + .community-stat {
-  border-left: 1px solid rgb(156 181 223 / 10%);
+.community-overview::after {
+  position: absolute;
+  top: 0.35rem;
+  bottom: 0.35rem;
+  left: 50%;
+  width: 1px;
+  background: rgb(156 181 223 / 10%);
+  pointer-events: none;
+  content: "";
 }
 
 .community-stats-demo .community-stat {
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
   gap: 0.16rem;
-  min-height: 3.75rem;
+  min-height: 3.25rem;
   padding: 0.48rem 0.55rem;
+  border: 0;
 }
 
 .community-stats-demo .community-stat strong {
@@ -195,7 +206,8 @@
 .community-yesterday {
   display: flex;
   align-items: center;
-  padding-left: 1.15rem;
+  margin: 0;
+  padding: 0 0 0 1rem;
   border-left: 1px solid rgb(156 181 223 / 10%);
 }
 
@@ -203,7 +215,7 @@
   display: grid;
   width: 100%;
   grid-template-columns: minmax(0, 1fr);
-  gap: 0;
+  gap: 0.25rem;
 }
 
 .community-result {
@@ -212,8 +224,8 @@
   min-width: 0;
   align-items: center;
   gap: 0.68rem;
-  min-height: 3.05rem;
-  padding: 0.45rem 0.62rem;
+  min-height: 3rem;
+  padding: 0.5rem 0;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -222,10 +234,6 @@
 
 .community-result[hidden] {
   display: none;
-}
-
-.community-result + .community-result {
-  border-left: 1px solid rgb(156 181 223 / 8%);
 }
 
 .community-result.is-official {
@@ -264,8 +272,7 @@
   display: grid;
   min-width: 3.4rem;
   justify-items: center;
-  padding-left: 0.62rem;
-  border-left: 1px solid rgb(156 181 223 / 10%);
+  padding-left: 0.25rem;
   line-height: 1;
 }
 
@@ -305,20 +312,19 @@
   .community-stats-demo {
     width: min(100% - 2rem, 74rem);
     grid-template-columns: 1fr;
-    gap: 0;
-    margin-top: 0.75rem;
-    padding: 0.78rem 0 0.55rem;
+    gap: 0.4rem;
+    margin-top: 0;
+    padding: 0.5rem 0 0.25rem;
   }
 
   .community-yesterday {
-    margin-top: 0.42rem;
-    padding: 0.34rem 0 0;
-    border-top: 1px solid rgb(156 181 223 / 8%);
+    padding: 0.5rem 0 0;
+    border-top: 1px solid rgb(156 181 223 / 10%);
     border-left: 0;
   }
 
   .community-stats-demo .community-stat {
-    min-height: 3.35rem;
+    min-height: 3rem;
     padding: 0.38rem 0.4rem;
     text-align: center;
   }
@@ -327,11 +333,6 @@
 @media (max-width: 30rem) {
   .community-result-grid {
     grid-template-columns: 1fr;
-  }
-
-  .community-result + .community-result {
-    border-top: 1px solid rgb(156 181 223 / 8%);
-    border-left: 0;
   }
 
   .community-result {
@@ -2074,4 +2075,312 @@
     width: 100%;
     min-width: 0;
   }
+}
+
+/* Local layout experiment: sizing, spacing and responsive proportions only. */
+.site-header,
+.app-shell,
+.community-stats-demo,
+.site-footer {
+  width: min(100% - 2rem, 66rem);
+}
+
+.site-header {
+  padding-block: 1.15rem 1rem;
+}
+
+.brand-logo {
+  width: clamp(3.35rem, 7vw, 5rem);
+  height: clamp(3.35rem, 7vw, 5rem);
+}
+
+h1 {
+  font-size: clamp(2rem, 8.4vw, 4rem);
+}
+
+.eyebrow {
+  font-size: 0.76rem;
+  margin-bottom: 0.18rem;
+}
+
+.app-shell {
+  padding-block: 1.25rem 1.5rem;
+}
+
+.panel {
+  padding: clamp(1.1rem, 3vw, 2rem);
+}
+
+.screen-heading {
+  margin-bottom: 1.25rem;
+}
+
+.screen-heading .kicker {
+  margin-bottom: 0.65rem;
+  font-size: 0.72rem;
+}
+
+.screen-heading h2,
+.bonus-panel h3 {
+  font-size: clamp(1.8rem, 4.6vw, 2.65rem);
+  line-height: 1.06;
+  margin-bottom: 0.6rem;
+}
+
+.screen-heading > p:last-child,
+.helper-text {
+  font-size: clamp(0.98rem, 2.8vw, 1.08rem);
+  line-height: 1.55;
+}
+
+.word-puzzle-panel .word-scoreboard {
+  width: min(100%, 28rem);
+  margin: 1.15rem auto 0;
+}
+
+.word-puzzle-panel {
+  width: min(100%, 54rem);
+  margin-inline: auto;
+}
+
+body:has(.word-puzzle-panel) .community-stats-demo {
+  max-width: 54rem;
+}
+
+.word-scoreboard > div,
+.quest-intel-status > div {
+  padding: 0.65rem 0.75rem;
+}
+
+.word-puzzle-panel .word-scoreboard > div { padding-block: 0.45rem; }
+
+.word-scoreboard span,
+.quest-intel-status span {
+  font-size: 0.68rem;
+}
+
+.word-scoreboard strong,
+.quest-intel-status strong {
+  font-size: 1.5rem;
+}
+
+.word-puzzle-panel .word-answer {
+  width: min(100%, 42rem);
+  min-height: 8rem;
+  margin: 0.75rem auto 0;
+  padding: 0.85rem 0.25rem;
+  row-gap: 0.7rem;
+}
+
+.word-letter {
+  width: clamp(1.3rem, 5.6vw, 2.6rem);
+  font-size: clamp(1.9rem, 6.5vw, 3.15rem);
+}
+
+.word-puzzle-panel .word-category-hint {
+  margin-top: 0.6rem;
+  font-size: 0.84rem;
+}
+
+.word-puzzle-panel .word-keyboard {
+  width: min(100%, 36rem);
+  margin: 1rem auto 0;
+  gap: 0.4rem;
+}
+
+.word-keyboard-row {
+  display: grid;
+  width: 100%;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  gap: 0.35rem;
+  margin-inline: auto;
+}
+
+.word-keyboard-row:nth-child(2) { width: 90%; }
+.word-keyboard-row:nth-child(3) { width: 70%; }
+
+.word-puzzle-panel .word-key {
+  width: 100%;
+  min-width: 0;
+  min-height: 3.15rem;
+  font-size: 1.05rem;
+}
+
+.word-puzzle-panel .word-game-status {
+  margin-top: 0.9rem;
+  font-size: 0.9rem;
+}
+
+.puzzle-hub-panel { padding: 0; }
+.puzzle-hub-hero { padding: 1.4rem 1.5rem; }
+.puzzle-choice-grid { padding: 1rem; gap: 1rem; }
+.puzzle-choice-copy { padding: 1.25rem 8.5rem 1rem 1.25rem; }
+.puzzle-choice-copy h3 { margin-block: 0.4rem 0.65rem; font-size: 1.7rem; }
+.puzzle-choice-copy > p:not(.kicker) { font-size: 0.96rem; line-height: 1.5; }
+.puzzle-choice-status-row { margin: 0 1.25rem 0.85rem; }
+.puzzle-choice-actions { padding: 0 1.25rem 1.25rem; }
+.puzzle-choice-art { width: 6.5rem; height: 6.5rem; }
+
+.public-profile-header > div { min-width: 0; }
+.public-profile-header h2 { overflow-wrap: anywhere; }
+
+.clue-number { margin-bottom: 0.65rem; }
+.clue-text { font-size: clamp(1.04rem, 3.2vw, 1.16rem); line-height: 1.5; }
+.quest-clue-panel .clue-card { min-height: 8.5rem; padding: 1.1rem; }
+.answer-selection-panel .card-title { font-size: 1.4rem; line-height: 1.08; }
+.answer-selection-panel .card-grid { grid-auto-rows: 1fr; }
+.answer-selection-panel .card-button {
+  min-height: 5.5rem;
+  height: 100%;
+  padding: 0.9rem 1rem;
+  align-content: start;
+  grid-template-columns: minmax(0, 1fr) 1.55rem;
+  column-gap: 0.55rem;
+  row-gap: 0.35rem;
+}
+.answer-selection-panel .card-button::after {
+  position: static;
+  grid-column: 2;
+  grid-row: 1;
+  align-self: start;
+}
+.answer-selection-panel .game-label { padding-right: 0; align-self: center; }
+.answer-selection-panel .card-title { grid-column: 1 / -1; margin-top: 0; overflow-wrap: anywhere; text-wrap: balance; }
+
+.result-banner { padding: 1.25rem 1.35rem; }
+.result-banner h2 { font-size: clamp(2rem, 5vw, 3rem); line-height: 1.05; }
+.final-map-name { font-size: clamp(2.4rem, 7vw, 3.75rem); margin-bottom: 1.2rem; }
+.share-score-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 1.75rem;
+}
+.share-score-actions .button {
+  width: min(100%, 32rem);
+  max-width: none;
+  min-width: 0;
+  flex: 0 0 auto;
+  min-height: 3.1rem;
+}
+
+.next-round-screen {
+  min-height: 13rem;
+  margin-top: 1.25rem;
+  padding: 2.5rem 1rem;
+}
+.next-round-screen .kicker { display: none; }
+.next-round-screen h3 { font-size: 1.35rem; margin-bottom: 1rem; }
+.end-screen-countdown { font-size: clamp(2.75rem, 8vw, 4.25rem); }
+.next-round-motivation { margin-top: 1.4rem; font-size: 0.95rem; text-wrap: balance; }
+
+.community-stats-demo .community-stat strong { font-size: 1.5rem; }
+.community-stats-demo .community-stat span { font-size: 0.68rem; line-height: 1.3; text-wrap: balance; }
+.community-result-title em { font-size: 0.58rem; line-height: 1.25; }
+.community-result-rate span,
+.community-result-copy span { font-size: 0.6rem; line-height: 1.25; }
+.community-result-copy { gap: 0.18rem; }
+.community-result-copy strong { font-size: 0.83rem; }
+.community-result-rate strong { font-size: 1.18rem; }
+.site-footer {
+  padding-block: 0.5rem 1.25rem;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+.site-footer p { font-size: 0.62rem; line-height: 1.45; }
+.site-footer .feedback-link { margin-top: 0.55rem; font-size: 0.68rem; line-height: 1.5; }
+
+@media (min-width: 48rem) and (max-width: 60rem) {
+  .site-header {
+    grid-template-areas: "brand utility" "stats stats";
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1rem;
+  }
+  .header-utility { display: grid; width: auto; justify-items: end; gap: 0.6rem; }
+  .header-utility .round-timing { order: 0; }
+  .header-utility:has(.account-button:not([hidden])) .account-controls {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .header-utility .round-timing { display: flex; align-items: center; gap: 0.6rem; }
+  .brand-logo { width: 3.75rem; height: 3.75rem; }
+  h1 { font-size: 2.9rem; }
+  .eyebrow { font-size: 0.68rem; }
+}
+
+@media (max-width: 48rem) {
+  .site-header { padding-block: 0.9rem; }
+  .brand-logo { width: 3.5rem; height: 3.5rem; }
+  h1 { font-size: clamp(2rem, 7vw, 3rem); }
+  .eyebrow { font-size: 0.68rem; }
+  .puzzle-choice-grid { gap: 0.75rem; padding: 0.75rem; }
+  .puzzle-choice-copy { padding: 1.1rem 7rem 1rem 1.1rem; }
+  .puzzle-choice-status-row { margin-inline: 1.1rem; }
+  .puzzle-choice-actions { padding: 0 1.1rem 1.1rem; }
+  .puzzle-choice-art { width: 5.25rem; height: 5.25rem; }
+  .quest-clue-panel .clue-card { min-height: 0; }
+  .quest-clue-panel .clue-card.is-hidden { min-height: 3.25rem; }
+}
+
+@media (max-width: 35rem) {
+  .site-header { padding-block: 0.8rem 0.75rem; gap: 0.65rem; }
+  .brand-lockup { gap: clamp(0.5rem, 1.4vw, 0.85rem); }
+  .brand-logo { width: clamp(3.3rem, 17vw, 4.1rem); height: clamp(3.3rem, 17vw, 4.1rem); }
+  h1 { font-size: clamp(2rem, 10vw, 2.8rem); line-height: 0.88; }
+  .eyebrow { font-size: clamp(0.68rem, 3.1vw, 0.8rem); letter-spacing: 0.095em; margin-bottom: 0.18rem; }
+  .header-meta { gap: 0.65rem; }
+  .round-timing { grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto; gap: 0.45rem; }
+  .round-timing .puzzle-date { min-width: 0; white-space: normal; }
+  .account-controls { gap: 0.6rem; }
+  .account-button { min-height: 2.75rem; font-size: 0.76rem; }
+  .app-shell { padding-block: 1rem 1.1rem; }
+  .panel { padding: 1rem; }
+  .screen-heading { margin-bottom: 1rem; }
+  .screen-heading h2 { font-size: clamp(1.7rem, 7.4vw, 2.15rem); line-height: 1.08; }
+  .screen-heading > p:last-child,
+  .helper-text { font-size: 0.94rem; line-height: 1.5; }
+  .screen-heading .kicker { font-size: 0.66rem; margin-bottom: 0.55rem; }
+  .word-puzzle-panel .word-scoreboard { margin-top: 0.9rem; }
+  .word-scoreboard > div,
+  .quest-intel-status > div { padding: 0.55rem 0.5rem; }
+  .word-puzzle-panel .word-answer { min-height: 6.5rem; margin-top: 0.4rem; padding-block: 0.65rem; }
+  .word-puzzle-panel .word-keyboard { width: calc(100% + 1.25rem); margin: 0.75rem -0.625rem 0; gap: 0.35rem; }
+  .word-keyboard-row { gap: 0.1rem; }
+  .word-puzzle-panel .word-key { min-height: 3.2rem; font-size: 1rem; }
+  .word-puzzle-panel .word-game-status { margin-top: 0.6rem; font-size: 0.86rem; }
+  .puzzle-hub-panel { padding: 0; }
+  .puzzle-hub-hero { padding: 1.2rem 1.1rem; }
+  .puzzle-choice-copy h3 { font-size: 1.55rem; }
+  .puzzle-choice-copy > p:not(.kicker) { font-size: 0.94rem; }
+  .puzzle-choice-copy { padding-right: 1.1rem; }
+  .puzzle-choice-copy .kicker,
+  .puzzle-choice-copy h3 { padding-right: 4.25rem; }
+  .puzzle-choice-art { width: 4rem; height: 4rem; }
+  .public-profile-header h2 { font-size: clamp(1.4rem, 6.5vw, 2rem); }
+  .answer-selection-panel .card-button { min-height: 5rem; padding: 0.75rem; grid-template-columns: minmax(0, 1fr) 1.4rem; }
+  .answer-selection-panel .card-title { font-size: 1.25rem; }
+  .quest-clue-panel .clue-card { padding: 1rem; }
+  .quest-clue-panel .clue-card.is-hidden { min-height: 3rem; }
+  .result-banner { padding: 1rem; }
+  .result-banner h2 { font-size: 2rem; }
+  .share-score-actions { gap: 0.6rem; margin-top: 1.5rem; }
+  .share-score-actions .button { width: min(100%, 20rem); min-height: 3rem; padding-inline: 0.8rem; font-size: 0.94rem; }
+  .next-round-screen { min-height: 11.5rem; padding: 2.25rem 1rem; margin-top: 1rem; }
+  .next-round-screen h3 { font-size: 1.15rem; margin-bottom: 0.8rem; }
+  .next-round-screen .kicker { font-size: 0.66rem; }
+  .next-round-motivation { margin-top: 1.25rem; font-size: 0.9rem; }
+  .community-result-title { gap: 0.2rem 0.3rem; }
+}
+/* End local layout experiment. */
+
+/* Readability refinements: retain the existing colours at a clearer strength. */
+.community-stats-demo .community-stat span {
+  color: rgb(168 178 199 / 82%);
+}
+.community-result-rate span,
+.community-result-copy span {
+  color: rgb(168 178 199 / 72%);
 }
