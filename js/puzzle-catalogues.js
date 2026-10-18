@@ -1,5 +1,5 @@
-import { fetchWithTimeout } from "./network.js?v=20261018-9";
-import { puzzleCatalogueUrls } from "./puzzle-catalogue-assets.js?v=20261018-9";
+import { fetchWithTimeout } from "./network.js?v=20261018-10";
+import { puzzleCatalogueUrls } from "./puzzle-catalogue-assets.js?v=20261018-10";
 
 export async function loadPuzzleCatalogues({ fetchImpl = globalThis.fetch } = {}) {
   // These paths include a content hash. Reusing a cached response cannot hide

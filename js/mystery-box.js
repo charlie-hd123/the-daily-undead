@@ -24,7 +24,7 @@ export function createMysteryBox() {
   stage?.addEventListener('mystery-box-unavailable', skipPresentation);
   // Load the renderer alongside the normal data requests, not before app startup.
   if (stage && !unavailable) {
-    renderingReady = import('./mystery-box-scene.js?v=20261018-9')
+    renderingReady = import('./mystery-box-scene.js?v=20261018-10')
       .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage))
       .then((scene) => {
         if (unavailable) { scene.dispose(); return null; }
