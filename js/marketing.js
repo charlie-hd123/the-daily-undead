@@ -2,10 +2,10 @@ import {
   buildDailyPuzzle,
   getAnswerDisplayTitle,
   getUtcDateKey,
-} from "./game-core.js?v=20261018-1";
-import { getOfficialPuzzleType } from "./daily-challenge-core.js?v=20261018-1";
-import { buildDailyWordPuzzle } from "./word-puzzle-core.js?v=20261018-1";
-import { fetchCommunityStats } from "./community-stats.js?v=20261018-1";
+} from "./game-core.js?v=20261018-2";
+import { getOfficialPuzzleType } from "./daily-challenge-core.js?v=20261018-2";
+import { buildDailyWordPuzzle } from "./word-puzzle-core.js?v=20261018-2";
+import { fetchCommunityStats } from "./community-stats.js?v=20261018-2";
 import {
   buildMarketingCopy,
   buildWordMarketingCopy,
@@ -13,7 +13,7 @@ import {
   getDailyPostNumber,
   getPreviousDateKey,
   isAppleMobileDevice,
-} from "./marketing-core.js?v=20261018-1";
+} from "./marketing-core.js?v=20261018-2";
 
 const pack = document.querySelector("#marketing-pack");
 const packDate = document.querySelector("#pack-date");
@@ -140,7 +140,7 @@ function fitClue(context, clue) {
 
 async function drawQuestStepsImage(clue) {
   await document.fonts.load("500 45px Barlow");
-  const template = await loadImage("./assets/marketing-template.jpg?v=20261018-1");
+  const template = await loadImage("./assets/marketing-template.jpg?v=20261018-2");
   const context = canvas.getContext("2d", { alpha: false });
   context.drawImage(template, 0, 0, canvas.width, canvas.height);
   erasePreviousClue(context);
@@ -261,7 +261,7 @@ async function drawLastWordsImage(answer, initialLetters, category) {
     document.fonts.load("800 66px Barlow Condensed"),
     document.fonts.load("500 44px Barlow"),
   ]);
-  const template = await loadImage("./assets/marketing-last-words-template.jpg?v=20261018-1");
+  const template = await loadImage("./assets/marketing-last-words-template.jpg?v=20261018-2");
   const context = canvas.getContext("2d", { alpha: false });
   context.drawImage(template, 0, 0, canvas.width, canvas.height);
 

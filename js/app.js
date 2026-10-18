@@ -12,19 +12,19 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261018-1";
+} from "./game-core.js?v=20261018-2";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
-} from "./word-puzzle-core.js?v=20261018-1";
+} from "./word-puzzle-core.js?v=20261018-2";
 import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261018-1";
+} from "./daily-challenge-core.js?v=20261018-2";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -33,27 +33,30 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261018-1";
+} from "./progression.js?v=20261018-2";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261018-1";
+} from "./account.js?v=20261018-2";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261018-1";
+} from "./community-stats.js?v=20261018-2";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261018-1";
-import { fetchWithTimeout } from "./network.js?v=20261018-1";
-import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261018-1";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261018-1";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261018-1";
-import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261018-1";
+} from "./leaderboards.js?v=20261018-2";
+import { fetchWithTimeout } from "./network.js?v=20261018-2";
+import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261018-2";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261018-2";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261018-2";
+import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261018-2";
+import { createMysteryBox } from "./mystery-box.js?v=20261018-2";
+
+const mysteryBox = createMysteryBox();
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -204,13 +207,13 @@ const puzzleTypes = {
     name: "Quest Steps",
     kicker: "Easter egg puzzle",
     description: "Can you identify the Zombies map from its Easter egg steps?",
-    image: "./assets/quest-steps-card.svg?v=20261018-1",
+    image: "./assets/quest-steps-card.svg?v=20261018-2",
   },
   word: {
     name: "Last Words",
     kicker: "Letter puzzle",
     description: "Can you identify the Zombies word or phrase by revealing its letters?",
-    image: "./assets/dead-letters-card.svg?v=20261018-1",
+    image: "./assets/dead-letters-card.svg?v=20261018-2",
   },
 };
 
@@ -1361,6 +1364,19 @@ function startPuzzle(type, mode) {
   activePlay = { type, mode };
   ensureSession(type);
   render();
+  const session = dayState.sessions[type];
+  const revealed = new Set(wordPuzzle.initialLetters);
+  mysteryBox.open({
+    key: `${puzzle.dateKey}:${type}`,
+    type,
+    fresh: !hasPuzzleStarted(type, session),
+    date: puzzle.dateKey,
+    label: type === "word" ? "Last Words / Starting intel" : "Quest Steps / Clue 01",
+    clue: type === "word"
+      ? [...wordPuzzle.entry.answer.toUpperCase()].map((letter) => /[A-Z]/.test(letter) && !revealed.has(letter) ? "_" : letter).join("")
+      : puzzle.displayedSteps[0].hardClue,
+    hint: type === "word" ? `Category: ${wordPuzzle.entry.category}` : "Identify the map. Make your first clue count.",
+  });
 }
 
 function hasPuzzleStarted(type, session) {
@@ -2431,6 +2447,7 @@ async function initialise() {
           applyRemoteAccount: dayPreviewEnabled ? () => {} : applyRemoteAccount,
         });
     document.addEventListener("keydown", (event) => {
+      if (mysteryBox.isOpen) return;
       if (activePlay?.type !== "word") return;
       const letter = normalizeLetter(event.key);
       if (letter) submitLetter(letter);
@@ -2454,6 +2471,12 @@ async function initialise() {
     updateNextRoundCountdown();
     window.setInterval(updateNextRoundCountdown, 1000);
     initialiseReleaseMonitoring();
+    const replayBox = document.createElement("button");
+    replayBox.type = "button";
+    replayBox.className = "mb-replay";
+    replayBox.textContent = "↻ Replay mystery box";
+    replayBox.addEventListener("click", () => mysteryBox.replay());
+    document.querySelector(".site-footer")?.append(replayBox);
     if (missedDayState && !missedDayState.resolved) {
       renderMissedDay();
     } else {
