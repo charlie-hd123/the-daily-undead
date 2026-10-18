@@ -1,4 +1,4 @@
-import * as T from './vendor/mystery-box-three.js?v=20261018-8';
+import * as T from './vendor/mystery-box-three.js?v=20261018-9';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
@@ -45,7 +45,11 @@ export async function createMysteryBoxScene(host) {
   rim.position.set(-4, 5, -5); scene.add(rim);
 
   host.dataset.renderer = 'texture';
-  const woodMap = await new T.TextureLoader().loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261018-8', import.meta.url).href);
+  const loader = new T.TextureLoader();
+  const [woodMap, paintMap] = await Promise.all([
+    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261018-9', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261018-9', import.meta.url).href),
+  ]);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;
   woodMap.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
@@ -124,13 +128,8 @@ export async function createMysteryBoxScene(host) {
   box(.25, .30, .06, metalEdge, 0, -.035, 2.29, lid);
   box(5.88, .035, 1.87, woodDark, 0, -.005, 1.10, lid);
 
-  // Painted marks, rather than neon tubes. Tiny missing flecks catch the wood beneath.
-  const paintCanvas = document.createElement('canvas'); paintCanvas.width = paintCanvas.height = 256;
-  const ctx = paintCanvas.getContext('2d');
-  ctx.fillStyle = '#e1e7dc'; ctx.font = '900 238px "Barlow Condensed", Impact, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('?', 126, 143);
-  ctx.globalCompositeOperation = 'destination-out';
-  for (let i = 0; i < 200; i++) { ctx.fillStyle = `rgba(0,0,0,${.2 + (i % 5) * .12})`; ctx.fillRect((i * 53) % 256, (i * 97) % 256, 1 + i % 3, 1 + i % 2); }
-  const paintMap = new T.CanvasTexture(paintCanvas); paintMap.colorSpace = T.SRGBColorSpace;
+  // Fixed artwork shared with the poster: font timing and OS font metrics cannot move it.
+  paintMap.colorSpace = T.SRGBColorSpace;
   const paint = new T.MeshStandardMaterial({ map: paintMap, transparent: true, roughness: .94, metalness: 0, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 });
   const markGeometry = new T.PlaneGeometry(.78, .90);
   for (const [i, x] of [-1.62, 0, 1.62].entries()) {

@@ -24,7 +24,7 @@ export function createMysteryBox() {
   stage?.addEventListener('mystery-box-unavailable', skipPresentation);
   // Load the renderer alongside the normal data requests, not before app startup.
   if (stage && !unavailable) {
-    renderingReady = import('./mystery-box-scene.js?v=20261018-8')
+    renderingReady = import('./mystery-box-scene.js?v=20261018-9')
       .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage))
       .then((scene) => {
         if (unavailable) { scene.dispose(); return null; }
@@ -38,6 +38,14 @@ export function createMysteryBox() {
             const image = document.createElement('img'); image.className = 'mb-export-image'; image.alt = 'Closed chest poster'; image.src = visual.poster(); stage.append(image);
           });
           stage.append(save);
+          const compare = document.createElement('button');
+          compare.type = 'button'; compare.textContent = 'Show loading image'; compare.className = 'mb-review-compare';
+          compare.addEventListener('click', () => {
+            stage.querySelector('.mb-export-image')?.remove();
+            const live = stage.classList.toggle('is-rendered');
+            compare.textContent = live ? 'Show loading image' : 'Show live 3D';
+          });
+          stage.append(compare);
         }
         return scene;
       })
