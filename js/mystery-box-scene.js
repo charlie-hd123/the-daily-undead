@@ -1,4 +1,4 @@
-import * as T from './vendor/mystery-box-three.js?v=20261018-7';
+import * as T from './vendor/mystery-box-three.js?v=20261018-8';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
@@ -45,7 +45,7 @@ export async function createMysteryBoxScene(host) {
   rim.position.set(-4, 5, -5); scene.add(rim);
 
   host.dataset.renderer = 'texture';
-  const woodMap = await new T.TextureLoader().loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261018-7', import.meta.url).href);
+  const woodMap = await new T.TextureLoader().loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261018-8', import.meta.url).href);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;
   woodMap.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
@@ -185,7 +185,7 @@ export async function createMysteryBoxScene(host) {
   host.append(canvas); resize();
   host.dataset.renderer = 'ready';
   const observer = new ResizeObserver(resize); observer.observe(host);
-  canvas.addEventListener('webglcontextlost', (event) => { event.preventDefault(); contextLost = true; host.classList.remove('is-rendered'); host.dataset.renderer = 'poster'; });
+  canvas.addEventListener('webglcontextlost', (event) => { event.preventDefault(); contextLost = true; host.classList.remove('is-rendered'); host.dataset.renderer = 'unavailable'; host.dispatchEvent(new Event('mystery-box-unavailable')); });
   canvas.addEventListener('webglcontextrestored', () => { contextLost = false; resize(); host.classList.add('is-rendered'); host.dataset.renderer = 'ready'; });
   return { draw, resize, poster() { draw(0); return canvas.toDataURL('image/png'); }, dispose() {
     observer.disconnect();

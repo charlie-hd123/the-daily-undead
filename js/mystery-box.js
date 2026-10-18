@@ -8,20 +8,28 @@ export function createMysteryBox() {
   let panel;
   let frame;
   let progress = 0;
-  let posterOnly = false;
+  let unavailable = reducedMotion() || review === 'fallback';
   let firstPresentation = true;
   const firstShownAt = performance.now();
   let renderingReady = Promise.resolve(null);
   let timers = [];
   const seen = new Set();
   const later = (callback, delay) => timers.push(window.setTimeout(callback, delay));
+  function skipPresentation() {
+    unavailable = true;
+    if (stage) stage.hidden = true;
+    cancel();
+  }
+  if (unavailable && stage) stage.hidden = true;
+  stage?.addEventListener('mystery-box-unavailable', skipPresentation);
   // Load the renderer alongside the normal data requests, not before app startup.
-  if (stage && !reducedMotion() && review !== 'fallback') {
-    renderingReady = import('./mystery-box-scene.js?v=20261018-7')
+  if (stage && !unavailable) {
+    renderingReady = import('./mystery-box-scene.js?v=20261018-8')
       .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage))
       .then((scene) => {
+        if (unavailable) { scene.dispose(); return null; }
         visual = scene; visual.draw(progress);
-        if (!posterOnly) stage.classList.add('is-rendered');
+        stage.classList.add('is-rendered');
         if (review === 'closed') {
           const save = document.createElement('button');
           save.type = 'button'; save.textContent = 'Render poster'; save.className = 'mb-review-export';
@@ -33,7 +41,7 @@ export function createMysteryBox() {
         }
         return scene;
       })
-      .catch((error) => { stage.dataset.renderer = 'poster'; console.warn('Mystery Box renderer unavailable; using its poster.', error); return null; });
+      .catch((error) => { skipPresentation(); console.warn('Mystery Box renderer unavailable; showing the puzzle directly.', error); return null; });
   }
 
   function cancel() {
@@ -60,11 +68,11 @@ export function createMysteryBox() {
     cancel();
     const shownAt = firstPresentation ? firstShownAt : performance.now();
     firstPresentation = false;
-    if (!stage || !fresh || seen.has(key) || reducedMotion()) return;
+    if (!stage || unavailable || !fresh || seen.has(key) || reducedMotion()) return;
     seen.add(key);
     panel = document.querySelector(type === 'word' ? '#app .word-puzzle-panel' : '#app .quest-clue-panel');
     if (!panel) return;
-    progress = 0; posterOnly = false; visual?.draw(0);
+    progress = 0; visual?.draw(0);
     if (visual) stage.classList.add('is-rendered');
     wrapper = document.createElement('div'); wrapper.className = 'mb-reveal'; wrapper.dataset.phase = 'closed';
     const focused = document.activeElement;
@@ -79,17 +87,16 @@ export function createMysteryBox() {
     }
     panel.inert = true;
     const currentWrapper = wrapper;
-    // Count loading time towards the closed hold; never swap a late renderer mid-open.
+    // Failed or slow 3D goes directly to the ordinary, interactive puzzle.
     const deadline = new Promise((resolve) => later(() => resolve(null), 1800));
     void Promise.race([renderingReady, deadline]).then(() => {
       if (wrapper !== currentWrapper || !wrapper?.isConnected) return;
+      if (!visual) { skipPresentation(); return; }
       const hold = Math.max(0, 1500 - (performance.now() - shownAt));
       later(() => {
         if (!wrapper) return;
-        posterOnly = !visual;
-        stage.classList.toggle('is-rendered', Boolean(visual));
         wrapper.dataset.phase = 'opening';
-        if (visual) animateLid();
+        animateLid();
       }, hold);
       later(() => { if (wrapper) wrapper.dataset.phase = 'illuminated'; }, hold + 850);
       later(() => {
@@ -103,6 +110,6 @@ export function createMysteryBox() {
     });
   }
   window.addEventListener('pagehide', (event) => { cancel(); if (!event.persisted) visual?.dispose(); });
-  window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', (event) => { if (event.matches) cancel(); });
+  window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', (event) => { if (event.matches) skipPresentation(); });
   return { open, cancel, get isPresenting() { return Boolean(panel?.inert); } };
 }
