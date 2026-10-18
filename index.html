@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#070a12">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <meta name="daily-undead-build" content="20261018-5">
+    <meta name="daily-undead-build" content="20261018-7">
     <!-- Public API URL only; localhost is isolated to a local Worker on port 8787. -->
     <meta name="daily-undead-stats-api" content="https://api.thedailyundead.com">
     <!-- Replace this marker with the exact UTC launch time in the production launch commit. -->
@@ -21,15 +21,16 @@
       content="The Daily Undead — your daily Treyarch Zombies challenge. Solve Last Words or identify a map from its Quest Steps."
     >
     <title>The Daily Undead</title>
-    <link rel="icon" href="./assets/favicon.png?v=20261018-5" type="image/png" sizes="128x128">
-    <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png?v=20261018-5" sizes="180x180">
-    <link rel="stylesheet" href="./styles.css?v=20261018-5">
-    <link rel="stylesheet" href="./staging-demo.css?v=20261018-5">
+    <link rel="icon" href="./assets/favicon.png?v=20261018-7" type="image/png" sizes="128x128">
+    <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png?v=20261018-7" sizes="180x180">
+    <link rel="preload" as="image" href="./assets/mystery-box/chest-poster.webp?v=20261018-7">
+    <link rel="stylesheet" href="./styles.css?v=20261018-7">
+    <link rel="stylesheet" href="./staging-demo.css?v=20261018-7">
   </head>
   <body>
     <header class="site-header">
       <div class="brand-lockup">
-        <img class="brand-logo" src="./assets/zombie-logo.png?v=20261018-5" alt="" width="512" height="512">
+        <img class="brand-logo" src="./assets/zombie-logo.png?v=20261018-7" alt="" width="512" height="512">
         <div class="brand-copy">
           <p class="eyebrow">Your daily Treyarch Zombies challenge</p>
           <h1>The Daily Undead</h1>
@@ -67,22 +68,7 @@
     <main id="app" class="app-shell">
       <div id="initial-mystery-box" class="mb-reveal mb-loading" data-phase="closed" role="status" aria-label="Loading today’s puzzle">
         <div class="mb-scene" aria-hidden="true">
-          <div class="mb-glow"></div>
-          <div class="mb-crate-rig">
-            <div class="mb-spill"></div>
-            <div class="mb-crate">
-              <div class="mb-interior"></div>
-              <div class="mb-side mb-side-left"><span></span></div>
-              <div class="mb-side mb-side-right"><span></span></div>
-              <div class="mb-front">
-                <span class="mb-question mb-question-left">?</span><span class="mb-question mb-question-center">?</span><span class="mb-question mb-question-right">?</span>
-                <i class="mb-strap mb-strap-left"></i><i class="mb-strap mb-strap-right"></i>
-                <i class="mb-lock"></i>
-              </div>
-              <div class="mb-lid"><div class="mb-lid-face"><span>?</span><span>?</span><span>?</span><i class="mb-strap mb-strap-left"></i><i class="mb-strap mb-strap-right"></i></div><div class="mb-lid-inner"></div><div class="mb-lid-edge"></div></div>
-              <div class="mb-seam"></div>
-            </div>
-          </div>
+          <img class="mb-poster" src="./assets/mystery-box/chest-poster.webp?v=20261018-7" alt="" width="1056" height="480" fetchpriority="high">
         </div>
       </div>
     </main>
@@ -461,7 +447,7 @@
       <div data-public-profile-content></div>
     </dialog>
 
-    <script type="module" src="./js/app.js?v=20261018-5"></script>
+    <script type="module" src="./js/app.js?v=20261018-7"></script>
 
     <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "4eeb20e1411c4e7baf24969ced969c88"}'></script><!-- End Cloudflare Web Analytics -->
 

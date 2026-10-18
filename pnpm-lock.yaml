@@ -15,6 +15,9 @@ importers:
       esbuild:
         specifier: ^0.28.2
         version: 0.28.2
+      three:
+        specifier: 0.180.0
+        version: 0.180.0
       wrangler:
         specifier: 4.151.0
         version: 4.151.0
@@ -507,6 +510,9 @@ packages:
     resolution: {integrity: sha512-SS+jx45GF1QjgEXQx4NJZV9ImqmO2NPz5FNsIHrsDjh2YsHnawpan7SNQ1o8NuhrbHZy9AZhIoCUiCeaW/C80g==}
     engines: {node: '>=18'}
 
+  three@0.180.0:
+    resolution: {integrity: sha512-o+qycAMZrh+TsE01GqWUxUIKR1AL0S8pq7zDkYOQw8GqfX8b8VoCKYUoHbhiX5j+7hr8XsuHDVU6+gkQJQKg9w==}
+
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
@@ -921,6 +927,8 @@ snapshots:
       '@img/sharp-win32-x64': 0.35.5
 
   supports-color@10.2.2: {}
+
+  three@0.180.0: {}
 
   tslib@2.8.1: {}
 
