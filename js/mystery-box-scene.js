@@ -1,4 +1,4 @@
-import * as T from './vendor/mystery-box-three.js?v=20261018-10';
+import * as T from './vendor/mystery-box-three.js?v=20261018-11';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
@@ -47,8 +47,8 @@ export async function createMysteryBoxScene(host) {
   host.dataset.renderer = 'texture';
   const loader = new T.TextureLoader();
   const [woodMap, paintMap] = await Promise.all([
-    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261018-10', import.meta.url).href),
-    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261018-10', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261018-11', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261018-11', import.meta.url).href),
   ]);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;
@@ -171,9 +171,15 @@ export async function createMysteryBoxScene(host) {
     glowMat.uniforms.strength.value = ease * .95;
     renderer.render(scene, camera);
   }
+  let previousWidth = 0;
+  let previousHeight = 0;
   function resize() {
     const { width, height } = host.getBoundingClientRect();
     if (width < 1 || height < 1) return;
+    // Moving the stage into the puzzle can notify ResizeObserver without changing its size.
+    // Resetting an unchanged WebGL backing buffer can expose a blank frame on that handover.
+    if (width === previousWidth && height === previousHeight) return;
+    previousWidth = width; previousHeight = height;
     const baseWidth = window.matchMedia('(max-width: 600px)').matches ? 4.4 : 6.1;
     const halfWidth = Math.max(baseWidth, (6.1 * 480 / 1056) * width / height);
     const halfHeight = halfWidth * height / width;
@@ -185,7 +191,7 @@ export async function createMysteryBoxScene(host) {
   host.dataset.renderer = 'ready';
   const observer = new ResizeObserver(resize); observer.observe(host);
   canvas.addEventListener('webglcontextlost', (event) => { event.preventDefault(); contextLost = true; host.classList.remove('is-rendered'); host.dataset.renderer = 'unavailable'; host.dispatchEvent(new Event('mystery-box-unavailable')); });
-  canvas.addEventListener('webglcontextrestored', () => { contextLost = false; resize(); host.classList.add('is-rendered'); host.dataset.renderer = 'ready'; });
+  canvas.addEventListener('webglcontextrestored', () => { contextLost = false; previousWidth = previousHeight = 0; host.classList.add('is-rendered'); resize(); host.dataset.renderer = 'ready'; });
   return { draw, resize, poster() { draw(0); return canvas.toDataURL('image/png'); }, dispose() {
     observer.disconnect();
     scene.traverse((node) => { if (node.isMesh) { node.geometry.dispose(); for (const material of [].concat(node.material)) material.dispose(); } });

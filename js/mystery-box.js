@@ -15,6 +15,12 @@ export function createMysteryBox() {
   let timers = [];
   const seen = new Set();
   const later = (callback, delay) => timers.push(window.setTimeout(callback, delay));
+  function showVisual() {
+    if (!visual || unavailable) return;
+    stage.classList.add('is-rendered');
+    // Draw in the same frame that exposes the canvas, rather than revealing an old buffer.
+    visual.draw(progress);
+  }
   function skipPresentation() {
     unavailable = true;
     if (stage) stage.hidden = true;
@@ -24,12 +30,11 @@ export function createMysteryBox() {
   stage?.addEventListener('mystery-box-unavailable', skipPresentation);
   // Load the renderer alongside the normal data requests, not before app startup.
   if (stage && !unavailable) {
-    renderingReady = import('./mystery-box-scene.js?v=20261018-10')
+    renderingReady = import('./mystery-box-scene.js?v=20261018-11')
       .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage))
       .then((scene) => {
         if (unavailable) { scene.dispose(); return null; }
-        visual = scene; visual.draw(progress);
-        stage.classList.add('is-rendered');
+        visual = scene; showVisual();
         if (review === 'closed') {
           const save = document.createElement('button');
           save.type = 'button'; save.textContent = 'Render poster'; save.className = 'mb-review-export';
@@ -43,6 +48,7 @@ export function createMysteryBox() {
           compare.addEventListener('click', () => {
             stage.querySelector('.mb-export-image')?.remove();
             const live = stage.classList.toggle('is-rendered');
+            if (live) visual.draw(progress);
             compare.textContent = live ? 'Show loading image' : 'Show live 3D';
           });
           stage.append(compare);
@@ -80,11 +86,10 @@ export function createMysteryBox() {
     seen.add(key);
     panel = document.querySelector(type === 'word' ? '#app .word-puzzle-panel' : '#app .quest-clue-panel');
     if (!panel) return;
-    progress = 0; visual?.draw(0);
-    if (visual) stage.classList.add('is-rendered');
+    progress = 0;
     wrapper = document.createElement('div'); wrapper.className = 'mb-reveal'; wrapper.dataset.phase = 'closed';
     const focused = document.activeElement;
-    panel.before(wrapper); wrapper.append(panel, stage); visual?.resize();
+    panel.before(wrapper); wrapper.append(panel, stage); visual?.resize(); showVisual();
     if (panel.contains(focused)) focused.focus({ preventScroll: true });
     // Freeze the real component for local visual QA and its first-frame poster.
     if (review === 'closed' || review === 'open') {
