@@ -1,5 +1,6 @@
 // The entire real puzzle emerges from the box; game state and controls stay with the app.
 export function createMysteryBox() {
+  const sceneTemplate = document.querySelector("#initial-mystery-box .mb-scene")?.cloneNode(true);
   let wrapper;
   let panel;
   let timers = [];
@@ -20,7 +21,7 @@ export function createMysteryBox() {
 
   function open({ key, type, fresh }) {
     cancel();
-    if (!fresh || seen.has(key)) return;
+    if (!fresh || seen.has(key) || !sceneTemplate) return;
     seen.add(key);
     // Reduced motion keeps the complete puzzle in its normal, accessible layout.
     if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
@@ -33,29 +34,7 @@ export function createMysteryBox() {
     panel.before(wrapper);
     wrapper.append(panel);
     if (panel.contains(focused)) focused.focus({ preventScroll: true });
-    const scene = document.createElement("div");
-    scene.className = "mb-scene";
-    scene.setAttribute("aria-hidden", "true");
-    scene.innerHTML = `
-      <div class="mb-glow"></div>
-      <div class="mb-beam"></div>
-      <div class="mb-white-light"></div>
-          <div class="mb-crate-rig">
-            <div class="mb-crate">
-              <div class="mb-interior"></div>
-              <div class="mb-side mb-side-left"><span></span></div>
-              <div class="mb-side mb-side-right"><span></span></div>
-              <div class="mb-front">
-                <div class="mb-stamp">PROPERTY OF<br><strong>THE UNKNOWN</strong><br>HANDLE WITH EXTREME CAUTION</div>
-                <span class="mb-question mb-question-left">?</span><span class="mb-question mb-question-right">?</span>
-                <i class="mb-strap mb-strap-left"></i><i class="mb-strap mb-strap-right"></i>
-                <i class="mb-lock"></i><span class="mb-serial">115 / DU — CLASSIFIED</span>
-              </div>
-              <div class="mb-lid"><div class="mb-lid-face"><span>?</span><span>?</span><span>?</span><i class="mb-strap mb-strap-left"></i><i class="mb-strap mb-strap-right"></i></div><div class="mb-lid-inner"></div><div class="mb-lid-edge"></div></div>
-              <div class="mb-seam"></div>
-            </div>
-          </div>
-`;
+    const scene = sceneTemplate.cloneNode(true);
     wrapper.append(scene);
     later(() => { if (wrapper) wrapper.dataset.phase = "opening"; }, 350);
     later(() => { if (wrapper) wrapper.dataset.phase = "illuminated"; }, 1150);
