@@ -3,7 +3,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("./assets/fonts/barlow-400.ttf?v=20261019-1") format("truetype");
+  src: url("./assets/fonts/barlow-400.ttf?v=20261019-2") format("truetype");
 }
 
 @font-face {
@@ -11,7 +11,7 @@
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url("./assets/fonts/barlow-500.ttf?v=20261019-1") format("truetype");
+  src: url("./assets/fonts/barlow-500.ttf?v=20261019-2") format("truetype");
 }
 
 @font-face {
@@ -19,7 +19,7 @@
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url("./assets/fonts/barlow-600.ttf?v=20261019-1") format("truetype");
+  src: url("./assets/fonts/barlow-600.ttf?v=20261019-2") format("truetype");
 }
 
 @font-face {
@@ -27,7 +27,7 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("./assets/fonts/barlow-700.ttf?v=20261019-1") format("truetype");
+  src: url("./assets/fonts/barlow-700.ttf?v=20261019-2") format("truetype");
 }
 
 @font-face {
@@ -35,7 +35,7 @@
   font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url("./assets/fonts/barlow-800.ttf?v=20261019-1") format("truetype");
+  src: url("./assets/fonts/barlow-800.ttf?v=20261019-2") format("truetype");
 }
 
 @font-face {
@@ -43,7 +43,7 @@
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-600.ttf?v=20261019-1") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-600.ttf?v=20261019-2") format("truetype");
 }
 
 @font-face {
@@ -51,7 +51,7 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-700.ttf?v=20261019-1") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-700.ttf?v=20261019-2") format("truetype");
 }
 
 @font-face {
@@ -59,7 +59,7 @@
   font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-800.ttf?v=20261019-1") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-800.ttf?v=20261019-2") format("truetype");
 }
 
 @font-face {
@@ -67,7 +67,7 @@
   font-style: normal;
   font-weight: 900;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-900.ttf?v=20261019-1") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-900.ttf?v=20261019-2") format("truetype");
 }
 
 :root {
@@ -1492,35 +1492,35 @@ h1 {
     linear-gradient(145deg, #122233, #05080d);
 }
 
-.zombie-avatar[data-avatar="richtofen"] { background-image: url("./assets/avatars/richtofen.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="dempsey"] { background-image: url("./assets/avatars/dempsey.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="takeo"] { background-image: url("./assets/avatars/takeo.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="nikolai"] { background-image: url("./assets/avatars/nikolai.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="samantha"] { background-image: url("./assets/avatars/samantha.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="dr-maxis"] { background-image: url("./assets/avatars/dr-maxis.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="dr-monty"] { background-image: url("./assets/avatars/dr-monty.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="warden"] { background-image: url("./assets/avatars/warden.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="misty"] { background-image: url("./assets/avatars/misty.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="stuhlinger"] { background-image: url("./assets/avatars/stuhlinger.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="marlton"] { background-image: url("./assets/avatars/marlton.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="russman"] { background-image: url("./assets/avatars/russman.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="scarlett"] { background-image: url("./assets/avatars/scarlett.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="diego"] { background-image: url("./assets/avatars/diego.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="bruno"] { background-image: url("./assets/avatars/bruno.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="stanton"] { background-image: url("./assets/avatars/stanton.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="weaver"] { background-image: url("./assets/avatars/weaver.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="grey"] { background-image: url("./assets/avatars/grey.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="carver"] { background-image: url("./assets/avatars/carver.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="maya"] { background-image: url("./assets/avatars/maya.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="shadowman"] { background-image: url("./assets/avatars/shadowman.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="tedd"] { background-image: url("./assets/avatars/tedd.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="brutus"] { background-image: url("./assets/avatars/brutus.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="scientist"] { background-image: url("./assets/avatars/richtofen.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="soldier"] { background-image: url("./assets/avatars/dempsey.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="warrior"] { background-image: url("./assets/avatars/takeo.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="explorer"] { background-image: url("./assets/avatars/nikolai.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="punk"] { background-image: url("./assets/avatars/misty.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="hazmat"] { background-image: url("./assets/avatars/carver.png?v=20261019-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="richtofen"] { background-image: url("./assets/avatars/richtofen.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="dempsey"] { background-image: url("./assets/avatars/dempsey.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="takeo"] { background-image: url("./assets/avatars/takeo.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="nikolai"] { background-image: url("./assets/avatars/nikolai.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="samantha"] { background-image: url("./assets/avatars/samantha.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="dr-maxis"] { background-image: url("./assets/avatars/dr-maxis.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="dr-monty"] { background-image: url("./assets/avatars/dr-monty.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="warden"] { background-image: url("./assets/avatars/warden.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="misty"] { background-image: url("./assets/avatars/misty.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="stuhlinger"] { background-image: url("./assets/avatars/stuhlinger.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="marlton"] { background-image: url("./assets/avatars/marlton.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="russman"] { background-image: url("./assets/avatars/russman.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="scarlett"] { background-image: url("./assets/avatars/scarlett.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="diego"] { background-image: url("./assets/avatars/diego.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="bruno"] { background-image: url("./assets/avatars/bruno.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="stanton"] { background-image: url("./assets/avatars/stanton.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="weaver"] { background-image: url("./assets/avatars/weaver.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="grey"] { background-image: url("./assets/avatars/grey.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="carver"] { background-image: url("./assets/avatars/carver.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="maya"] { background-image: url("./assets/avatars/maya.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="shadowman"] { background-image: url("./assets/avatars/shadowman.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="tedd"] { background-image: url("./assets/avatars/tedd.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="brutus"] { background-image: url("./assets/avatars/brutus.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="scientist"] { background-image: url("./assets/avatars/richtofen.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="soldier"] { background-image: url("./assets/avatars/dempsey.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="warrior"] { background-image: url("./assets/avatars/takeo.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="explorer"] { background-image: url("./assets/avatars/nikolai.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="punk"] { background-image: url("./assets/avatars/misty.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="hazmat"] { background-image: url("./assets/avatars/carver.png?v=20261019-2"), linear-gradient(145deg, #122233, #05080d); }
 
 .avatar-choice .zombie-avatar {
   width: 100%;
@@ -3395,26 +3395,38 @@ h1 {
 .mb-canvas { visibility: hidden; }
 .mb-scene.is-rendered .mb-canvas { visibility: visible; }
 .mb-scene.is-rendered .mb-poster { visibility: hidden; }
-.mb-reveal > .panel { position: relative; z-index: 3; opacity: 0; transform: none; transition: opacity .55s ease; }
-.mb-reveal > .panel > * { opacity: 0; transition: opacity .4s ease; }
-.mb-reveal > .panel > .clue-list { transform: none; }
-.mb-reveal .quest-intel-status, .mb-reveal .word-scoreboard { transition-delay: .08s; }
-.mb-reveal .actions, .mb-reveal .word-keyboard, .mb-reveal .word-game-status { transition-delay: .18s; }
-.mb-reveal[data-phase="assembling"] > .panel,
-.mb-reveal[data-phase="assembling"] > .panel > * { opacity: 1; }
-.mb-reveal:is([data-phase="settling"], [data-phase="assembling"]) .mb-scene { opacity: 0; transform: translateY(12px); }
-/* The actual clue/letter board leaves a measured slot and returns to that same slot. */
-.mb-reveal > .mb-reward-context { position: absolute; inset: 0; z-index: 4; width: auto; max-width: none; margin: 0; padding: 0; overflow: visible; pointer-events: none; }
-.mb-reward-slot { visibility: hidden; box-sizing: border-box; }
-.mb-reward-context .mb-reward { z-index: 1; transform-origin: 0 0; will-change: transform; transition: none; pointer-events: none; box-shadow: 0 0 0 1px rgb(235 251 255 / var(--mb-light)), 0 0 26px rgb(212 244 255 / calc(var(--mb-light) * .44)), 0 20px 44px rgb(0 0 0 / .26); }
-.mb-reward-context .mb-reward::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(0deg, rgb(228 248 255 / .24), transparent 58%); opacity: var(--mb-light); }
-.mb-reward-context .word-answer { border-radius: .8rem; background: rgb(13 20 33 / var(--mb-surface)); }
+.mb-caption { position: absolute; top: 94%; inset-inline: 16px; margin: 0; color: #f2f4fa; text-align: center; font: 500 clamp(.9rem, 2.5vw, 1rem)/1.3 "Barlow", sans-serif; letter-spacing: .025em; opacity: .9; transition: opacity .28s ease, transform .5s ease; }
+.mb-reveal:not([data-phase="closed"]) .mb-caption { opacity: 0; transform: translateY(-5px); }
+.puzzle-title { display: inline-block; vertical-align: top; color: var(--text); font-family: var(--font-display); font-size: clamp(2.1rem, 5.8vw, 2.8rem); font-weight: 900; line-height: 1.06; letter-spacing: .015em; text-transform: uppercase; white-space: nowrap; }
+.mb-reveal > .panel { position: relative; z-index: 3; opacity: 0; transition: opacity .55s ease; }
+.mb-reveal[data-phase="assembling"] > .panel { opacity: 1; }
+.mb-reveal > .panel > * { opacity: 0; transform: translateY(12px); transition: opacity .5s ease, transform .7s cubic-bezier(.22,1,.36,1); }
+.mb-reveal > .panel > .screen-heading { opacity: 1; transform: none; }
+.mb-reveal .screen-heading > :not(h2) { opacity: 0; transform: translateY(8px); transition: opacity .45s ease, transform .6s cubic-bezier(.22,1,.36,1); }
+.mb-reveal .quest-intel-status, .mb-reveal .word-scoreboard { transition-delay: .06s; }
+.mb-reveal .clue-list, .mb-reveal .word-answer { transition-delay: .12s; }
+.mb-reveal .actions, .mb-reveal .word-keyboard, .mb-reveal .word-game-status { transition-delay: .22s; }
+.mb-reveal[data-phase="assembling"] > .panel > *,
+.mb-reveal[data-phase="assembling"] .screen-heading > :not(h2) { opacity: 1; transform: none; }
+.mb-reveal:is([data-phase="settling"], [data-phase="assembling"]) .mb-scene { opacity: 0; transform: translateY(16px); }
+/* The actual title becomes its own heading; there is no duplicate to cross-fade. */
+.mb-title-portal { position: absolute; z-index: 4; pointer-events: none; overflow: visible; }
+.mb-title-slot { display: inline-block; vertical-align: top; visibility: hidden; }
+.mb-title-traveller { transform-origin: 0 0; perspective: 900px; will-change: transform; pointer-events: none; }
+.mb-title-object { position: relative; display: block; transform-style: preserve-3d; transform-origin: 50% 50%; }
+.mb-title-face, .mb-title-side { display: block; backface-visibility: hidden; }
+.puzzle-title:not(.mb-title-traveller), .mb-title-face { background: linear-gradient(110deg, #fff 6%, #dff8ff 50%, #b9b2ff 100%); background-clip: text; -webkit-background-clip: text; color: transparent; }
+.mb-title-face { position: relative; text-shadow: 0 0 calc(12px * var(--mb-light)) rgb(192 239 255 / calc(.3 * var(--mb-light))); }
+.mb-title-side { position: absolute; inset: 0; transform: translateZ(calc(-.75px * var(--layer) * var(--mb-depth))); color: #426178; -webkit-text-stroke: .35px #426178; opacity: var(--mb-depth); }
+.mb-title-side:nth-child(2n) { color: #514e78; -webkit-text-stroke-color: #514e78; }
 /* Local, frozen poses use the real renderer for visual QA and asset export. */
+.mb-reveal[data-review] :is(.mb-scene, .mb-caption, .panel, .panel > *, .screen-heading > *) { transition: none; }
 .mb-reveal:is([data-review="closed"], [data-review="open"]) > .panel { visibility: hidden; pointer-events: none; }
 .mb-review-export, .mb-review-compare { position: absolute; bottom: 0; left: 10px; pointer-events: auto; font: 12px sans-serif; padding: 8px 12px; z-index: 10; }
 .mb-review-compare { left: 125px; }
 .mb-export-image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
-@media (max-width: 600px) { .mb-loading { min-height: 554px; } .mb-scene { height: min(310px, max(200px, calc(100svh - 190px))); } .mb-poster { width: 138.6364%; left: -19.3182%; } }
+@media (max-width: 600px) { .mb-caption { top: 80%; } .mb-loading { min-height: 554px; } .mb-scene { height: min(310px, max(200px, calc(100svh - 190px))); } .mb-poster { width: 138.6364%; left: -19.3182%; } }
+@media (max-height: 500px) { .mb-caption { top: auto; bottom: 0; font-size: .8rem; } }
 @media (prefers-reduced-motion: reduce) {
   .mb-reveal:not(.mb-loading) { display: contents; }
   .mb-reveal > .panel, .mb-reveal > .panel > * { opacity: 1; transform: none; transition: none; }

@@ -1,4 +1,4 @@
-import { BOX_SEQUENCE, createRewardFlight } from './mystery-box-motion.js?v=20261019-1';
+import { BOX_SEQUENCE, createTitleFlight } from './mystery-box-motion.js?v=20261019-2';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox() {
@@ -33,8 +33,15 @@ export function createMysteryBox() {
   stage?.addEventListener('mystery-box-unavailable', skipPresentation);
   // Load the renderer alongside the normal data requests, not before app startup.
   if (stage && !unavailable) {
-    renderingReady = import('./mystery-box-scene.js?v=20261019-1')
-      .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage))
+    renderingReady = Promise.all([
+      document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
+      import('./mystery-box-scene.js?v=20261019-2')
+        .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
+    ])
+      .then(([fontReady, scene]) => {
+        if (!fontReady) { scene.dispose(); throw new Error('Branded title font unavailable'); }
+        return scene;
+      })
       .then((scene) => {
         if (unavailable) { scene.dispose(); return null; }
         visual = scene; showVisual();
@@ -65,9 +72,9 @@ export function createMysteryBox() {
     timers.forEach(window.clearTimeout); timers = [];
     window.cancelAnimationFrame(frame);
     if (reward) {
-      const { node, slot, context, style, hidden, inert } = reward;
+      const { node, slot, context, style, hidden, inert, content } = reward;
       slot.replaceWith(node);
-      node.classList.remove('mb-reward'); node.style.cssText = style; node.inert = inert;
+      node.classList.remove('mb-title-traveller'); node.replaceChildren(...content); node.style.cssText = style; node.inert = inert;
       if (hidden === null) node.removeAttribute('aria-hidden'); else node.setAttribute('aria-hidden', hidden);
       context.remove(); reward = null;
     }
@@ -79,41 +86,53 @@ export function createMysteryBox() {
     }
     wrapper = panel = null;
   }
-  function prepareReward(type) {
-    const node = panel.querySelector(type === 'word' ? '.word-answer' : '.clue-card:not(.is-hidden)');
+  function prepareReward() {
+    const node = panel.querySelector('.puzzle-title');
     if (!node) return false;
     const target = node.getBoundingClientRect();
     const origin = wrapper.getBoundingClientRect();
     const stageRect = stage.getBoundingClientRect();
     if (!target.width || !target.height) return false;
-    const slot = document.createElement('div'); slot.className = 'mb-reward-slot';
+    const slot = document.createElement('span'); slot.className = 'mb-title-slot';
     slot.setAttribute('aria-hidden', 'true');
-    slot.style.cssText = `width:${target.width}px;height:${target.height}px;margin:${getComputedStyle(node).margin};max-width:100%;`;
-    const context = document.createElement('div');
-    context.className = `mb-reward-context ${type === 'word' ? 'word-puzzle-panel' : 'quest-clue-panel'}`;
+    slot.style.cssText = `width:${target.width}px;height:${target.height}px;`;
+    const context = document.createElement('div'); context.className = 'mb-title-portal';
     context.setAttribute('aria-hidden', 'true'); context.inert = true;
-    reward = { node, slot, context, target, style: node.style.cssText,
+    const content = [...node.childNodes];
+    const object = document.createElement('span'); object.className = 'mb-title-object';
+    // Shallow, real CSS 3D layers use the exact same font metrics as the final heading.
+    for (let layer = 8; layer >= 1; layer--) {
+      const side = document.createElement('span'); side.className = 'mb-title-side';
+      side.textContent = node.textContent; side.setAttribute('aria-hidden', 'true');
+      side.style.setProperty('--layer', layer); object.append(side);
+    }
+    const face = document.createElement('span'); face.className = 'mb-title-face';
+    face.append(...content); object.append(face);
+    reward = { node, slot, context, object, content, target, style: node.style.cssText,
       hidden: node.getAttribute('aria-hidden'), inert: node.inert,
-      flight: createRewardFlight({ target, mouth: visual.aperture(), stage: stageRect }) };
-    node.replaceWith(slot); wrapper.append(context); context.append(node);
-    node.classList.add('mb-reward'); node.inert = true; node.setAttribute('aria-hidden', 'true');
-    Object.assign(node.style, { position: 'absolute', left: `${target.left - origin.left}px`,
-      top: `${target.top - origin.top}px`, width: `${target.width}px`, height: `${target.height}px`, margin: '0' });
+      flight: createTitleFlight({ target, mouth: visual.aperture(), stage: stageRect }) };
+    node.replaceChildren(object); node.replaceWith(slot); wrapper.append(context); context.append(node);
+    context.style.cssText = `left:${stageRect.left - origin.left}px;top:${stageRect.top - origin.top}px;width:${stageRect.width}px;height:${Math.max(stageRect.height, panel.offsetHeight)}px;`;
+    node.classList.add('mb-title-traveller'); node.inert = true; node.setAttribute('aria-hidden', 'true');
+    Object.assign(node.style, { position: 'absolute', left: `${target.left - stageRect.left}px`,
+      top: `${target.top - stageRect.top}px`, width: `${target.width}px`, height: `${target.height}px`, margin: '0' });
     return true;
   }
   function positionReward(elapsed) {
-    const { node, target, flight } = reward;
+    const { node, object, context, target, flight } = reward;
     const pose = flight(elapsed);
     node.style.transform = `translate3d(${pose.left - target.left}px,${pose.top - target.top}px,0) scale(${pose.scale})`;
-    node.style.clipPath = `polygon(0 0,100% 0,100% ${pose.clipRight}px,0 ${pose.clipLeft}px)`;
+    object.style.transform = `rotateX(${pose.rotateX}deg) rotateY(${pose.rotateY}deg) rotateZ(${pose.rotateZ}deg)`;
+    context.style.clipPath = elapsed < BOX_SEQUENCE.settleAt
+      ? `polygon(0 0,100% 0,100% ${pose.clipRight}px,0 ${pose.clipLeft}px)` : 'none';
     node.style.setProperty('--mb-light', pose.light);
-    node.style.setProperty('--mb-surface', pose.surface);
+    node.style.setProperty('--mb-depth', pose.depth);
   }
-  function showSequenceAt(elapsed, type) {
+  function showSequenceAt(elapsed) {
     const lid = Math.min(1, elapsed / BOX_SEQUENCE.lid);
     if (lid !== progress) { progress = lid; visual.draw(progress); }
     if (elapsed >= BOX_SEQUENCE.liftAt) {
-      if (!reward && !prepareReward(type)) { cancel(); return; }
+      if (!reward && !prepareReward()) { cancel(); return; }
       positionReward(elapsed);
     }
     const phase = elapsed >= BOX_SEQUENCE.assembleAt ? 'assembling'
@@ -122,12 +141,12 @@ export function createMysteryBox() {
       : elapsed >= BOX_SEQUENCE.liftAt ? 'lifting' : 'opening';
     if (wrapper.dataset.phase !== phase) wrapper.dataset.phase = phase;
   }
-  function animateSequence(type, focused) {
+  function animateSequence(focused) {
     const started = performance.now();
     function tick(now) {
       if (!wrapper?.isConnected) return;
       const elapsed = now - started;
-      showSequenceAt(elapsed, type);
+      showSequenceAt(elapsed);
       if (!wrapper) return;
       if (elapsed >= BOX_SEQUENCE.finishAt) {
         const currentPanel = panel; cancel();
@@ -167,7 +186,7 @@ export function createMysteryBox() {
       void renderingReady.then(() => {
         if (wrapper !== currentWrapper || !visual) return;
         progress = 1; visual.draw(1);
-        showSequenceAt(review === 'lift' ? 1000 : review === 'reward' ? 1750 : 2850, type);
+        showSequenceAt(review === 'lift' ? 1070 : review === 'reward' ? 1900 : 3100);
       });
       return;
     }
@@ -180,7 +199,7 @@ export function createMysteryBox() {
       later(() => {
         if (!wrapper) return;
         wrapper.dataset.phase = 'opening';
-        animateSequence(type, focused);
+        animateSequence(focused);
       }, hold);
     });
   }

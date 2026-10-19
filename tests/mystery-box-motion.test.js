@@ -1,47 +1,51 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { BOX_SEQUENCE as timing, createRewardFlight } from '../js/mystery-box-motion.js';
+import { BOX_SEQUENCE as timing, createTitleFlight } from '../js/mystery-box-motion.js';
 
-const desktop = { target: { left: 226, top: 360, width: 330, height: 156 },
+const desktop = { target: { left: 226, top: 185, width: 228, height: 48 },
   mouth: { left: { x: 450, y: 368 }, right: { x: 950, y: 424 }, center: { x: 715, y: 370 } },
-  stage: { top: 134, width: 1056, height: 480 } };
+  stage: { left: 192, top: 134, width: 1056, height: 480 } };
 
-test('the real card starts fully occluded by the front rim and clears both sloping edges', () => {
-  const flight = createRewardFlight(desktop);
+test('the title starts below the chest rim and rises fully clear of it', () => {
+  const flight = createTitleFlight(desktop);
   const start = flight(timing.liftAt);
-  assert.equal(start.clipLeft, 0); assert.equal(start.clipRight, 0);
+  assert.ok(start.top > desktop.mouth.right.y + desktop.target.height * start.scale / 2);
   const raised = flight(timing.liftAt + timing.liftFor);
-  assert.equal(raised.clipLeft, desktop.target.height);
-  assert.equal(raised.clipRight, desktop.target.height);
   assert.ok(raised.top > desktop.stage.top);
   assert.ok(raised.top + desktop.target.height * raised.scale < desktop.mouth.left.y);
+  assert.ok(raised.rotateX < 0 && raised.rotateY < 0 && raised.depth === 1);
 });
 
-test('the reward lands exactly in its native slot with its native scale and no residual light', () => {
-  const pose = createRewardFlight(desktop)(timing.assembleAt);
+test('the dimensional title becomes its exact native heading without a residual transform or glow', () => {
+  const pose = createTitleFlight(desktop)(timing.settleAt + timing.settleFor);
   assert.equal(pose.left, desktop.target.left); assert.equal(pose.top, desktop.target.top);
-  assert.equal(pose.scale, 1); assert.equal(pose.light, 0); assert.equal(pose.surface, 0);
-  assert.equal(pose.clipLeft, desktop.target.height); assert.equal(pose.clipRight, desktop.target.height);
+  assert.equal(pose.scale, 1); assert.equal(pose.light, 0); assert.equal(pose.depth, 0);
+  assert.equal(Math.abs(pose.rotateX), 0); assert.equal(Math.abs(pose.rotateY), 0); assert.equal(Math.abs(pose.rotateZ), 0);
 });
 
-test('phone cards and wide word boards fit above the mouth without crossing the header', () => {
-  for (const dimensions of [{ width: 310, height: 200 }, { width: 672, height: 144 }]) {
-    const input = { target: { left: 30, top: 440, ...dimensions },
-      mouth: { left: { x: 66, y: 368 }, right: { x: 290, y: 392 }, center: { x: 185, y: 365 } },
-      stage: { top: 223, width: 343, height: 310 } };
-    const pose = createRewardFlight(input)(timing.settleAt);
-    assert.ok(pose.top >= input.stage.top + 10);
-    assert.ok(pose.scale > 0 && pose.scale <= 1.06);
-    assert.ok(dimensions.width * pose.scale <= input.stage.width - 28);
-    assert.equal(pose.clipLeft, dimensions.height); assert.equal(pose.clipRight, dimensions.height);
+test('both puzzle names fit narrow phones, tablets and short landscape stages', () => {
+  for (const stage of [{ left: 20, top: 223, width: 280, height: 310 },
+    { left: 20, top: 180, width: 728, height: 310 }, { left: 20, top: 150, width: 804, height: 200 }]) {
+    for (const width of [165, 195, 228]) {
+      const input = { target: { left: 30, top: stage.top + 50, width, height: 38 },
+        mouth: { left: { x: stage.left + stage.width * .2, y: stage.top + stage.height * .52 },
+          right: { x: stage.left + stage.width * .8, y: stage.top + stage.height * .62 },
+          center: { x: stage.left + stage.width / 2, y: stage.top + stage.height * .55 } }, stage };
+      const pose = createTitleFlight(input)(timing.settleAt);
+      assert.ok(pose.top >= stage.top + 24);
+      assert.ok(pose.scale > 0 && pose.scale <= 2.25);
+      assert.ok(width * pose.scale <= stage.width - 40);
+      assert.ok(pose.left >= stage.left && pose.left + width * pose.scale <= stage.left + stage.width);
+    }
   }
 });
 
-test('the card stays in the same pose during the reward pause before travelling to its slot', () => {
-  const flight = createRewardFlight(desktop);
+test('the title holds for reading, then moves continuously toward its heading', () => {
+  const flight = createTitleFlight(desktop);
   assert.deepEqual(flight(timing.liftAt + timing.liftFor), flight(timing.settleAt));
-  const halfway = flight(timing.settleAt + timing.settleFor / 2);
+  const midpoint = flight(timing.settleAt + timing.settleFor / 2);
   const raised = flight(timing.settleAt);
-  assert.ok(halfway.left < raised.left && halfway.left > desktop.target.left);
-  assert.ok(halfway.top > raised.top && halfway.top < desktop.target.top);
+  assert.ok(midpoint.left < raised.left && midpoint.left > desktop.target.left);
+  assert.ok(midpoint.top < raised.top && midpoint.top > desktop.target.top);
+  assert.equal(midpoint.depth, .5);
 });

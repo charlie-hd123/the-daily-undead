@@ -12,19 +12,19 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261019-1";
+} from "./game-core.js?v=20261019-2";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
-} from "./word-puzzle-core.js?v=20261019-1";
+} from "./word-puzzle-core.js?v=20261019-2";
 import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261019-1";
+} from "./daily-challenge-core.js?v=20261019-2";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -33,28 +33,28 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261019-1";
+} from "./progression.js?v=20261019-2";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261019-1";
+} from "./account.js?v=20261019-2";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261019-1";
+} from "./community-stats.js?v=20261019-2";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261019-1";
-import { fetchWithTimeout } from "./network.js?v=20261019-1";
-import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261019-1";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261019-1";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261019-1";
-import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261019-1";
-import { createMysteryBox } from "./mystery-box.js?v=20261019-1";
+} from "./leaderboards.js?v=20261019-2";
+import { fetchWithTimeout } from "./network.js?v=20261019-2";
+import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261019-2";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261019-2";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261019-2";
+import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261019-2";
+import { createMysteryBox } from "./mystery-box.js?v=20261019-2";
 
 const mysteryBox = createMysteryBox();
 
@@ -207,13 +207,13 @@ const puzzleTypes = {
     name: "Quest Steps",
     kicker: "Easter egg puzzle",
     description: "Can you identify the Zombies map from its Easter egg steps?",
-    image: "./assets/quest-steps-card.svg?v=20261019-1",
+    image: "./assets/quest-steps-card.svg?v=20261019-2",
   },
   word: {
     name: "Last Words",
     kicker: "Letter puzzle",
     description: "Can you identify the Zombies word or phrase by revealing its letters?",
-    image: "./assets/dead-letters-card.svg?v=20261019-1",
+    image: "./assets/dead-letters-card.svg?v=20261019-2",
   },
 };
 
@@ -1342,11 +1342,11 @@ function setState(update, focusSelector = null) {
   render();
 }
 
-function renderHeading(title, description, kicker = "Today’s round") {
+function renderHeading(title, description, kicker = "Today’s round", puzzleTitle = false) {
   return `
     <div class="screen-heading">
       <p class="kicker">${escapeHtml(kicker)}</p>
-      <h2>${escapeHtml(title)}</h2>
+      <h2>${puzzleTitle ? `<span class="puzzle-title">${escapeHtml(title)}</span>` : escapeHtml(title)}</h2>
       <p>${escapeHtml(description)}</p>
     </div>
   `;
@@ -1667,7 +1667,7 @@ function renderWordPuzzle({ scoreChanged = false, revealLetter = "", feedbackLet
   const keyboardRows = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
   app.innerHTML = `
     <section class="panel word-puzzle-panel">
-      ${renderHeading("Which Zombies word is it?", "Try to solve the Zombies word or phrase by revealing its letters.", official ? "Today’s round" : "Just for fun")}
+      ${renderHeading("Last Words", "Try to solve the Zombies word or phrase by revealing its letters.", official ? "Today’s round" : "Just for fun", true)}
       ${official ? "" : '<p class="puzzle-mode-note">Playing just for fun. This result will not change your stats.</p>'}
       <div class="word-scoreboard${official ? "" : " is-single"}" aria-label="Word puzzle progress">
         <div class="word-mistakes danger-level-${session.wrongGuesses}"><span>Misses</span><strong>${session.wrongGuesses} / 5</strong><div class="word-danger-meter" aria-hidden="true">${[1, 2, 3, 4, 5].map((stage) => `<i class="${stage <= session.wrongGuesses ? "is-active" : ""}${scoreChanged && stage === session.wrongGuesses ? " is-new" : ""}"></i>`).join("")}</div></div>
@@ -1767,11 +1767,12 @@ function renderClues({ newlyRevealedIndex = -1, scoreChanged = false } = {}) {
   app.innerHTML = `
     <section class="panel quest-clue-panel">
       ${renderHeading(
-        "Which Zombies map is it?",
+        "Quest Steps",
         official
           ? "Identify the map from its main quest steps. Reveal as few clues as possible to earn more points."
           : "Identify the map from its main quest steps. Reveal another clue if you need it.",
         official ? "Today’s round" : "Just for fun",
+        true,
       )}
       ${official ? "" : '<p class="puzzle-mode-note">Playing just for fun. This result will not change your stats.</p>'}
       <div class="quest-intel-status${official ? "" : " is-single"}" aria-label="Quest puzzle progress">
