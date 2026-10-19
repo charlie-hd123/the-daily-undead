@@ -1,12 +1,13 @@
-import { BOX_SEQUENCE, createIconFlight, createBoxActivation } from './mystery-box-motion.js?v=20261019-6';
+import { BOX_SEQUENCE, createIconFlight, createBoxActivation } from './mystery-box-motion.js?v=20261019-7';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261019-6';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261019-7';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox() {
   const stage = document.querySelector('#initial-mystery-box .mb-scene');
   const trigger = stage?.querySelector('.mb-open-trigger');
   const caption = document.querySelector('#initial-mystery-box .mb-caption');
+  const intro = document.querySelector('#initial-mystery-box .mb-intro-title');
   const review = ['localhost', '127.0.0.1'].includes(location.hostname) ? new URLSearchParams(location.search).get('boxReview') : null;
   const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   let visual;
@@ -57,15 +58,16 @@ export function createMysteryBox() {
     unavailable = true;
     if (stage) stage.hidden = true;
     if (caption) caption.hidden = true;
+    if (intro) intro.hidden = true;
     cancel();
   }
-  if (unavailable) { if (stage) stage.hidden = true; if (caption) caption.hidden = true; }
+  if (unavailable) { if (stage) stage.hidden = true; if (caption) caption.hidden = true; if (intro) intro.hidden = true; }
   stage?.addEventListener('mystery-box-unavailable', skipPresentation);
   // Load the renderer alongside the normal data requests, not before app startup.
   if (stage && !unavailable) {
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261019-6')
+      import('./mystery-box-scene.js?v=20261019-7')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -134,7 +136,7 @@ export function createMysteryBox() {
     context.setAttribute('aria-hidden', 'true'); context.inert = true;
     const traveller = document.createElement('div'); traveller.className = 'mb-icon-traveller';
     const object = document.createElement('div'); object.className = 'mb-icon-object';
-    for (let layer = 8; layer >= 1; layer--) {
+    for (let layer = 4; layer >= 1; layer--) {
       const side = node.cloneNode(false); side.className = 'mb-icon-side';
       side.setAttribute('aria-hidden', 'true'); side.style.setProperty('--layer', layer); object.append(side);
     }
@@ -160,6 +162,7 @@ export function createMysteryBox() {
     traveller.style.setProperty('--mb-depth', pose.depth);
   }
   function showSequenceAt(elapsed) {
+    intro?.setAttribute('aria-hidden', 'true');
     const lid = Math.min(1, elapsed / BOX_SEQUENCE.lid);
     if (lid !== progress) { progress = lid; visual.draw(progress); }
     if (elapsed >= BOX_SEQUENCE.liftAt) {
@@ -205,13 +208,16 @@ export function createMysteryBox() {
     progress = 0;
     wrapper = document.createElement('div'); wrapper.className = 'mb-reveal'; wrapper.dataset.phase = 'closed';
     const focused = document.activeElement;
-    panel.before(wrapper); caption.hidden = false; wrapper.append(panel, stage, caption); visual?.resize(); showVisual();
+    panel.before(wrapper); caption.hidden = false;
+    if (intro) { intro.hidden = false; intro.removeAttribute('aria-hidden'); }
+    wrapper.append(panel, ...(intro ? [intro] : []), stage, caption); visual?.resize(); showVisual();
     if (review) trigger.hidden = true;
     // Freeze the real component for local visual QA and its first-frame poster.
     if (review === 'closed' || review === 'open') {
       wrapper.dataset.review = review;
       wrapper.dataset.phase = review === 'open' ? 'illuminated' : 'closed';
       progress = review === 'open' ? 1 : 0; visual?.draw(progress);
+      if (review === 'open') intro?.setAttribute('aria-hidden', 'true');
       return;
     }
     panel.inert = true;

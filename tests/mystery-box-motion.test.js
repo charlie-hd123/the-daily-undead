@@ -22,7 +22,9 @@ test('the icon starts below the front rim and rises clear of it with visible dep
   assert.ok(ink.top >= desktop.stage.top + 24);
   assert.ok(ink.bottom < desktop.mouth.left.y);
   assert.equal(raised.opacity, 1);
-  assert.ok(raised.rotateX < 0 && raised.rotateY < 0 && raised.depth === 1);
+  assert.equal(raised.rotateZ, 0);
+  assert.ok(ink.right - ink.left <= (desktop.mouth.right.x - desktop.mouth.left.x) * .62);
+  assert.ok(raised.rotateX > 0 && raised.rotateY > 0 && raised.depth === 1);
 });
 
 test('the travelling icon becomes its exact faint corner watermark without residual depth or glow', () => {

@@ -15,8 +15,8 @@ export function createIconFlight({ target, mouth, stage }) {
     (x - mouth.left.x) / (mouth.right.x - mouth.left.x));
   const openingWidth = Math.abs(mouth.right.x - mouth.left.x);
   const availableHeight = Math.max(30, Math.min(mouth.left.y, mouth.right.y) - stage.top - 40);
-  const peakSize = Math.min(280, (stage.width - 40) / ICON_INK.width,
-    openingWidth * 1.05 / ICON_INK.width, availableHeight / ICON_INK.height);
+  const peakSize = Math.min(210, (stage.width - 40) / ICON_INK.width,
+    openingWidth * .62 / ICON_INK.width, availableHeight / ICON_INK.height);
   const peakScale = peakSize / target.width;
   const startScale = peakScale * .62;
   const startTop = Math.max(mouth.left.y, mouth.right.y) + target.height * startScale;
@@ -32,10 +32,11 @@ export function createIconFlight({ target, mouth, stage }) {
     const left = mix(mouth.center.x - target.width * floatingScale / 2, target.left, settle);
     const arc = settle > 0 && settle < 1 ? Math.sin(Math.PI * settle) * Math.min(28, stage.height * .08) : 0;
     const top = mix(mix(startTop, peakTop, lift), target.top, settle) - arc;
+    // Match the chest front plane: orthographic projection, 14° pitch and 29° yaw.
     return { left, top, scale,
-      rotateX: mix(-52, -10, lift) * (1 - settle),
-      rotateY: mix(-28, -16, lift) * (1 - settle),
-      rotateZ: mix(-5, -2, lift) * (1 - settle),
+      rotateX: mix(26, 14, lift) * (1 - settle),
+      rotateY: 29 * (1 - settle),
+      rotateZ: 0,
       depth: 1 - settle, light: (.8 - .45 * lift) * (1 - settle),
       opacity: mix(1, .12, fade),
       clipLeft: lipY(stage.left) - stage.top,

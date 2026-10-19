@@ -2392,7 +2392,7 @@ body:has(.word-puzzle-panel) .community-stats-demo {
   position: absolute;
   z-index: 0;
   top: .85rem;
-  right: .75rem;
+  right: 1.4rem;
   width: var(--puzzle-panel-art-size);
   height: var(--puzzle-panel-art-size);
   object-fit: contain;
@@ -2401,6 +2401,6 @@ body:has(.word-puzzle-panel) .community-stats-demo {
   user-select: none;
 }
 :is(.word-puzzle-panel, .quest-clue-panel) > .screen-heading > :is(.kicker, h2) {
-  padding-inline-end: calc(var(--puzzle-panel-art-size) + .25rem);
+  padding-inline-end: calc(var(--puzzle-panel-art-size) + .9rem);
 }
 .mb-reveal[data-phase="assembling"] > .panel > .puzzle-panel-art { opacity: .12; transform: none; }
