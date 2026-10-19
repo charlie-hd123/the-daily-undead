@@ -1,6 +1,6 @@
-import { BOX_SEQUENCE, createIconFlight, createBoxActivation } from './mystery-box-motion.js?v=20261019-8';
+import { BOX_SEQUENCE, createIconFlight, createBoxActivation } from './mystery-box-motion.js?v=20261019-9';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261019-8';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261019-9';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox() {
@@ -68,7 +68,7 @@ export function createMysteryBox() {
   if (stage && !unavailable) {
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261019-8')
+      import('./mystery-box-scene.js?v=20261019-9')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
