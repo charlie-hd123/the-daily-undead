@@ -12,19 +12,19 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261019-14";
+} from "./game-core.js?v=20261019-15";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
-} from "./word-puzzle-core.js?v=20261019-14";
+} from "./word-puzzle-core.js?v=20261019-15";
 import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261019-14";
+} from "./daily-challenge-core.js?v=20261019-15";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -33,28 +33,28 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261019-14";
+} from "./progression.js?v=20261019-15";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261019-14";
+} from "./account.js?v=20261019-15";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261019-14";
+} from "./community-stats.js?v=20261019-15";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261019-14";
-import { fetchWithTimeout } from "./network.js?v=20261019-14";
-import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261019-14";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261019-14";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261019-14";
-import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261019-14";
-import { createMysteryBox } from "./mystery-box.js?v=20261019-14";
+} from "./leaderboards.js?v=20261019-15";
+import { fetchWithTimeout } from "./network.js?v=20261019-15";
+import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261019-15";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261019-15";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261019-15";
+import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261019-15";
+import { createMysteryBox } from "./mystery-box.js?v=20261019-15";
 
 const mysteryBox = createMysteryBox();
 
@@ -207,13 +207,13 @@ const puzzleTypes = {
     name: "Quest Steps",
     kicker: "Easter egg puzzle",
     description: "Can you identify the Zombies map from its Easter egg steps?",
-    image: "./assets/quest-steps-card.svg?v=20261019-14",
+    image: "./assets/quest-steps-card.svg?v=20261019-15",
   },
   word: {
     name: "Last Words",
     kicker: "Letter puzzle",
     description: "Can you identify the Zombies word or phrase by revealing its letters?",
-    image: "./assets/dead-letters-card.svg?v=20261019-14",
+    image: "./assets/dead-letters-card.svg?v=20261019-15",
   },
 };
 

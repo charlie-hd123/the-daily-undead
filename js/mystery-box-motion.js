@@ -30,10 +30,11 @@ export function revealHeight(elapsed, closedHeight, puzzleHeight) {
 
 // Painted bounds, including strokes, in the original 240px SVG viewBoxes.
 export const ICON_INK = Object.freeze({
-  word: Object.freeze({ left: 28 / 240, top: 72 / 240, width: 184 / 240, height: 101 / 240 }),
-  easter: Object.freeze({ left: 38.5 / 240, top: 50.5 / 240, width: 163 / 240, height: 141 / 240 }),
+  word: Object.freeze({ left: 28 / 240, top: 72 / 240, width: 184 / 240, height: 101 / 240, visualScale: 1.25 }),
+  easter: Object.freeze({ left: 38.5 / 240, top: 50.5 / 240, width: 163 / 240, height: 141 / 240, visualScale: 1 }),
 });
-const tallestIcon = Math.max(...Object.values(ICON_INK).map((ink) => ink.height / ink.width));
+const tallestIcon = Math.max(...Object.values(ICON_INK).map((ink) => ink.height / ink.width * ink.visualScale));
+const widestIcon = Math.max(...Object.values(ICON_INK).map((ink) => ink.visualScale));
 
 export function createIconFlight({ target, mouth, stage, viewDirection, ink = ICON_INK.easter }) {
   // CSS uses screen Y down and positive Z towards the player. Both rotations
@@ -44,9 +45,9 @@ export function createIconFlight({ target, mouth, stage, viewDirection, ink = IC
     (x - mouth.left.x) / (mouth.right.x - mouth.left.x));
   const openingWidth = Math.abs(mouth.right.x - mouth.left.x);
   const availableHeight = Math.max(30, Math.min(mouth.left.y, mouth.right.y) - stage.top - 40);
-  // Size both rewards by visible width, with shared clearance for the taller map.
-  const peakInkWidth = Math.min(168, stage.width - 40, openingWidth * .62, availableHeight / tallestIcon);
-  const peakSize = peakInkWidth / ink.width;
+  // Optical balance: the shallow letter tiles need more width to match the map's visual weight.
+  const peakInkWidth = Math.min(168, (stage.width - 40) / widestIcon, openingWidth * .62, availableHeight / tallestIcon);
+  const peakSize = peakInkWidth * ink.visualScale / ink.width;
   const peakScale = peakSize / target.width;
   const startScale = peakScale * .62;
   const startTop = Math.max(mouth.left.y, mouth.right.y) + target.height * startScale;

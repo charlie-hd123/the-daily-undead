@@ -32,7 +32,7 @@ test('the lid starts easing down with the fade and never closes completely on sc
   }
 });
 
-test('both painted rewards emerge at identical visible widths despite different SVG margins', () => {
+test('the letter tiles emerge 25% wider to optically balance the taller map', () => {
   for (const size of [[288, 250], [343, 250], [736, 310], [1056, 480], [797, 200]]) {
     const stage = { left: 20, top: 150, width: size[0], height: size[1] };
     const input = { ...desktop, stage, mouth: {
@@ -44,7 +44,7 @@ test('both painted rewards emerge at identical visible widths despite different 
         const pose = createIconFlight({ ...input, ink })(elapsed);
         return ink.width * input.target.width * pose.scale;
       });
-      assert.ok(Math.abs(widths[0] - widths[1]) < 1e-10);
+      assert.ok(Math.abs(widths[0] / widths[1] - 1.25) < 1e-10);
     }
   }
 });
@@ -95,12 +95,14 @@ test('both SVG silhouettes fit phones, tablets and short landscape stages withou
         mouth: { left: { x: stage.left + stage.width * .2, y: stage.top + stage.height * .52 },
           right: { x: stage.left + stage.width * .8, y: stage.top + stage.height * .62 },
           center: { x: stage.left + stage.width / 2, y: stage.top + stage.height * .55 } }, stage };
-      const pose = createIconFlight(input)(timing.settleAt);
-      const ink = inkBounds(pose, input.target);
-      assert.ok(ink.top >= stage.top + 24 - .001);
-      assert.ok(ink.left >= stage.left && ink.right <= stage.left + stage.width);
-      assert.ok(ink.bottom < input.mouth.left.y);
-      assert.ok(ink.right - ink.left <= stage.width - 40);
+      for (const silhouette of Object.values(ICON_INK)) {
+        const pose = createIconFlight({ ...input, ink: silhouette })(timing.settleAt);
+        const bounds = inkBounds(pose, input.target, silhouette);
+        assert.ok(bounds.top >= stage.top + 24 - .001);
+        assert.ok(bounds.left >= stage.left && bounds.right <= stage.left + stage.width);
+        assert.ok(bounds.bottom < input.mouth.left.y);
+        assert.ok(bounds.right - bounds.left <= stage.width - 40);
+      }
     }
   }
 });
