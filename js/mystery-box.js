@@ -1,3 +1,5 @@
+import { BOX_SEQUENCE, createRewardFlight } from './mystery-box-motion.js?v=20261019-1';
+
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox() {
   const stage = document.querySelector('#initial-mystery-box .mb-scene');
@@ -6,6 +8,7 @@ export function createMysteryBox() {
   let visual;
   let wrapper;
   let panel;
+  let reward;
   let frame;
   let progress = 0;
   let unavailable = reducedMotion() || review === 'fallback';
@@ -30,7 +33,7 @@ export function createMysteryBox() {
   stage?.addEventListener('mystery-box-unavailable', skipPresentation);
   // Load the renderer alongside the normal data requests, not before app startup.
   if (stage && !unavailable) {
-    renderingReady = import('./mystery-box-scene.js?v=20261018-11')
+    renderingReady = import('./mystery-box-scene.js?v=20261019-1')
       .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage))
       .then((scene) => {
         if (unavailable) { scene.dispose(); return null; }
@@ -61,6 +64,13 @@ export function createMysteryBox() {
   function cancel() {
     timers.forEach(window.clearTimeout); timers = [];
     window.cancelAnimationFrame(frame);
+    if (reward) {
+      const { node, slot, context, style, hidden, inert } = reward;
+      slot.replaceWith(node);
+      node.classList.remove('mb-reward'); node.style.cssText = style; node.inert = inert;
+      if (hidden === null) node.removeAttribute('aria-hidden'); else node.setAttribute('aria-hidden', hidden);
+      context.remove(); reward = null;
+    }
     if (panel) panel.inert = false;
     if (wrapper?.isConnected && panel) {
       const focused = document.activeElement;
@@ -69,12 +79,62 @@ export function createMysteryBox() {
     }
     wrapper = panel = null;
   }
-  function animateLid() {
+  function prepareReward(type) {
+    const node = panel.querySelector(type === 'word' ? '.word-answer' : '.clue-card:not(.is-hidden)');
+    if (!node) return false;
+    const target = node.getBoundingClientRect();
+    const origin = wrapper.getBoundingClientRect();
+    const stageRect = stage.getBoundingClientRect();
+    if (!target.width || !target.height) return false;
+    const slot = document.createElement('div'); slot.className = 'mb-reward-slot';
+    slot.setAttribute('aria-hidden', 'true');
+    slot.style.cssText = `width:${target.width}px;height:${target.height}px;margin:${getComputedStyle(node).margin};max-width:100%;`;
+    const context = document.createElement('div');
+    context.className = `mb-reward-context ${type === 'word' ? 'word-puzzle-panel' : 'quest-clue-panel'}`;
+    context.setAttribute('aria-hidden', 'true'); context.inert = true;
+    reward = { node, slot, context, target, style: node.style.cssText,
+      hidden: node.getAttribute('aria-hidden'), inert: node.inert,
+      flight: createRewardFlight({ target, mouth: visual.aperture(), stage: stageRect }) };
+    node.replaceWith(slot); wrapper.append(context); context.append(node);
+    node.classList.add('mb-reward'); node.inert = true; node.setAttribute('aria-hidden', 'true');
+    Object.assign(node.style, { position: 'absolute', left: `${target.left - origin.left}px`,
+      top: `${target.top - origin.top}px`, width: `${target.width}px`, height: `${target.height}px`, margin: '0' });
+    return true;
+  }
+  function positionReward(elapsed) {
+    const { node, target, flight } = reward;
+    const pose = flight(elapsed);
+    node.style.transform = `translate3d(${pose.left - target.left}px,${pose.top - target.top}px,0) scale(${pose.scale})`;
+    node.style.clipPath = `polygon(0 0,100% 0,100% ${pose.clipRight}px,0 ${pose.clipLeft}px)`;
+    node.style.setProperty('--mb-light', pose.light);
+    node.style.setProperty('--mb-surface', pose.surface);
+  }
+  function showSequenceAt(elapsed, type) {
+    const lid = Math.min(1, elapsed / BOX_SEQUENCE.lid);
+    if (lid !== progress) { progress = lid; visual.draw(progress); }
+    if (elapsed >= BOX_SEQUENCE.liftAt) {
+      if (!reward && !prepareReward(type)) { cancel(); return; }
+      positionReward(elapsed);
+    }
+    const phase = elapsed >= BOX_SEQUENCE.assembleAt ? 'assembling'
+      : elapsed >= BOX_SEQUENCE.settleAt ? 'settling'
+      : elapsed >= BOX_SEQUENCE.liftAt + BOX_SEQUENCE.liftFor ? 'reward'
+      : elapsed >= BOX_SEQUENCE.liftAt ? 'lifting' : 'opening';
+    if (wrapper.dataset.phase !== phase) wrapper.dataset.phase = phase;
+  }
+  function animateSequence(type, focused) {
     const started = performance.now();
     function tick(now) {
-      progress = Math.min(1, (now - started) / 850);
-      visual?.draw(progress);
-      if (progress < 1 && wrapper?.isConnected) frame = window.requestAnimationFrame(tick);
+      if (!wrapper?.isConnected) return;
+      const elapsed = now - started;
+      showSequenceAt(elapsed, type);
+      if (!wrapper) return;
+      if (elapsed >= BOX_SEQUENCE.finishAt) {
+        const currentPanel = panel; cancel();
+        if (document.activeElement === document.body && currentPanel.contains(focused)) focused.focus({ preventScroll: true });
+        return;
+      }
+      frame = window.requestAnimationFrame(tick);
     }
     frame = window.requestAnimationFrame(tick);
   }
@@ -86,6 +146,8 @@ export function createMysteryBox() {
     seen.add(key);
     panel = document.querySelector(type === 'word' ? '#app .word-puzzle-panel' : '#app .quest-clue-panel');
     if (!panel) return;
+    // A new reveal must be in view when entered from a result or the just-for-fun cards.
+    if (window.scrollY) window.scrollTo(0, 0);
     progress = 0;
     wrapper = document.createElement('div'); wrapper.className = 'mb-reveal'; wrapper.dataset.phase = 'closed';
     const focused = document.activeElement;
@@ -100,6 +162,15 @@ export function createMysteryBox() {
     }
     panel.inert = true;
     const currentWrapper = wrapper;
+    if (['lift', 'reward', 'landed'].includes(review)) {
+      wrapper.dataset.review = review;
+      void renderingReady.then(() => {
+        if (wrapper !== currentWrapper || !visual) return;
+        progress = 1; visual.draw(1);
+        showSequenceAt(review === 'lift' ? 1000 : review === 'reward' ? 1750 : 2850, type);
+      });
+      return;
+    }
     // Failed or slow 3D goes directly to the ordinary, interactive puzzle.
     const deadline = new Promise((resolve) => later(() => resolve(null), 1800));
     void Promise.race([renderingReady, deadline]).then(() => {
@@ -109,20 +180,12 @@ export function createMysteryBox() {
       later(() => {
         if (!wrapper) return;
         wrapper.dataset.phase = 'opening';
-        animateLid();
+        animateSequence(type, focused);
       }, hold);
-      later(() => { if (wrapper) wrapper.dataset.phase = 'illuminated'; }, hold + 850);
-      later(() => {
-        if (!wrapper) return;
-        wrapper.dataset.phase = 'emerging'; panel.inert = false;
-        if (document.activeElement === document.body && panel.contains(focused)) focused.focus({ preventScroll: true });
-      }, hold + 1300);
-      later(() => { if (wrapper) wrapper.dataset.phase = 'rising'; }, hold + 1650);
-      later(() => { if (wrapper) wrapper.dataset.phase = 'revealed'; }, hold + 2200);
-      later(cancel, hold + 2850);
     });
   }
   window.addEventListener('pagehide', (event) => { cancel(); if (!event.persisted) visual?.dispose(); });
   window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', (event) => { if (event.matches) skipPresentation(); });
+  window.addEventListener('resize', () => { if (reward) cancel(); });
   return { open, cancel, get isPresenting() { return Boolean(panel?.inert); } };
 }

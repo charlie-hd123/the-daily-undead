@@ -1,4 +1,4 @@
-import * as T from './vendor/mystery-box-three.js?v=20261018-11';
+import * as T from './vendor/mystery-box-three.js?v=20261019-1';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
@@ -47,8 +47,8 @@ export async function createMysteryBoxScene(host) {
   host.dataset.renderer = 'texture';
   const loader = new T.TextureLoader();
   const [woodMap, paintMap] = await Promise.all([
-    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261018-11', import.meta.url).href),
-    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261018-11', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261019-1', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261019-1', import.meta.url).href),
   ]);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;
@@ -144,7 +144,7 @@ export async function createMysteryBoxScene(host) {
     transparent: true, depthWrite: false, blending: T.AdditiveBlending, side: T.DoubleSide,
     uniforms: { strength: { value: 0 } },
     vertexShader: 'varying vec2 vUv; void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader: 'varying vec2 vUv; uniform float strength; void main(){ float width=mix(.27,.5,vUv.y); float edge=1.-smoothstep(width*.38,width,abs(vUv.x-.5));float fade=pow(1.-vUv.y,2.5)*smoothstep(0.,.08,vUv.y);gl_FragColor=vec4(.67,.87,1.,edge*fade*strength);}',
+    fragmentShader: 'varying vec2 vUv; uniform float strength; void main(){ float width=mix(.27,.5,vUv.y); float edge=1.-smoothstep(width*.38,width,abs(vUv.x-.5));float fade=pow(1.-vUv.y,2.5)*smoothstep(0.,.08,vUv.y);gl_FragColor=vec4(.88,.96,1.,edge*fade*strength);}',
   });
   const glow = new T.Mesh(new T.PlaneGeometry(6.5, 3.2), glowMat); glow.position.set(0, 3.03, -.12); glow.rotation.y = .4; caseGroup.add(glow);
 
@@ -192,7 +192,17 @@ export async function createMysteryBoxScene(host) {
   const observer = new ResizeObserver(resize); observer.observe(host);
   canvas.addEventListener('webglcontextlost', (event) => { event.preventDefault(); contextLost = true; host.classList.remove('is-rendered'); host.dataset.renderer = 'unavailable'; host.dispatchEvent(new Event('mystery-box-unavailable')); });
   canvas.addEventListener('webglcontextrestored', () => { contextLost = false; previousWidth = previousHeight = 0; host.classList.add('is-rendered'); resize(); host.dataset.renderer = 'ready'; });
-  return { draw, resize, poster() { draw(0); return canvas.toDataURL('image/png'); }, dispose() {
+  function aperture() {
+    const rect = host.getBoundingClientRect();
+    const project = (x, y, z) => {
+      const point = new T.Vector3(x, y, z).project(camera);
+      return { x: rect.left + (point.x + 1) * rect.width / 2,
+        y: rect.top + (1 - point.y) * rect.height / 2 };
+    };
+    return { left: project(-2.89, 1.65, 1.08), right: project(2.89, 1.65, 1.08),
+      center: project(0, 1.65, .25) };
+  }
+  return { draw, resize, aperture, poster() { draw(0); return canvas.toDataURL('image/png'); }, dispose() {
     observer.disconnect();
     scene.traverse((node) => { if (node.isMesh) { node.geometry.dispose(); for (const material of [].concat(node.material)) material.dispose(); } });
     woodMap.dispose(); paintMap.dispose(); contactTexture.dispose(); env.dispose(); renderer.dispose(); canvas.remove();
