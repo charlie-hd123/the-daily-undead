@@ -121,3 +121,12 @@ test("community values use subtle placeholders for unavailable data", () => {
   assert.equal(formatSolvePercentage(63), "63%");
   assert.equal(formatSolvePercentage(null), "—");
 });
+
+test('memory-only storage cannot create repeat anonymous community identities', () => {
+  assert.equal(getOrCreateAnonymousPlayerId({ persistent: false, getItem: () => null, setItem() {} }), null);
+});
+
+test('a failure while saving a new anonymous id cannot create an ephemeral submission identity', () => {
+  const s = { persistent: true, getItem: () => null, setItem() { this.persistent = false; } };
+  assert.equal(getOrCreateAnonymousPlayerId(s, { randomUUID: () => 'new-id' }), null);
+});

@@ -1,6 +1,6 @@
-import { BOX_SEQUENCE, ICON_INK, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261019-16';
+import { BOX_SEQUENCE, ICON_INK, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261019-18';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261019-16';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261019-18';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox() {
@@ -17,13 +17,16 @@ export function createMysteryBox() {
   let layout;
   let frame;
   let progress = 0;
-  let unavailable = reducedMotion() || review === 'fallback';
+  const supported = globalThis.dailyUndeadEntry?.canAnimate
+    ?? (typeof WebGL2RenderingContext === 'function' && typeof ResizeObserver === 'function');
+  let unavailable = reducedMotion() || review === 'fallback' || !supported;
   let beginReveal;
   let activation = createBoxActivation(() => beginReveal?.());
-  let renderingReady = Promise.resolve(null);
+  let renderingReady;
   let timers = [];
   let history;
   let historyStorage;
+  let activeEligibility;
   const later = (callback, delay) => timers.push(window.setTimeout(callback, delay));
   function positionTrigger() {
     if (!visual || !trigger || progress) return;
@@ -48,8 +51,8 @@ export function createMysteryBox() {
   // Announce the opening control on entry, but draw its focus ring after keyboard interaction.
   trigger?.addEventListener('keydown', () => trigger.removeAttribute('data-auto-focus'));
   trigger?.addEventListener('blur', () => trigger.removeAttribute('data-auto-focus'));
-  const triggerObserver = stage && new ResizeObserver(positionTrigger);
-  if (stage) triggerObserver.observe(stage);
+  const triggerObserver = stage && typeof ResizeObserver === 'function' ? new ResizeObserver(positionTrigger) : null;
+  triggerObserver?.observe(stage);
   function showVisual() {
     if (!visual || unavailable) return;
     stage.classList.add('is-rendered');
@@ -65,11 +68,13 @@ export function createMysteryBox() {
   }
   if (unavailable) { if (stage) stage.hidden = true; if (caption) caption.hidden = true; if (intro) intro.hidden = true; }
   stage?.addEventListener('mystery-box-unavailable', skipPresentation);
-  // Load the renderer alongside the normal data requests, not before app startup.
-  if (stage && !unavailable) {
+  // Returning players never import or initialize Three.js. Only a confirmed fresh
+  // official puzzle can start it; the matching HTML poster covers that short load.
+  function ensureRenderer() {
+    if (renderingReady) return renderingReady;
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261019-16')
+      import('./mystery-box-scene.js?v=20261019-18')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -100,9 +105,11 @@ export function createMysteryBox() {
         return scene;
       })
       .catch((error) => { skipPresentation(); console.warn('Mystery Box renderer unavailable; showing the puzzle directly.', error); return null; });
+    return renderingReady;
   }
 
   function cancel() {
+    activeEligibility = null;
     if (wrapper) {
       activation.cancel(); activation = createBoxActivation(() => beginReveal?.());
     }
@@ -208,6 +215,7 @@ export function createMysteryBox() {
     }
     panel = document.querySelector(type === 'word' ? '#app .word-puzzle-panel' : '#app .quest-clue-panel');
     if (!panel) return;
+    activeEligibility = { dateKey, official, fresh };
     // The official daily reveal starts in view.
     if (window.scrollY) window.scrollTo(0, 0);
     progress = 0;
@@ -216,6 +224,7 @@ export function createMysteryBox() {
     panel.before(wrapper); caption.hidden = activation.requested;
     if (intro) { intro.hidden = false; intro.removeAttribute('aria-hidden'); }
     wrapper.append(panel, ...(intro ? [intro] : []), stage, caption); visual?.resize(); showVisual();
+    const rendererReady = ensureRenderer();
     if (review) trigger.hidden = true;
     // Freeze the real component for local visual QA and its first-frame poster.
     if (review === 'closed' || review === 'open') {
@@ -237,14 +246,15 @@ export function createMysteryBox() {
         if (wrapper !== currentWrapper || !visual) return;
         // Another tab may have opened this day's box while this one was waiting.
         if (!history.canOpen({ dateKey, official, fresh })) { cancel(); return; }
-        history.markOpened(dateKey); trigger.hidden = true;
+        if (!history.markOpened(dateKey)) { cancel(); return; }
+        trigger.hidden = true;
         wrapper.dataset.phase = 'opening'; syncTrigger();
         animateSequence(focused);
       };
     } else trigger.hidden = true;
     // Decode the actual SVG before the reveal; a missing asset goes directly to play.
     const icon = panel.querySelector('.puzzle-panel-art');
-    const presentationReady = Promise.all([renderingReady, icon ? icon.decode() : Promise.reject()])
+    const presentationReady = Promise.all([rendererReady, icon ? icon.decode() : Promise.reject()])
       .then(([scene]) => scene).catch(() => null);
     if (['lift', 'reward', 'landed'].includes(review)) {
       wrapper.dataset.review = review;
@@ -267,5 +277,11 @@ export function createMysteryBox() {
   window.addEventListener('pagehide', (event) => { cancel(); if (!event.persisted) { triggerObserver?.disconnect(); visual?.dispose(); } });
   window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', (event) => { if (event.matches) skipPresentation(); });
   window.addEventListener('resize', () => { if (reward) cancel(); });
+  window.addEventListener('storage', (event) => {
+    if (wrapper?.dataset.phase !== 'closed' || !activeEligibility) return;
+    if (event.key === null || event.key?.endsWith(`mystery-box-opened:${activeEligibility.dateKey}`)) {
+      if (!history.canOpen(activeEligibility)) cancel();
+    }
+  });
   return { open, cancel, get isPresenting() { return Boolean(panel?.inert); } };
 }

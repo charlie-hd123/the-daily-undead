@@ -21,6 +21,13 @@ export function normalizeLetter(value) {
   return /^[A-Z]$/.test(letter) ? letter : null;
 }
 
+export function shouldHandleWordShortcut(event, { presenting = false, modalOpen = false } = {}) {
+  if (presenting || modalOpen || event.defaultPrevented || event.isComposing
+    || event.ctrlKey || event.metaKey || event.altKey || event.repeat) return false;
+  if (event.target?.closest?.('input, textarea, select, [contenteditable]:not([contenteditable="false"]), [role="textbox"], [role="searchbox"]')) return false;
+  return Boolean(normalizeLetter(event.key));
+}
+
 export function getAnswerLetters(answer) {
   return String(answer || "").toUpperCase().match(/[A-Z]/g) || [];
 }

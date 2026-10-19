@@ -1,3 +1,4 @@
+import { browserStorage } from "./browser-storage.js?v=20261019-18";
 const playerIdStorageKey = "the-daily-undead:community-player-id";
 const submittedPuzzleStoragePrefix = "the-daily-undead:community-submitted:";
 
@@ -12,7 +13,8 @@ function createAnonymousPlayerId(cryptoApi = globalThis.crypto) {
   return `${hex.slice(0, 4).join("")}-${hex.slice(4, 6).join("")}-${hex.slice(6, 8).join("")}-${hex.slice(8, 10).join("")}-${hex.slice(10).join("")}`;
 }
 
-export function getOrCreateAnonymousPlayerId(storage = globalThis.localStorage, cryptoApi = globalThis.crypto) {
+export function getOrCreateAnonymousPlayerId(storage = browserStorage, cryptoApi = globalThis.crypto) {
+  if (storage?.persistent === false) return null;
   try {
     const savedId = storage.getItem(playerIdStorageKey);
     if (savedId) return savedId;
@@ -20,7 +22,7 @@ export function getOrCreateAnonymousPlayerId(storage = globalThis.localStorage, 
     const playerId = createAnonymousPlayerId(cryptoApi);
     if (!playerId) return null;
     storage.setItem(playerIdStorageKey, playerId);
-    return storage.getItem(playerIdStorageKey) === playerId ? playerId : null;
+    return storage.persistent !== false && storage.getItem(playerIdStorageKey) === playerId ? playerId : null;
   } catch {
     // Without persistent storage, a stable anonymous ID cannot be guaranteed.
     return null;
@@ -110,7 +112,7 @@ export async function submitCommunityAttempt({
   mapId,
   mapName,
   isCorrect,
-  storage = globalThis.localStorage,
+  storage = browserStorage,
   cryptoApi = globalThis.crypto,
   fetchImpl,
 }) {

@@ -9,6 +9,7 @@ import {
   isPlayableWordEntry,
   isWordAvailableOnDate,
   isWordSolved,
+  shouldHandleWordShortcut,
   WORD_FAMILIARITY,
 } from "../js/word-puzzle-core.js";
 
@@ -17,6 +18,25 @@ const entries = [
   { id: "richtofen", category: "Characters", answer: "Edward Richtofen", familiarity: WORD_FAMILIARITY.WELL_KNOWN, availableFrom: "2026-01-01" },
   { id: "eisendrache", category: "Maps", answer: "Der Eisendrache", familiarity: WORD_FAMILIARITY.WELL_KNOWN, availableFrom: "2026-01-01" },
 ];
+
+test("word shortcuts ignore forms, dialogs, browser commands and composition", () => {
+  const event = { key: 'r', target: { closest: () => null } };
+  assert.equal(shouldHandleWordShortcut(event), true);
+  assert.equal(shouldHandleWordShortcut({ ...event, shiftKey: true, key: 'R' }), true);
+  for (const flag of ['ctrlKey', 'metaKey', 'altKey', 'isComposing', 'defaultPrevented', 'repeat']) {
+    assert.equal(shouldHandleWordShortcut({ ...event, [flag]: true }), false, flag);
+  }
+  for (const flag of ['presenting', 'modalOpen']) {
+    assert.equal(shouldHandleWordShortcut(event, { [flag]: true }), false, flag);
+  }
+  for (const target of ['input', 'textarea', 'select', '[contenteditable]', '[role="textbox"]']) {
+    assert.equal(shouldHandleWordShortcut({ ...event, target: { closest: (selector) => {
+      assert.match(selector, /input, textarea, select/);
+      return { tagName: target };
+    } } }), false, target);
+  }
+  assert.equal(shouldHandleWordShortcut({ key: 'Enter' }), false);
+});
 
 test("the same UTC date produces the same word and starting letters", () => {
   const first = buildDailyWordPuzzle("2026-10-07", entries);

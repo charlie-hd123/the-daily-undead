@@ -1,3 +1,4 @@
+import { browserStorage } from "./browser-storage.js?v=20261019-18";
 import { createClient } from "./vendor/supabase.js";
 
 function readConfig(documentObject) {
@@ -38,6 +39,7 @@ export async function loadSupabaseAuth(documentObject = document) {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
+      storage: browserStorage,
       detectSessionInUrl: true,
       flowType: "pkce",
     },
@@ -220,9 +222,9 @@ export async function loadSupabaseAuth(documentObject = document) {
     forgetDeletedSession() {
       const storageKey = `sb-${new URL(config.url).hostname.split(".")[0]}-auth-token`;
       try {
-        localStorage.removeItem(storageKey);
-        localStorage.removeItem(`${storageKey}-code-verifier`);
-        localStorage.removeItem(`${storageKey}-user`);
+        browserStorage.removeItem(storageKey);
+        browserStorage.removeItem(`${storageKey}-code-verifier`);
+        browserStorage.removeItem(`${storageKey}-user`);
       } catch { /* Storage may be unavailable. */ }
       currentSession = null;
       listeners.forEach((listener) => listener({ user: null }));

@@ -5,13 +5,16 @@ export function createDailyBoxHistory(storage) {
   const opened = new Set();
   return {
     canOpen({ dateKey, official, fresh }) {
-      if (!official || !fresh || !dateKey || opened.has(dateKey)) return false;
+      if (!official || !fresh || !dateKey || opened.has(dateKey) || storage?.persistent === false) return false;
       try { return storage.getItem(`${storagePrefix}${dateKey}`) !== '1'; }
-      catch { return true; }
+      catch { return false; }
     },
     markOpened(dateKey) {
       opened.add(dateKey);
-      try { storage.setItem(`${storagePrefix}${dateKey}`, '1'); } catch { /* Keep this page's receipt if storage is unavailable. */ }
+      try {
+        storage.setItem(`${storagePrefix}${dateKey}`, '1');
+        return storage.persistent !== false && storage.getItem(`${storagePrefix}${dateKey}`) === '1';
+      } catch { return false; }
     },
   };
 }

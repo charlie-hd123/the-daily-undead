@@ -1,3 +1,4 @@
+import { browserStorage } from "./browser-storage.js?v=20261019-18";
 import {
   accountMemoryStorageKey,
   clearPendingProgress,
@@ -6,9 +7,9 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261019-16";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261019-16";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261019-16";
+} from "./account-session.js?v=20261019-18";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261019-18";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261019-18";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -734,7 +735,7 @@ export async function initialiseAccount({
   try {
     clerk = await withTimeout(
       supabaseConfigured
-        ? import("./supabase-auth.js?v=20261019-16").then(({ loadSupabaseAuth }) => (
+        ? import("./supabase-auth.js?v=20261019-18").then(({ loadSupabaseAuth }) => (
           loadSupabaseAuth(documentObject)
         ))
         : loadClerk(publishableKey),
@@ -758,9 +759,9 @@ export async function initialiseAccount({
     else dialog.removeAttribute("open");
   };
 
-  const rememberedAccount = () => readRememberedAccount(globalThis.localStorage);
+  const rememberedAccount = () => readRememberedAccount(browserStorage);
   const persistPendingProgress = (userId, revision) => !readOnlyProgress && writePendingProgress(
-    globalThis.localStorage,
+    browserStorage,
     {
       userId,
       revision,
@@ -782,11 +783,11 @@ export async function initialiseAccount({
   const beforeSignOut = () => {
     intentionalSignOut = true;
     signedOutMemory = rememberedAccount();
-    forgetRememberedAccount(globalThis.localStorage);
+    forgetRememberedAccount(browserStorage);
   };
   const afterSignOutFailure = () => {
     intentionalSignOut = false;
-    if (signedOutMemory) rememberAccount(globalThis.localStorage, signedOutMemory);
+    if (signedOutMemory) rememberAccount(browserStorage, signedOutMemory);
     signedOutMemory = null;
   };
   const openSignOutDialog = () => {
@@ -863,7 +864,7 @@ export async function initialiseAccount({
       }
     });
     globalThis.addEventListener?.("storage", (event) => {
-      if (event.key !== accountMemoryStorageKey || readRememberedAccount(globalThis.localStorage)) return;
+      if (event.key !== accountMemoryStorageKey || readRememberedAccount(browserStorage)) return;
       closeDialog(sessionExpiredDialog);
       accountButton.classList.remove("has-expired-session");
       accountButton.textContent = "Log in";
@@ -960,30 +961,30 @@ export async function initialiseAccount({
   profile = account.profile;
   const userId = account.accountId || clerk.user.id;
   const legacyUserId = account.legacyUserId;
-  let pendingProgress = readOnlyProgress ? null : readPendingProgress(globalThis.localStorage, userId);
+  let pendingProgress = readOnlyProgress ? null : readPendingProgress(browserStorage, userId);
   if (!readOnlyProgress && !pendingProgress && legacyUserId && legacyUserId !== userId) {
-    const legacyPending = readPendingProgress(globalThis.localStorage, legacyUserId);
+    const legacyPending = readPendingProgress(browserStorage, legacyUserId);
     if (legacyPending) {
-      writePendingProgress(globalThis.localStorage, { ...legacyPending, userId });
-      clearPendingProgress(globalThis.localStorage, legacyUserId);
-      pendingProgress = readPendingProgress(globalThis.localStorage, userId);
+      writePendingProgress(browserStorage, { ...legacyPending, userId });
+      clearPendingProgress(browserStorage, legacyUserId);
+      pendingProgress = readPendingProgress(browserStorage, userId);
     }
     const remembered = rememberedAccount();
     if (remembered?.userId === legacyUserId) {
-      rememberAccount(globalThis.localStorage, { ...remembered, userId });
+      rememberAccount(browserStorage, { ...remembered, userId });
     }
   }
   if (!readOnlyProgress && !pendingProgress) {
     try {
-      if (globalThis.localStorage.getItem(legacyDirtyStorageKey) === userId) {
-        writePendingProgress(globalThis.localStorage, {
+      if (browserStorage.getItem(legacyDirtyStorageKey) === userId) {
+        writePendingProgress(browserStorage, {
           userId,
           revision: null,
           puzzleDate,
           snapshot: getLocalSnapshot(),
         });
-        globalThis.localStorage.removeItem(legacyDirtyStorageKey);
-        pendingProgress = readPendingProgress(globalThis.localStorage, userId);
+        browserStorage.removeItem(legacyDirtyStorageKey);
+        pendingProgress = readPendingProgress(browserStorage, userId);
       }
     } catch {
       // Legacy pending progress remains local if storage is unavailable.
@@ -1015,12 +1016,12 @@ export async function initialiseAccount({
         if (pendingProgress.puzzleDate === puzzleDate) {
           account.dailyState = pendingProgress.snapshot.dailyState;
         }
-        clearPendingProgress(globalThis.localStorage, userId);
+        clearPendingProgress(browserStorage, userId);
         pendingProgress = null;
       } catch {
         accountButton.disabled = false;
         accountButton.textContent = "Progress waiting to sync";
-        rememberAccount(globalThis.localStorage, { userId, revision: cloudRevision });
+        rememberAccount(browserStorage, { userId, revision: cloudRevision });
         return createUnavailableController({
           clerk,
           signedIn: true,
@@ -1029,7 +1030,7 @@ export async function initialiseAccount({
         });
       }
     } else {
-      clearPendingProgress(globalThis.localStorage, userId);
+      clearPendingProgress(browserStorage, userId);
       pendingProgress = null;
     }
   }
@@ -1060,7 +1061,7 @@ export async function initialiseAccount({
   }
 
   applyRemoteAccount(account);
-  rememberAccount(globalThis.localStorage, {
+  rememberAccount(browserStorage, {
     userId,
     revision: account.progress?.revision,
   });
@@ -1341,8 +1342,8 @@ export async function initialiseAccount({
       });
       currentRevision = Number(saveResult.progress?.revision || currentRevision + 1);
       if (deletingAccount) return;
-      rememberAccount(globalThis.localStorage, { userId, revision: currentRevision });
-      clearPendingProgress(globalThis.localStorage, userId);
+      rememberAccount(browserStorage, { userId, revision: currentRevision });
+      clearPendingProgress(browserStorage, userId);
     } catch (error) {
       // Progress remains stored locally and the next change will retry the sync.
       if (error.status === 409) accountButton.textContent = "Progress waiting to sync";
@@ -1372,7 +1373,7 @@ export async function initialiseAccount({
       });
       currentRevision = Math.max(currentRevision, Number(result.progress?.revision || 0));
       if (deletingAccount) return null;
-      rememberAccount(globalThis.localStorage, { userId, revision: currentRevision });
+      rememberAccount(browserStorage, { userId, revision: currentRevision });
       scheduleSave();
       return result;
     } catch {
@@ -1390,7 +1391,7 @@ export async function initialiseAccount({
       });
       currentRevision = Math.max(currentRevision, Number(result.progress?.revision || 0));
       if (deletingAccount) return null;
-      rememberAccount(globalThis.localStorage, { userId, revision: currentRevision });
+      rememberAccount(browserStorage, { userId, revision: currentRevision });
       scheduleSave();
       return result;
     } catch {
@@ -1408,7 +1409,7 @@ export async function initialiseAccount({
       });
       currentRevision = Math.max(currentRevision, Number(result.progress?.revision || 0));
       if (deletingAccount) return null;
-      rememberAccount(globalThis.localStorage, { userId, revision: currentRevision });
+      rememberAccount(browserStorage, { userId, revision: currentRevision });
       scheduleSave();
       return result;
     } catch {
@@ -1438,8 +1439,8 @@ export async function initialiseAccount({
     controller.canSync = false;
     globalThis.clearTimeout(saveTimer);
     saveAgain = false;
-    if (!readRememberedAccount(globalThis.localStorage)) deletingAccount = true;
-    if (!intentionalSignOut && readRememberedAccount(globalThis.localStorage)) {
+    if (!readRememberedAccount(browserStorage)) deletingAccount = true;
+    if (!intentionalSignOut && readRememberedAccount(browserStorage)) {
       controller.resultSubmissionRequiresSignIn = true;
       persistPendingProgress(userId, currentRevision);
       showExpiredSession();

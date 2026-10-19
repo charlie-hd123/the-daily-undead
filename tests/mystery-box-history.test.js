@@ -49,11 +49,24 @@ test('preview receipts never consume the real day’s official reveal', () => {
   assert.equal(createDailyBoxHistory(storage).canOpen(today), true);
 });
 
-test('blocked storage still prevents repeats in the current page without blocking play', () => {
+test('blocked storage skips the reveal and leaves normal play available', () => {
   const blocked = { getItem() { throw new Error('denied'); }, setItem() { throw new Error('denied'); } };
   const history = createDailyBoxHistory(blocked);
-  assert.equal(history.canOpen(today), true);
-  assert.doesNotThrow(() => history.markOpened(today.dateKey));
   assert.equal(history.canOpen(today), false);
-  assert.equal(history.canOpen({ ...today, dateKey: '2026-10-20' }), true);
+  assert.equal(history.markOpened(today.dateKey), false);
+  assert.equal(history.canOpen(today), false);
+  assert.equal(history.canOpen({ ...today, dateKey: '2026-10-20' }), false);
+});
+
+test('a quota error or silently discarded receipt cannot start an animation', () => {
+  for (const storage of [{ getItem: () => null, setItem() { throw Error('quota'); } }, { getItem: () => null, setItem() {} }]) {
+    const history = createDailyBoxHistory(storage);
+    assert.equal(history.markOpened(today.dateKey), false);
+    assert.equal(history.canOpen(today), false);
+  }
+});
+test('a nonpersistent preview wrapper never offers a box', () => {
+  const base = { ...memoryStorage(), persistent: false };
+  const preview = createDayPreviewStorage(base, today.dateKey, true);
+  assert.equal(createDailyBoxHistory(preview).canOpen(today), false);
 });

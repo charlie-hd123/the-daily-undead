@@ -1,3 +1,5 @@
+import { browserStorage } from "./browser-storage.js?v=20261019-18";
+import { rememberPlayDestination, restorePlayDestination } from "./play-destination.js?v=20261019-18";
 import {
   buildDailyPuzzle,
   calculateBonusPoints,
@@ -12,19 +14,20 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261019-16";
+} from "./game-core.js?v=20261019-18";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
-} from "./word-puzzle-core.js?v=20261019-16";
+  shouldHandleWordShortcut,
+} from "./word-puzzle-core.js?v=20261019-18";
 import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261019-16";
+} from "./daily-challenge-core.js?v=20261019-18";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -33,28 +36,28 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261019-16";
+} from "./progression.js?v=20261019-18";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261019-16";
+} from "./account.js?v=20261019-18";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261019-16";
+} from "./community-stats.js?v=20261019-18";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261019-16";
-import { fetchWithTimeout } from "./network.js?v=20261019-16";
-import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261019-16";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261019-16";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261019-16";
-import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261019-16";
-import { createMysteryBox } from "./mystery-box.js?v=20261019-16";
+} from "./leaderboards.js?v=20261019-18";
+import { fetchWithTimeout } from "./network.js?v=20261019-18";
+import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261019-18";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261019-18";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261019-18";
+import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261019-18";
+import { createMysteryBox } from "./mystery-box.js?v=20261019-18";
 
 const mysteryBox = createMysteryBox();
 
@@ -97,7 +100,7 @@ if (isLocalPreview && !document.querySelector("#advance-dev-day")) {
 const advanceDevDayButton = document.querySelector("#advance-dev-day");
 const returnDevTodayButton = document.querySelector("#return-dev-today");
 let dayPreviewEnabled = false;
-let localStorage = window.localStorage;
+let localStorage = browserStorage;
 const socialDemoEnabled = isLocalDevelopment && new URLSearchParams(window.location.search).get("socialDemo") === "1";
 const currentBuild = readCurrentBuild();
 const communityStatsApiUrl = resolveCommunityStatsApiUrl({ isLocalDevelopment });
@@ -207,13 +210,13 @@ const puzzleTypes = {
     name: "Quest Steps",
     kicker: "Easter egg puzzle",
     description: "Can you identify the Zombies map from its Easter egg steps?",
-    image: "./assets/quest-steps-card.svg?v=20261019-16",
+    image: "./assets/quest-steps-card.svg?v=20261019-18",
   },
   word: {
     name: "Last Words",
     kicker: "Letter puzzle",
     description: "Can you identify the Zombies word or phrase by revealing its letters?",
-    image: "./assets/dead-letters-card.svg?v=20261019-16",
+    image: "./assets/dead-letters-card.svg?v=20261019-18",
   },
 };
 
@@ -1362,6 +1365,7 @@ function isMultiPuzzleLaunchActive() {
 
 function startPuzzle(type, mode) {
   activePlay = { type, mode };
+  rememberPlayDestination(localStorage, puzzle.dateKey, activePlay);
   ensureSession(type);
   render();
   const session = dayState.sessions[type];
@@ -1443,6 +1447,7 @@ function renderHub() {
     return;
   }
   activePlay = null;
+  rememberPlayDestination(localStorage, puzzle.dateKey, { screen: "hub" });
   const allComplete = areAllPuzzlesCompleted();
   const otherType = getOtherPuzzleType(dayState.officialType);
   const guidance = allComplete
@@ -2409,7 +2414,7 @@ async function initialise() {
     const dateKey = getDateKey();
     liveDateKey = getUtcDateKey(getCurrentTime());
     dayPreviewEnabled = isLocalPreview && dateKey !== liveDateKey;
-    localStorage = createDayPreviewStorage(window.localStorage, dateKey, dayPreviewEnabled);
+    localStorage = createDayPreviewStorage(browserStorage, dateKey, dayPreviewEnabled);
     migrateStoredRoundNumbering(localStorage, {
       streakKey: streakStorageKey,
       bestRoundKey: bestRoundStorageKey,
@@ -2447,8 +2452,11 @@ async function initialise() {
           applyRemoteAccount: dayPreviewEnabled ? () => {} : applyRemoteAccount,
         });
     document.addEventListener("keydown", (event) => {
-      if (mysteryBox.isPresenting) return;
       if (activePlay?.type !== "word") return;
+      if (!shouldHandleWordShortcut(event, {
+        presenting: mysteryBox.isPresenting,
+        modalOpen: Boolean(document.querySelector('dialog[open]')),
+      })) return;
       const letter = normalizeLetter(event.key);
       if (letter) submitLetter(letter);
     });
@@ -2474,7 +2482,9 @@ async function initialise() {
     if (missedDayState && !missedDayState.resolved) {
       renderMissedDay();
     } else {
-      startPuzzle(dayState.officialType, "official");
+      const destination = restorePlayDestination(localStorage, dateKey, dayState);
+      if (destination?.screen === "hub") renderHub();
+      else startPuzzle(destination?.type || dayState.officialType, destination?.mode || "official");
     }
   } catch (error) {
     console.error(error);

@@ -1,3 +1,4 @@
+import { browserStorage } from "./browser-storage.js?v=20261019-18";
 export async function requestEmailChange(auth, email, currentEmail, redirectUrl) {
   const nextEmail = String(email || "").trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nextEmail)) throw new Error("Enter a valid email address.");
@@ -152,7 +153,7 @@ export function initialiseAccountSettings({ documentObject, clerk, userIds, requ
       const result = await requestDelete();
       if (result.deleted !== true) throw new Error("Could not confirm deletion. Please try again.");
       deleted = true;
-      try { clearDeletedAccountStorage(globalThis.localStorage, userIds); } catch { /* Storage may be disabled. */ }
+      try { clearDeletedAccountStorage(browserStorage, userIds); } catch { /* Storage may be disabled. */ }
       try { await clerk.signOut(); } catch { /* The auth user may already be gone. */ }
       clerk.forgetDeletedSession?.();
       deleteForm.hidden = true;

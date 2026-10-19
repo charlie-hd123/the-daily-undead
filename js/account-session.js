@@ -1,3 +1,4 @@
+import { browserStorage } from "./browser-storage.js?v=20261019-18";
 export const accountMemoryStorageKey = "the-daily-undead:account-memory";
 const pendingProgressStoragePrefix = "the-daily-undead:account-pending:";
 
@@ -25,7 +26,7 @@ function pendingProgressStorageKey(userId) {
   return `${pendingProgressStoragePrefix}${userId}`;
 }
 
-export function readRememberedAccount(storage = globalThis.localStorage) {
+export function readRememberedAccount(storage = browserStorage) {
   const value = parseStoredObject(storage, accountMemoryStorageKey);
   if (!validUserId(value?.userId)) return null;
   return {
@@ -47,7 +48,7 @@ export function rememberAccount(storage, { userId, revision = null }) {
   }
 }
 
-export function forgetRememberedAccount(storage = globalThis.localStorage) {
+export function forgetRememberedAccount(storage = browserStorage) {
   try {
     storage.removeItem(accountMemoryStorageKey);
   } catch {
