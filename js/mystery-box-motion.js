@@ -31,9 +31,9 @@ export function revealHeight(elapsed, closedHeight, puzzleHeight) {
 // Painted bounds, including strokes, in the original 240px SVG viewBoxes.
 export const ICON_INK = Object.freeze({
   word: Object.freeze({ left: 28 / 240, top: 72 / 240, width: 184 / 240, height: 101 / 240, visualScale: 1.25 }),
-  easter: Object.freeze({ left: 38.5 / 240, top: 50.5 / 240, width: 163 / 240, height: 141 / 240, visualScale: 1 }),
+  easter: Object.freeze({ left: 38.5 / 240, top: 50.5 / 240, width: 163 / 240, height: 141 / 240, visualScale: .9 }),
 });
-const tallestIcon = Math.max(...Object.values(ICON_INK).map((ink) => ink.height / ink.width * ink.visualScale));
+const tallestIcon = Math.max(...Object.values(ICON_INK).map((ink) => ink.height / ink.width * Math.max(1, ink.visualScale)));
 const widestIcon = Math.max(...Object.values(ICON_INK).map((ink) => ink.visualScale));
 
 export function createIconFlight({ target, mouth, stage, viewDirection, ink = ICON_INK.easter }) {

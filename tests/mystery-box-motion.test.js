@@ -32,7 +32,7 @@ test('the lid starts easing down with the fade and never closes completely on sc
   }
 });
 
-test('the letter tiles emerge 25% wider to optically balance the taller map', () => {
+test('the letter tiles retain their optical boost while the map is reduced by 10%', () => {
   for (const size of [[288, 250], [343, 250], [736, 310], [1056, 480], [797, 200]]) {
     const stage = { left: 20, top: 150, width: size[0], height: size[1] };
     const input = { ...desktop, stage, mouth: {
@@ -44,7 +44,7 @@ test('the letter tiles emerge 25% wider to optically balance the taller map', ()
         const pose = createIconFlight({ ...input, ink })(elapsed);
         return ink.width * input.target.width * pose.scale;
       });
-      assert.ok(Math.abs(widths[0] / widths[1] - 1.25) < 1e-10);
+      assert.ok(Math.abs(widths[0] / widths[1] - 1.25 / .9) < 1e-10);
     }
   }
 });
