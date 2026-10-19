@@ -1,8 +1,9 @@
-import { BOX_SEQUENCE, createTitleFlight } from './mystery-box-motion.js?v=20261019-2';
+import { BOX_SEQUENCE, createTitleFlight, createBoxActivation } from './mystery-box-motion.js?v=20261019-3';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox() {
   const stage = document.querySelector('#initial-mystery-box .mb-scene');
+  const trigger = stage?.querySelector('.mb-open-trigger');
   const review = ['localhost', '127.0.0.1'].includes(location.hostname) ? new URLSearchParams(location.search).get('boxReview') : null;
   const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   let visual;
@@ -12,17 +13,41 @@ export function createMysteryBox() {
   let frame;
   let progress = 0;
   let unavailable = reducedMotion() || review === 'fallback';
-  let firstPresentation = true;
-  const firstShownAt = performance.now();
+  let beginReveal;
+  let activation = createBoxActivation(() => beginReveal?.());
   let renderingReady = Promise.resolve(null);
   let timers = [];
   const seen = new Set();
   const later = (callback, delay) => timers.push(window.setTimeout(callback, delay));
+  function positionTrigger() {
+    if (!visual || !trigger || progress) return;
+    visual.resize();
+    const rect = stage.getBoundingClientRect();
+    const bounds = visual.closedBounds();
+    Object.assign(trigger.style, { left: `${bounds.left - rect.left - 8}px`, top: `${bounds.top - rect.top - 8}px`,
+      width: `${bounds.width + 16}px`, height: `${bounds.height + 16}px` });
+  }
+  function syncTrigger() {
+    if (!trigger) return;
+    trigger.disabled = activation.requested;
+    const waiting = activation.requested && !trigger.hidden;
+    stage.classList.toggle('is-requested', waiting);
+    if (waiting) trigger.setAttribute('aria-busy', 'true'); else trigger.removeAttribute('aria-busy');
+  }
+  trigger?.addEventListener('click', () => {
+    if (unavailable || review) return;
+    activation.request(); syncTrigger();
+  });
+  // Announce the opening control on entry, but draw its focus ring after keyboard interaction.
+  trigger?.addEventListener('keydown', () => trigger.removeAttribute('data-auto-focus'));
+  trigger?.addEventListener('blur', () => trigger.removeAttribute('data-auto-focus'));
+  const triggerObserver = stage && new ResizeObserver(positionTrigger);
+  if (stage) triggerObserver.observe(stage);
   function showVisual() {
     if (!visual || unavailable) return;
     stage.classList.add('is-rendered');
     // Draw in the same frame that exposes the canvas, rather than revealing an old buffer.
-    visual.draw(progress);
+    visual.draw(progress); positionTrigger();
   }
   function skipPresentation() {
     unavailable = true;
@@ -35,7 +60,7 @@ export function createMysteryBox() {
   if (stage && !unavailable) {
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261019-2')
+      import('./mystery-box-scene.js?v=20261019-3')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -69,6 +94,11 @@ export function createMysteryBox() {
   }
 
   function cancel() {
+    if (wrapper) {
+      activation.cancel(); activation = createBoxActivation(() => beginReveal?.());
+    }
+    beginReveal = null;
+    if (trigger) { trigger.hidden = false; trigger.removeAttribute('data-auto-focus'); syncTrigger(); }
     timers.forEach(window.clearTimeout); timers = [];
     window.cancelAnimationFrame(frame);
     if (reward) {
@@ -159,10 +189,10 @@ export function createMysteryBox() {
   }
   function open({ key, type, fresh }) {
     cancel();
-    const shownAt = firstPresentation ? firstShownAt : performance.now();
-    firstPresentation = false;
-    if (!stage || unavailable || !fresh || seen.has(key) || reducedMotion()) return;
-    seen.add(key);
+    if (!stage || !trigger || unavailable || !fresh || seen.has(key) || reducedMotion()) {
+      activation.cancel(); activation = createBoxActivation(() => beginReveal?.()); syncTrigger();
+      return;
+    }
     panel = document.querySelector(type === 'word' ? '#app .word-puzzle-panel' : '#app .quest-clue-panel');
     if (!panel) return;
     // A new reveal must be in view when entered from a result or the just-for-fun cards.
@@ -171,7 +201,7 @@ export function createMysteryBox() {
     wrapper = document.createElement('div'); wrapper.className = 'mb-reveal'; wrapper.dataset.phase = 'closed';
     const focused = document.activeElement;
     panel.before(wrapper); wrapper.append(panel, stage); visual?.resize(); showVisual();
-    if (panel.contains(focused)) focused.focus({ preventScroll: true });
+    if (review) trigger.hidden = true;
     // Freeze the real component for local visual QA and its first-frame poster.
     if (review === 'closed' || review === 'open') {
       wrapper.dataset.review = review;
@@ -181,6 +211,19 @@ export function createMysteryBox() {
     }
     panel.inert = true;
     const currentWrapper = wrapper;
+    const currentActivation = activation;
+    if (!review) {
+      syncTrigger();
+      if (panel.contains(focused) && !activation.requested) {
+        trigger.setAttribute('data-auto-focus', ''); trigger.focus({ preventScroll: true });
+      }
+      beginReveal = () => {
+        if (wrapper !== currentWrapper || !visual) return;
+        seen.add(key); trigger.hidden = true;
+        wrapper.dataset.phase = 'opening'; syncTrigger();
+        animateSequence(focused);
+      };
+    } else trigger.hidden = true;
     if (['lift', 'reward', 'landed'].includes(review)) {
       wrapper.dataset.review = review;
       void renderingReady.then(() => {
@@ -195,15 +238,10 @@ export function createMysteryBox() {
     void Promise.race([renderingReady, deadline]).then(() => {
       if (wrapper !== currentWrapper || !wrapper?.isConnected) return;
       if (!visual) { skipPresentation(); return; }
-      const hold = Math.max(0, 1500 - (performance.now() - shownAt));
-      later(() => {
-        if (!wrapper) return;
-        wrapper.dataset.phase = 'opening';
-        animateSequence(focused);
-      }, hold);
+      currentActivation.ready();
     });
   }
-  window.addEventListener('pagehide', (event) => { cancel(); if (!event.persisted) visual?.dispose(); });
+  window.addEventListener('pagehide', (event) => { cancel(); if (!event.persisted) { triggerObserver?.disconnect(); visual?.dispose(); } });
   window.matchMedia?.('(prefers-reduced-motion: reduce)').addEventListener?.('change', (event) => { if (event.matches) skipPresentation(); });
   window.addEventListener('resize', () => { if (reward) cancel(); });
   return { open, cancel, get isPresenting() { return Boolean(panel?.inert); } };

@@ -37,3 +37,19 @@ export function createTitleFlight({ target, mouth, stage }) {
     };
   };
 }
+
+// Readiness alone must never open the box. Either event may arrive first.
+export function createBoxActivation(start) {
+  let requested = false;
+  let ready = false;
+  let finished = false;
+  function tryStart() {
+    if (!finished && requested && ready) { finished = true; start(); }
+  }
+  return {
+    request() { if (!finished) requested = true; tryStart(); },
+    ready() { ready = true; tryStart(); },
+    cancel() { finished = true; },
+    get requested() { return requested; },
+  };
+}

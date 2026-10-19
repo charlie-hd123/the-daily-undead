@@ -1,4 +1,4 @@
-import * as T from './vendor/mystery-box-three.js?v=20261019-2';
+import * as T from './vendor/mystery-box-three.js?v=20261019-3';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
@@ -47,8 +47,8 @@ export async function createMysteryBoxScene(host) {
   host.dataset.renderer = 'texture';
   const loader = new T.TextureLoader();
   const [woodMap, paintMap] = await Promise.all([
-    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261019-2', import.meta.url).href),
-    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261019-2', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261019-3', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261019-3', import.meta.url).href),
   ]);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;
@@ -192,17 +192,25 @@ export async function createMysteryBoxScene(host) {
   const observer = new ResizeObserver(resize); observer.observe(host);
   canvas.addEventListener('webglcontextlost', (event) => { event.preventDefault(); contextLost = true; host.classList.remove('is-rendered'); host.dataset.renderer = 'unavailable'; host.dispatchEvent(new Event('mystery-box-unavailable')); });
   canvas.addEventListener('webglcontextrestored', () => { contextLost = false; previousWidth = previousHeight = 0; host.classList.add('is-rendered'); resize(); host.dataset.renderer = 'ready'; });
-  function aperture() {
+  function project(x, y, z) {
     const rect = host.getBoundingClientRect();
-    const project = (x, y, z) => {
-      const point = new T.Vector3(x, y, z).project(camera);
-      return { x: rect.left + (point.x + 1) * rect.width / 2,
-        y: rect.top + (1 - point.y) * rect.height / 2 };
-    };
+    const point = new T.Vector3(x, y, z).project(camera);
+    return { x: rect.left + (point.x + 1) * rect.width / 2,
+      y: rect.top + (1 - point.y) * rect.height / 2 };
+  }
+  function closedBounds() {
+    const points = [];
+    for (const x of [-3.38, 3.38]) for (const y of [0, 1.96]) for (const z of [-1.25, 1.25]) points.push(project(x, y, z));
+    const left = Math.min(...points.map((point) => point.x));
+    const top = Math.min(...points.map((point) => point.y));
+    return { left, top, width: Math.max(...points.map((point) => point.x)) - left,
+      height: Math.max(...points.map((point) => point.y)) - top };
+  }
+  function aperture() {
     return { left: project(-2.89, 1.65, 1.08), right: project(2.89, 1.65, 1.08),
       center: project(0, 1.65, .25) };
   }
-  return { draw, resize, aperture, poster() { draw(0); return canvas.toDataURL('image/png'); }, dispose() {
+  return { draw, resize, aperture, closedBounds, poster() { draw(0); return canvas.toDataURL('image/png'); }, dispose() {
     observer.disconnect();
     scene.traverse((node) => { if (node.isMesh) { node.geometry.dispose(); for (const material of [].concat(node.material)) material.dispose(); } });
     woodMap.dispose(); paintMap.dispose(); contactTexture.dispose(); env.dispose(); renderer.dispose(); canvas.remove();

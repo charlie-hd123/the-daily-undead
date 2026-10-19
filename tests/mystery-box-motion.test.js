@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { BOX_SEQUENCE as timing, createTitleFlight } from '../js/mystery-box-motion.js';
+import { BOX_SEQUENCE as timing, createTitleFlight, createBoxActivation } from '../js/mystery-box-motion.js';
 
 const desktop = { target: { left: 226, top: 185, width: 228, height: 48 },
   mouth: { left: { x: 450, y: 368 }, right: { x: 950, y: 424 }, center: { x: 715, y: 370 } },
@@ -48,4 +48,45 @@ test('the title holds for reading, then moves continuously toward its heading', 
   assert.ok(midpoint.left < raised.left && midpoint.left > desktop.target.left);
   assert.ok(midpoint.top < raised.top && midpoint.top > desktop.target.top);
   assert.equal(midpoint.depth, .5);
+});
+
+
+test('a loaded box waits indefinitely for a player activation and opens only once', () => {
+  let openings = 0;
+  const box = createBoxActivation(() => openings++);
+  box.ready(); box.ready();
+  assert.equal(openings, 0);
+  box.request(); box.request(); box.ready();
+  assert.equal(openings, 1);
+});
+
+test('an early tap is remembered until the renderer and puzzle are ready', () => {
+  let openings = 0;
+  const box = createBoxActivation(() => openings++);
+  box.request(); box.request();
+  assert.equal(box.requested, true);
+  assert.equal(openings, 0);
+  box.ready(); box.ready();
+  assert.equal(openings, 1);
+});
+
+test('cancelled loading or presentation cannot start when a late event arrives', () => {
+  for (const requestFirst of [true, false]) {
+    let openings = 0;
+    const box = createBoxActivation(() => openings++);
+    if (requestFirst) box.request(); else box.ready();
+    box.cancel(); box.ready(); box.request();
+    assert.equal(openings, 0);
+  }
+});
+
+test('each new puzzle requires its own activation', () => {
+  let openings = 0;
+  const first = createBoxActivation(() => openings++);
+  first.ready(); first.request();
+  const second = createBoxActivation(() => openings++);
+  second.ready(); first.request();
+  assert.equal(openings, 1);
+  second.request();
+  assert.equal(openings, 2);
 });
