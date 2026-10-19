@@ -1,6 +1,6 @@
-import { BOX_SEQUENCE, createIconFlight, createBoxActivation } from './mystery-box-motion.js?v=20261019-7';
+import { BOX_SEQUENCE, createIconFlight, createBoxActivation } from './mystery-box-motion.js?v=20261019-8';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261019-7';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261019-8';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox() {
@@ -36,7 +36,8 @@ export function createMysteryBox() {
     if (!trigger) return;
     trigger.disabled = activation.requested;
     const waiting = activation.requested && !trigger.hidden;
-    stage.classList.toggle('is-requested', waiting);
+    // Touch browsers can retain :hover after a tap; hide the prompt independently of CSS.
+    if (caption) caption.hidden = unavailable || activation.requested;
     if (waiting) trigger.setAttribute('aria-busy', 'true'); else trigger.removeAttribute('aria-busy');
   }
   trigger?.addEventListener('click', () => {
@@ -67,7 +68,7 @@ export function createMysteryBox() {
   if (stage && !unavailable) {
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261019-7')
+      import('./mystery-box-scene.js?v=20261019-8')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -208,7 +209,7 @@ export function createMysteryBox() {
     progress = 0;
     wrapper = document.createElement('div'); wrapper.className = 'mb-reveal'; wrapper.dataset.phase = 'closed';
     const focused = document.activeElement;
-    panel.before(wrapper); caption.hidden = false;
+    panel.before(wrapper); caption.hidden = activation.requested;
     if (intro) { intro.hidden = false; intro.removeAttribute('aria-hidden'); }
     wrapper.append(panel, ...(intro ? [intro] : []), stage, caption); visual?.resize(); showVisual();
     if (review) trigger.hidden = true;
