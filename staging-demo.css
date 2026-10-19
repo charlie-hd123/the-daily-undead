@@ -2384,3 +2384,23 @@ body:has(.word-puzzle-panel) .community-stats-demo {
 .community-result-copy span {
   color: rgb(168 178 199 / 72%);
 }
+
+
+/* The same quiet puzzle identities used on the selection cards. */
+:is(.word-puzzle-panel, .quest-clue-panel) { --puzzle-panel-art-size: clamp(3.5rem, 9vw, 5.5rem); }
+.panel > .puzzle-panel-art {
+  position: absolute;
+  z-index: 0;
+  top: .85rem;
+  right: .75rem;
+  width: var(--puzzle-panel-art-size);
+  height: var(--puzzle-panel-art-size);
+  object-fit: contain;
+  opacity: .12;
+  pointer-events: none;
+  user-select: none;
+}
+:is(.word-puzzle-panel, .quest-clue-panel) > .screen-heading > :is(.kicker, h2) {
+  padding-inline-end: calc(var(--puzzle-panel-art-size) + .25rem);
+}
+.mb-reveal[data-phase="assembling"] > .panel > .puzzle-panel-art { opacity: .12; transform: none; }

@@ -12,19 +12,19 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261019-4";
+} from "./game-core.js?v=20261019-5";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
-} from "./word-puzzle-core.js?v=20261019-4";
+} from "./word-puzzle-core.js?v=20261019-5";
 import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261019-4";
+} from "./daily-challenge-core.js?v=20261019-5";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -33,28 +33,28 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261019-4";
+} from "./progression.js?v=20261019-5";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261019-4";
+} from "./account.js?v=20261019-5";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261019-4";
+} from "./community-stats.js?v=20261019-5";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261019-4";
-import { fetchWithTimeout } from "./network.js?v=20261019-4";
-import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261019-4";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261019-4";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261019-4";
-import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261019-4";
-import { createMysteryBox } from "./mystery-box.js?v=20261019-4";
+} from "./leaderboards.js?v=20261019-5";
+import { fetchWithTimeout } from "./network.js?v=20261019-5";
+import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261019-5";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261019-5";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261019-5";
+import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261019-5";
+import { createMysteryBox } from "./mystery-box.js?v=20261019-5";
 
 const mysteryBox = createMysteryBox();
 
@@ -207,13 +207,13 @@ const puzzleTypes = {
     name: "Quest Steps",
     kicker: "Easter egg puzzle",
     description: "Can you identify the Zombies map from its Easter egg steps?",
-    image: "./assets/quest-steps-card.svg?v=20261019-4",
+    image: "./assets/quest-steps-card.svg?v=20261019-5",
   },
   word: {
     name: "Last Words",
     kicker: "Letter puzzle",
     description: "Can you identify the Zombies word or phrase by revealing its letters?",
-    image: "./assets/dead-letters-card.svg?v=20261019-4",
+    image: "./assets/dead-letters-card.svg?v=20261019-5",
   },
 };
 
@@ -1669,6 +1669,7 @@ function renderWordPuzzle({ scoreChanged = false, revealLetter = "", feedbackLet
   const keyboardRows = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
   app.innerHTML = `
     <section class="panel word-puzzle-panel">
+      <img class="puzzle-panel-art" src="${puzzleTypes.word.image}" alt="" width="240" height="240" aria-hidden="true">
       ${renderHeading("Last Words", "Try to solve the Zombies word or phrase by revealing its letters.", official ? "Today’s round" : "Just for fun", true)}
       ${official ? "" : '<p class="puzzle-mode-note">Playing just for fun. This result will not change your stats.</p>'}
       <div class="word-scoreboard${official ? "" : " is-single"}" aria-label="Word puzzle progress">
@@ -1768,6 +1769,7 @@ function renderClues({ newlyRevealedIndex = -1, scoreChanged = false } = {}) {
   const potentialPoints = calculateMapPoints(state.cluesRevealed);
   app.innerHTML = `
     <section class="panel quest-clue-panel">
+      <img class="puzzle-panel-art" src="${puzzleTypes.easter.image}" alt="" width="240" height="240" aria-hidden="true">
       ${renderHeading(
         "Quest Steps",
         official
