@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { OrthographicCamera, Vector3 } from 'three';
-import { BOX_SEQUENCE as timing, ICON_INK, createIconFlight, createBoxActivation, BOX_FRAME, fitBoxCamera, revealHeight } from '../js/mystery-box-motion.js';
+import { BOX_SEQUENCE as timing, ICON_INK, createIconFlight, createBoxActivation, BOX_FRAME, fitBoxCamera, revealHeight, lidOpenness } from '../js/mystery-box-motion.js';
 
 const camera = new OrthographicCamera(-4.6, 4.6, 2.3, -2.3, .1, 60);
 camera.position.set(7.8, 5.7, 14); camera.lookAt(0, 1.7, 0); camera.updateMatrixWorld();
@@ -11,12 +11,43 @@ const desktop = { viewDirection, target: { left: 1050, top: 149, width: 88, heig
   mouth: { left: { x: 450, y: 368 }, right: { x: 950, y: 424 }, center: { x: 715, y: 370 } },
   stage: { left: 192, top: 134, width: 1056, height: 480 } };
 
-function inkBounds(pose, target) {
-  return { left: pose.left + ICON_INK.left * target.width * pose.scale,
-    right: pose.left + (ICON_INK.left + ICON_INK.width) * target.width * pose.scale,
-    top: pose.top + ICON_INK.top * target.height * pose.scale,
-    bottom: pose.top + (ICON_INK.top + ICON_INK.height) * target.height * pose.scale };
+function inkBounds(pose, target, ink = ICON_INK.easter) {
+  return { left: pose.left + ink.left * target.width * pose.scale,
+    right: pose.left + (ink.left + ink.width) * target.width * pose.scale,
+    top: pose.top + ink.top * target.height * pose.scale,
+    bottom: pose.top + (ink.top + ink.height) * target.height * pose.scale };
 }
+
+test('the lid starts easing down with the fade and never closes completely on screen', () => {
+  assert.equal(lidOpenness(0), 0);
+  assert.equal(lidOpenness(timing.lid), 1);
+  assert.equal(lidOpenness(timing.settleAt), 1);
+  assert.equal(lidOpenness(timing.settleAt + timing.fadeFor / 2), .88);
+  assert.equal(lidOpenness(timing.settleAt + timing.fadeFor), .76);
+  let previous = 1;
+  for (let elapsed = timing.settleAt; elapsed <= timing.finishAt; elapsed += 10) {
+    const amount = lidOpenness(elapsed);
+    assert.ok(amount <= previous && amount >= .76);
+    previous = amount;
+  }
+});
+
+test('both painted rewards emerge at identical visible widths despite different SVG margins', () => {
+  for (const size of [[288, 250], [343, 250], [736, 310], [1056, 480], [797, 200]]) {
+    const stage = { left: 20, top: 150, width: size[0], height: size[1] };
+    const input = { ...desktop, stage, mouth: {
+      left: { x: stage.left + stage.width * .2, y: stage.top + stage.height * .52 },
+      right: { x: stage.left + stage.width * .8, y: stage.top + stage.height * .62 },
+      center: { x: stage.left + stage.width / 2, y: stage.top + stage.height * .55 } } };
+    for (const elapsed of [timing.liftAt, timing.liftAt + timing.liftFor / 2, timing.settleAt]) {
+      const widths = Object.values(ICON_INK).map((ink) => {
+        const pose = createIconFlight({ ...input, ink })(elapsed);
+        return ink.width * input.target.width * pose.scale;
+      });
+      assert.ok(Math.abs(widths[0] - widths[1]) < 1e-10);
+    }
+  }
+});
 
 test('the icon starts below the front rim and rises clear of it with visible depth', () => {
   const flight = createIconFlight(desktop);

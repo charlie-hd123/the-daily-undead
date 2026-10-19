@@ -1,6 +1,6 @@
-import { BOX_SEQUENCE, createIconFlight, createBoxActivation, revealHeight } from './mystery-box-motion.js?v=20261019-13';
+import { BOX_SEQUENCE, ICON_INK, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261019-14';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261019-13';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261019-14';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox() {
@@ -69,7 +69,7 @@ export function createMysteryBox() {
   if (stage && !unavailable) {
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261019-13')
+      import('./mystery-box-scene.js?v=20261019-14')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -145,7 +145,8 @@ export function createMysteryBox() {
     }
     reward = { node, slot, context, traveller, object, target, style: node.style.cssText,
       hidden: node.getAttribute('aria-hidden'), inert: node.inert,
-      flight: createIconFlight({ target, mouth: visual.aperture(), stage: stageRect, viewDirection: visual.viewDirection() }) };
+      flight: createIconFlight({ target, mouth: visual.aperture(), stage: stageRect, viewDirection: visual.viewDirection(),
+        ink: ICON_INK[panel.classList.contains('word-puzzle-panel') ? 'word' : 'easter'] }) };
     node.replaceWith(slot); object.append(node); traveller.append(object); context.append(traveller); wrapper.append(context);
     context.style.cssText = `left:${stageRect.left - origin.left}px;top:${stageRect.top - origin.top}px;width:${stageRect.width}px;height:${Math.max(stageRect.height, panel.offsetHeight)}px;`;
     node.classList.add('mb-icon-face'); node.inert = true; node.setAttribute('aria-hidden', 'true');
@@ -166,7 +167,7 @@ export function createMysteryBox() {
   }
   function showSequenceAt(elapsed) {
     intro?.setAttribute('aria-hidden', 'true');
-    const lid = Math.min(1, elapsed / BOX_SEQUENCE.lid);
+    const lid = lidOpenness(elapsed);
     if (lid !== progress) { progress = lid; visual.draw(progress); }
     if (elapsed >= BOX_SEQUENCE.liftAt) {
       if (!reward && !prepareReward()) { cancel(); return; }

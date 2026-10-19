@@ -1,11 +1,17 @@
 export const BOX_SEQUENCE = Object.freeze({
   lid: 850, liftAt: 620, liftFor: 1050, settleAt: 2010, settleFor: 880,
-  growFor: 500, assembleAt: 2540, finishAt: 3500,
+  growFor: 500, fadeFor: 550, assembleAt: 2540, finishAt: 3500,
 });
 
 const clamp = (value, low = 0, high = 1) => Math.max(low, Math.min(high, value));
 const mix = (a, b, amount) => a + (b - a) * amount;
 const smooth = (value) => value < .5 ? 4 * value ** 3 : 1 - (-2 * value + 2) ** 3 / 2;
+
+export function lidOpenness(elapsed) {
+  const opening = smooth(clamp(elapsed / BOX_SEQUENCE.lid));
+  const closing = smooth(clamp((elapsed - BOX_SEQUENCE.settleAt) / BOX_SEQUENCE.fadeFor));
+  return opening * (1 - .24 * closing);
+}
 
 // Covers the full lid sweep, whose highest point is just past vertical, not at the end.
 export const BOX_FRAME = Object.freeze({ desktopHalfWidth: 6.1, mobileHalfWidth: 4.4,
@@ -22,10 +28,14 @@ export function revealHeight(elapsed, closedHeight, puzzleHeight) {
   return mix(closedHeight, puzzleHeight, amount);
 }
 
-// Viewport CSS pixels. Both SVGs paint inside this shared portion of their viewBox.
-export const ICON_INK = Object.freeze({ left: .1, top: .2, width: .8, height: .6 });
+// Painted bounds, including strokes, in the original 240px SVG viewBoxes.
+export const ICON_INK = Object.freeze({
+  word: Object.freeze({ left: 28 / 240, top: 72 / 240, width: 184 / 240, height: 101 / 240 }),
+  easter: Object.freeze({ left: 38.5 / 240, top: 50.5 / 240, width: 163 / 240, height: 141 / 240 }),
+});
+const tallestIcon = Math.max(...Object.values(ICON_INK).map((ink) => ink.height / ink.width));
 
-export function createIconFlight({ target, mouth, stage, viewDirection }) {
+export function createIconFlight({ target, mouth, stage, viewDirection, ink = ICON_INK.easter }) {
   // CSS uses screen Y down and positive Z towards the player. Both rotations
   // must be negative for this camera, including the depth of the thin side layers.
   const pitch = Math.asin(clamp(viewDirection.y, -1, 1)) * 180 / Math.PI;
@@ -34,13 +44,14 @@ export function createIconFlight({ target, mouth, stage, viewDirection }) {
     (x - mouth.left.x) / (mouth.right.x - mouth.left.x));
   const openingWidth = Math.abs(mouth.right.x - mouth.left.x);
   const availableHeight = Math.max(30, Math.min(mouth.left.y, mouth.right.y) - stage.top - 40);
-  const peakSize = Math.min(210, (stage.width - 40) / ICON_INK.width,
-    openingWidth * .62 / ICON_INK.width, availableHeight / ICON_INK.height);
+  // Size both rewards by visible width, with shared clearance for the taller map.
+  const peakInkWidth = Math.min(168, stage.width - 40, openingWidth * .62, availableHeight / tallestIcon);
+  const peakSize = peakInkWidth / ink.width;
   const peakScale = peakSize / target.width;
   const startScale = peakScale * .62;
   const startTop = Math.max(mouth.left.y, mouth.right.y) + target.height * startScale;
   const peakTop = Math.min(mouth.left.y, mouth.right.y) - 16
-    - (ICON_INK.top + ICON_INK.height) * target.height * peakScale;
+    - (ink.top + ink.height) * target.height * peakScale;
 
   return (elapsed) => {
     const lift = 1 - (1 - clamp((elapsed - BOX_SEQUENCE.liftAt) / BOX_SEQUENCE.liftFor)) ** 3;
@@ -48,7 +59,7 @@ export function createIconFlight({ target, mouth, stage, viewDirection }) {
     const fade = smooth(clamp((elapsed - BOX_SEQUENCE.settleAt - BOX_SEQUENCE.settleFor * .3) / (BOX_SEQUENCE.settleFor * .7)));
     const floatingScale = mix(startScale, peakScale, lift);
     const scale = mix(floatingScale, 1, settle);
-    const left = mix(mouth.center.x - target.width * floatingScale / 2, target.left, settle);
+    const left = mix(mouth.center.x - (ink.left + ink.width / 2) * target.width * floatingScale, target.left, settle);
     const arc = settle > 0 && settle < 1 ? Math.sin(Math.PI * settle) * Math.min(28, stage.height * .08) : 0;
     const top = mix(mix(startTop, peakTop, lift), target.top, settle) - arc;
     // Keep the front plane aligned with the real camera throughout the lift.
