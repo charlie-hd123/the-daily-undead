@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { OrthographicCamera, Vector3 } from 'three';
-import { BOX_SEQUENCE as timing, ICON_INK, createIconFlight, createBoxActivation } from '../js/mystery-box-motion.js';
+import { BOX_SEQUENCE as timing, ICON_INK, createIconFlight, createBoxActivation, BOX_FRAME, fitBoxCamera, revealHeight } from '../js/mystery-box-motion.js';
 
 const camera = new OrthographicCamera(-4.6, 4.6, 2.3, -2.3, .1, 60);
 camera.position.set(7.8, 5.7, 14); camera.lookAt(0, 1.7, 0); camera.updateMatrixWorld();
@@ -84,6 +84,47 @@ test('the reward holds for recognition, then arcs toward the corner while becomi
   assert.ok(midpoint.scale > 1 && midpoint.scale < raised.scale);
   assert.ok(midpoint.opacity < 1 && midpoint.opacity > .12);
   assert.equal(midpoint.depth, .5);
+});
+
+
+test('the compact page grows to the native puzzle height before that panel becomes visible', () => {
+  for (const [closed, puzzle] of [[290, 650], [544, 510], [310, 740]]) {
+    assert.equal(revealHeight(0, closed, puzzle), closed);
+    assert.equal(revealHeight(timing.settleAt, closed, puzzle), closed);
+    const midpoint = revealHeight(timing.settleAt + timing.growFor / 2, closed, puzzle);
+    assert.equal(midpoint, (closed + puzzle) / 2);
+    assert.equal(revealHeight(timing.settleAt + timing.growFor, closed, puzzle), puzzle);
+    assert.equal(revealHeight(timing.assembleAt, closed, puzzle), puzzle);
+    assert.equal(revealHeight(timing.finishAt, closed, puzzle), puzzle);
+  }
+});
+
+const framingSizes = [[288, 250, true], [343, 250, true], [383, 250, true], [553, 250, true],
+  [554, 310, false], [736, 310, false], [797, 200, false], [1056, 480, false], [3840, 200, false]];
+
+test('every camera fit protects the measured full lid sweep, including the peak before fully open', () => {
+  // Actual prop vertices swept through 121 hinge positions; peak occurs at about 97 degrees.
+  const envelope = { left: -3.313647, right: 3.650736, bottom: -2.156026, top: 2.828978 };
+  for (const [width, height, mobile] of framingSizes) {
+    const fit = fitBoxCamera(width, height, mobile);
+    assert.ok(fit.halfWidth > Math.max(-envelope.left, envelope.right));
+    assert.ok(fit.halfHeight > Math.max(-envelope.bottom, envelope.top));
+    assert.ok((fit.halfHeight - envelope.top) * height / (2 * fit.halfHeight) >= 8);
+    assert.ok(Math.abs(fit.halfWidth / fit.halfHeight - width / height) < 1e-10);
+  }
+});
+
+test('the fixed poster export and responsive image fit register with the live camera', () => {
+  const reference = fitBoxCamera(BOX_FRAME.posterWidth, BOX_FRAME.posterHeight, false);
+  assert.equal(reference.halfWidth, BOX_FRAME.desktopHalfWidth);
+  assert.equal(reference.halfHeight, BOX_FRAME.halfHeight);
+  for (const [width, height, mobile] of framingSizes) {
+    const imageBoxWidth = width * (mobile ? BOX_FRAME.desktopHalfWidth / BOX_FRAME.mobileHalfWidth : 1);
+    const paintedWidth = Math.min(imageBoxWidth, height * BOX_FRAME.posterWidth / BOX_FRAME.posterHeight);
+    const posterUnit = paintedWidth / (2 * BOX_FRAME.desktopHalfWidth);
+    const liveUnit = width / (2 * fitBoxCamera(width, height, mobile).halfWidth);
+    assert.ok(Math.abs(posterUnit - liveUnit) < 1e-10);
+  }
 });
 
 test('a loaded box waits indefinitely for a player activation and opens only once', () => {

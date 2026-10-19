@@ -1,4 +1,5 @@
-import * as T from './vendor/mystery-box-three.js?v=20261019-10';
+import * as T from './vendor/mystery-box-three.js?v=20261019-12';
+import { BOX_FRAME, fitBoxCamera } from './mystery-box-motion.js?v=20261019-12';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
@@ -47,8 +48,8 @@ export async function createMysteryBoxScene(host) {
   host.dataset.renderer = 'texture';
   const loader = new T.TextureLoader();
   const [woodMap, paintMap] = await Promise.all([
-    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261019-10', import.meta.url).href),
-    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261019-10', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261019-12', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261019-12', import.meta.url).href),
   ]);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;
@@ -170,6 +171,13 @@ export async function createMysteryBoxScene(host) {
     inner.material.opacity = .65 + ease * .35;
     glowMat.uniforms.strength.value = ease * .95;
     renderer.render(scene, camera);
+    if (capture) {
+      const bounds = propBounds();
+      host.dataset.propTop = bounds.top.toFixed(3);
+      host.dataset.propBottom = bounds.bottom.toFixed(3);
+      host.dataset.propLeft = bounds.left.toFixed(3);
+      host.dataset.propRight = bounds.right.toFixed(3);
+    }
   }
   let previousWidth = 0;
   let previousHeight = 0;
@@ -180,9 +188,7 @@ export async function createMysteryBoxScene(host) {
     // Resetting an unchanged WebGL backing buffer can expose a blank frame on that handover.
     if (width === previousWidth && height === previousHeight) return;
     previousWidth = width; previousHeight = height;
-    const baseWidth = window.matchMedia('(max-width: 600px)').matches ? 4.4 : 6.1;
-    const halfWidth = Math.max(baseWidth, (6.1 * 480 / 1056) * width / height);
-    const halfHeight = halfWidth * height / width;
+    const { halfWidth, halfHeight } = fitBoxCamera(width, height, window.matchMedia('(max-width: 600px)').matches);
     camera.left = -halfWidth; camera.right = halfWidth; camera.top = halfHeight; camera.bottom = -halfHeight;
     camera.updateProjectionMatrix(); renderer.setSize(width, height, false); draw();
   }
@@ -197,6 +203,33 @@ export async function createMysteryBoxScene(host) {
     const point = new T.Vector3(x, y, z).project(camera);
     return { x: rect.left + (point.x + 1) * rect.width / 2,
       y: rect.top + (1 - point.y) * rect.height / 2 };
+  }
+  // Local QA measures the real geometry, excluding the intentionally fading light beam.
+  function propBounds() {
+    const { width, height } = host.getBoundingClientRect();
+    const bounds = { top: Infinity, bottom: -Infinity, left: Infinity, right: -Infinity };
+    const point = new T.Vector3();
+    caseGroup.traverse((mesh) => {
+      if (!mesh.isMesh || mesh === glow) return;
+      const positions = mesh.geometry.attributes.position;
+      for (let index = 0; index < positions.count; index++) {
+        point.fromBufferAttribute(positions, index).applyMatrix4(mesh.matrixWorld).project(camera);
+        const x = (point.x + 1) * width / 2, y = (1 - point.y) * height / 2;
+        bounds.left = Math.min(bounds.left, x); bounds.right = Math.max(bounds.right, x);
+        bounds.top = Math.min(bounds.top, y); bounds.bottom = Math.max(bounds.bottom, y);
+      }
+    });
+    return bounds;
+  }
+  function poster() {
+    const savedProgress = lastProgress, savedRatio = renderer.getPixelRatio();
+    renderer.setPixelRatio(1); renderer.setSize(BOX_FRAME.posterWidth, BOX_FRAME.posterHeight, false);
+    camera.left = -BOX_FRAME.desktopHalfWidth; camera.right = BOX_FRAME.desktopHalfWidth;
+    camera.top = BOX_FRAME.halfHeight; camera.bottom = -BOX_FRAME.halfHeight; camera.updateProjectionMatrix();
+    draw(0);
+    const result = canvas.toDataURL('image/webp', .96);
+    renderer.setPixelRatio(savedRatio); previousWidth = previousHeight = 0; resize(); draw(savedProgress);
+    return result;
   }
   function closedBounds() {
     const points = [];
@@ -214,7 +247,7 @@ export async function createMysteryBoxScene(host) {
     const direction = camera.getWorldDirection(new T.Vector3());
     return { x: direction.x, y: direction.y, z: direction.z };
   }
-  return { draw, resize, aperture, closedBounds, viewDirection, poster() { draw(0); return canvas.toDataURL('image/png'); }, dispose() {
+  return { draw, resize, aperture, closedBounds, viewDirection, poster, dispose() {
     observer.disconnect();
     scene.traverse((node) => { if (node.isMesh) { node.geometry.dispose(); for (const material of [].concat(node.material)) material.dispose(); } });
     woodMap.dispose(); paintMap.dispose(); contactTexture.dispose(); env.dispose(); renderer.dispose(); canvas.remove();

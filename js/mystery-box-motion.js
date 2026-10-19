@@ -1,11 +1,26 @@
 export const BOX_SEQUENCE = Object.freeze({
   lid: 850, liftAt: 620, liftFor: 1050, settleAt: 2010, settleFor: 880,
-  assembleAt: 2540, finishAt: 3500,
+  growFor: 500, assembleAt: 2540, finishAt: 3500,
 });
 
 const clamp = (value, low = 0, high = 1) => Math.max(low, Math.min(high, value));
 const mix = (a, b, amount) => a + (b - a) * amount;
 const smooth = (value) => value < .5 ? 4 * value ** 3 : 1 - (-2 * value + 2) ** 3 / 2;
+
+// Covers the full lid sweep, whose highest point is just past vertical, not at the end.
+export const BOX_FRAME = Object.freeze({ desktopHalfWidth: 6.1, mobileHalfWidth: 4.4,
+  halfHeight: 3.1, posterWidth: 1220, posterHeight: 620 });
+
+export function fitBoxCamera(width, height, mobile) {
+  const halfWidth = Math.max(mobile ? BOX_FRAME.mobileHalfWidth : BOX_FRAME.desktopHalfWidth,
+    BOX_FRAME.halfHeight * width / height);
+  return { halfWidth, halfHeight: halfWidth * height / width };
+}
+
+export function revealHeight(elapsed, closedHeight, puzzleHeight) {
+  const amount = smooth(clamp((elapsed - BOX_SEQUENCE.settleAt) / BOX_SEQUENCE.growFor));
+  return mix(closedHeight, puzzleHeight, amount);
+}
 
 // Viewport CSS pixels. Both SVGs paint inside this shared portion of their viewBox.
 export const ICON_INK = Object.freeze({ left: .1, top: .2, width: .8, height: .6 });

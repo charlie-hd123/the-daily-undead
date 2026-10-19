@@ -1,6 +1,6 @@
-import { BOX_SEQUENCE, createIconFlight, createBoxActivation } from './mystery-box-motion.js?v=20261019-10';
+import { BOX_SEQUENCE, createIconFlight, createBoxActivation, revealHeight } from './mystery-box-motion.js?v=20261019-12';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261019-10';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261019-12';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox() {
@@ -14,6 +14,7 @@ export function createMysteryBox() {
   let wrapper;
   let panel;
   let reward;
+  let layout;
   let frame;
   let progress = 0;
   let unavailable = reducedMotion() || review === 'fallback';
@@ -68,7 +69,7 @@ export function createMysteryBox() {
   if (stage && !unavailable) {
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261019-10')
+      import('./mystery-box-scene.js?v=20261019-12')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -122,7 +123,7 @@ export function createMysteryBox() {
       wrapper.replaceWith(panel);
       if (panel.contains(focused)) focused.focus({ preventScroll: true });
     }
-    wrapper = panel = null;
+    wrapper = panel = layout = null;
   }
   function prepareReward() {
     const node = panel.querySelector('.puzzle-panel-art');
@@ -130,6 +131,7 @@ export function createMysteryBox() {
     const target = node.getBoundingClientRect();
     const origin = wrapper.getBoundingClientRect();
     const stageRect = stage.getBoundingClientRect();
+    layout = { closedHeight: origin.height, puzzleHeight: panel.getBoundingClientRect().height };
     if (!target.width || !target.height) return false;
     // The native icon is out of flow, so a comment preserves its place without adding layout.
     const slot = document.createComment('Puzzle icon');
@@ -168,6 +170,7 @@ export function createMysteryBox() {
     if (lid !== progress) { progress = lid; visual.draw(progress); }
     if (elapsed >= BOX_SEQUENCE.liftAt) {
       if (!reward && !prepareReward()) { cancel(); return; }
+      wrapper.style.height = `${revealHeight(elapsed, layout.closedHeight, layout.puzzleHeight)}px`;
       positionReward(elapsed);
     }
     const phase = elapsed >= BOX_SEQUENCE.assembleAt ? 'assembling'
