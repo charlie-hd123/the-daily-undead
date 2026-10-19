@@ -1,6 +1,6 @@
-import { BOX_SEQUENCE, ICON_INK, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261019-18';
+import { BOX_SEQUENCE, ICON_INK, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261019-20';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261019-18';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261019-20';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox() {
@@ -74,7 +74,7 @@ export function createMysteryBox() {
     if (renderingReady) return renderingReady;
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261019-18')
+      import('./mystery-box-scene.js?v=20261019-20')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -212,6 +212,11 @@ export function createMysteryBox() {
     if (!stage || !trigger || !caption || unavailable || !eligible || reducedMotion()) {
       activation.cancel(); activation = createBoxActivation(() => beginReveal?.()); syncTrigger();
       return;
+    }
+    // Remembered accounts start quietly; their first genuine fresh box must also
+    // pass the real graphics check before a visible wrapper is inserted.
+    if (globalThis.dailyUndeadEntry?.acquireGraphics && !globalThis.dailyUndeadEntry.acquireGraphics()) {
+      skipPresentation(); return;
     }
     panel = document.querySelector(type === 'word' ? '#app .word-puzzle-panel' : '#app .quest-clue-panel');
     if (!panel) return;

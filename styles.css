@@ -3,7 +3,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("./assets/fonts/barlow-400.ttf?v=20261019-18") format("truetype");
+  src: url("./assets/fonts/barlow-400.ttf?v=20261019-20") format("truetype");
 }
 
 @font-face {
@@ -11,7 +11,7 @@
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url("./assets/fonts/barlow-500.ttf?v=20261019-18") format("truetype");
+  src: url("./assets/fonts/barlow-500.ttf?v=20261019-20") format("truetype");
 }
 
 @font-face {
@@ -19,7 +19,7 @@
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url("./assets/fonts/barlow-600.ttf?v=20261019-18") format("truetype");
+  src: url("./assets/fonts/barlow-600.ttf?v=20261019-20") format("truetype");
 }
 
 @font-face {
@@ -27,7 +27,7 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("./assets/fonts/barlow-700.ttf?v=20261019-18") format("truetype");
+  src: url("./assets/fonts/barlow-700.ttf?v=20261019-20") format("truetype");
 }
 
 @font-face {
@@ -35,7 +35,7 @@
   font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url("./assets/fonts/barlow-800.ttf?v=20261019-18") format("truetype");
+  src: url("./assets/fonts/barlow-800.ttf?v=20261019-20") format("truetype");
 }
 
 @font-face {
@@ -43,7 +43,7 @@
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-600.ttf?v=20261019-18") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-600.ttf?v=20261019-20") format("truetype");
 }
 
 @font-face {
@@ -51,7 +51,7 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-700.ttf?v=20261019-18") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-700.ttf?v=20261019-20") format("truetype");
 }
 
 @font-face {
@@ -59,7 +59,7 @@
   font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-800.ttf?v=20261019-18") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-800.ttf?v=20261019-20") format("truetype");
 }
 
 @font-face {
@@ -67,7 +67,7 @@
   font-style: normal;
   font-weight: 900;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-900.ttf?v=20261019-18") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-900.ttf?v=20261019-20") format("truetype");
 }
 
 :root {
@@ -1493,35 +1493,35 @@ h1 {
     linear-gradient(145deg, #122233, #05080d);
 }
 
-.zombie-avatar[data-avatar="richtofen"] { background-image: url("./assets/avatars/richtofen.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="dempsey"] { background-image: url("./assets/avatars/dempsey.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="takeo"] { background-image: url("./assets/avatars/takeo.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="nikolai"] { background-image: url("./assets/avatars/nikolai.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="samantha"] { background-image: url("./assets/avatars/samantha.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="dr-maxis"] { background-image: url("./assets/avatars/dr-maxis.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="dr-monty"] { background-image: url("./assets/avatars/dr-monty.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="warden"] { background-image: url("./assets/avatars/warden.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="misty"] { background-image: url("./assets/avatars/misty.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="stuhlinger"] { background-image: url("./assets/avatars/stuhlinger.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="marlton"] { background-image: url("./assets/avatars/marlton.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="russman"] { background-image: url("./assets/avatars/russman.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="scarlett"] { background-image: url("./assets/avatars/scarlett.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="diego"] { background-image: url("./assets/avatars/diego.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="bruno"] { background-image: url("./assets/avatars/bruno.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="stanton"] { background-image: url("./assets/avatars/stanton.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="weaver"] { background-image: url("./assets/avatars/weaver.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="grey"] { background-image: url("./assets/avatars/grey.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="carver"] { background-image: url("./assets/avatars/carver.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="maya"] { background-image: url("./assets/avatars/maya.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="shadowman"] { background-image: url("./assets/avatars/shadowman.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="tedd"] { background-image: url("./assets/avatars/tedd.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="brutus"] { background-image: url("./assets/avatars/brutus.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="scientist"] { background-image: url("./assets/avatars/richtofen.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="soldier"] { background-image: url("./assets/avatars/dempsey.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="warrior"] { background-image: url("./assets/avatars/takeo.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="explorer"] { background-image: url("./assets/avatars/nikolai.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="punk"] { background-image: url("./assets/avatars/misty.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="hazmat"] { background-image: url("./assets/avatars/carver.png?v=20261019-18"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="richtofen"] { background-image: url("./assets/avatars/richtofen.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="dempsey"] { background-image: url("./assets/avatars/dempsey.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="takeo"] { background-image: url("./assets/avatars/takeo.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="nikolai"] { background-image: url("./assets/avatars/nikolai.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="samantha"] { background-image: url("./assets/avatars/samantha.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="dr-maxis"] { background-image: url("./assets/avatars/dr-maxis.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="dr-monty"] { background-image: url("./assets/avatars/dr-monty.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="warden"] { background-image: url("./assets/avatars/warden.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="misty"] { background-image: url("./assets/avatars/misty.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="stuhlinger"] { background-image: url("./assets/avatars/stuhlinger.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="marlton"] { background-image: url("./assets/avatars/marlton.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="russman"] { background-image: url("./assets/avatars/russman.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="scarlett"] { background-image: url("./assets/avatars/scarlett.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="diego"] { background-image: url("./assets/avatars/diego.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="bruno"] { background-image: url("./assets/avatars/bruno.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="stanton"] { background-image: url("./assets/avatars/stanton.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="weaver"] { background-image: url("./assets/avatars/weaver.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="grey"] { background-image: url("./assets/avatars/grey.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="carver"] { background-image: url("./assets/avatars/carver.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="maya"] { background-image: url("./assets/avatars/maya.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="shadowman"] { background-image: url("./assets/avatars/shadowman.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="tedd"] { background-image: url("./assets/avatars/tedd.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="brutus"] { background-image: url("./assets/avatars/brutus.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="scientist"] { background-image: url("./assets/avatars/richtofen.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="soldier"] { background-image: url("./assets/avatars/dempsey.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="warrior"] { background-image: url("./assets/avatars/takeo.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="explorer"] { background-image: url("./assets/avatars/nikolai.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="punk"] { background-image: url("./assets/avatars/misty.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="hazmat"] { background-image: url("./assets/avatars/carver.png?v=20261019-20"), linear-gradient(145deg, #122233, #05080d); }
 
 .avatar-choice .zombie-avatar {
   width: 100%;
@@ -3387,11 +3387,12 @@ h1 {
 }
 
 /* A shared product-shot stage, with a matching first-frame poster. */
-.puzzle-entry-loading { display: none; }
+.puzzle-entry-loading { display: grid; place-items: center; min-height: 290px; margin: 0; color: var(--muted); font-size: .95rem; }
 .storage-status { display: none; width: min(100% - 2rem, 66rem); margin: .75rem auto 0; padding: .75rem 1rem; border: 1px solid var(--border); border-radius: .75rem; background: var(--surface); color: var(--muted); font-size: .9rem; }
 html[data-player-storage="memory"] .storage-status { display: block; }
-html[data-player-entry="direct"] .mb-loading { display: none; }
-html[data-player-entry="direct"] .puzzle-entry-loading { display: grid; place-items: center; min-height: 290px; margin: 0; color: var(--muted); font-size: .95rem; }
+.mb-loading { display: none; }
+html[data-player-entry="box"] .mb-loading { display: block; }
+html[data-player-entry="box"] .puzzle-entry-loading { display: none; }
 .mb-reveal { --mb-title-gap: clamp(1.5rem, 3vw, 2.25rem); --mb-prompt-gap: clamp(1rem, 2vw, 1.375rem); --mb-box-top: max(-7.500507%, calc(var(--mb-stage-height) * -.147591)); --mb-box-bottom: min(18.952471%, calc(var(--mb-stage-height) * .372936)); --mb-stage-height: min(clamp(310px, 40vw, 480px), max(200px, calc(100svh - 190px))); position: relative; min-width: 0; height: calc(var(--mb-stage-height) + clamp(2.5rem, 5vw, 4rem)); overflow: hidden; overflow: clip; isolation: isolate; }
 .mb-scene { position: absolute; inset: 0 0 auto; height: var(--mb-stage-height); z-index: 2; overflow: hidden; pointer-events: none; transition: opacity .55s ease, transform .7s cubic-bezier(.22,1,.36,1); }
 .mb-poster, .mb-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain; }

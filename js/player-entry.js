@@ -9,6 +9,25 @@
     && typeof globalThis.document?.fonts?.load === 'function'
     && typeof globalThis.document?.fonts?.check === 'function'
     && Boolean(globalThis.HTMLElement && 'inert' in globalThis.HTMLElement.prototype);
+  let graphics;
+  let graphicsFailed = false;
+  function acquireGraphics() {
+    if (!canAnimate || graphicsFailed) return null;
+    try {
+      if (!graphics) {
+        const canvas = globalThis.document.createElement('canvas');
+        const capture = /^(localhost|127\.0\.0\.1)$/.test(globalThis.location?.hostname || '')
+          && new URLSearchParams(globalThis.location?.search || '').has('boxReview');
+        const context = canvas.getContext('webgl2', {
+          alpha: true, antialias: true, powerPreference: 'low-power', preserveDrawingBuffer: capture,
+        });
+        if (!context) throw new Error('WebGL 2 context unavailable');
+        graphics = { canvas, context };
+      }
+      if (graphics.context.isContextLost()) throw new Error('WebGL 2 context lost');
+      return graphics;
+    } catch { graphicsFailed = true; return null; }
+  }
   const unavailable = () => {
     persistent = false;
     globalThis.document?.documentElement?.setAttribute('data-player-storage', 'memory');
@@ -88,10 +107,16 @@
     // A remembered account may have newer cloud progress than this device.
     // Wait quietly for normal account loading rather than flash a speculative box.
     const knownAccount = Boolean(storage.getItem('the-daily-undead:account-memory'));
-    const review = /^(localhost|127\.0\.0\.1)$/.test(host) && params.has('boxReview');
-    mode = review || persistent && !opened && !started && !reduced && !knownAccount && canAnimate ? 'box' : 'direct';
+    const localReview = /^(localhost|127\.0\.0\.1)$/.test(host);
+    const forceFallback = localReview && params.get('boxReview') === 'fallback';
+    const review = localReview && params.has('boxReview') && !forceFallback;
+    mode = !forceFallback && (review || persistent && !opened && !started && !reduced && !knownAccount && canAnimate) ? 'box' : 'direct';
+    // The API can exist even when a GPU/driver/policy prevents rendering. Acquire
+    // the actual context before showing a poster, then reuse it in Three.js.
+    if (mode === 'box' && !acquireGraphics()) mode = 'direct';
   } catch { /* A safe direct entry if storage or date information is unavailable. */ }
-  globalThis.dailyUndeadEntry = Object.freeze({ storage, mode, canAnimate });
+  globalThis.dailyUndeadEntry = Object.freeze({ storage, mode, acquireGraphics,
+    get canAnimate() { return canAnimate && !graphicsFailed; } });
   globalThis.document?.documentElement?.setAttribute('data-player-storage', persistent ? 'persistent' : 'memory');
   globalThis.document?.documentElement?.setAttribute('data-player-entry', mode);
 })();

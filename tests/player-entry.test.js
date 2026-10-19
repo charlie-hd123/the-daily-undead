@@ -8,14 +8,20 @@ function memory() {
   return { values, get length() { return values.size; }, key: (i) => [...values.keys()][i] ?? null,
     getItem: (k) => values.get(k) ?? null, setItem: (k, v) => values.set(k, String(v)), removeItem: (k) => values.delete(k) };
 }
-function boot({ storage = memory(), denied = false, reduced = false, hostname = 'thedailyundead.com', search = '', webgl = true, resize = true, inert = true, fonts = true, sessionStorage = memory() } = {}) {
+function boot({ storage = memory(), denied = false, reduced = false, hostname = 'thedailyundead.com', search = '', webgl = true, resize = true, inert = true, fonts = true, graphics = 'ok', sessionStorage = memory() } = {}) {
   const attrs = new Map();
+  let contextRequests = 0;
+  const contextOptions = [];
   const context = { Date: class extends Date { constructor(...args) { super(...(args.length ? args : ['2026-10-19T12:00:00Z'])); } },
     location: { hostname, search }, sessionStorage, URLSearchParams, WebGL2RenderingContext: webgl ? class {} : undefined, ResizeObserver: resize ? class {} : undefined, HTMLElement: { prototype: inert ? { inert: false } : {} }, matchMedia: () => ({ matches: reduced }),
-    document: { fonts: fonts ? { load() {}, check() {} } : undefined, documentElement: { setAttribute: (k, v) => attrs.set(k, v) } } };
+    document: { createElement: (tag) => { assert.equal(tag, 'canvas'); return { getContext(type, options) {
+      contextRequests++; assert.equal(type, 'webgl2'); contextOptions.push(options);
+      if (graphics === 'throw') throw new Error('Graphics denied');
+      return graphics === 'null' ? null : { isContextLost: () => graphics === 'lost' };
+    } }; }, fonts: fonts ? { load() {}, check() {} } : undefined, documentElement: { setAttribute: (k, v) => attrs.set(k, v) } } };
   Object.defineProperty(context, 'localStorage', { get() { if (denied) throw new Error('SecurityError'); return storage; } });
   vm.runInNewContext(source, context);
-  return { ...context.dailyUndeadEntry, attrs, storageBackend: storage };
+  return { ...context.dailyUndeadEntry, attrs, storageBackend: storage, contextOptions, get contextRequests() { return contextRequests; } };
 }
 const receipt = 'the-daily-undead:mystery-box-opened:2026-10-19';
 test('pre-paint entry shows a fresh box but hides it for an opened daily puzzle', () => {
@@ -79,4 +85,36 @@ test('an authorized future preview uses its own opening receipt before paint', (
 test('remembered accounts wait for authoritative cloud state without painting a speculative box', () => {
   const s = memory(); s.setItem('the-daily-undead:account-memory', JSON.stringify({ userId: 'acct_test' }));
   assert.equal(boot({ storage: s }).mode, 'direct'); assert.equal(s.getItem(receipt), null);
+});
+
+test('advertised WebGL with blocked, throwing or lost graphics skips the box before paint', () => {
+  for (const graphics of ['null', 'throw', 'lost']) {
+    const result = boot({ graphics });
+    assert.equal(result.mode, 'direct');
+    assert.equal(result.attrs.get('data-player-entry'), 'direct');
+    assert.equal(result.canAnimate, false);
+    assert.equal(result.acquireGraphics(), null);
+    assert.equal(result.contextRequests, 1);
+  }
+});
+
+test('the real renderer reuses the successfully acquired context without allocating another', () => {
+  const result = boot();
+  assert.equal(result.mode, 'box');
+  assert.equal(result.acquireGraphics(), result.acquireGraphics());
+  assert.equal(result.contextRequests, 1);
+  assert.equal(result.contextOptions[0].powerPreference, 'low-power');
+  assert.equal(result.contextOptions[0].preserveDrawingBuffer, false);
+});
+
+test('direct entry does not allocate a graphics context for returning or reduced-motion players', () => {
+  const s = memory(); s.setItem(receipt, '1');
+  for (const options of [{ storage: s }, { reduced: true }, { denied: true }, { webgl: false }, { hostname: '127.0.0.1', search: '?boxReview=fallback' }]) {
+    const result = boot(options); assert.equal(result.mode, 'direct'); assert.equal(result.contextRequests, 0);
+  }
+  const account = memory(); account.setItem('the-daily-undead:account-memory', '{}');
+  const result = boot({ storage: account, graphics: 'null' });
+  assert.equal(result.contextRequests, 0);
+  assert.equal(result.acquireGraphics(), null);
+  assert.equal(result.contextRequests, 1);
 });

@@ -1,12 +1,15 @@
-import * as T from './vendor/mystery-box-three.js?v=20261019-18';
-import { BOX_FRAME, fitBoxCamera } from './mystery-box-motion.js?v=20261019-18';
+import * as T from './vendor/mystery-box-three.js?v=20261019-20';
+import { BOX_FRAME, fitBoxCamera } from './mystery-box-motion.js?v=20261019-20';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
   host.dataset.renderer = 'initializing';
   const mobile = window.matchMedia('(max-width: 600px)').matches;
   const capture = ['localhost', '127.0.0.1'].includes(location.hostname) && new URLSearchParams(location.search).has('boxReview');
-  const renderer = new T.WebGLRenderer({ alpha: true, antialias: true, powerPreference: 'low-power', preserveDrawingBuffer: capture });
+  const graphics = globalThis.dailyUndeadEntry?.acquireGraphics();
+  if (!graphics) throw new Error('WebGL 2 context unavailable');
+  const renderer = new T.WebGLRenderer({ canvas: graphics.canvas, context: graphics.context,
+    alpha: true, antialias: true, powerPreference: 'low-power', preserveDrawingBuffer: capture });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, mobile ? 1.5 : 1.75));
   renderer.setClearColor(0x000000, 0);
   renderer.outputColorSpace = T.SRGBColorSpace;
@@ -48,8 +51,8 @@ export async function createMysteryBoxScene(host) {
   host.dataset.renderer = 'texture';
   const loader = new T.TextureLoader();
   const [woodMap, paintMap] = await Promise.all([
-    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261019-18', import.meta.url).href),
-    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261019-18', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261019-20', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261019-20', import.meta.url).href),
   ]);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;

@@ -65,3 +65,12 @@ test('a quiet pre-paint account check can still offer its genuinely fresh offici
   const f = boxFixture({ entry: { canAnimate: true, mode: 'direct' } }); f.open(); await f.flush();
   assert.equal(f.loads, 1); assert.equal(f.controller.isPresenting, true); assert.equal(f.values.size, 0);
 });
+
+test('a fresh account puzzle with blocked graphics stays native without inserting a box or loading Three.js', async () => {
+  let checks = 0;
+  const f = boxFixture({ entry: { canAnimate: true, mode: 'direct', acquireGraphics: () => { checks++; return null; } } });
+  f.open(); await f.flush();
+  assert.equal(checks, 1); assert.equal(f.loads, 0); assert.equal(f.controller.isPresenting, false);
+  assert.equal(f.panel.inert, false); assert.equal(f.panel.parentElement.className, 'app');
+  assert.equal(f.stage.hidden, true);
+});
