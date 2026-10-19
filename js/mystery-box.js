@@ -1,9 +1,12 @@
-import { BOX_SEQUENCE, createTitleFlight, createBoxActivation } from './mystery-box-motion.js?v=20261019-3';
+import { BOX_SEQUENCE, createTitleFlight, createBoxActivation } from './mystery-box-motion.js?v=20261019-4';
+
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261019-4';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox() {
   const stage = document.querySelector('#initial-mystery-box .mb-scene');
   const trigger = stage?.querySelector('.mb-open-trigger');
+  const caption = document.querySelector('#initial-mystery-box .mb-caption');
   const review = ['localhost', '127.0.0.1'].includes(location.hostname) ? new URLSearchParams(location.search).get('boxReview') : null;
   const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   let visual;
@@ -17,7 +20,8 @@ export function createMysteryBox() {
   let activation = createBoxActivation(() => beginReveal?.());
   let renderingReady = Promise.resolve(null);
   let timers = [];
-  const seen = new Set();
+  let history;
+  let historyStorage;
   const later = (callback, delay) => timers.push(window.setTimeout(callback, delay));
   function positionTrigger() {
     if (!visual || !trigger || progress) return;
@@ -52,15 +56,16 @@ export function createMysteryBox() {
   function skipPresentation() {
     unavailable = true;
     if (stage) stage.hidden = true;
+    if (caption) caption.hidden = true;
     cancel();
   }
-  if (unavailable && stage) stage.hidden = true;
+  if (unavailable) { if (stage) stage.hidden = true; if (caption) caption.hidden = true; }
   stage?.addEventListener('mystery-box-unavailable', skipPresentation);
   // Load the renderer alongside the normal data requests, not before app startup.
   if (stage && !unavailable) {
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261019-3')
+      import('./mystery-box-scene.js?v=20261019-4')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -187,20 +192,24 @@ export function createMysteryBox() {
     }
     frame = window.requestAnimationFrame(tick);
   }
-  function open({ key, type, fresh }) {
+  function open({ dateKey, type, fresh, official, storage }) {
     cancel();
-    if (!stage || !trigger || unavailable || !fresh || seen.has(key) || reducedMotion()) {
+    if (!history || historyStorage !== storage) {
+      history = createDailyBoxHistory(storage); historyStorage = storage;
+    }
+    const eligible = review ? official && fresh : history.canOpen({ dateKey, official, fresh });
+    if (!stage || !trigger || !caption || unavailable || !eligible || reducedMotion()) {
       activation.cancel(); activation = createBoxActivation(() => beginReveal?.()); syncTrigger();
       return;
     }
     panel = document.querySelector(type === 'word' ? '#app .word-puzzle-panel' : '#app .quest-clue-panel');
     if (!panel) return;
-    // A new reveal must be in view when entered from a result or the just-for-fun cards.
+    // The official daily reveal starts in view.
     if (window.scrollY) window.scrollTo(0, 0);
     progress = 0;
     wrapper = document.createElement('div'); wrapper.className = 'mb-reveal'; wrapper.dataset.phase = 'closed';
     const focused = document.activeElement;
-    panel.before(wrapper); wrapper.append(panel, stage); visual?.resize(); showVisual();
+    panel.before(wrapper); caption.hidden = false; wrapper.append(panel, stage, caption); visual?.resize(); showVisual();
     if (review) trigger.hidden = true;
     // Freeze the real component for local visual QA and its first-frame poster.
     if (review === 'closed' || review === 'open') {
@@ -219,7 +228,9 @@ export function createMysteryBox() {
       }
       beginReveal = () => {
         if (wrapper !== currentWrapper || !visual) return;
-        seen.add(key); trigger.hidden = true;
+        // Another tab may have opened this day's box while this one was waiting.
+        if (!history.canOpen({ dateKey, official, fresh })) { cancel(); return; }
+        history.markOpened(dateKey); trigger.hidden = true;
         wrapper.dataset.phase = 'opening'; syncTrigger();
         animateSequence(focused);
       };
