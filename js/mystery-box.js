@@ -1,6 +1,6 @@
-import { BOX_SEQUENCE, createIconFlight, createBoxActivation } from './mystery-box-motion.js?v=20261019-9';
+import { BOX_SEQUENCE, createIconFlight, createBoxActivation } from './mystery-box-motion.js?v=20261019-10';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261019-9';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261019-10';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox() {
@@ -68,7 +68,7 @@ export function createMysteryBox() {
   if (stage && !unavailable) {
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261019-9')
+      import('./mystery-box-scene.js?v=20261019-10')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -143,7 +143,7 @@ export function createMysteryBox() {
     }
     reward = { node, slot, context, traveller, object, target, style: node.style.cssText,
       hidden: node.getAttribute('aria-hidden'), inert: node.inert,
-      flight: createIconFlight({ target, mouth: visual.aperture(), stage: stageRect }) };
+      flight: createIconFlight({ target, mouth: visual.aperture(), stage: stageRect, viewDirection: visual.viewDirection() }) };
     node.replaceWith(slot); object.append(node); traveller.append(object); context.append(traveller); wrapper.append(context);
     context.style.cssText = `left:${stageRect.left - origin.left}px;top:${stageRect.top - origin.top}px;width:${stageRect.width}px;height:${Math.max(stageRect.height, panel.offsetHeight)}px;`;
     node.classList.add('mb-icon-face'); node.inert = true; node.setAttribute('aria-hidden', 'true');

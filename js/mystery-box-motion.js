@@ -10,7 +10,11 @@ const smooth = (value) => value < .5 ? 4 * value ** 3 : 1 - (-2 * value + 2) ** 
 // Viewport CSS pixels. Both SVGs paint inside this shared portion of their viewBox.
 export const ICON_INK = Object.freeze({ left: .1, top: .2, width: .8, height: .6 });
 
-export function createIconFlight({ target, mouth, stage }) {
+export function createIconFlight({ target, mouth, stage, viewDirection }) {
+  // CSS uses screen Y down and positive Z towards the player. Both rotations
+  // must be negative for this camera, including the depth of the thin side layers.
+  const pitch = Math.asin(clamp(viewDirection.y, -1, 1)) * 180 / Math.PI;
+  const yaw = Math.atan2(viewDirection.x, -viewDirection.z) * 180 / Math.PI;
   const lipY = (x) => mix(mouth.left.y, mouth.right.y,
     (x - mouth.left.x) / (mouth.right.x - mouth.left.x));
   const openingWidth = Math.abs(mouth.right.x - mouth.left.x);
@@ -32,10 +36,10 @@ export function createIconFlight({ target, mouth, stage }) {
     const left = mix(mouth.center.x - target.width * floatingScale / 2, target.left, settle);
     const arc = settle > 0 && settle < 1 ? Math.sin(Math.PI * settle) * Math.min(28, stage.height * .08) : 0;
     const top = mix(mix(startTop, peakTop, lift), target.top, settle) - arc;
-    // Match the chest front plane: orthographic projection, 14° pitch and 29° yaw.
+    // Keep the front plane aligned with the real camera throughout the lift.
     return { left, top, scale,
-      rotateX: mix(26, 14, lift) * (1 - settle),
-      rotateY: 29 * (1 - settle),
+      rotateX: pitch * (1 - settle),
+      rotateY: yaw * (1 - settle),
       rotateZ: 0,
       depth: 1 - settle, light: (.8 - .45 * lift) * (1 - settle),
       opacity: mix(1, .12, fade),

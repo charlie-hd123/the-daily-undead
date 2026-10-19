@@ -1,4 +1,4 @@
-import * as T from './vendor/mystery-box-three.js?v=20261019-9';
+import * as T from './vendor/mystery-box-three.js?v=20261019-10';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
@@ -47,8 +47,8 @@ export async function createMysteryBoxScene(host) {
   host.dataset.renderer = 'texture';
   const loader = new T.TextureLoader();
   const [woodMap, paintMap] = await Promise.all([
-    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261019-9', import.meta.url).href),
-    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261019-9', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261019-10', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261019-10', import.meta.url).href),
   ]);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;
@@ -210,7 +210,11 @@ export async function createMysteryBoxScene(host) {
     return { left: project(-2.89, 1.65, 1.08), right: project(2.89, 1.65, 1.08),
       center: project(0, 1.65, .25) };
   }
-  return { draw, resize, aperture, closedBounds, poster() { draw(0); return canvas.toDataURL('image/png'); }, dispose() {
+  function viewDirection() {
+    const direction = camera.getWorldDirection(new T.Vector3());
+    return { x: direction.x, y: direction.y, z: direction.z };
+  }
+  return { draw, resize, aperture, closedBounds, viewDirection, poster() { draw(0); return canvas.toDataURL('image/png'); }, dispose() {
     observer.disconnect();
     scene.traverse((node) => { if (node.isMesh) { node.geometry.dispose(); for (const material of [].concat(node.material)) material.dispose(); } });
     woodMap.dispose(); paintMap.dispose(); contactTexture.dispose(); env.dispose(); renderer.dispose(); canvas.remove();

@@ -1,8 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { OrthographicCamera, Vector3 } from 'three';
 import { BOX_SEQUENCE as timing, ICON_INK, createIconFlight, createBoxActivation } from '../js/mystery-box-motion.js';
 
-const desktop = { target: { left: 1050, top: 149, width: 88, height: 88 },
+const camera = new OrthographicCamera(-4.6, 4.6, 2.3, -2.3, .1, 60);
+camera.position.set(7.8, 5.7, 14); camera.lookAt(0, 1.7, 0); camera.updateMatrixWorld();
+const viewDirection = camera.getWorldDirection(new Vector3());
+
+const desktop = { viewDirection, target: { left: 1050, top: 149, width: 88, height: 88 },
   mouth: { left: { x: 450, y: 368 }, right: { x: 950, y: 424 }, center: { x: 715, y: 370 } },
   stage: { left: 192, top: 134, width: 1056, height: 480 } };
 
@@ -24,7 +29,23 @@ test('the icon starts below the front rim and rises clear of it with visible dep
   assert.equal(raised.opacity, 1);
   assert.equal(raised.rotateZ, 0);
   assert.ok(ink.right - ink.left <= (desktop.mouth.right.x - desktop.mouth.left.x) * .62);
-  assert.ok(raised.rotateX > 0 && raised.rotateY > 0 && raised.depth === 1);
+  assert.ok(raised.rotateX < 0 && raised.rotateY < 0 && raised.depth === 1);
+});
+
+
+test('the front face and depth face the same way as the chest camera throughout emergence', () => {
+  const flight = createIconFlight(desktop);
+  const view = camera.matrixWorldInverse.elements;
+  for (const elapsed of [timing.liftAt, timing.liftAt + timing.liftFor / 2, timing.settleAt]) {
+    const pose = flight(elapsed);
+    const x = pose.rotateX * Math.PI / 180, y = pose.rotateY * Math.PI / 180;
+    // Columns of the CSS front-plane rotation, including the normal that controls extrusion.
+    const css = [Math.cos(y), Math.sin(x) * Math.sin(y), -Math.cos(x) * Math.sin(y),
+      0, Math.cos(x), Math.sin(x), Math.sin(y), -Math.sin(x) * Math.cos(y), Math.cos(x) * Math.cos(y)];
+    // Convert the actual Three.js view basis to CSS's downwards image Y axis.
+    const projected = [view[0], -view[1], view[2], -view[4], view[5], -view[6], view[8], -view[9], view[10]];
+    css.forEach((value, index) => assert.ok(Math.abs(value - projected[index]) < 1e-10));
+  }
 });
 
 test('the travelling icon becomes its exact faint corner watermark without residual depth or glow', () => {
@@ -36,10 +57,10 @@ test('the travelling icon becomes its exact faint corner watermark without resid
 });
 
 test('both SVG silhouettes fit phones, tablets and short landscape stages without crossing the header', () => {
-  for (const stage of [{ left: 20, top: 223, width: 280, height: 310 },
+  for (const stage of [{ left: 20, top: 223, width: 280, height: 250 },
     { left: 20, top: 180, width: 728, height: 310 }, { left: 20, top: 150, width: 804, height: 200 }]) {
     for (const width of [56, 69, 88]) {
-      const input = { target: { left: stage.left + stage.width - width - 12, top: stage.top + 14, width, height: width },
+      const input = { viewDirection, target: { left: stage.left + stage.width - width - 12, top: stage.top + 14, width, height: width },
         mouth: { left: { x: stage.left + stage.width * .2, y: stage.top + stage.height * .52 },
           right: { x: stage.left + stage.width * .8, y: stage.top + stage.height * .62 },
           center: { x: stage.left + stage.width / 2, y: stage.top + stage.height * .55 } }, stage };
