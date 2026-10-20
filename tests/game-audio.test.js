@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { createGameAudio, letterSound, SOUND_CUES, SOUND_PREFERENCE_KEY } from '../js/game-audio.js';
+import { createGameAudio, initialiseGameAudio, letterSound, SOUND_CUES, SOUND_PREFERENCE_KEY } from '../js/game-audio.js';
 
 function fixture({ muted = false, unavailable = false, fetchAudio, decode } = {}) {
   let time = 0, hidden = false;
@@ -18,13 +18,14 @@ function fixture({ muted = false, unavailable = false, fetchAudio, decode } = {}
     createGain() { return { gain: { value: 1, cancelScheduledValues() {}, setValueAtTime() {}, linearRampToValueAtTime() {} }, connect() {}, disconnect() {} }; },
   };
   const calls = [];
-  const audio = createGameAudio({
+  const platform = {
     storage: { getItem: key => values.get(key), setItem: (key, value) => values.set(key, value) },
     AudioContext: unavailable ? null : class { constructor() { return context; } },
     fetchAudio: fetchAudio || (async url => { calls.push(String(url)); return { ok: true, arrayBuffer: async () => new ArrayBuffer(1) }; }),
     now: () => time, isHidden: () => hidden,
-  });
-  return { audio, context, calls, starts, stopped, values, advance: value => { time += value; }, hide: value => { hidden = value; } };
+  };
+  const audio = createGameAudio(platform);
+  return { audio, platform, context, calls, starts, stopped, values, advance: value => { time += value; }, hide: value => { hidden = value; } };
 }
 
 test('no autoplay; accepted interaction unlocks warmed audio and schedules at the requested cue', async () => {
@@ -36,6 +37,53 @@ test('no autoplay; accepted interaction unlocks warmed audio and schedules at th
   assert.equal(await f.audio.play('highest-round', { delay: 1450 }), true);
   assert.equal(f.starts[0].at, 10);
   assert.equal(f.starts[1].at, 11.45);
+});
+
+test('the first box cue waits for an asynchronous browser audio resume', async () => {
+  const f = fixture(); await f.audio.prepare();
+  let resume;
+  f.context.resume = () => new Promise(resolve => {
+    resume = () => { f.context.state = 'running'; resolve(); };
+  });
+  f.audio.unlock();
+  const firstTap = f.audio.play('mystery-box-a');
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(f.starts.length, 0);
+  resume();
+  assert.equal(await firstTap, true);
+  assert.equal(f.starts.length, 1);
+});
+
+test('touch-end and click can unlock first-tap audio when pointerdown is denied', async () => {
+  for (const gesture of ['touchend', 'click']) {
+    const f = fixture();
+    let allowed = false;
+    f.context.resume = () => {
+      if (!allowed) return Promise.reject(new Error('gesture not accepted'));
+      f.context.state = 'running'; return Promise.resolve();
+    };
+    const handlers = new Map();
+    const document = { querySelector: () => null, addEventListener: (name, fn, options) => handlers.set(name, { fn, options }) };
+    const audio = initialiseGameAudio(f.platform.storage, document, { addEventListener() {} }, f.platform);
+    await audio.prepare();
+    handlers.get('pointerdown').fn({ isTrusted: true });
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(await audio.ready('mystery-box-a'), false);
+    allowed = true;
+    assert.equal(handlers.get(gesture).options.capture, true);
+    handlers.get(gesture).fn({ isTrusted: true });
+    assert.equal(await audio.ready('mystery-box-a'), true);
+    assert.equal(await audio.play('mystery-box-a'), true);
+  }
+});
+
+test('muting during an asynchronous resume still cancels the first pending cue', async () => {
+  const f = fixture(); await f.audio.prepare();
+  let resume;
+  f.context.resume = () => new Promise(resolve => { resume = () => { f.context.state = 'running'; resolve(); }; });
+  f.audio.unlock(); const pending = f.audio.play('mystery-box-a');
+  f.audio.setEnabled(false); resume();
+  assert.equal(await pending, false); assert.equal(f.starts.length, 0);
 });
 
 test('muting cancels active/future sounds and persists across instances', async () => {

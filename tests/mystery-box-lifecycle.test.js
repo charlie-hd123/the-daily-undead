@@ -2,6 +2,31 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { boxFixture } from './helpers/mystery-box-fixture.js';
 
+test('the lid waits for audio readiness so the first recorded creak stays aligned', async () => {
+  let ready, opens = 0;
+  const preparing = new Promise(resolve => { ready = resolve; });
+  const f = boxFixture({ beforeOpen: () => preparing, onOpen: () => opens++ });
+  f.open(); await f.flush(); f.trigger.click();
+  assert.equal(f.frameCount, 0); assert.equal(f.values.size, 0); assert.equal(opens, 0);
+  ready(); await f.flush();
+  assert.equal(f.frameCount, 1); assert.equal(opens, 1);
+  assert.equal(f.values.get('the-daily-undead:mystery-box-opened:2026-10-19'), '1');
+});
+
+test('blocked, rejected or cancelled audio cannot trap or reopen the real puzzle', async () => {
+  let opens = 0;
+  const blocked = boxFixture({ beforeOpen: () => new Promise(() => {}), onOpen: () => opens++ });
+  blocked.open(); await blocked.flush(); blocked.trigger.click(); blocked.timeout(750); await blocked.flush();
+  assert.equal(opens, 1); assert.equal(blocked.frameCount, 1);
+  const rejected = boxFixture({ beforeOpen: () => Promise.reject(new Error('blocked')), onOpen: () => opens++ });
+  rejected.open(); await rejected.flush(); rejected.trigger.click(); await rejected.flush(); assert.equal(opens, 2);
+  let ready;
+  const cancelled = boxFixture({ beforeOpen: () => new Promise(resolve => { ready = resolve; }), onOpen: () => opens++ });
+  cancelled.open(); await cancelled.flush(); cancelled.trigger.click(); cancelled.controller.cancel();
+  ready(); await cancelled.flush();
+  assert.equal(opens, 2); assert.equal(cancelled.values.size, 0); assert.equal(cancelled.panel.inert, false);
+});
+
 test('box audio starts only on a real opening, once readiness and receipt are confirmed', async () => {
   let opens = 0, cancels = 0;
   const f = boxFixture({ slow: true, onOpen: () => opens++, onCancel: () => cancels++ });

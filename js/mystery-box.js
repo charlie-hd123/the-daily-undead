@@ -1,9 +1,9 @@
-import { BOX_SEQUENCE, ICON_INK, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261020-14';
+import { BOX_SEQUENCE, ICON_INK, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261020-15';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261020-14';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261020-15';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
-export function createMysteryBox({ onOpen = () => {}, onCancel = () => {} } = {}) {
+export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () => {} } = {}) {
   const stage = document.querySelector('#initial-mystery-box .mb-scene');
   const trigger = stage?.querySelector('.mb-open-trigger');
   const caption = document.querySelector('#initial-mystery-box .mb-caption');
@@ -76,7 +76,7 @@ export function createMysteryBox({ onOpen = () => {}, onCancel = () => {} } = {}
     if (renderingReady) return renderingReady;
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261020-14')
+      import('./mystery-box-scene.js?v=20261020-15')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -254,7 +254,7 @@ export function createMysteryBox({ onOpen = () => {}, onCancel = () => {} } = {}
       if (panel.contains(focused) && !activation.requested) {
         trigger.setAttribute('data-auto-focus', ''); trigger.focus({ preventScroll: true });
       }
-      beginReveal = () => {
+      const reveal = () => {
         if (wrapper !== currentWrapper || !visual) return;
         // Another tab may have opened this day's box while this one was waiting.
         if (!history.canOpen({ dateKey, official, fresh })) { cancel(); return; }
@@ -263,6 +263,16 @@ export function createMysteryBox({ onOpen = () => {}, onCancel = () => {} } = {}
         wrapper.dataset.phase = 'opening'; syncTrigger();
         onOpen();
         animateSequence(focused);
+      };
+      beginReveal = () => {
+        let preparation;
+        try { preparation = beforeOpen?.(); } catch { /* Sound cannot block the puzzle. */ }
+        if (preparation && typeof preparation.then === 'function') {
+          // Keep the recorded latch and the lid in sync on the first browser tap.
+          // Missing/blocked audio has a short ceiling, so the real game still opens.
+          const audioDeadline = new Promise(resolve => later(resolve, 750));
+          void Promise.race([preparation, audioDeadline]).catch(() => false).then(reveal);
+        } else reveal();
       };
     } else trigger.hidden = true;
     // Decode the actual SVG before the reveal; a missing asset goes directly to play.

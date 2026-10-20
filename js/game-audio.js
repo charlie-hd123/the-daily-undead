@@ -151,6 +151,7 @@ export function createGameAudio({
   let enabled = true;
   try { enabled = storage?.getItem(SOUND_PREFERENCE_KEY) !== 'false'; } catch { /* session-only preference */ }
   let context, unlocked = false, generation = 0;
+  let resumeReady = Promise.resolve(false);
   const buffers = new Map(), sources = new Set(), cueGenerations = new Map();
   const supported = typeof AudioContext === 'function' && typeof fetchAudio === 'function';
 
@@ -186,8 +187,16 @@ export function createGameAudio({
     if (!audio) return;
     unlocked = true;
     // Call resume inside the trusted pointer/key event, before any awaits.
-    try { Promise.resolve(audio.resume()).catch(() => { unlocked = false; }); } catch { unlocked = false; }
+    try {
+      resumeReady = Promise.resolve(audio.state === 'running' ? undefined : audio.resume())
+        .then(() => audio.state === 'running', () => false);
+    } catch { resumeReady = Promise.resolve(false); }
     void prepare();
+  }
+  async function ready(cue) {
+    if (!SOUND_CUES[cue] || !enabled || !unlocked || isHidden()) return false;
+    const [buffer, running] = await Promise.all([load(cue), resumeReady]);
+    return Boolean(buffer && running && enabled && !isHidden() && context.state === 'running');
   }
   function stopSource(entry) {
     try {
@@ -217,8 +226,8 @@ export function createGameAudio({
     if (!SOUND_CUES[cue] || !enabled || !unlocked || isHidden()) return false;
     const epoch = generation, cueEpoch = cueGenerations.get(cue) || 0;
     const intendedAt = now() + delay;
-    const buffer = await load(cue);
-    if (!buffer || epoch !== generation || cueEpoch !== (cueGenerations.get(cue) || 0) || !enabled || isHidden() || context.state !== 'running') return false;
+    const [buffer, running] = await Promise.all([load(cue), resumeReady]);
+    if (!buffer || !running || epoch !== generation || cueEpoch !== (cueGenerations.get(cue) || 0) || !enabled || isHidden() || context.state !== 'running') return false;
     const late = now() - intendedAt;
     // Never queue feedback to play much later than its actual action on a slow connection.
     if (late > 180 || late / 1000 >= buffer.duration) return false;
@@ -244,11 +253,11 @@ export function createGameAudio({
     for (const other of ['puzzle-solved-a', 'double-points-a', 'highest-round']) stopCue(other);
     return play(cue, options);
   }
-  return { supported, get enabled() { return enabled; }, prepare, unlock, play, reward, countPoints, stopCue, stopAll, setEnabled };
+  return { supported, get enabled() { return enabled; }, prepare, ready, unlock, play, reward, countPoints, stopCue, stopAll, setEnabled };
 }
 
-export function initialiseGameAudio(storage, document = globalThis.document, window = globalThis.window) {
-  const audio = createGameAudio({ storage });
+export function initialiseGameAudio(storage, document = globalThis.document, window = globalThis.window, platform = {}) {
+  const audio = createGameAudio({ ...platform, storage });
   const button = document.querySelector('#sound-toggle');
   const update = () => {
     if (!button) return;
@@ -259,7 +268,9 @@ export function initialiseGameAudio(storage, document = globalThis.document, win
     button.querySelector('span').textContent = audio.enabled ? 'Sound on' : 'Sound off';
   };
   button?.addEventListener('click', () => { audio.setEnabled(!audio.enabled); update(); });
-  for (const event of ['pointerdown', 'keydown']) document.addEventListener(event, (event) => { if (event.isTrusted) audio.unlock(); }, { capture: true, passive: true });
+  // Touch browsers may grant activation only at touchend/click, not pointerdown.
+  // Capture click before the box/button handler requests its very first cue.
+  for (const event of ['pointerdown', 'touchend', 'click', 'keydown']) document.addEventListener(event, (event) => { if (event.isTrusted) audio.unlock(); }, { capture: true, passive: true });
   document.addEventListener('visibilitychange', () => { if (document.hidden) audio.stopAll(); });
   window.addEventListener('pagehide', () => audio.stopAll());
   window.addEventListener('storage', (event) => {
