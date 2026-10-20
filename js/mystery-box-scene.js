@@ -1,5 +1,5 @@
-import * as T from './vendor/mystery-box-three.js?v=20261020-3';
-import { BOX_FRAME, fitBoxCamera } from './mystery-box-motion.js?v=20261020-3';
+import * as T from './vendor/mystery-box-three.js?v=20261020-5';
+import { BOX_FRAME, fitBoxCamera } from './mystery-box-motion.js?v=20261020-5';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
@@ -32,8 +32,8 @@ export async function createMysteryBoxScene(host) {
   scene.environmentIntensity = .65;
   room.dispose();
   pmrem.dispose();
-  scene.add(new T.HemisphereLight(0xc4d8ff, 0x171014, 1.25));
-  const key = new T.DirectionalLight(0xffe5c5, 3.6);
+  scene.add(new T.HemisphereLight(0xb9d8ee, 0x10101c, 1.1));
+  const key = new T.DirectionalLight(0xffeddb, 3.4);
   key.position.set(-3, 7, 6);
   key.castShadow = true;
   key.shadow.mapSize.set(mobile ? 512 : 1024, mobile ? 512 : 1024);
@@ -43,16 +43,16 @@ export async function createMysteryBoxScene(host) {
   key.shadow.bias = -.0002;
   key.shadow.radius = 3;
   scene.add(key);
-  const fill = new T.DirectionalLight(0x73cef5, .9);
-  fill.position.set(5, 3, 1); scene.add(fill);
-  const rim = new T.DirectionalLight(0xa093ff, 1.35);
-  rim.position.set(-4, 5, -5); scene.add(rim);
+  const fill = new T.DirectionalLight(0x55daf8, 4.0);
+  fill.position.set(-4, 2.5, 6); scene.add(fill);
+  const rim = new T.DirectionalLight(0x9c78ff, 3.2);
+  rim.position.set(6, 4.5, 4); scene.add(rim);
 
   host.dataset.renderer = 'texture';
   const loader = new T.TextureLoader();
   const [woodMap, paintMap] = await Promise.all([
-    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261020-3', import.meta.url).href),
-    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261020-3', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261020-5', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261020-5', import.meta.url).href),
   ]);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;
@@ -152,11 +152,26 @@ export async function createMysteryBoxScene(host) {
   });
   const glow = new T.Mesh(new T.PlaneGeometry(6.5, 3.2), glowMat); glow.position.set(0, 3.03, -.12); glow.rotation.y = .4; caseGroup.add(glow);
 
-  const ground = new T.Mesh(new T.PlaneGeometry(25, 25), new T.ShadowMaterial({ opacity: .09 })); ground.rotation.x = -Math.PI / 2; ground.position.y = -.01; ground.receiveShadow = true; scene.add(ground);
+  // A softly lit floor gives the contact and directional shadows a visible
+  // surface. It shares the prop's perspective and fades to transparent at its edge.
+  const floorCanvas = document.createElement('canvas'); floorCanvas.width = floorCanvas.height = 256;
+  const floorCtx = floorCanvas.getContext('2d');
+  const floorBase = floorCtx.createRadialGradient(128, 128, 10, 128, 128, 126);
+  floorBase.addColorStop(0, 'rgba(23,33,49,.94)'); floorBase.addColorStop(.55, 'rgba(17,25,39,.7)'); floorBase.addColorStop(1, 'rgba(12,17,30,0)');
+  floorCtx.fillStyle = floorBase; floorCtx.fillRect(0, 0, 256, 256);
+  for (const [x, color] of [[80, 'rgba(61,170,194,.24)'], [172, 'rgba(123,82,188,.22)']]) {
+    const pool = floorCtx.createRadialGradient(x, 126, 0, x, 126, 86);
+    pool.addColorStop(0, color); pool.addColorStop(1, 'rgba(0,0,0,0)');
+    floorCtx.fillStyle = pool; floorCtx.fillRect(0, 0, 256, 256);
+  }
+  const floorTexture = new T.CanvasTexture(floorCanvas); floorTexture.colorSpace = T.SRGBColorSpace;
+  const floor = new T.Mesh(new T.PlaneGeometry(15, 10), new T.MeshBasicMaterial({ map: floorTexture, transparent: true, depthWrite: false, toneMapped: false }));
+  floor.rotation.x = -Math.PI / 2; floor.position.y = -.025; floor.renderOrder = -2; scene.add(floor);
+  const ground = new T.Mesh(new T.PlaneGeometry(25, 25), new T.ShadowMaterial({ opacity: .3 })); ground.rotation.x = -Math.PI / 2; ground.position.y = -.01; ground.renderOrder = -1; ground.receiveShadow = true; scene.add(ground);
   const contactCanvas = document.createElement('canvas'); contactCanvas.width = contactCanvas.height = 128;
   const contactCtx = contactCanvas.getContext('2d');
   const contactGradient = contactCtx.createRadialGradient(64,64,4,64,64,64);
-  contactGradient.addColorStop(0, 'rgba(0,0,0,.6)'); contactGradient.addColorStop(.55, 'rgba(0,0,0,.3)'); contactGradient.addColorStop(1, 'rgba(0,0,0,0)');
+  contactGradient.addColorStop(0, 'rgba(0,0,0,.88)'); contactGradient.addColorStop(.55, 'rgba(0,0,0,.48)'); contactGradient.addColorStop(1, 'rgba(0,0,0,0)');
   contactCtx.fillStyle = contactGradient; contactCtx.fillRect(0,0,128,128);
   const contactTexture = new T.CanvasTexture(contactCanvas);
   const contact = new T.Mesh(new T.PlaneGeometry(8.3,4.4), new T.MeshBasicMaterial({ map: contactTexture, transparent: true, depthWrite: false }));
@@ -253,6 +268,6 @@ export async function createMysteryBoxScene(host) {
   return { draw, resize, aperture, closedBounds, viewDirection, poster, dispose() {
     observer.disconnect();
     scene.traverse((node) => { if (node.isMesh) { node.geometry.dispose(); for (const material of [].concat(node.material)) material.dispose(); } });
-    woodMap.dispose(); paintMap.dispose(); contactTexture.dispose(); env.dispose(); renderer.dispose(); canvas.remove();
+    woodMap.dispose(); paintMap.dispose(); floorTexture.dispose(); contactTexture.dispose(); env.dispose(); renderer.dispose(); canvas.remove();
   } };
 }

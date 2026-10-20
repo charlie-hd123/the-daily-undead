@@ -13,9 +13,12 @@ test('ineligible official, just-for-fun, consumed, reduced-motion and unsupporte
 });
 test('a fresh ready box waits, records its opening before any frame, and cannot restart', async () => {
   const f = boxFixture(); f.open(); await f.flush();
+  assert.equal(f.intro.parentElement, f.copy); assert.equal(f.caption.parentElement, f.copy);
+  assert.equal(f.copy.parentElement, f.stage.parentElement);
   assert.equal(f.loads, 1); assert.equal(f.frameCount, 0); assert.equal(f.controller.isPresenting, true);
   f.trigger.click(); assert.equal(f.caption.hidden, true); assert.equal(f.values.get('the-daily-undead:mystery-box-opened:2026-10-19'), '1');
   f.frame(3500); assert.equal(f.controller.isPresenting, false); assert.equal(f.panel.inert, false);
+  assert.equal(f.copy.isConnected, false); assert.equal(f.stage.isConnected, false);
   f.open(); await f.flush(); assert.equal(f.loads, 1); assert.equal(f.controller.isPresenting, false);
 });
 test('an early tap queues one opening until the renderer is ready', async () => {
@@ -27,6 +30,7 @@ test('renderer, font and icon failures leave the real panel usable and do not co
   for (const options of [{ sceneFails: true }, { fontFails: true }, { iconFails: true }]) {
     const f = boxFixture(options); f.open(); f.trigger.click(); await f.flush();
     assert.equal(f.controller.isPresenting, false); assert.equal(f.panel.inert, false); assert.equal(f.values.size, 0);
+    assert.equal(f.copy.isConnected, false);
   }
 });
 test('a slow renderer times out to play and cannot open after its late resolution', async () => {
@@ -73,4 +77,5 @@ test('a fresh account puzzle with blocked graphics stays native without insertin
   assert.equal(checks, 1); assert.equal(f.loads, 0); assert.equal(f.controller.isPresenting, false);
   assert.equal(f.panel.inert, false); assert.equal(f.panel.parentElement.className, 'app');
   assert.equal(f.stage.hidden, true);
+  assert.equal(f.copy.hidden, true);
 });

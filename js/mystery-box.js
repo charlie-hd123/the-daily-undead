@@ -1,6 +1,6 @@
-import { BOX_SEQUENCE, ICON_INK, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261020-3';
+import { BOX_SEQUENCE, ICON_INK, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261020-5';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261020-3';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261020-5';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox() {
@@ -8,6 +8,7 @@ export function createMysteryBox() {
   const trigger = stage?.querySelector('.mb-open-trigger');
   const caption = document.querySelector('#initial-mystery-box .mb-caption');
   const intro = document.querySelector('#initial-mystery-box .mb-intro-title');
+  const copy = document.querySelector('#initial-mystery-box .mb-copy');
   const review = ['localhost', '127.0.0.1'].includes(location.hostname) ? new URLSearchParams(location.search).get('boxReview') : null;
   const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
   let visual;
@@ -64,6 +65,7 @@ export function createMysteryBox() {
     if (stage) stage.hidden = true;
     if (caption) caption.hidden = true;
     if (intro) intro.hidden = true;
+    if (copy) copy.hidden = true;
     cancel();
   }
   if (unavailable) { if (stage) stage.hidden = true; if (caption) caption.hidden = true; if (intro) intro.hidden = true; }
@@ -74,7 +76,7 @@ export function createMysteryBox() {
     if (renderingReady) return renderingReady;
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261020-3')
+      import('./mystery-box-scene.js?v=20261020-5')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -228,7 +230,8 @@ export function createMysteryBox() {
     const focused = document.activeElement;
     panel.before(wrapper); caption.hidden = activation.requested;
     if (intro) { intro.hidden = false; intro.removeAttribute('aria-hidden'); }
-    wrapper.append(panel, ...(intro ? [intro] : []), stage, caption); visual?.resize(); showVisual();
+    if (copy) copy.hidden = false;
+    wrapper.append(panel, stage, ...(copy ? [copy] : [...(intro ? [intro] : []), caption])); visual?.resize(); showVisual();
     const rendererReady = ensureRenderer();
     if (review) trigger.hidden = true;
     // Freeze the real component for local visual QA and its first-frame poster.

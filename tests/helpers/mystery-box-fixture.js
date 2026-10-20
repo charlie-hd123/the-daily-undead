@@ -35,13 +35,13 @@ export function boxFixture(options = {}) {
     querySelector(s) { return this === stage && s === '.mb-open-trigger' ? trigger : this === panel && s === '.puzzle-panel-art' ? icon : null; }
   }
   const body = new Node('body'), app = new Node('app'), initial = new Node('initial'); body.append(app); app.append(initial);
-  const stage = new Node('mb-scene'), trigger = new Node('mb-open-trigger'), caption = new Node('mb-caption'), intro = new Node('mb-intro-title');
-  initial.append(stage, caption, intro); stage.append(trigger);
+  const stage = new Node('mb-scene'), trigger = new Node('mb-open-trigger'), caption = new Node('mb-caption'), intro = new Node('mb-intro-title'), copy = new Node('mb-copy');
+  initial.append(stage, copy); copy.append(intro, caption); stage.append(trigger);
   const panel = new Node('panel word-puzzle-panel'), icon = new Node('puzzle-panel-art');
   icon.decode = () => options.iconFails ? Promise.reject(new Error('icon unavailable')) : Promise.resolve(); panel.append(icon); app.append(panel);
   document = { body, activeElement: panel, fonts: { load: () => Promise.resolve(), check: () => !options.fontFails },
     createElement: () => new Node(), createComment: () => new Node(),
-    querySelector(s) { return s.endsWith('.mb-scene') ? stage : s.endsWith('.mb-caption') ? caption : s.endsWith('.mb-intro-title') ? intro : s.includes('#app .') ? panel : null; } };
+    querySelector(s) { return s.endsWith('.mb-scene') ? stage : s.endsWith('.mb-copy') ? copy : s.endsWith('.mb-caption') ? caption : s.endsWith('.mb-intro-title') ? intro : s.includes('#app .') ? panel : null; } };
   const values = new Map();
   const storage = options.storage || { getItem: (k) => values.get(k) ?? null, setItem: (k, v) => values.set(k, String(v)) };
   const visual = { draw() { draws++; }, resize() {}, dispose() { disposed++; },
@@ -61,7 +61,7 @@ export function boxFixture(options = {}) {
     .replace(/^import[^\n]+\n/gm, '').replace('export function createMysteryBox', 'function createMysteryBox')
     .replace(/import\('\.\/mystery-box-scene\.js\?v=[^']+'\)/g, 'loadScene()');
   vm.runInNewContext(source + '\nglobalThis.controller = createMysteryBox();', context);
-  return { controller: context.controller, panel, stage, trigger, caption, storage, values,
+  return { controller: context.controller, panel, stage, trigger, caption, intro, copy, storage, values,
     get loads() { return loads; }, get draws() { return draws; }, get disposed() { return disposed; },
     open(extra = {}) { context.controller.open({ dateKey: '2026-10-19', type: 'word', official: true, fresh: true, storage, ...extra }); },
     flush: () => new Promise((resolve) => setImmediate(resolve)),
