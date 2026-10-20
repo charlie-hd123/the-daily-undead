@@ -1,5 +1,5 @@
-import * as T from './vendor/mystery-box-three.js?v=20261020-9';
-import { BOX_FRAME, fitBoxCamera } from './mystery-box-motion.js?v=20261020-9';
+import * as T from './vendor/mystery-box-three.js?v=20261020-10';
+import { BOX_FRAME, fitBoxCamera, lidDepthScale } from './mystery-box-motion.js?v=20261020-10';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
@@ -51,8 +51,8 @@ export async function createMysteryBoxScene(host) {
   host.dataset.renderer = 'texture';
   const loader = new T.TextureLoader();
   const [woodMap, paintMap] = await Promise.all([
-    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261020-9', import.meta.url).href),
-    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261020-9', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261020-10', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261020-10', import.meta.url).href),
   ]);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;
@@ -177,6 +177,7 @@ export async function createMysteryBoxScene(host) {
   const contact = new T.Mesh(new T.PlaneGeometry(8.3,4.4), new T.MeshBasicMaterial({ map: contactTexture, transparent: true, depthWrite: false }));
   contact.rotation.x = -Math.PI/2; contact.position.y = .003; scene.add(contact);
   let lastProgress = 0;
+  let mostOpen = 0;
   let contextLost = false;
   function draw(progress = lastProgress) {
     lastProgress = progress;
@@ -184,8 +185,10 @@ export async function createMysteryBoxScene(host) {
     const t = Math.max(0, Math.min(1, progress));
     // Openness is already eased by the shared sequence, including the partial closing.
     const ease = t;
-    // Lean the open lid back so its broad interior reads as a lid, not a tall backboard.
-    lid.rotation.x = -(115 * Math.PI / 180) * ease;
+    lid.rotation.x = -1.83 * ease;
+    // Hold the shorter silhouette through the fading close, then reset with the closed pose.
+    mostOpen = t === 0 ? 0 : Math.max(mostOpen, t);
+    lid.scale.z = lidDepthScale(mostOpen);
     innerLight.intensity = 17 * Math.pow(ease, .75);
     inner.material.opacity = .65 + ease * .35;
     glowMat.uniforms.strength.value = ease * .95;

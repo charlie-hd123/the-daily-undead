@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { OrthographicCamera, Vector3 } from 'three';
-import { BOX_SEQUENCE as timing, ICON_INK, createIconFlight, createBoxActivation, BOX_FRAME, fitBoxCamera, revealHeight, lidOpenness } from '../js/mystery-box-motion.js';
+import { BOX_SEQUENCE as timing, ICON_INK, createIconFlight, createBoxActivation, BOX_FRAME, fitBoxCamera, revealHeight, lidOpenness, lidDepthScale } from '../js/mystery-box-motion.js';
 
 const camera = new OrthographicCamera(-4.6, 4.6, 2.3, -2.3, .1, 60);
 camera.position.set(7.8, 5.7, 14); camera.lookAt(0, 1.7, 0); camera.updateMatrixWorld();
@@ -29,6 +29,18 @@ test('the lid starts easing down with the fade and never closes completely on sc
     const amount = lidOpenness(elapsed);
     assert.ok(amount <= previous && amount >= .76);
     previous = amount;
+  }
+});
+
+test('lid proportions stay fitted until the late swing, then finish subtly shorter', () => {
+  for (const openness of [0, .25, .5, .7]) assert.equal(lidDepthScale(openness), 1);
+  assert.equal(lidDepthScale(1), .88);
+  let previous = 1;
+  for (let step = 71; step <= 100; step++) {
+    const scale = lidDepthScale(step / 100);
+    assert.ok(scale <= previous && scale >= .88);
+    assert.ok(previous - scale < .012, 'no visible size jump between animation frames');
+    previous = scale;
   }
 });
 
@@ -136,9 +148,9 @@ const framingSizes = [[288, 250, true], [343, 250, true], [383, 250, true], [553
   [554, 310, false], [736, 310, false], [797, 200, false], [1056, 480, false], [3840, 200, false]];
 
 test('every camera fit protects the measured full lid sweep, including the peak before fully open', () => {
-  // Measured full sweep peaks near 97 degrees. The 115-degree endpoint extends
-  // the right edge to 3.82382; round outward to protect the entire newer pose.
-  const envelope = { left: -3.313647, right: 3.825, bottom: -2.156026, top: 2.828978 };
+  // Unshortened prop swept through 121 hinge positions; the late lid compression
+  // remains inside this conservative envelope, whose top peaks near 97 degrees.
+  const envelope = { left: -3.313647, right: 3.650736, bottom: -2.156026, top: 2.828978 };
   for (const [width, height, mobile] of framingSizes) {
     const fit = fitBoxCamera(width, height, mobile);
     assert.ok(fit.halfWidth > Math.max(-envelope.left, envelope.right));

@@ -13,6 +13,11 @@ export function lidOpenness(elapsed) {
   return opening * (1 - .24 * closing);
 }
 
+// Preserve the fitted closed lid and early swing; shorten only its late, upright pose.
+export function lidDepthScale(openness) {
+  return 1 - .12 * smooth(clamp((openness - .7) / .3));
+}
+
 // Covers the full lid sweep, whose highest point is just past vertical, not at the end.
 export const BOX_FRAME = Object.freeze({ desktopHalfWidth: 6.1, mobileHalfWidth: 4.4,
   halfHeight: 3.1, posterWidth: 1220, posterHeight: 620 });
