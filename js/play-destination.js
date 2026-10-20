@@ -1,4 +1,4 @@
-import { isPuzzleSessionComplete } from './daily-challenge-core.js?v=20261020-13';
+import { isPuzzleSessionComplete } from './daily-challenge-core.js?v=20261020-14';
 
 const key = (date) => `the-daily-undead:play-destination:${date}`;
 

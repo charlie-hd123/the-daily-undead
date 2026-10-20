@@ -1,9 +1,9 @@
-import { BOX_SEQUENCE, ICON_INK, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261020-13';
+import { BOX_SEQUENCE, ICON_INK, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261020-14';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261020-13';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261020-14';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
-export function createMysteryBox() {
+export function createMysteryBox({ onOpen = () => {}, onCancel = () => {} } = {}) {
   const stage = document.querySelector('#initial-mystery-box .mb-scene');
   const trigger = stage?.querySelector('.mb-open-trigger');
   const caption = document.querySelector('#initial-mystery-box .mb-caption');
@@ -76,7 +76,7 @@ export function createMysteryBox() {
     if (renderingReady) return renderingReady;
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261020-13')
+      import('./mystery-box-scene.js?v=20261020-14')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -111,6 +111,7 @@ export function createMysteryBox() {
   }
 
   function cancel() {
+    onCancel();
     activeEligibility = null;
     if (wrapper) {
       activation.cancel(); activation = createBoxActivation(() => beginReveal?.());
@@ -260,6 +261,7 @@ export function createMysteryBox() {
         if (!history.markOpened(dateKey)) { cancel(); return; }
         trigger.hidden = true;
         wrapper.dataset.phase = 'opening'; syncTrigger();
+        onOpen();
         animateSequence(focused);
       };
     } else trigger.hidden = true;

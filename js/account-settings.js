@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261020-13";
+import { browserStorage } from "./browser-storage.js?v=20261020-14";
 export async function requestEmailChange(auth, email, currentEmail, redirectUrl) {
   const nextEmail = String(email || "").trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nextEmail)) throw new Error("Enter a valid email address.");

@@ -54,13 +54,14 @@ export function boxFixture(options = {}) {
     requestAnimationFrame(fn) { const id = ++sequence; frames.set(id, fn); return id; }, cancelAnimationFrame: (id) => frames.delete(id), scrollTo() {} };
   const context = { ...motion, createDailyBoxHistory, document, window, location: { hostname: 'example.com', search: '' },
     ResizeObserver: options.resize === false ? undefined : class { observe() {} disconnect() {} }, dailyUndeadEntry: options.entry, performance: { now: () => 0 }, WebGL2RenderingContext: options.webgl === false ? undefined : class {},
+    onBoxOpen: options.onOpen, onBoxCancel: options.onCancel,
     console: { warn() {} }, loadScene() { loads++; if (options.sceneFails) return Promise.reject(new Error('renderer unavailable'));
       if (options.slow) return new Promise((resolve) => { settleLoader = () => resolve({ createMysteryBoxScene: async () => visual }); });
       return Promise.resolve({ createMysteryBoxScene: async () => visual }); } };
   const source = readFileSync(new URL('../../js/mystery-box.js', import.meta.url), 'utf8')
     .replace(/^import[^\n]+\n/gm, '').replace('export function createMysteryBox', 'function createMysteryBox')
     .replace(/import\('\.\/mystery-box-scene\.js\?v=[^']+'\)/g, 'loadScene()');
-  vm.runInNewContext(source + '\nglobalThis.controller = createMysteryBox();', context);
+  vm.runInNewContext(source + '\nglobalThis.controller = createMysteryBox({ onOpen: onBoxOpen, onCancel: onBoxCancel });', context);
   return { controller: context.controller, panel, stage, trigger, caption, intro, copy, storage, values,
     get loads() { return loads; }, get draws() { return draws; }, get disposed() { return disposed; },
     open(extra = {}) { context.controller.open({ dateKey: '2026-10-19', type: 'word', official: true, fresh: true, storage, ...extra }); },

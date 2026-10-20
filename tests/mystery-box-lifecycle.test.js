@@ -2,6 +2,20 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { boxFixture } from './helpers/mystery-box-fixture.js';
 
+test('box audio starts only on a real opening, once readiness and receipt are confirmed', async () => {
+  let opens = 0, cancels = 0;
+  const f = boxFixture({ slow: true, onOpen: () => opens++, onCancel: () => cancels++ });
+  f.open(); f.trigger.click(); assert.equal(opens, 0);
+  f.ready(); await f.flush(); assert.equal(opens, 1);
+  f.trigger.click(); assert.equal(opens, 1);
+  f.loseContext(); assert.ok(cancels > 0);
+  for (const options of [{ sceneFails: true }, { reduced: true }, { iconFails: true }]) {
+    const skipped = boxFixture({ ...options, onOpen: () => opens++ });
+    skipped.open(); skipped.trigger.click(); await skipped.flush();
+    assert.equal(opens, 1);
+  }
+});
+
 test('ineligible official, just-for-fun, consumed, reduced-motion and unsupported entries never load Three.js', async () => {
   for (const options of [{}, { reduced: true }, { webgl: false }, { resize: false }, { entry: { canAnimate: false } }]) {
     const f = boxFixture(options); assert.equal(f.loads, 0);
