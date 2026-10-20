@@ -1,6 +1,6 @@
-import { BOX_SEQUENCE, ICON_INK, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261020-11';
+import { BOX_SEQUENCE, ICON_INK, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261020-12';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261020-11';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261020-12';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox() {
@@ -76,7 +76,7 @@ export function createMysteryBox() {
     if (renderingReady) return renderingReady;
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261020-11')
+      import('./mystery-box-scene.js?v=20261020-12')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -238,7 +238,10 @@ export function createMysteryBox() {
     if (review === 'closed' || review === 'open') {
       wrapper.dataset.review = review;
       wrapper.dataset.phase = review === 'open' ? 'illuminated' : 'closed';
-      progress = review === 'open' ? 1 : 0; visual?.draw(progress);
+      const reviewFrame = new URLSearchParams(location.search).get('boxFrame');
+      const frameMs = reviewFrame !== null && Number.isFinite(Number(reviewFrame))
+        ? Math.max(0, Math.min(BOX_SEQUENCE.lid, Number(reviewFrame))) : BOX_SEQUENCE.lid;
+      progress = review === 'open' ? lidOpenness(frameMs) : 0; visual?.draw(progress);
       if (review === 'open') intro?.setAttribute('aria-hidden', 'true');
       return;
     }

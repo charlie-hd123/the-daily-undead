@@ -13,9 +13,10 @@ export function lidOpenness(elapsed) {
   return opening * (1 - .24 * closing);
 }
 
-// Preserve the fitted closed lid and early swing; shorten only its late, upright pose.
+// Start compensating as the lid lifts, reaching its final proportions before
+// the broad interior faces the player; a late correction causes a mid-swing bulge.
 export function lidDepthScale(openness) {
-  return 1 - .20 * smooth(clamp((openness - .7) / .3));
+  return 1 - .20 * smooth(clamp((openness - .1) / .55));
 }
 
 // Covers the full lid sweep, whose highest point is just past vertical, not at the end.

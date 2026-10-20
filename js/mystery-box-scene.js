@@ -1,5 +1,5 @@
-import * as T from './vendor/mystery-box-three.js?v=20261020-11';
-import { BOX_FRAME, fitBoxCamera, lidDepthScale } from './mystery-box-motion.js?v=20261020-11';
+import * as T from './vendor/mystery-box-three.js?v=20261020-12';
+import { BOX_FRAME, fitBoxCamera, lidDepthScale } from './mystery-box-motion.js?v=20261020-12';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
@@ -51,8 +51,8 @@ export async function createMysteryBoxScene(host) {
   host.dataset.renderer = 'texture';
   const loader = new T.TextureLoader();
   const [woodMap, paintMap] = await Promise.all([
-    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261020-11', import.meta.url).href),
-    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261020-11', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261020-12', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261020-12', import.meta.url).href),
   ]);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;
@@ -199,6 +199,10 @@ export async function createMysteryBoxScene(host) {
       host.dataset.propBottom = bounds.bottom.toFixed(3);
       host.dataset.propLeft = bounds.left.toFixed(3);
       host.dataset.propRight = bounds.right.toFixed(3);
+      const lidBounds = meshBounds(lid);
+      host.dataset.lidHeight = (lidBounds.bottom - lidBounds.top).toFixed(3);
+      host.dataset.lidScale = lid.scale.z.toFixed(6);
+      host.dataset.lidOpenness = t.toFixed(6);
     }
   }
   let previousWidth = 0;
@@ -227,11 +231,12 @@ export async function createMysteryBoxScene(host) {
       y: rect.top + (1 - point.y) * rect.height / 2 };
   }
   // Local QA measures the real geometry, excluding the intentionally fading light beam.
-  function propBounds() {
+  function propBounds() { return meshBounds(caseGroup); }
+  function meshBounds(group) {
     const { width, height } = host.getBoundingClientRect();
     const bounds = { top: Infinity, bottom: -Infinity, left: Infinity, right: -Infinity };
     const point = new T.Vector3();
-    caseGroup.traverse((mesh) => {
+    group.traverse((mesh) => {
       if (!mesh.isMesh || mesh === glow) return;
       const positions = mesh.geometry.attributes.position;
       for (let index = 0; index < positions.count; index++) {

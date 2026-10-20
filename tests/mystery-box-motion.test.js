@@ -32,15 +32,34 @@ test('the lid starts easing down with the fade and never closes completely on sc
   }
 });
 
-test('lid proportions stay fitted until the late swing, then finish subtly shorter', () => {
-  for (const openness of [0, .25, .5, .7]) assert.equal(lidDepthScale(openness), 1);
+test('lid proportions ease down before the broad interior turns towards the player', () => {
+  assert.equal(lidDepthScale(0), 1);
+  assert.equal(lidDepthScale(.1), 1);
+  assert.equal(lidDepthScale(.65), .8);
   assert.equal(lidDepthScale(1), .8);
   let previous = 1;
-  for (let step = 71; step <= 100; step++) {
+  for (let step = 1; step <= 100; step++) {
     const scale = lidDepthScale(step / 100);
     assert.ok(scale <= previous && scale >= .8);
-    assert.ok(previous - scale < .02, 'no visible size jump between animation frames');
+    assert.ok(previous - scale < .012, 'continuous size adjustment through the swing');
     previous = scale;
+  }
+});
+
+test('every millisecond of the opening keeps the projected lid within the approved open height', () => {
+  // Conservative local bounds include lid trim, clasp and screws, projected with
+  // the actual camera. This catches an oversized intermediate pose, not just endpoints.
+  const hinge = new Vector3(0, 1.66, -1.08), axis = new Vector3(1, 0, 0);
+  function height(elapsed) {
+    const openness = lidOpenness(elapsed), scale = lidDepthScale(openness), values = [];
+    for (const x of [-3.135, 3.135]) for (const y of [-.185, .283]) for (const z of [-.065, 2.35]) {
+      values.push(new Vector3(x, y, z * scale).applyAxisAngle(axis, -1.83 * openness).add(hinge).project(camera).y);
+    }
+    return Math.max(...values) - Math.min(...values);
+  }
+  const approved = height(timing.lid);
+  for (let elapsed = 0; elapsed <= timing.lid; elapsed++) {
+    assert.ok(height(elapsed) <= approved * 1.02, `oversized lid at ${elapsed}ms`);
   }
 });
 
