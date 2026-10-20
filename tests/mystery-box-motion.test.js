@@ -34,12 +34,12 @@ test('the lid starts easing down with the fade and never closes completely on sc
 
 test('lid proportions stay fitted until the late swing, then finish subtly shorter', () => {
   for (const openness of [0, .25, .5, .7]) assert.equal(lidDepthScale(openness), 1);
-  assert.equal(lidDepthScale(1), .88);
+  assert.equal(lidDepthScale(1), .8);
   let previous = 1;
   for (let step = 71; step <= 100; step++) {
     const scale = lidDepthScale(step / 100);
-    assert.ok(scale <= previous && scale >= .88);
-    assert.ok(previous - scale < .012, 'no visible size jump between animation frames');
+    assert.ok(scale <= previous && scale >= .8);
+    assert.ok(previous - scale < .02, 'no visible size jump between animation frames');
     previous = scale;
   }
 });

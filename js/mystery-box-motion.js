@@ -15,7 +15,7 @@ export function lidOpenness(elapsed) {
 
 // Preserve the fitted closed lid and early swing; shorten only its late, upright pose.
 export function lidDepthScale(openness) {
-  return 1 - .12 * smooth(clamp((openness - .7) / .3));
+  return 1 - .20 * smooth(clamp((openness - .7) / .3));
 }
 
 // Covers the full lid sweep, whose highest point is just past vertical, not at the end.
