@@ -136,8 +136,9 @@ const framingSizes = [[288, 250, true], [343, 250, true], [383, 250, true], [553
   [554, 310, false], [736, 310, false], [797, 200, false], [1056, 480, false], [3840, 200, false]];
 
 test('every camera fit protects the measured full lid sweep, including the peak before fully open', () => {
-  // Actual prop vertices swept through 121 hinge positions; peak occurs at about 97 degrees.
-  const envelope = { left: -3.313647, right: 3.650736, bottom: -2.156026, top: 2.828978 };
+  // Measured full sweep peaks near 97 degrees. The 115-degree endpoint extends
+  // the right edge to 3.82382; round outward to protect the entire newer pose.
+  const envelope = { left: -3.313647, right: 3.825, bottom: -2.156026, top: 2.828978 };
   for (const [width, height, mobile] of framingSizes) {
     const fit = fitBoxCamera(width, height, mobile);
     assert.ok(fit.halfWidth > Math.max(-envelope.left, envelope.right));

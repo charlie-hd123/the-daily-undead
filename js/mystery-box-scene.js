@@ -1,5 +1,5 @@
-import * as T from './vendor/mystery-box-three.js?v=20261020-8';
-import { BOX_FRAME, fitBoxCamera } from './mystery-box-motion.js?v=20261020-8';
+import * as T from './vendor/mystery-box-three.js?v=20261020-9';
+import { BOX_FRAME, fitBoxCamera } from './mystery-box-motion.js?v=20261020-9';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
@@ -51,8 +51,8 @@ export async function createMysteryBoxScene(host) {
   host.dataset.renderer = 'texture';
   const loader = new T.TextureLoader();
   const [woodMap, paintMap] = await Promise.all([
-    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261020-8', import.meta.url).href),
-    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261020-8', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261020-9', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261020-9', import.meta.url).href),
   ]);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;
@@ -184,7 +184,8 @@ export async function createMysteryBoxScene(host) {
     const t = Math.max(0, Math.min(1, progress));
     // Openness is already eased by the shared sequence, including the partial closing.
     const ease = t;
-    lid.rotation.x = -1.83 * ease;
+    // Lean the open lid back so its broad interior reads as a lid, not a tall backboard.
+    lid.rotation.x = -(115 * Math.PI / 180) * ease;
     innerLight.intensity = 17 * Math.pow(ease, .75);
     inner.material.opacity = .65 + ease * .35;
     glowMat.uniforms.strength.value = ease * .95;
