@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#070a12">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <meta name="daily-undead-build" content="20261020-7">
+    <meta name="daily-undead-build" content="20261020-8">
     <!-- Public API URL only; localhost is isolated to a local Worker on port 8787. -->
     <meta name="daily-undead-stats-api" content="https://api.thedailyundead.com">
     <!-- Replace this marker with the exact UTC launch time in the production launch commit. -->
@@ -21,18 +21,18 @@
       content="The Daily Undead — your daily Treyarch Zombies challenge. Solve Last Words or identify a map from its Quest Steps."
     >
     <title>The Daily Undead</title>
-    <link rel="icon" href="./assets/favicon.png?v=20261020-7" type="image/png" sizes="128x128">
-    <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png?v=20261020-7" sizes="180x180">
-    <link rel="preload" as="image" href="./assets/mystery-box/chest-poster.webp?v=20261020-7">
-    <link rel="preload" as="font" href="./assets/fonts/barlow-500.ttf?v=20261020-7" type="font/ttf" crossorigin>
-    <link rel="stylesheet" href="./styles.css?v=20261020-7">
-    <link rel="stylesheet" href="./staging-demo.css?v=20261020-7">
+    <link rel="icon" href="./assets/favicon.png?v=20261020-8" type="image/png" sizes="128x128">
+    <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png?v=20261020-8" sizes="180x180">
+    <link rel="preload" as="image" href="./assets/mystery-box/chest-poster.webp?v=20261020-8">
+    <link rel="preload" as="font" href="./assets/fonts/barlow-condensed-600.ttf?v=20261020-8" type="font/ttf" crossorigin>
+    <link rel="stylesheet" href="./styles.css?v=20261020-8">
+    <link rel="stylesheet" href="./staging-demo.css?v=20261020-8">
   </head>
   <body>
-    <script src="./js/player-entry.js?v=20261020-7"></script>
+    <script src="./js/player-entry.js?v=20261020-8"></script>
     <header class="site-header">
       <div class="brand-lockup">
-        <img class="brand-logo" src="./assets/zombie-logo.png?v=20261020-7" alt="" width="512" height="512">
+        <img class="brand-logo" src="./assets/zombie-logo.png?v=20261020-8" alt="" width="512" height="512">
         <div class="brand-copy">
           <p class="eyebrow">Your daily Treyarch Zombies challenge</p>
           <h1>The Daily Undead</h1>
@@ -72,7 +72,7 @@
       <p class="puzzle-entry-loading" role="status">Loading today’s puzzle…</p>
       <div id="initial-mystery-box" class="mb-reveal mb-loading" data-phase="closed">
         <div class="mb-scene">
-          <img class="mb-poster" src="./assets/mystery-box/chest-poster.webp?v=20261020-7" alt="" width="1220" height="620" fetchpriority="high">
+          <img class="mb-poster" src="./assets/mystery-box/chest-poster.webp?v=20261020-8" alt="" width="1220" height="620" fetchpriority="high">
           <button id="mb-open-trigger" class="mb-open-trigger" type="button" aria-label="Open box to reveal today’s puzzle"></button>
         </div>
         <div class="mb-copy">
@@ -95,7 +95,7 @@
               document.querySelector('.mb-intro-title').textContent = headings[Math.floor(Math.random() * headings.length)];
             })();
           </script>
-          <label class="mb-caption" for="mb-open-trigger" aria-hidden="true"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 16V4M5.5 8.5 10 4l4.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Tap box to open</span></label>
+          <p class="mb-caption" aria-hidden="true">Tap box to open</p>
         </div>
       </div>
     </main>
@@ -474,7 +474,7 @@
       <div data-public-profile-content></div>
     </dialog>
 
-    <script type="module" src="./js/app.js?v=20261020-7"></script>
+    <script type="module" src="./js/app.js?v=20261020-8"></script>
 
     <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "4eeb20e1411c4e7baf24969ced969c88"}'></script><!-- End Cloudflare Web Analytics -->
 
