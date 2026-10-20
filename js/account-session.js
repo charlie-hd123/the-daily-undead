@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261019-20";
+import { browserStorage } from "./browser-storage.js?v=20261020-2";
 export const accountMemoryStorageKey = "the-daily-undead:account-memory";
 const pendingProgressStoragePrefix = "the-daily-undead:account-pending:";
 
