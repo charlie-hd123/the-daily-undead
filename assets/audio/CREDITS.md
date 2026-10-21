@@ -1,11 +1,35 @@
-# The Daily Undead sound effects · feedback revision 2.2
+# The Daily Undead sound effects · feedback revision 2.3
 
 The active pack contains 17 original effects, all generated locally. No Treyarch
 recording, transcribed melody, door creak, speech or background music is included
 in the current playback table. No paid service or downloaded sample was used for
 this revision.
 
-## Latest listening feedback · revision 2.2
+## Latest listening feedback · revision 2.3
+
+Only Mystery Box and clue-reveal audio files changed. The other 15 cue pairs,
+including run ended, and every playback gain remain bit-identical to revision 2.2.
+
+- Box: a new miniature clockwork melody replaces the isolated chimes. Nine
+  short comb tones form three rolling groups, ending unresolved before 1.6 s.
+  Mechanical taps accompany lid movement; dull contacts follow the existing
+  settle/assembly beats. No closing chord, creak, detuning or sustained pad.
+- Clue: the reversed-glass shape is retained. Fundamentals drop from 1175/587 Hz
+  to 880/440 Hz, with a rounded 9 ms attack, reduced upper partials and 1.8 kHz
+  low-pass shaping to soften the sharp edge.
+- Button click: waveform unchanged. Only puzzle cards/navigation, map/game
+  selection, and Blood Ties shuffle/deselect opt in. Letter, clue, box, bonus,
+  Blood Ties tile and confirmation handlers retain their dedicated cues.
+  Account, leaderboard, sharing, settings, stat explainers, dialogs and ordinary
+  site buttons are silent. New buttons default to silence.
+- Bonus reward timing from revision 2.2 is unchanged.
+
+Rebuild with `python scripts/revise-audio-timing.py --feedback-r5`. The standalone
+player and montage are in `audio-review/2026-10-21-r5`. This is original local
+synthesis, using the haunted clockwork/music-box character as creative direction.
+No Treyarch samples or melody were copied; no direct listening tool was available.
+
+## Previous listening feedback · revision 2.2
 
 Only Mystery Box and clue-reveal files were replaced in this revision. The other
 15 active cue pairs, including the approved run-ended impact, and all gains are

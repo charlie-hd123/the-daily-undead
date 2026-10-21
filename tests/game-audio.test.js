@@ -137,7 +137,7 @@ test('lossless WAV is primary, with AAC fallback if that download fails', async 
   assert.ok(correct[0].endsWith('.wav')); assert.ok(correct[1].endsWith('.m4a'));
 });
 
-test('ordinary buttons get one low click after navigation cleanup; dedicated cues and disabled controls take priority', async () => {
+test('puzzle navigation gets one click; dedicated cues, site controls and disabled controls stay silent', async () => {
   const f = fixture(), handlers = new Map();
   const document = { querySelector: () => null, addEventListener: (name, fn) => handlers.set(name, fn) };
   const audio = initialiseGameAudio(f.platform.storage, document, { addEventListener() {} }, f.platform);
@@ -152,10 +152,14 @@ test('ordinary buttons get one low click after navigation cleanup; dedicated cue
   assert.equal(f.starts.length, 1);
   click('#lock-answer'); await new Promise(resolve => setImmediate(resolve));
   assert.equal(f.starts.length, 2);
-  for (const selector of ['[data-letter]', '[data-bonus-step-id]', '#mb-open-trigger', '#sound-toggle', '#reveal-clue', '#confirm-map', '#submit-order']) click(selector);
+  for (const selector of ['[data-letter]', '[data-bonus-step-id]', '[data-blood-tile]', '#blood-submit', '#mb-open-trigger', '#sound-toggle', '#reveal-clue', '#confirm-map', '#submit-order',
+    '#account-button', '#leaderboards-button', '[role="tab"]', '[data-stat-explainer]', '#share-score', '#result-account-action', '.dialog-close', '[data-account-action]', '[data-close-account-dialog]', '[data-leaderboard-find]', 'button']) click(selector);
   click('#back-to-clues', { disabled: true }); click('#back-to-clues', { trusted: false });
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(f.starts.length, 2);
+  for (const selector of ['[data-card-action]', '[data-see-result]', '[data-game-id]', '[data-map-id]', '#back-to-games', '#return-to-puzzle-home', '#continue-after-missed-day', '#blood-shuffle', '#blood-clear']) click(selector);
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(f.starts.length, 11);
 });
 
 test('removed heartbeat and highest-round cues cannot be scheduled', async () => {

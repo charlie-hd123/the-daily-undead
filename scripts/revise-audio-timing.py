@@ -1,8 +1,9 @@
-"""Feedback revisions 2.1 / 2.2. Accepted files/gains stay bit-identical.
+"""Feedback revisions 2.1 / 2.2 / 2.3. Accepted files/gains stay bit-identical.
 
 Uses the existing original-synthesis renderer (numpy + macOS afconvert).
 The box beats are taken from the actual shared BOX_SEQUENCE animation timings.
 Use --feedback-r4 for the two-cue revision and delayed bonus-flourish montage.
+Use --feedback-r5 for the clockwork box and softened glass clue.
 """
 from pathlib import Path
 import copy
@@ -18,8 +19,9 @@ ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('synthesis', ROOT/'scripts/synthesise-feedback.py')
 s = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(s)
-R4 = '--feedback-r4' in sys.argv
-REVIEW = ROOT/('audio-review/2026-10-21-r4' if R4 else 'audio-review/2026-10-21-r3')
+R5 = '--feedback-r5' in sys.argv
+R4 = '--feedback-r4' in sys.argv or R5
+REVIEW = ROOT/('audio-review/2026-10-21-r5' if R5 else 'audio-review/2026-10-21-r4' if R4 else 'audio-review/2026-10-21-r3')
 s.REVIEW = REVIEW
 timing_source = (ROOT/'js/mystery-box-motion.js').read_text().split('});', 1)[0]
 BEATS = {key: int(value)/1000 for key,value in re.findall(r'(\w+):\s*(\d+)', timing_source)}
@@ -27,6 +29,22 @@ BEATS = {key: int(value)/1000 for key,value in re.findall(r'(\w+):\s*(\d+)', tim
 
 def box():
     x = s.canvas(BEATS['assembleAt'] + .16)
+    if R5:
+        # A rolling miniature clockwork tune, rather than three isolated bells.
+        # Stable comb partials: no chorus, pitch wobble, creak or closing chord.
+        notes = [(0.10,84),(.23,79),(.36,87),(.50,86),(BEATS['liftAt'],83),
+                 (.76,80),(.89,79),(1.04,82),(1.20,78)]
+        for i,(at,midi) in enumerate(notes):
+            times=s.t(.38)
+            hz=440*2**((midi-69)/12)
+            tone=sum(level*np.sin(2*np.pi*hz*ratio*times)*s.env(times,.003,decay)
+                     for ratio,level,decay in [(1,1,.072),(2,.12,.035),(3.01,.055,.024)])
+            s.put(x,tone,at,.38 if i%3==0 else .29)
+        for at,hz,gain in [(0,310,.46),(.17,420,.22),(.34,370,.19),(.51,490,.16)]:
+            s.put(x,s.knock(hz,.075),at,gain)
+        s.put(x,s.knock(300,.12),BEATS['settleAt'],.24)
+        s.put(x,s.knock(225,.09),BEATS['assembleAt'],.28)
+        return x
     # Taps track the initial lid movement. The musical phrase now lasts less
     # than a second, with its first note at the actual start of the icon lift.
     for at,gain,hz in [(0,.65,330),(.22*BEATS['lid'],.48,380),(.44*BEATS['lid'],.32,430)]:
@@ -41,6 +59,18 @@ def box():
 
 
 def clue():
+    if R5:
+        x=s.canvas(.41)
+        # Keep the reversed glass shape, with lower fundamentals, a rounded
+        # onset and heavily reduced upper partials to remove the sharp edge.
+        def soft_glass(hz,duration,decay):
+            times=s.t(duration)
+            return sum(level*np.sin(2*np.pi*hz*ratio*times)*s.env(times,.009,decay*lifetime)
+                       for ratio,level,lifetime in [(1,1,1),(3.006,.035,.43),(5.92,.004,.22)])
+        s.put(x,soft_glass(880,.18,.035)[::-1],0,.28)
+        s.put(x,soft_glass(440,.26,.058),.145,.34)
+        bins=np.fft.rfftfreq(len(x),1/s.SR)
+        return np.fft.irfft(np.fft.rfft(x)/np.sqrt(1+(bins/1800)**8),n=len(x))
     if R4:
         x=s.canvas(.39)
         # A short drawn-in glass glint, with no paper/stone scrape or noise bed.
@@ -86,6 +116,14 @@ if R4:
         'quest-clue-reveal': (clue,-18,'Quest clue · Glass glint',
             'When the next clue appears.', 'Brief reversed-glass glint. No paper, scrape, hollow knock or noise bed.'),
     }
+if R5:
+    replacements={
+        'mystery-box-a': (box,-18,'Mystery Box · Haunted clockwork',
+            'Mechanical taps and a miniature rolling tune during lid opening/lift; dull contacts at settle and assembly.',
+            'New original nine-note music-box phrase, grouped in threes and ending unresolved. No closing chord, creak, detuning or sustained pad.'),
+        'quest-clue-reveal': (clue,-18,'Quest clue · Soft glass glint',
+            'When the next clue appears.', 'Reversed-glass character retained; lower pitch, rounded attack and reduced upper partials soften the sharpness.'),
+    }
 buffers={}
 for item in pack['sounds']:
     cue=item['id']
@@ -113,6 +151,10 @@ for item in pack['sounds']:
     item.update(wav=f'wav/{cue}.wav',compressed=f'm4a/{cue}.m4a')
     if R4 and cue=='double-points-a':
         item['trigger']='After the visible points count and finishing ping: 1220 ms after the result appears, or 500 ms with reduced motion. Unscored play has no count to wait for.'
+    if R5 and cue=='map-select':
+        item.update(title='Puzzle selection · Low click',group='Puzzle controls',
+                    trigger='Puzzle cards, result navigation, map/game selection, back to clues/games, and Blood Ties shuffle/deselect. Other puzzle actions use dedicated cues.',
+                    note='Accepted waveform and gain unchanged. Account, leaderboard, sharing, settings, stat explainers and ordinary site controls are silent.')
 
 events=[(0,'mystery-box-a'),(3.8,'letter-correct'),(4.5,'letter-streak-2'),
         (5.2,'letter-streak-3'),(5.9,'letter-streak-4'),(6.6,'letter-wrong'),
@@ -130,7 +172,7 @@ assert peak<10**(-1/20)
 montage_path=REVIEW/'wav/sample-gameplay.wav'
 s.write_wav(montage_path,montage);s.encode(montage_path)
 montage_path.with_suffix('.m4a').replace(REVIEW/'m4a/sample-gameplay.m4a')
-pack.update(version='2.2' if R4 else '2.1',source_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip() if R4 else 'f751d04ec8f93c6eb8345a1d304bdb041cd65771',
+pack.update(version='2.3' if R5 else '2.2' if R4 else '2.1',source_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip() if R4 else 'f751d04ec8f93c6eb8345a1d304bdb041cd65771',
             revised_cues=list(replacements),box_animation_seconds=BEATS,
             mixed_sequence_true_peak_dbfs=s.db(peak),
             sequences=[dict(variant='A',wav='wav/sample-gameplay.wav',compressed='m4a/sample-gameplay.m4a',duration=montage_length,
@@ -146,5 +188,5 @@ source=re.sub(r'export const SOUND_CUES = \{.*?\};',lambda _:'export const SOUND
 audio_file.write_text(source)
 s.verify()
 print(f'Revised {len(replacements)} cues; {len(before)-len(replacements)} accepted cue pairs and every playback gain unchanged.')
-print('Box:',len(buffers['mystery-box-a'])/s.SR,'seconds;', 'closing note removed; three unsettled notes.' if R4 else 'four-note phrase ends at 1.48 seconds.')
+print('Box:',len(buffers['mystery-box-a'])/s.SR,'seconds;', 'new rolling clockwork phrase ends before 1.6 seconds.' if R5 else 'closing note removed; three unsettled notes.' if R4 else 'four-note phrase ends at 1.48 seconds.')
 print('Mixed gameplay peak:',s.db(peak),'dBTP.')

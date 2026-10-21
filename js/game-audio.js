@@ -3,8 +3,8 @@ export const SOUND_PREFERENCE_KEY = 'the-daily-undead:sound-enabled';
 export const SOUND_CUES = {
   "mystery-box-a": {
     "files": [
-      "mystery-box-a-b6d6b9b106.wav",
-      "mystery-box-a-940dc68456.m4a"
+      "mystery-box-a-3a0117ff8a.wav",
+      "mystery-box-a-6060edf828.m4a"
     ],
     "gain": 0.86
   },
@@ -45,8 +45,8 @@ export const SOUND_CUES = {
   },
   "quest-clue-reveal": {
     "files": [
-      "quest-clue-reveal-4f6c4b9d03.wav",
-      "quest-clue-reveal-58ed62eac9.m4a"
+      "quest-clue-reveal-81ddbaf63d.wav",
+      "quest-clue-reveal-4e64d9c6f1.m4a"
     ],
     "gain": 0.8
   },
@@ -127,11 +127,11 @@ export function letterSound({ correct, solved, streak = 0 }) {
   return correct ? streak >= 2 ? `letter-streak-${Math.min(4, streak)}` : 'letter-correct' : 'letter-wrong';
 }
 
-// Dedicated action sounds take priority over ordinary interface feedback.
+// Only puzzle navigation opts into the low click. Dedicated puzzle handlers
+// supply their own cues; account, sharing and surrounding site controls stay quiet.
 export function buttonSound(button) {
   if (!button || button.disabled || button.getAttribute('aria-disabled') === 'true') return null;
-  if (button.matches('[data-letter], [data-bonus-step-id], #mb-open-trigger, #sound-toggle, #reveal-clue, #confirm-map, #submit-order')) return null;
-  return 'map-select';
+  return button.matches('[data-card-action], [data-see-result], [data-game-id], [data-map-id], #lock-answer, #back-to-clues, #back-to-games, #return-to-puzzle-home, #continue-after-missed-day, #blood-shuffle, #blood-clear') ? 'map-select' : null;
 }
 
 export function createGameAudio({
