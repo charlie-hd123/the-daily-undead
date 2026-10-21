@@ -258,7 +258,7 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(html, /Your existing cloud save is safe\./);
   assert.match(html, /id="account-progress-conflict-dialog"/);
   assert.match(account, /accountButton\.textContent = "Session expired";/);
-  assert.equal((appScript.match(/confirmAccountResultSubmission\(accountController\)/g) || []).length, 3);
+  assert.equal((appScript.match(/confirmAccountResultSubmission\(accountController\)/g) || []).length, 4);
   assert.match(account, /await replaySavedAccountResult/);
   assert.match(account, /readRememberedAccount/);
   assert.match(account, /readPendingProgress/);
@@ -615,7 +615,7 @@ test("Quest Steps uses hard clues first, a full third clue and full bonus steps"
   assert.doesNotMatch(bonus, /step\.hardClue/);
 });
 
-test("the shared daily round is date-assigned and the extra puzzle unlocks afterward", async () => {
+test("the shared daily round is date-assigned and both extra puzzles unlock afterward", async () => {
   const [html, app] = await Promise.all([
     readProjectFile("index.html"),
     readProjectFile("js/app.js"),
@@ -623,7 +623,8 @@ test("the shared daily round is date-assigned and the extra puzzle unlocks after
 
   assert.match(app, /officialType: getOfficialPuzzleType\(puzzle\.dateKey\)/);
   assert.match(app, /startPuzzle\(dayState\.officialType, "official"\)/);
-  assert.match(app, /getOtherPuzzleType\(dayState\.officialType\)/);
+  assert.match(app, /Object\.keys\(puzzleTypes\)\.filter\(\(type\) => type !== dayState\.officialType\)/);
+  assert.match(app, /bloodTiesEnabled \? renderPuzzleCard\('blood'\) : ''/);
   assert.match(app, /index === 2 \? step\.clue : step\.hardClue/);
   assert.doesNotMatch(app, /lockOfficialChoice/);
   assert.doesNotMatch(app, /Choose your daily puzzle/);
@@ -646,12 +647,12 @@ test("official result actions link signed-out players to accounts and omit the a
   assert.match(app, /accountController\.signedIn\s*\? ""\s*: '[^']*Save your progress/);
   assert.doesNotMatch(app, /result-account-action[^\n]*Leaderboards/);
   assert.doesNotMatch(app, /leaderboardsButton\?\.click\(\)/);
-  assert.equal((app.match(/official \? renderResultAccountAction\(\) : ""/g) || []).length, 2);
-  assert.equal((app.match(/renderResultAccountAction\(\)[\s\S]*?id="share-score"/g) || []).length, 2);
+  assert.equal((app.match(/official \? renderResultAccountAction\(\) : (?:""|'')/g) || []).length, 3);
+  assert.equal((app.match(/renderResultAccountAction\(\)[\s\S]*?id="share-score"/g) || []).length, 3);
   assert.match(account, /signedIn: false,[\s\S]*?openAccountAccess: \(\) => openDialog\(accessDialog\)/);
   assert.match(css, /\.result-account-button\.is-save-progress \{[\s\S]*?border-color: rgb\(247 200 92 \/ 58%\);[\s\S]*?color: #f7c85c/);
   assert.doesNotMatch(css, /\.result-account-button\.is-leaderboards \{/);
-  assert.equal((app.match(/snapPageToTop\(\);/g) || []).length, 5);
+  assert.equal((app.match(/snapPageToTop\(\);/g) || []).length, 7);
 });
 
 test("community statistics are placed near the bottom and contain no frontend credentials", async () => {

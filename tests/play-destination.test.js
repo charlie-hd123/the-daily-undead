@@ -1,10 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { rememberPlayDestination, restorePlayDestination } from '../js/play-destination.js';
-const day = { officialType: 'word', officialCompleted: true, sessions: { word: {}, easter: {} } };
+const day = { officialType: 'word', officialCompleted: true, sessions: { word: {}, easter: {}, blood: {} } };
 function memory() { const m = new Map(); return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, v) }; }
-test('both just-for-fun destinations restore only after the official puzzle is complete', () => {
-  for (const type of ['word', 'easter']) {
+test('all three just-for-fun destinations restore only after the official puzzle is complete', () => {
+  for (const type of ['word', 'easter', 'blood']) {
     const s = memory(), state = { ...day, officialType: type === 'word' ? 'easter' : 'word' };
     rememberPlayDestination(s, '2026-10-19', { type, mode: 'for_fun' });
     assert.deepEqual(restorePlayDestination(s, '2026-10-19', state), { type, mode: 'for_fun' });
@@ -18,6 +18,8 @@ test('hub and official result destinations survive refresh without unlocking ano
   rememberPlayDestination(s, '2026-10-19', { type: 'word', mode: 'official' });
   assert.deepEqual(restorePlayDestination(s, '2026-10-19', day), { type: 'word', mode: 'official' });
   assert.equal(restorePlayDestination(s, '2026-10-19', { ...day, officialType: 'easter' }), null);
+  rememberPlayDestination(s, '2026-10-22', { type: 'blood', mode: 'official' });
+  assert.deepEqual(restorePlayDestination(s, '2026-10-22', { ...day, officialType: 'blood' }), { type: 'blood', mode: 'official' });
 });
 test('corrupt, missing-session and unavailable destination storage safely uses official entry', () => {
   const s = memory(); rememberPlayDestination(s, '2026-10-19', { type: 'easter', mode: 'for_fun' });
