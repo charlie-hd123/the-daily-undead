@@ -167,11 +167,11 @@ test("fictional staging activity uses real SQL, remains idempotent and rolls ove
   // A new isolate loses its memory cache; database uniqueness must still protect totals.
   await ensureStagingFixtures({ ...env, DB: { ...db } }, "2026-10-17");
   assert.equal(db.sqlite.prepare("SELECT total_games FROM community_totals").get().total_games, initial);
-  assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS count FROM puzzle_attempts WHERE puzzle_date = '2026-10-17'").get().count, 32);
+  assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS count FROM puzzle_attempts WHERE puzzle_date = '2026-10-17'").get().count, 48);
   assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS count FROM player_daily_results WHERE puzzle_date = '2026-10-17' AND puzzle_type = 'word'").get().count, 8);
   await ensureStagingFixtures(env, "2026-10-18");
   assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS count FROM player_daily_results WHERE puzzle_date = '2026-10-18' AND puzzle_type = 'easter'").get().count, 8);
-  assert.equal(db.sqlite.prepare("SELECT total_games FROM community_totals").get().total_games, initial + 32);
+  assert.equal(db.sqlite.prepare("SELECT total_games FROM community_totals").get().total_games, initial + 48);
   assert.deepEqual({ ...db.sqlite.prepare("SELECT score,current_round,best_round,revision FROM player_saves WHERE user_id='real-test-account'").get() }, { score: 1234, current_round: 9, best_round: 12, revision: 7 });
   db.sqlite.close();
 });

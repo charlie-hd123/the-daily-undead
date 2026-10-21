@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261021-1";
+import { browserStorage } from "./browser-storage.js?v=20261021-2";
 import {
   accountMemoryStorageKey,
   clearPendingProgress,
@@ -7,9 +7,9 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261021-1";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261021-1";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261021-1";
+} from "./account-session.js?v=20261021-2";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261021-2";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261021-2";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -364,11 +364,16 @@ export async function replaySavedAccountResult({
   sendMapResult,
   sendBonusResult,
   sendWordResult,
+  sendBloodResult,
 }) {
   if (dailyState?.dayStateVersion === 1 && dailyState.dateKey === puzzleDate) {
     const officialType = dailyState.officialType;
     const session = dailyState.sessions?.[officialType];
     if (!dailyState.officialCompleted || !isPuzzleSessionComplete(officialType, session)) return null;
+    if (officialType === 'blood') {
+      const result = await sendBloodResult?.({ puzzleDate, puzzleId: session.key, attempts: session.attempts });
+      return result?.progress || null;
+    }
     if (officialType === "word") {
       const wordResult = await sendWordResult({
         puzzleDate,
@@ -735,7 +740,7 @@ export async function initialiseAccount({
   try {
     clerk = await withTimeout(
       supabaseConfigured
-        ? import("./supabase-auth.js?v=20261021-1").then(({ loadSupabaseAuth }) => (
+        ? import("./supabase-auth.js?v=20261021-2").then(({ loadSupabaseAuth }) => (
           loadSupabaseAuth(documentObject)
         ))
         : loadClerk(publishableKey),
@@ -1053,6 +1058,9 @@ export async function initialiseAccount({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
+      }),
+      sendBloodResult: (payload) => requestJson(clerk, apiUrl, '/api/account/results/blood', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
       }),
     });
     if (replayedProgress) account.progress = replayedProgress;
@@ -1417,6 +1425,19 @@ export async function initialiseAccount({
     }
   }
 
+  async function recordBloodResult(payload) {
+    if (readOnlyProgress || deletingAccount) return null;
+    try {
+      const result = await requestJson(clerk, apiUrl, '/api/account/results/blood', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
+      });
+      currentRevision = Math.max(currentRevision, Number(result.progress?.revision || 0));
+      if (deletingAccount) return null;
+      rememberAccount(browserStorage, { userId, revision: currentRevision });
+      scheduleSave(); return result;
+    } catch { return null; }
+  }
+
   const controller = {
     available: true,
     signedIn: true,
@@ -1429,6 +1450,7 @@ export async function initialiseAccount({
     recordMapResult,
     recordBonusResult,
     recordWordResult,
+    recordBloodResult,
     openPlayerProfile,
   };
 
@@ -1471,6 +1493,7 @@ function createUnavailableController({
     async recordMapResult() { return null; },
     async recordBonusResult() { return null; },
     async recordWordResult() { return null; },
+    async recordBloodResult() { return null; },
     openPlayerProfile,
   };
 }

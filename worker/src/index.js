@@ -2,12 +2,15 @@ import { verifyAccountRequest } from "./auth.js";
 import { deleteAccount, isAccountRevoked, retryAuthDeletions } from "./account-deletion.js";
 import { retryAuthProfileSync, syncAuthProfile } from "./auth-profile-sync.js";
 import { ensureStagingFixtures, fixturesEnabled } from "./staging-fixtures.js";
+import { puzzleOptions } from './puzzle-environment.js';
+import { buildDailyBloodTiesPuzzle, replayBloodTiesAttempts } from '../../js/blood-ties-core.js';
 import {
   getAccount,
   getPublicProfile,
   recordVerifiedBonusResult,
   recordVerifiedMapResult,
   recordVerifiedWordResult,
+  recordVerifiedBloodResult,
   registerAccount,
   saveAccount,
   updateSocialProfile,
@@ -82,7 +85,7 @@ function textIsValid(value, maximumLength) {
 export function validateAttempt(payload, todayDateKey) {
   if (!payload || typeof payload !== "object") return "A JSON request body is required.";
   if (!textIsValid(payload.playerId, 128)) return "playerId is invalid.";
-  if (payload.puzzleType != null && !["easter", "word"].includes(payload.puzzleType)) {
+  if (payload.puzzleType != null && !["easter", "word", "blood"].includes(payload.puzzleType)) {
     return "puzzleType is invalid.";
   }
   if (!isValidDateKey(payload.puzzleDate)) return "puzzleDate is invalid.";
@@ -146,6 +149,7 @@ async function readStats(db, dateKey) {
     yesterday: {
       date: yesterdayDateKey,
       word: puzzleStat("word"),
+      blood: puzzleStat('blood'),
       easter,
       attempts: easter.attempts,
       correct: easter.correct,
@@ -229,7 +233,16 @@ async function handleAttempt(request, env) {
   if (validationError) return errorResponse(request, env, validationError, 400);
 
   const playerHash = await hashPlayerId(payload.playerId);
-  const puzzleType = payload.puzzleType === "word" ? "word" : "easter";
+  const puzzleType = payload.puzzleType || 'easter';
+  if (puzzleType === 'blood') {
+    if (!puzzleOptions(env).bloodTies) return errorResponse(request, env, 'Blood Ties is available only in the staging demo.', 400);
+    const puzzle = buildDailyBloodTiesPuzzle(todayDateKey);
+    let result;
+    try { result = replayBloodTiesAttempts(puzzle, payload.attempts); }
+    catch { return errorResponse(request, env, 'Invalid Blood Ties attempts.', 400); }
+    if (payload.puzzleId !== puzzle.key || !Array.isArray(payload.attempts) || !result.complete || result.success !== payload.isCorrect) return errorResponse(request, env, 'Invalid Blood Ties result.', 400);
+    payload.mapId = 'blood-ties'; payload.mapName = 'Four hidden connections';
+  }
   const insertResult = await env.DB
     .prepare(
       `INSERT OR IGNORE INTO puzzle_attempts (
@@ -310,11 +323,13 @@ async function handleAccountRequest(request, env, url, context) {
   } else if (url.pathname === "/api/account/save" && request.method === "PUT") {
     result = await saveAccount(env.DB, request, identity.userId);
   } else if (url.pathname === "/api/account/results/map" && request.method === "POST") {
-    result = await recordVerifiedMapResult(env.DB, request, identity.userId);
+    result = await recordVerifiedMapResult(env.DB, request, identity.userId, puzzleOptions(env));
   } else if (url.pathname === "/api/account/results/bonus" && request.method === "POST") {
     result = await recordVerifiedBonusResult(env.DB, request, identity.userId);
   } else if (url.pathname === "/api/account/results/word" && request.method === "POST") {
-    result = await recordVerifiedWordResult(env.DB, request, identity.userId);
+    result = await recordVerifiedWordResult(env.DB, request, identity.userId, puzzleOptions(env));
+  } else if (url.pathname === '/api/account/results/blood' && request.method === 'POST') {
+    result = await recordVerifiedBloodResult(env.DB, request, identity.userId, puzzleOptions(env));
   } else {
     return errorResponse(request, env, "Not found.", 404);
   }
@@ -370,6 +385,7 @@ export default {
           apiDigest: env.RELEASE_API_DIGEST || null,
           configurationDigest: env.RELEASE_CONFIG_DIGEST || null,
           fixturesEnabled: fixturesEnabled(env),
+          bloodTiesDemo: puzzleOptions(env).bloodTies,
           accountsConfigured: Boolean(env.CLERK_ISSUER || env.SUPABASE_ISSUER),
           accountProviders: {
             clerk: Boolean(env.CLERK_ISSUER),

@@ -6,12 +6,15 @@
     "DEPLOYMENT_ENVIRONMENT": "local",
     "STAGING_FIXTURES": "1",
     "ALLOWED_ORIGINS": "http://localhost:8080,http://127.0.0.1:8080",
-    "SUPABASE_ISSUER": "https://zsnnvzhimtlhpvwhwxpy.supabase.co/auth/v1"
+    "SUPABASE_ISSUER": "https://zsnnvzhimtlhpvwhwxpy.supabase.co/auth/v1",
+    "BLOOD_TIES_DEMO": "1"
   },
-  "d1_databases": [{
-    "binding": "DB",
-    "database_name": "daily-undead-development",
-    "database_id": "00000000-0000-0000-0000-000000000000",
-    "migrations_dir": "migrations"
-  }]
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "daily-undead-development",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ]
 }

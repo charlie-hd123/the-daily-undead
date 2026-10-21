@@ -1,6 +1,6 @@
-import { BOX_SEQUENCE, ICON_INK, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261021-1';
+import { BOX_SEQUENCE, ICON_INK, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261021-2';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261021-1';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261021-2';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () => {} } = {}) {
@@ -76,7 +76,7 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     if (renderingReady) return renderingReady;
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261021-1')
+      import('./mystery-box-scene.js?v=20261021-2')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -156,7 +156,7 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     reward = { node, slot, context, traveller, object, target, style: node.style.cssText,
       hidden: node.getAttribute('aria-hidden'), inert: node.inert,
       flight: createIconFlight({ target, mouth: visual.aperture(), stage: stageRect, viewDirection: visual.viewDirection(),
-        ink: ICON_INK[panel.classList.contains('word-puzzle-panel') ? 'word' : 'easter'] }) };
+        ink: ICON_INK[panel.classList.contains('word-puzzle-panel') ? 'word' : panel.classList.contains('blood-puzzle-panel') ? 'blood' : 'easter'] }) };
     node.replaceWith(slot); object.append(node); traveller.append(object); context.append(traveller); wrapper.append(context);
     context.style.cssText = `left:${stageRect.left - origin.left}px;top:${stageRect.top - origin.top}px;width:${stageRect.width}px;height:${Math.max(stageRect.height, panel.offsetHeight)}px;`;
     node.classList.add('mb-icon-face'); node.inert = true; node.setAttribute('aria-hidden', 'true');
@@ -221,7 +221,7 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     if (globalThis.dailyUndeadEntry?.acquireGraphics && !globalThis.dailyUndeadEntry.acquireGraphics()) {
       skipPresentation(); return;
     }
-    panel = document.querySelector(type === 'word' ? '#app .word-puzzle-panel' : '#app .quest-clue-panel');
+    panel = document.querySelector(type === 'word' ? '#app .word-puzzle-panel' : type === 'blood' ? '#app .blood-puzzle-panel' : '#app .quest-clue-panel');
     if (!panel) return;
     activeEligibility = { dateKey, official, fresh };
     // The official daily reveal starts in view.

@@ -13,8 +13,9 @@ function rowToDailyEntry(row) {
     cluesUsed: nonNegativeInteger(row.clues_used),
     bonusCorrect: row.bonus_status === "correct",
     points: nonNegativeInteger(row.points),
-    puzzleType: row.puzzle_type === "word" ? "word" : "easter",
+    puzzleType: ['word', 'blood'].includes(row.puzzle_type) ? row.puzzle_type : 'easter',
     wordMisses: nonNegativeInteger(row.word_misses),
+    ...(row.puzzle_type === 'blood' ? { bloodMisses: nonNegativeInteger(row.blood_misses) } : {}),
   };
 }
 
@@ -44,6 +45,7 @@ export async function readLeaderboards(db, dateKey) {
           results.bonus_status,
           results.puzzle_type,
           results.word_misses,
+          results.blood_misses,
           results.points_earned AS points
         FROM player_daily_results AS results
         INNER JOIN player_profiles AS profiles ON profiles.user_id = results.user_id

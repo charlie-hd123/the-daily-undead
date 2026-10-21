@@ -24,6 +24,7 @@ import {
   workerMaps,
 } from "./generated-map-catalog.js";
 import { workerWords } from "./generated-word-catalog.js";
+import { buildDailyBloodTiesPuzzle, normalizeBloodTiesSession, replayBloodTiesAttempts } from '../../js/blood-ties-core.js';
 
 const maximumCounter = 1_000_000_000;
 const allowedPhases = new Set(["clues", "game", "map", "result"]);
@@ -145,7 +146,7 @@ function sanitizeWordState(value, puzzleDate) {
 export function sanitizeDailyState(value, puzzleDate) {
   if (value?.dayStateVersion !== 1) return sanitizeEasterState(value, puzzleDate);
   if (value.dateKey !== puzzleDate) return null;
-  const officialType = value.officialType === "word" || value.officialType === "easter"
+  const officialType = ['word', 'easter', 'blood'].includes(value.officialType)
     ? value.officialType
     : null;
   if (!officialType) return null;
@@ -166,7 +167,8 @@ export function sanitizeDailyState(value, puzzleDate) {
       : null,
     progressionApplied: Boolean(value.progressionApplied),
     lastCompleted: null,
-    sessions: { easter, word },
+    sessions: { easter, word, blood: value.sessions?.blood && puzzleDate <= getUtcDateKey()
+      ? normalizeBloodTiesSession(buildDailyBloodTiesPuzzle(puzzleDate), value.sessions.blood) : null },
   };
 }
 
@@ -274,15 +276,16 @@ function rowToResult(row) {
         pointsEarned: Number(row.points_earned),
         puzzleType: row.puzzle_type || "easter",
         wordMisses: Number(row.word_misses || 0),
+        ...(row.puzzle_type === 'blood' ? { bloodMisses: Number(row.blood_misses || 0) } : {}),
         completedAt: row.completed_at || null,
       }
     : null;
 }
 
-export async function recordVerifiedWordResult(db, request, userId) {
+export async function recordVerifiedWordResult(db, request, userId, options = {}) {
   const body = await readJsonBody(request, 8_000);
   const today = getUtcDateKey();
-  if (body.puzzleDate !== today || getOfficialPuzzleType(today) !== "word") {
+  if (body.puzzleDate !== today || getOfficialPuzzleType(today, options) !== "word") {
     return { status: 400, body: { error: "Only today’s official Last Words result can be saved." } };
   }
   const puzzle = buildDailyWordPuzzle(today, workerWords);
@@ -297,24 +300,45 @@ export async function recordVerifiedWordResult(db, request, userId) {
     return { status: 400, body: { error: "The Last Words attempt is not complete." } };
   }
   const points = success ? calculateWordPoints(wrongGuesses) : 0;
+  return persistSimpleResult(db, userId, { today, puzzleId: puzzle.key, answerId: puzzle.entry.id, success, points, misses: wrongGuesses, type: 'word' });
+}
+
+export async function recordVerifiedBloodResult(db, request, userId, options = {}) {
+  const body = await readJsonBody(request, 8000);
+  const today = getUtcDateKey();
+  if (!options.bloodTies || body.puzzleDate !== today || getOfficialPuzzleType(today, options) !== 'blood') {
+    return { status: 400, body: { error: 'Only today’s official Blood Ties result can be saved.' } };
+  }
+  const puzzle = buildDailyBloodTiesPuzzle(today);
+  if (body.puzzleId !== puzzle.key || !Array.isArray(body.attempts)) return { status: 400, body: { error: 'The submitted Blood Ties puzzle is invalid.' } };
+  let result;
+  try { result = replayBloodTiesAttempts(puzzle, body.attempts); }
+  catch { return { status: 400, body: { error: 'The Blood Ties attempt history is invalid.' } }; }
+  if (!result.complete) return { status: 400, body: { error: 'The Blood Ties attempt is not complete.' } };
+  return persistSimpleResult(db, userId, { today, puzzleId: puzzle.key, answerId: 'blood-ties', success: result.success, points: result.points, misses: result.misses, type: 'blood' });
+}
+
+async function persistSimpleResult(db, userId, { today, puzzleId, answerId, success, points, misses, type }) {
 
   await db.batch([
     db.prepare(
       `INSERT OR IGNORE INTO player_daily_results (
         user_id, puzzle_date, puzzle_id, selected_map_id, clues_used,
         map_correct, map_points, bonus_status, points_earned, completed_at,
-        score_awarded, progression_applied, puzzle_type, word_misses
-      ) VALUES (?, ?, ?, ?, 1, ?, ?, 'unavailable', ?, ?, 0, 0, 'word', ?)`,
+        score_awarded, progression_applied, puzzle_type, word_misses, blood_misses
+      ) VALUES (?, ?, ?, ?, 1, ?, ?, 'unavailable', ?, ?, 0, 0, ?, ?, ?)`,
     ).bind(
       userId,
       today,
-      puzzle.key,
-      puzzle.entry.id,
+      puzzleId,
+      answerId,
       success ? 1 : 0,
       points,
       points,
       new Date().toISOString(),
-      wrongGuesses,
+      type,
+      type === 'word' ? misses : 0,
+      type === 'blood' ? misses : 0,
     ),
     db.prepare(
       `UPDATE player_saves SET
@@ -770,13 +794,13 @@ export async function saveAccount(db, request, userId) {
   return { status: 200, body: { progress: rowToProgress(saved) } };
 }
 
-export async function recordVerifiedMapResult(db, request, userId) {
+export async function recordVerifiedMapResult(db, request, userId, options = {}) {
   const body = await readJsonBody(request, 5_000);
   const today = getUtcDateKey();
   if (body.puzzleDate !== today || !isValidDateKey(body.puzzleDate)) {
     return { status: 400, body: { error: "Only today’s live result can be saved." } };
   }
-  if (getOfficialPuzzleType(today) !== "easter") {
+  if (getOfficialPuzzleType(today, options) !== "easter") {
     return { status: 400, body: { error: "Quest Steps is not today’s official puzzle." } };
   }
   if (

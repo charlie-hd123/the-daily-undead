@@ -142,14 +142,15 @@ function renderTodayEntries(list, entries, currentUsername, documentObject) {
     const item = documentObject.createElement("li");
     item.className = "leaderboard-entry leaderboard-today-entry";
     markCurrentPlayer(item, entry.username, currentUsername);
-    const isWordResult = entry.puzzleType === "word";
+    const isWordResult = entry.puzzleType === "word" || entry.puzzleType === 'blood';
+    const misses = entry.puzzleType === 'blood' ? entry.bloodMisses : entry.wordMisses;
     const resultLabel = isWordResult
-      ? entry.wordMisses === 0
+      ? misses === 0
         ? "Perfect Solve"
-        : `${entry.wordMisses} ${entry.wordMisses === 1 ? "Miss" : "Misses"}`
+        : `${misses} ${misses === 1 ? "Miss" : "Misses"}`
       : `${entry.cluesUsed} ${entry.cluesUsed === 1 ? "Clue" : "Clues"}${entry.bonusCorrect ? " + Bonus" : ""}`;
     const isPerfect = isWordResult
-      ? entry.wordMisses === 0
+      ? misses === 0
       : entry.cluesUsed === 1 && entry.bonusCorrect;
     item.append(
       makePlayer(

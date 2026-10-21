@@ -85,6 +85,7 @@ export function assertSmoke({ health, stats, leaderboards, manifest }) {
   if (!health.ok || !health.accountProviders?.supabase || health.apiDigest !== manifest.apiDigest || health.configurationDigest !== manifest.apiConfigurationDigest) throw new Error("API health, authentication configuration or API version check failed.");
   if (health.environment !== "staging" || !health.fixturesEnabled) throw new Error("Staging isolation or test-data configuration check failed.");
   if (!(stats.playersToday > 0) || !stats.yesterday?.word?.attempts || !stats.yesterday?.easter?.attempts || !leaderboards.today?.elite?.length || !leaderboards.allTime?.length) throw new Error("Staging is incomplete: current statistics or leaderboards are empty.");
+  if (health.bloodTiesDemo && !stats.yesterday?.blood?.attempts) throw new Error('Staging Blood Ties statistics are empty.');
 }
 
 async function smoke(staging) {

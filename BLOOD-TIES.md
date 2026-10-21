@@ -1,0 +1,38 @@
+# Blood Ties staging demo
+
+Blood Ties is the third game in the shared Daily Undead application. It is enabled only on local development hosts and the normal staging host. `BLOOD_TIES_DEMO=1` additionally enables its Worker routes in local/staging environments. Production ignores that flag and retains the existing two-game schedule. No production deployment or data migration is part of this demo.
+
+The staging rotation starts on **22 October 2026 UTC**: Blood Ties, Last Words, Quest Steps, then repeats every three days. Earlier assignments are unchanged. After the official round, either remaining game is available just for fun. Just-for-fun games never award Score, Solves or Round progression. Date previews use the existing isolated browser storage and disable account uploads.
+
+## Rules
+
+- Twelve distinct tiles form four connections of three. Select three tiles, then Submit.
+- A correct trio moves into a named solved row. The remaining tiles replenish the board layout in a fresh deterministic shuffle. The board starts with all twelve tiles and shrinks as connections are found.
+- Three incorrect attempts end the puzzle. Repeating the same trio in another order does not consume another attempt. Two correct tiles give a “one tile away” hint.
+- After three correct connections, the final group reveals automatically.
+- A solve awards 100 points with no mistakes, 70 with one, or 40 with two. A failed round awards zero and ends the survival run. There is no separate bonus round.
+- Results, account recovery, public profiles, leaderboards and yesterday’s official-puzzle statistics use the existing application flows. The server replays the complete attempt transcript to verify completion and score. Duplicate result requests cannot award points twice.
+
+## Database and generator
+
+`js/blood-ties-catalogue.js` contains the 51 eligible connections imported from the **first worksheet only** of the supplied workbook. Blank cells and rows with fewer than three unique eligible answers are excluded. Category definitions and difficulty are retained, with the original research links as provenance. The workbook’s incomplete or provisional research is accepted as demo content, not independently certified.
+
+To inspect a new workbook import locally:
+
+```sh
+python3 scripts/import-blood-ties.py /path/to/workbook.xlsx
+```
+
+The demo generator and catalogue are versioned together as v1. Keep this shipped catalogue frozen while v1 accounts have saved attempts. A future content release must preserve the old catalogue/generator for historical dates and activate the new version on a future UTC date; do not silently regenerate existing puzzle identities from a changed workbook.
+
+The seeded generator first builds a reproducible pool of boards. Every board has four selected connections, three unique assigned answers each, and at least two answers that also belong to another selected connection. An exact-cover search rejects boards with multiple complete solutions among the four selected connections. Different orders of solving the same partition do not count as different solutions. Connections outside those four are not part of that uniqueness guarantee.
+
+Daily selection computes shared history from a fixed UTC epoch, independent of device, browser storage or play order. Categories and tiles cannot recur within the preceding three calendar days, including the previous official Blood Ties round. Among eligible boards it minimizes tile reuse from days four through seven. It fails explicitly if cooldowns cannot be met, rather than quietly allowing an ambiguous or repetitive board. Both browser and Worker import the same generator and catalogue.
+
+## Developer controls and release
+
+Use **Advance a day** in the footer to test the rotation. **Return to today** restores normal staging/local progress. **Fresh preview** starts another isolated preview run for the simulated date, retaining previous preview saves and leaving the real account untouched. Blood Ties has a collapsed **Developer · inspect answers** panel showing the UTC date, puzzle identity, four answers and overlap traps. These controls are unavailable in production.
+
+Migration `0015_blood_ties_demo.sql` extends the allowed puzzle types, preserves historical rows and aggregates, adds a separate Blood Ties mistake count, and restores indexes, the aggregate trigger and admin view. It is applied only to local/staging for this task. Production application requires a separate explicit review and authorization.
+
+Use the normal `release:prepare`, committed-candidate checks and `deploy:staging` workflow in STAGING.md. Do not publish main or copy player data between environments.

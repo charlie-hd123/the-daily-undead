@@ -38,6 +38,7 @@ export function revealHeight(elapsed, closedHeight, puzzleHeight) {
 export const ICON_INK = Object.freeze({
   word: Object.freeze({ left: 28 / 240, top: 72 / 240, width: 184 / 240, height: 101 / 240, visualScale: 1.25 }),
   easter: Object.freeze({ left: 38.5 / 240, top: 50.5 / 240, width: 163 / 240, height: 141 / 240, visualScale: .9 }),
+  blood: Object.freeze({ left: 22 / 240, top: 49 / 240, width: 196 / 240, height: 140 / 240, visualScale: .9 }),
 });
 const tallestIcon = Math.max(...Object.values(ICON_INK).map((ink) => ink.height / ink.width * Math.max(1, ink.visualScale)));
 const widestIcon = Math.max(...Object.values(ICON_INK).map((ink) => ink.visualScale));

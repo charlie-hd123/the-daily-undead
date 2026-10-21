@@ -90,7 +90,9 @@
     const validDate = /^\d{4}-\d{2}-\d{2}$/.test(requested || '')
       && new Date(`${requested}T00:00:00Z`).toISOString().slice(0, 10) === requested;
     const date = validDate && (requested <= today || authorized) ? requested : today;
-    const prefix = previewHost && date !== today ? `the-daily-undead:day-preview:${date}:` : '';
+    const previewRun = params.get('previewRun') || '';
+    const run = /^[a-zA-Z0-9-]{1,80}$/.test(previewRun) ? `${previewRun}:` : '';
+    const prefix = previewHost && date !== today ? `the-daily-undead:day-preview:${date}:${run}` : '';
     const opened = storage.getItem(`${prefix}the-daily-undead:mystery-box-opened:${date}`) === '1';
     let started = false;
     try {
@@ -98,7 +100,7 @@
       if (day?.dateKey === date && day.dayStateVersion === 1) {
         const session = day.sessions?.[day.officialType];
         started = Boolean(day.officialCompleted || session?.complete || session?.pendingResult
-          || session?.guesses?.length || session?.cluesRevealed > 1
+          || session?.guesses?.length || session?.attempts?.length || session?.selected?.length || session?.cluesRevealed > 1
           || session?.selectedGameId || session?.selectedMapId
           || session?.phase && session.phase !== 'clues');
       }

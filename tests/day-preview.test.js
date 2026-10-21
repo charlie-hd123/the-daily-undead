@@ -26,3 +26,15 @@ test("preview scores and puzzles are isolated by day without altering today's gu
   assert.equal(storage.getItem("score"), "100");
   assert.equal(createDayPreviewStorage(storage, "2026-10-17", false), storage);
 });
+
+test('fresh preview runs retain previous previews and never select ordinary storage', () => {
+  const values = new Map([['score', '100']]);
+  const storage = { getItem: (key) => values.get(key) ?? null, setItem: (key, value) => values.set(key, String(value)), removeItem: (key) => values.delete(key) };
+  const original = createDayPreviewStorage(storage, '2026-10-22', true);
+  original.setItem('score', '70');
+  const fresh = createDayPreviewStorage(storage, '2026-10-22', true, 'run-one');
+  assert.equal(fresh.getItem('score'), null); fresh.setItem('score', '40');
+  assert.equal(createDayPreviewStorage(storage, '2026-10-22', true, 'run-one').getItem('score'), '40');
+  assert.equal(original.getItem('score'), '70'); assert.equal(storage.getItem('score'), '100');
+  assert.equal(createDayPreviewStorage(storage, '2026-10-22', true, '../invalid').getItem('score'), '70');
+});

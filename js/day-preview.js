@@ -2,9 +2,10 @@ export function canPreviewDays(hostname, environment, isLocalPreview) {
   return isLocalPreview || environment === "staging" && hostname === "daily-undead-staging.pages.dev";
 }
 
-export function createDayPreviewStorage(storage, dateKey, enabled) {
+export function createDayPreviewStorage(storage, dateKey, enabled, run = '') {
   if (!enabled) return storage;
-  const prefix = `the-daily-undead:day-preview:${dateKey}:`;
+  const safeRun = /^[a-zA-Z0-9-]{1,80}$/.test(run) ? `${run}:` : '';
+  const prefix = `the-daily-undead:day-preview:${dateKey}:${safeRun}`;
   return {
     get persistent() { return storage.persistent; },
     getItem: (key) => storage.getItem(`${prefix}${key}`),

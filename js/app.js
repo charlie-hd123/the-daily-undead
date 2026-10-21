@@ -1,5 +1,7 @@
-import { browserStorage } from "./browser-storage.js?v=20261021-1";
-import { rememberPlayDestination, restorePlayDestination } from "./play-destination.js?v=20261021-1";
+import { browserStorage } from "./browser-storage.js?v=20261021-2";
+import { buildDailyBloodTiesPuzzle, createBloodTiesSession, normalizeBloodTiesSession, replayBloodTiesAttempts } from './blood-ties-core.js?v=20261021-2';
+import { renderBloodTiesView } from './blood-ties-view.js?v=20261021-2';
+import { rememberPlayDestination, restorePlayDestination } from "./play-destination.js?v=20261021-2";
 import {
   buildDailyPuzzle,
   calculateBonusPoints,
@@ -14,20 +16,19 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261021-1";
+} from "./game-core.js?v=20261021-2";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
   shouldHandleWordShortcut,
-} from "./word-puzzle-core.js?v=20261021-1";
+} from "./word-puzzle-core.js?v=20261021-2";
 import {
-  getOfficialPuzzleType,
-  getOtherPuzzleType,
+  getOfficialPuzzleType as selectOfficialPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261021-1";
+} from "./daily-challenge-core.js?v=20261021-2";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -36,29 +37,29 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261021-1";
+} from "./progression.js?v=20261021-2";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261021-1";
+} from "./account.js?v=20261021-2";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261021-1";
+} from "./community-stats.js?v=20261021-2";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261021-1";
-import { fetchWithTimeout } from "./network.js?v=20261021-1";
-import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261021-1";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261021-1";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261021-1";
-import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261021-1";
-import { createMysteryBox } from "./mystery-box.js?v=20261021-1";
-import { initialiseGameAudio, letterSound } from "./game-audio.js?v=20261021-1";
+} from "./leaderboards.js?v=20261021-2";
+import { fetchWithTimeout } from "./network.js?v=20261021-2";
+import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261021-2";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261021-2";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261021-2";
+import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261021-2";
+import { createMysteryBox } from "./mystery-box.js?v=20261021-2";
+import { initialiseGameAudio, letterSound } from "./game-audio.js?v=20261021-2";
 
 const gameAudio = initialiseGameAudio(browserStorage);
 const mysteryBox = createMysteryBox({
@@ -91,6 +92,15 @@ const communityYesterdayEasterAnswerLabel = document.querySelector("#community-y
 const yesterdayCommunityResults = [...document.querySelectorAll("[data-community-puzzle]")];
 const isLocalDevelopment = isLocalDevelopmentHostname(window.location.hostname);
 const isLocalPreview = canPreviewDays(window.location.hostname, document.querySelector('meta[name="daily-undead-environment"]')?.content, isLocalPreviewHostname(window.location.hostname));
+const bloodTiesEnabled = isLocalPreview;
+const getOfficialPuzzleType = (dateKey) => selectOfficialPuzzleType(dateKey, { bloodTies: bloodTiesEnabled });
+if (bloodTiesEnabled) {
+  const article = document.createElement('article');
+  article.className = 'community-result'; article.dataset.communityPuzzle = 'blood'; article.hidden = true;
+  article.innerHTML = '<div class="community-result-copy"><div class="community-result-title"><span>Blood Ties ·</span><em data-yesterday-round-badge>Yesterday’s round</em></div><details class="blood-yesterday"><summary>View yesterday’s connections</summary><div id="community-yesterday-blood-answer"></div></details></div><div class="community-result-rate"><strong id="community-yesterday-blood-solved">—</strong><span>solved</span></div>';
+  document.querySelector('.community-yesterday')?.append(article);
+  yesterdayCommunityResults.push(article);
+}
 // Direct local file servers skip the environment build that normally adds these links.
 if (isLocalPreview && !document.querySelector("#advance-dev-day")) {
   const footerCopy = document.querySelector(".site-footer > p");
@@ -156,6 +166,7 @@ let selectableMaps;
 let puzzle;
 let wordEntries;
 let wordPuzzle;
+let bloodPuzzle;
 let dayState;
 let activePlay = null;
 let state;
@@ -183,6 +194,7 @@ let accountController = {
   async recordMapResult() { return null; },
   async recordBonusResult() { return null; },
   async recordWordResult() { return null; },
+  async recordBloodResult() { return null; },
 };
 
 function preserveProgressBeforeReleaseReload() {
@@ -217,14 +229,19 @@ const puzzleTypes = {
     name: "Quest Steps",
     kicker: "Easter egg puzzle",
     description: "Can you identify the Zombies map from its Easter egg steps?",
-    image: "./assets/quest-steps-card.svg?v=20261021-1",
+    image: "./assets/quest-steps-card.svg?v=20261021-2",
   },
   word: {
     name: "Last Words",
     kicker: "Letter puzzle",
     description: "Can you identify the Zombies word or phrase by revealing its letters?",
-    image: "./assets/dead-letters-card.svg?v=20261021-1",
+    image: "./assets/dead-letters-card.svg?v=20261021-2",
   },
+};
+if (bloodTiesEnabled) puzzleTypes.blood = {
+  name: 'Blood Ties', kicker: 'Connection puzzle',
+  description: 'Can you uncover the hidden connections between Zombies maps, weapons and more?',
+  image: './assets/blood-ties-card.svg?v=20261021-2',
 };
 
 function escapeHtml(value) {
@@ -379,6 +396,8 @@ function getPreviousDateKey(dateKey) {
 }
 
 function updateCommunityStatsDisplay(stats) {
+  const bloodRate = document.querySelector('#community-yesterday-blood-solved');
+  if (bloodRate) bloodRate.textContent = formatSolvePercentage(stats?.yesterday?.blood?.solvePercentage);
   communityPlayersTodayLabel.textContent = formatCommunityCount(stats?.playersToday);
   communityGamesTotalLabel.textContent = formatCommunityCount(stats?.totalPuzzles ?? stats?.totalGames);
   communityYesterdayWordSolvedLabel.textContent = formatSolvePercentage(stats?.yesterday?.word?.solvePercentage);
@@ -392,6 +411,7 @@ function updateCommunityStatsDisplay(stats) {
 
 function prepareCommunityStatsDisplay() {
   const yesterdayDateKey = getPreviousDateKey(puzzle.dateKey);
+  if (bloodTiesEnabled) document.querySelector('#community-yesterday-blood-answer').innerHTML = buildDailyBloodTiesPuzzle(yesterdayDateKey).groups.map((g) => `<p><b>${escapeHtml(g.name)}</b><br>${g.answers.map(escapeHtml).join(' · ')}</p>`).join('');
 
   try {
     const yesterdayPuzzle = buildDailyPuzzle(yesterdayDateKey, maps);
@@ -433,9 +453,9 @@ function recordCommunityAttemptFor(type, isCorrect) {
   // Preview puzzles never contribute to the live community totals.
   if (!communityStatsApiUrl || puzzle.dateKey !== liveDateKey) return;
 
-  const puzzleId = type === "word" ? wordPuzzle.key : puzzle.key;
-  const answerId = type === "word" ? wordPuzzle.entry.id : puzzle.map.id;
-  const answerName = type === "word" ? wordPuzzle.entry.answer : getPuzzleAnswerTitle();
+  const puzzleId = type === 'blood' ? bloodPuzzle.key : type === "word" ? wordPuzzle.key : puzzle.key;
+  const answerId = type === 'blood' ? 'blood-ties' : type === "word" ? wordPuzzle.entry.id : puzzle.map.id;
+  const answerName = type === 'blood' ? 'Four hidden connections' : type === "word" ? wordPuzzle.entry.answer : getPuzzleAnswerTitle();
   submitCommunityAttempt({
     apiUrl: communityStatsApiUrl,
     puzzleDate: puzzle.dateKey,
@@ -444,6 +464,7 @@ function recordCommunityAttemptFor(type, isCorrect) {
     mapId: answerId,
     mapName: answerName,
     isCorrect,
+    attempts: type === 'blood' ? dayState.sessions.blood?.attempts : undefined,
   })
     .then((stats) => {
       if (stats) updateCommunityStatsDisplay(stats);
@@ -480,6 +501,7 @@ if (isLocalPreview && advanceDevDayButton) {
       const url = new URL(window.location.href);
       url.searchParams.delete("date");
       url.searchParams.delete("devPreview");
+      url.searchParams.delete('previewRun');
       sessionStorage.removeItem(devPreviewStorageKey);
       window.location.assign(url.href);
     });
@@ -689,7 +711,7 @@ function createWordSession() {
 }
 
 function createDayState(easterSession = createInitialState()) {
-  const legacyFinished = easterSession.phase === "result"
+  const legacyFinished = getOfficialPuzzleType(puzzle.dateKey) === 'easter' && easterSession.phase === "result"
     && (!easterSession.isCorrect || easterSession.bonusComplete || easterSession.bonusFailed);
   const legacyPoints = Number(easterSession.mapPoints || 0) + Number(easterSession.bonusPoints || 0);
   return {
@@ -707,6 +729,7 @@ function createDayState(easterSession = createInitialState()) {
     sessions: {
       easter: easterSession,
       word: null,
+      blood: null,
     },
   };
 }
@@ -737,9 +760,12 @@ function normalizeDayState(value, fallbackEaster = createInitialState()) {
     ...value,
     officialType: getOfficialPuzzleType(puzzle.dateKey),
     sessions: {
+      // A stored developer preview may predate the three-game rotation.
       easter: easterSession,
       word: normalizeWordSession(value.sessions?.word),
+      blood: bloodTiesEnabled ? normalizeBloodTiesSession(bloodPuzzle, value.sessions?.blood) : null,
     },
+    ...(value.officialType !== getOfficialPuzzleType(puzzle.dateKey) ? { officialCompleted: false, officialResult: null, progressionApplied: false } : {}),
   };
 }
 
@@ -751,11 +777,12 @@ function loadPuzzleStats() {
       solves: Math.max(0, Number(saved?.[type]?.solves) || 0),
       plays: Math.max(0, Number(saved?.[type]?.plays) || 0),
     });
-    return { easter: safe("easter"), word: safe("word") };
+    return { easter: safe("easter"), word: safe("word"), blood: safe('blood') };
   } catch {
     return {
       easter: { score: 0, solves: 0, plays: 0 },
       word: { score: 0, solves: 0, plays: 0 },
+      blood: { score: 0, solves: 0, plays: 0 },
     };
   }
 }
@@ -783,6 +810,10 @@ function loadMultiPuzzleDayState(legacyEasterState) {
 }
 
 function ensureSession(type) {
+  if (type === 'blood') {
+    dayState.sessions.blood ||= createBloodTiesSession(bloodPuzzle);
+    return dayState.sessions.blood;
+  }
   if (type === "easter") {
     dayState.sessions.easter = state;
     return state;
@@ -1388,6 +1419,7 @@ function startPuzzle(type, mode) {
 
 function hasPuzzleStarted(type, session) {
   if (!session) return false;
+  if (type === 'blood') return session.complete || session.attempts?.length > 0 || session.selected?.length > 0;
   if (type === "word") {
     return session.complete || session.pendingResult || (session.guesses?.length || 0) > 0;
   }
@@ -1458,10 +1490,10 @@ function renderHub() {
   activePlay = null;
   rememberPlayDestination(localStorage, puzzle.dateKey, { screen: "hub" });
   const allComplete = areAllPuzzlesCompleted();
-  const otherType = getOtherPuzzleType(dayState.officialType);
+  const otherNames = Object.keys(puzzleTypes).filter((type) => type !== dayState.officialType).map((type) => puzzleTypes[type].name).join(' and ');
   const guidance = allComplete
-    ? "You have completed both of today’s puzzles."
-    : `Today’s round is complete. You can now play ${puzzleTypes[otherType].name} just for fun, with no effect on your stats.`;
+    ? "You have completed all of today’s puzzles."
+    : `Today’s round is complete. You can now play ${otherNames} just for fun, with no effect on your stats.`;
   app.innerHTML = `
     <section class="panel puzzle-hub-panel">
       <div class="puzzle-hub-hero">
@@ -1474,6 +1506,7 @@ function renderHub() {
       <div class="puzzle-choice-grid">
         ${renderPuzzleCard("word")}
         ${renderPuzzleCard("easter")}
+        ${bloodTiesEnabled ? renderPuzzleCard('blood') : ''}
       </div>
     </section>
     ${renderNextRoundScreen()}
@@ -1507,6 +1540,59 @@ function renderWordSlots(answer, revealedLetters, { revealLetter = "", finalReve
       }).join("")}
     </span>
   `).join('<span class="word-space" aria-hidden="true"></span>');
+}
+
+function renderBloodPuzzle() {
+  mysteryBox.cancel();
+  const session = ensureSession('blood');
+  const official = isOfficialPlay('blood');
+  renderBloodTiesView({
+    app, puzzle: bloodPuzzle, session, official, developer: isLocalPreview, heading: renderHeading,
+    resultActions: `<div class="actions share-score-actions">${official ? renderResultAccountAction() : ''}${official ? '<button id="share-score" class="button share-score-button" type="button">Share with your squad</button>' : ''}<button id="return-to-puzzle-home" class="button" type="button">${areAllPuzzlesCompleted() ? 'View puzzles' : 'Play another puzzle'}</button></div><p id="share-score-status" class="share-score-status" aria-live="polite"></p>`,
+    nextRound: renderNextRoundScreen(),
+    onSound: (cue) => void gameAudio.play(cue),
+    onSave: (rerender) => { saveState(); if (rerender) renderBloodPuzzle(); },
+    onSubmit: () => {
+      if (session.complete || session.selected.length !== 3) return;
+      let next;
+      try { next = replayBloodTiesAttempts(bloodPuzzle, [...session.attempts, session.selected]); }
+      catch { session.message = 'You already tried that trio. Choose a different connection.'; saveState(); renderBloodPuzzle(); return; }
+      if (official && next.complete && !confirmAccountResultSubmission(accountController)) return;
+      const correct = next.solved.length > session.solved.length;
+      Object.assign(session, next, { shuffleCount: session.shuffleCount + (correct ? 1 : 0) });
+      if (session.complete) {
+        if (official && !dayState.officialCompleted) {
+          session.roundsSurvivedBeforeLoss = session.success ? 0 : streakCount;
+          session.newBestRound = recordMapResult(session.success);
+          if (session.success) awardPoints(session.points);
+          recordDailyParticipation(puzzle.dateKey);
+          puzzleStats.blood.plays++;
+          if (session.success) { puzzleStats.blood.solves++; puzzleStats.blood.score += session.points; }
+          savePuzzleStats();
+          dayState.progressionApplied = true;
+          dayState.officialCompleted = true;
+          dayState.officialResult = { type: 'blood', puzzleType: 'blood', success: session.success, points: session.points };
+          void accountController.recordBloodResult?.({ puzzleDate: puzzle.dateKey, puzzleId: bloodPuzzle.key, attempts: session.attempts });
+        }
+        dayState.lastCompleted = { type: 'blood', mode: activePlay.mode, success: session.success, points: session.points };
+        recordCommunityAttemptFor('blood', session.success);
+      }
+      saveState(); renderBloodPuzzle();
+      if (session.complete) {
+        snapPageToTop();
+        if (session.success) playScoreCount(session.points); else void gameAudio.play('run-ended');
+      } else void gameAudio.play(correct ? 'answer-lock' : 'letter-wrong');
+      if (!session.complete) app.querySelector('[data-blood-tile]')?.focus({ preventScroll: true });
+    },
+  });
+  if (session.complete) {
+    animatePointTotal(app.querySelector('[data-count-to]'), session.points);
+    updateNextRoundCountdown();
+    bindResultAccountAction();
+    app.querySelector('#return-to-puzzle-home')?.addEventListener('click', () => { renderHub(); snapPageToTop(); });
+    app.querySelector('#share-score')?.addEventListener('click', (event) => shareScore(event.currentTarget, app.querySelector('#share-score-status')));
+  }
+  focusAfterRender(session.complete ? `blood-result:${session.success}` : 'blood-puzzle');
 }
 
 function getWordCompletionDelay(success) {
@@ -2182,8 +2268,8 @@ function renderMissedDay() {
 }
 
 function buildScoreSharePayload() {
-  const activeSession = activePlay?.type === "word" ? dayState?.sessions?.word : state;
-  const isCorrect = activePlay?.type === "word" ? activeSession?.success : state.isCorrect;
+  const activeSession = ['word', 'blood'].includes(activePlay?.type) ? dayState?.sessions?.[activePlay.type] : state;
+  const isCorrect = ['word', 'blood'].includes(activePlay?.type) ? activeSession?.success : state.isCorrect;
   const shareRound = !isCorrect
     ? Math.max(1, activeSession?.roundsSurvivedBeforeLoss || 1)
     : Math.max(1, streakCount);
@@ -2416,6 +2502,10 @@ function render() {
     startPuzzle(dayState.officialType, "official");
     return;
   }
+  if (activePlay.type === 'blood') {
+    renderBloodPuzzle();
+    return;
+  }
   if (activePlay.type === "word") {
     renderWordPuzzle();
     return;
@@ -2451,7 +2541,14 @@ async function initialise() {
     const dateKey = getDateKey();
     liveDateKey = getUtcDateKey(getCurrentTime());
     dayPreviewEnabled = isLocalPreview && dateKey !== liveDateKey;
-    localStorage = createDayPreviewStorage(browserStorage, dateKey, dayPreviewEnabled);
+    localStorage = createDayPreviewStorage(browserStorage, dateKey, dayPreviewEnabled, new URLSearchParams(window.location.search).get('previewRun') || '');
+    if (dayPreviewEnabled) {
+      const fresh = document.createElement('button'); fresh.id = 'fresh-dev-preview'; fresh.type = 'button'; fresh.className = 'dev-day-button'; fresh.textContent = 'FRESH PREVIEW';
+      fresh.addEventListener('click', () => {
+        const url = new URL(window.location.href); url.searchParams.set('previewRun', crypto.randomUUID()); window.location.assign(url.href);
+      });
+      document.querySelector('.site-footer > p')?.append(document.createTextNode(' '), fresh);
+    }
     migrateStoredRoundNumbering(localStorage, {
       streakKey: streakStorageKey,
       bestRoundKey: bestRoundStorageKey,
@@ -2468,6 +2565,7 @@ async function initialise() {
     lastPlayedDate = loadLastPlayedDate();
     puzzle = buildDailyPuzzle(dateKey, maps);
     wordPuzzle = buildDailyWordPuzzle(dateKey, wordEntries);
+    if (bloodTiesEnabled) bloodPuzzle = buildDailyBloodTiesPuzzle(dateKey);
     const legacyEasterState = loadState();
     dayState = loadMultiPuzzleDayState(legacyEasterState);
     state = dayState.sessions.easter;

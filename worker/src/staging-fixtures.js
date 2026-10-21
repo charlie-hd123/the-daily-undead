@@ -3,8 +3,9 @@ import { buildDailyWordPuzzle, calculateWordPoints } from "../../js/word-puzzle-
 import { getOfficialPuzzleType } from "../../js/daily-challenge-core.js";
 import { workerMaps } from "./generated-map-catalog.js";
 import { workerWords } from "./generated-word-catalog.js";
+import { buildDailyBloodTiesPuzzle, calculateBloodTiesPoints } from '../../js/blood-ties-core.js';
 
-const fixtureVersion = 1;
+const fixtureVersion = 2;
 const ready = new WeakMap();
 const characters = [
   ["Richtofen", "richtofen", "World at War", "Der Riese"],
@@ -42,28 +43,29 @@ export function fixtureStatements(db, today) {
     const dateKey = date.toISOString().slice(0, 10);
     const map = buildDailyPuzzle(dateKey, workerMaps);
     const word = buildDailyWordPuzzle(dateKey, workerWords);
-    const official = getOfficialPuzzleType(dateKey);
+    const blood = buildDailyBloodTiesPuzzle(dateKey);
+    const official = getOfficialPuzzleType(dateKey, { bloodTies: true });
     for (let index = 0; index < 16; index += 1) {
       const correct = index < 12;
-      for (const type of ["easter", "word"]) {
+      for (const type of ["easter", "word", 'blood']) {
         statement(`INSERT OR IGNORE INTO puzzle_attempts (puzzle_date, puzzle_type, puzzle_id, player_hash, answer_id, answer_name, is_correct)
-          VALUES (?, ?, ?, ?, ?, ?, ?)`, dateKey, type, type === "word" ? word.key : map.key,
-        `staging-fixture-player-${index}`, type === "word" ? word.entry.id : map.map.id,
-        type === "word" ? word.entry.answer : map.map.title, correct ? 1 : 0);
+          VALUES (?, ?, ?, ?, ?, ?, ?)`, dateKey, type, type === 'blood' ? blood.key : type === "word" ? word.key : map.key,
+        `staging-fixture-player-${index}`, type === 'blood' ? 'blood-ties' : type === "word" ? word.entry.id : map.map.id,
+        type === 'blood' ? 'Four hidden connections' : type === "word" ? word.entry.answer : map.map.title, correct ? 1 : 0);
       }
       if (index >= characters.length) continue;
       const misses = index % 4;
       const clues = index % 3 + 1;
       const bonusCorrect = index % 2 === 0;
-      const mapPoints = official === "word" ? calculateWordPoints(misses) : [0, 50, 20, 10][clues];
+      const mapPoints = official === 'blood' ? calculateBloodTiesPoints(index % 3) : official === "word" ? calculateWordPoints(misses) : [0, 50, 20, 10][clues];
       const bonusPoints = official === "easter" && bonusCorrect ? mapPoints : 0;
       statement(`INSERT INTO player_daily_results (user_id, puzzle_date, puzzle_id, selected_map_id, clues_used, map_correct,
-        map_points, bonus_status, bonus_points, points_earned, completed_at, score_awarded, progression_applied, puzzle_type, word_misses)
-        VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, 1, ?, ?) ON CONFLICT(user_id, puzzle_date) DO NOTHING`,
-      `stage_demo_${String(index + 1).padStart(2, "0")}`, dateKey, official === "word" ? word.key : map.key,
-      official === "word" ? word.entry.id : map.map.id, clues, mapPoints,
-      official === "word" ? "unavailable" : bonusCorrect ? "correct" : "incorrect",
-      bonusPoints, mapPoints + bonusPoints, `${dateKey}T08:00:00Z`, mapPoints + bonusPoints, official, misses);
+        map_points, bonus_status, bonus_points, points_earned, completed_at, score_awarded, progression_applied, puzzle_type, word_misses, blood_misses)
+        VALUES (?, ?, ?, ?, ?, 1, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?) ON CONFLICT(user_id, puzzle_date) DO NOTHING`,
+      `stage_demo_${String(index + 1).padStart(2, "0")}`, dateKey, official === 'blood' ? blood.key : official === "word" ? word.key : map.key,
+      official === 'blood' ? 'blood-ties' : official === "word" ? word.entry.id : map.map.id, clues, mapPoints,
+      official !== 'easter' ? "unavailable" : bonusCorrect ? "correct" : "incorrect",
+      bonusPoints, mapPoints + bonusPoints, `${dateKey}T08:00:00Z`, mapPoints + bonusPoints, official, official === 'word' ? misses : 0, official === 'blood' ? index % 3 : 0);
     }
   }
   statement("INSERT OR IGNORE INTO staging_fixture_runs (date_key, version) VALUES (?, ?)", today, fixtureVersion);

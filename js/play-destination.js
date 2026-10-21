@@ -1,4 +1,4 @@
-import { isPuzzleSessionComplete } from './daily-challenge-core.js?v=20261021-1';
+import { isPuzzleSessionComplete } from './daily-challenge-core.js?v=20261021-2';
 
 const key = (date) => `the-daily-undead:play-destination:${date}`;
 
@@ -21,7 +21,7 @@ export function restorePlayDestination(storage, date, day) {
       if (progressed && !isPuzzleSessionComplete(type, session)) return { type, mode: 'for_fun' };
     }
     if (value?.screen === 'hub' && day.officialCompleted) return { screen: 'hub' };
-    if (!['word', 'easter'].includes(value?.type)) return null;
+    if (!['word', 'easter', 'blood'].includes(value?.type)) return null;
     const official = value.type === day.officialType;
     if (value.mode === 'official' && official) return { type: value.type, mode: 'official' };
     if (value.mode === 'for_fun' && !official && day.officialCompleted && day.sessions?.[value.type]) {
