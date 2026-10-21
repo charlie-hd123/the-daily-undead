@@ -3,8 +3,8 @@ export const SOUND_PREFERENCE_KEY = 'the-daily-undead:sound-enabled';
 export const SOUND_CUES = {
   "mystery-box-a": {
     "files": [
-      "mystery-box-a-3a0117ff8a.wav",
-      "mystery-box-a-6060edf828.m4a"
+      "mystery-box-a-510129c141.wav",
+      "mystery-box-a-b24cfcc6a4.m4a"
     ],
     "gain": 0.86
   },
@@ -45,8 +45,8 @@ export const SOUND_CUES = {
   },
   "quest-clue-reveal": {
     "files": [
-      "quest-clue-reveal-81ddbaf63d.wav",
-      "quest-clue-reveal-4e64d9c6f1.m4a"
+      "quest-clue-reveal-c1f190285d.wav",
+      "quest-clue-reveal-b3d34b2956.m4a"
     ],
     "gain": 0.8
   },

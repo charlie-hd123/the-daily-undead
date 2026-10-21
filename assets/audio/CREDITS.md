@@ -1,11 +1,30 @@
-# The Daily Undead sound effects · feedback revision 2.3
+# The Daily Undead sound effects · feedback revision 2.4
 
 The active pack contains 17 original effects, all generated locally. No Treyarch
 recording, transcribed melody, door creak, speech or background music is included
 in the current playback table. No paid service or downloaded sample was used for
 this revision.
 
-## Latest listening feedback · revision 2.3
+## Latest listening feedback · revision 2.4
+
+Only Mystery Box and clue-reveal audio changed. The other 15 cue pairs, all gains,
+button routing and delayed bonus reward timing remain unchanged from revision 2.3.
+
+- Box: a nonmusical hollow mechanism rattle and inward breath. Short inharmonic
+  material contacts follow the lid opening; broad air resonances accompany the
+  lift. This gesture ends by 1.3 s, with quiet contacts at the unchanged settle
+  and assembly beats. No music-box melody, comb tones, glass, creak or ending chord.
+- Clue: a 280 ms rounded pressure pulse with a soft, falling body. The glass
+  synthesis and reverse swell are removed entirely. No chime, note sequence,
+  paper, scrape or radio texture.
+
+These are original procedural synthesis using local numpy and macOS afconvert.
+No downloaded audio or paid generation services were used. No direct listening
+assessment was available; WAV and decoded AAC signal checks are recorded in the
+review pack. Rebuild with `python scripts/revise-audio-timing.py --feedback-r6`;
+the standalone audition player is in `audio-review/2026-10-21-r6`.
+
+## Previous listening feedback · revision 2.3
 
 Only Mystery Box and clue-reveal audio files changed. The other 15 cue pairs,
 including run ended, and every playback gain remain bit-identical to revision 2.2.
