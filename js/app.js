@@ -1,7 +1,7 @@
-import { browserStorage } from "./browser-storage.js?v=20261021-2";
-import { buildDailyBloodTiesPuzzle, createBloodTiesSession, normalizeBloodTiesSession, replayBloodTiesAttempts } from './blood-ties-core.js?v=20261021-2';
-import { renderBloodTiesView } from './blood-ties-view.js?v=20261021-2';
-import { rememberPlayDestination, restorePlayDestination } from "./play-destination.js?v=20261021-2";
+import { browserStorage } from "./browser-storage.js?v=20261021-3";
+import { buildDailyBloodTiesPuzzle, createBloodTiesSession, normalizeBloodTiesSession, replayBloodTiesAttempts } from './blood-ties-core.js?v=20261021-3';
+import { renderBloodTiesView } from './blood-ties-view.js?v=20261021-3';
+import { rememberPlayDestination, restorePlayDestination } from "./play-destination.js?v=20261021-3";
 import {
   buildDailyPuzzle,
   calculateBonusPoints,
@@ -16,19 +16,19 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261021-2";
+} from "./game-core.js?v=20261021-3";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
   shouldHandleWordShortcut,
-} from "./word-puzzle-core.js?v=20261021-2";
+} from "./word-puzzle-core.js?v=20261021-3";
 import {
   getOfficialPuzzleType as selectOfficialPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261021-2";
+} from "./daily-challenge-core.js?v=20261021-3";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -37,29 +37,29 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261021-2";
+} from "./progression.js?v=20261021-3";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261021-2";
+} from "./account.js?v=20261021-3";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261021-2";
+} from "./community-stats.js?v=20261021-3";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261021-2";
-import { fetchWithTimeout } from "./network.js?v=20261021-2";
-import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261021-2";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261021-2";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261021-2";
-import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261021-2";
-import { createMysteryBox } from "./mystery-box.js?v=20261021-2";
-import { initialiseGameAudio, letterSound } from "./game-audio.js?v=20261021-2";
+} from "./leaderboards.js?v=20261021-3";
+import { fetchWithTimeout } from "./network.js?v=20261021-3";
+import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261021-3";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261021-3";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261021-3";
+import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261021-3";
+import { createMysteryBox } from "./mystery-box.js?v=20261021-3";
+import { initialiseGameAudio, letterSound } from "./game-audio.js?v=20261021-3";
 
 const gameAudio = initialiseGameAudio(browserStorage);
 const mysteryBox = createMysteryBox({
@@ -67,7 +67,6 @@ const mysteryBox = createMysteryBox({
   onOpen: () => { void gameAudio.play('mystery-box-a'); },
   onCancel: () => gameAudio.stopCue('mystery-box-a'),
 });
-const pendingWordSounds = new WeakSet();
 
 const app = document.querySelector("#app");
 const dateLabel = document.querySelector("#puzzle-date");
@@ -229,19 +228,19 @@ const puzzleTypes = {
     name: "Quest Steps",
     kicker: "Easter egg puzzle",
     description: "Can you identify the Zombies map from its Easter egg steps?",
-    image: "./assets/quest-steps-card.svg?v=20261021-2",
+    image: "./assets/quest-steps-card.svg?v=20261021-3",
   },
   word: {
     name: "Last Words",
     kicker: "Letter puzzle",
     description: "Can you identify the Zombies word or phrase by revealing its letters?",
-    image: "./assets/dead-letters-card.svg?v=20261021-2",
+    image: "./assets/dead-letters-card.svg?v=20261021-3",
   },
 };
 if (bloodTiesEnabled) puzzleTypes.blood = {
   name: 'Blood Ties', kicker: 'Connection puzzle',
   description: 'Can you uncover the hidden connections between Zombies maps, weapons and more?',
-  image: './assets/blood-ties-card.svg?v=20261021-2',
+  image: './assets/blood-ties-card.svg?v=20261021-3',
 };
 
 function escapeHtml(value) {
@@ -1630,7 +1629,6 @@ function applyOfficialWordProgression(session, success, points) {
 }
 
 function finishWordPuzzle(session, success) {
-  const withSound = pendingWordSounds.delete(session);
   const points = success ? calculateWordPoints(session.wrongGuesses) : 0;
   session.pendingResult = null;
   session.complete = true;
@@ -1655,12 +1653,6 @@ function finishWordPuzzle(session, success) {
   saveState();
   recordCommunityAttemptFor("word", success);
   renderWordResult(session, activePlay?.mode || "for_fun");
-  if (withSound) {
-    if (!success) void gameAudio.play('run-ended');
-    else {
-      playScoreCount(points);
-    }
-  }
 }
 
 function finishPendingWordResult(session) {
@@ -1831,14 +1823,17 @@ function submitLetter(value) {
   }
   const cue = letterSound({ correct, solved, streak: session.correctStreak });
   if (solved) void gameAudio.reward(cue); else void gameAudio.play(cue);
-  if (solved || session.wrongGuesses >= 5) pendingWordSounds.add(session);
   if (solved) {
+    // Schedule from the accepted guess, before rendering normalizes the session.
+    // The audio engine cancels these pending cues on mute, hiding or navigation.
+    if (official) gameAudio.countPoints(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 0 : 720, { delay: getWordCompletionDelay(true) });
     session.pendingResult = "success";
     saveState();
     renderWordPuzzle({ revealLetter: letter, feedbackLetter: letter, statusMessage: "Answer revealed!", statusType: "complete" });
     return;
   }
   if (session.wrongGuesses >= 5) {
+    void gameAudio.play('run-ended', { delay: getWordCompletionDelay(false) });
     session.pendingResult = "failure";
     saveState();
     renderWordPuzzle({ scoreChanged: true, feedbackLetter: letter, statusMessage: "No guesses remaining." });

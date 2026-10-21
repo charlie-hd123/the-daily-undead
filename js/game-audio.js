@@ -3,8 +3,8 @@ export const SOUND_PREFERENCE_KEY = 'the-daily-undead:sound-enabled';
 export const SOUND_CUES = {
   "mystery-box-a": {
     "files": [
-      "mystery-box-a-1ff26a32b0.wav",
-      "mystery-box-a-c7af3da689.m4a"
+      "mystery-box-a-4438f0eefe.wav",
+      "mystery-box-a-959ccdc94f.m4a"
     ],
     "gain": 0.86
   },
@@ -45,8 +45,8 @@ export const SOUND_CUES = {
   },
   "quest-clue-reveal": {
     "files": [
-      "quest-clue-reveal-b9a12642b5.wav",
-      "quest-clue-reveal-eb48790f1e.m4a"
+      "quest-clue-reveal-e2480a882d.wav",
+      "quest-clue-reveal-fbe7a91ffc.m4a"
     ],
     "gain": 0.8
   },
@@ -115,8 +115,8 @@ export const SOUND_CUES = {
   },
   "run-ended": {
     "files": [
-      "run-ended-65b97ef178.wav",
-      "run-ended-bd57e182fd.m4a"
+      "run-ended-fc45b8974f.wav",
+      "run-ended-4cbf95aa7d.m4a"
     ],
     "gain": 0.93
   }
@@ -253,10 +253,10 @@ export function createGameAudio({
       return true;
     } catch { return false; }
   }
-  function countPoints(duration = 720) {
+  function countPoints(duration = 720, { delay = 0 } = {}) {
     stopCue('points-tick'); stopCue('points-finish');
-    if (duration > 0) for (let i = 0; i < 7; i++) void play('points-tick', { delay: i * duration / 8 });
-    void play('points-finish', { delay: duration });
+    if (duration > 0) for (let i = 0; i < 7; i++) void play('points-tick', { delay: delay + i * duration / 8 });
+    void play('points-finish', { delay: delay + duration });
   }
   function reward(cue, options) {
     for (const other of ['puzzle-solved-a', 'double-points-a']) stopCue(other);
