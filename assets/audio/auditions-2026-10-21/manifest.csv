@@ -1,0 +1,7 @@
+label,title,group,wav,compressed,duration,volume,note
+1A,Crooked toy box,Mystery Box,box-a-b73d80ca0d.wav,box-a-4efa737812.m4a,2.7,0.86,"A lower, uneven toy-box tune."
+1B,Muted strings,Mystery Box,box-b-f32321a814.wav,box-b-4a2cef7f19.m4a,2.7,0.86,Dry plucked strings with a dark falling answer.
+1C,Dark reed,Mystery Box,box-c-5fd663cba6.wav,box-c-98db0f8f47.m4a,2.7,0.86,"One rounded, eerie reed swell."
+8A,Dry switch,Clue reveal,clue-a-757709b537.wav,clue-a-182f8cff20.m4a,0.19,0.8,"A small, restrained double contact."
+8B,Warm pluck,Clue reveal,clue-b-0ac77b4c7a.wav,clue-b-aab565f880.m4a,0.35,0.8,"A short, warm string pluck."
+8C,Soft sweep,Clue reveal,clue-c-50d8e3b222.wav,clue-c-80da48da52.m4a,0.34,0.8,"A smooth, quiet brush of air."

@@ -1,4 +1,4 @@
-import { calculateBloodTiesPoints } from './blood-ties-core.js?v=20261021-6';
+import { calculateBloodTiesPoints } from './blood-ties-core.js?v=20261021-7';
 import { createRng, hashString, shuffle } from './game-core.js';
 
 const html = (value) => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
@@ -18,7 +18,7 @@ export function renderBloodTiesView({ app, puzzle, session, official, developer,
       ${official ? session.success ? '' : ' Your permanent Score and Solves are safe.' : ' This result did not affect your stats.'}</p>
       ${official && session.success ? `<div class="result-score-total"><span>Round score</span><strong data-count-to="${session.points}">${session.points}</strong></div>` : ''}
       ${official && !session.success ? `<p class="survival-summary">Your next game starts at <strong>Round 1</strong>.</p>` : ''}</div>`
-      : `<img class="puzzle-panel-art" src="./assets/blood-ties-card.svg?v=20261021-6" alt="" width="240" height="240" aria-hidden="true">
+      : `<img class="puzzle-panel-art" src="./assets/blood-ties-card.svg?v=20261021-7" alt="" width="240" height="240" aria-hidden="true">
       ${heading('Blood Ties', 'Find three tiles with a shared connection. Four groups. Three chances.', official ? 'Today’s round' : 'Just for fun', true)}
       <div class="word-scoreboard${official ? '' : ' is-single'}"><div class="blood-attempts"><span>Mistakes remaining</span><strong>${3 - session.misses} / 3</strong><div class="blood-life-meter" aria-hidden="true">${[0, 1, 2].map((i) => `<i class="${i < 3 - session.misses ? 'is-active' : ''}"></i>`).join('')}</div></div>
       ${official ? `<div><span>Potential score</span><strong>${calculateBloodTiesPoints(session.misses)}</strong></div>` : ''}</div>

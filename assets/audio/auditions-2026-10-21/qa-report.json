@@ -1,0 +1,43 @@
+{
+  "result": "PASS",
+  "format": "48 kHz mono 16-bit PCM WAV primary, 192 kb/s AAC fallback",
+  "source_and_aac_decode_checks": [
+    {
+      "id": "box-a",
+      "duration": 2.7,
+      "true_peak_dbfs": -7.593,
+      "aac_true_peak_dbfs": -7.586
+    },
+    {
+      "id": "box-b",
+      "duration": 2.7,
+      "true_peak_dbfs": -6.53,
+      "aac_true_peak_dbfs": -6.541
+    },
+    {
+      "id": "box-c",
+      "duration": 2.7,
+      "true_peak_dbfs": -8.401,
+      "aac_true_peak_dbfs": -8.398
+    },
+    {
+      "id": "clue-a",
+      "duration": 0.19,
+      "true_peak_dbfs": -3.5,
+      "aac_true_peak_dbfs": -3.505
+    },
+    {
+      "id": "clue-b",
+      "duration": 0.35,
+      "true_peak_dbfs": -10.763,
+      "aac_true_peak_dbfs": -10.779
+    },
+    {
+      "id": "clue-c",
+      "duration": 0.34,
+      "true_peak_dbfs": -5.102,
+      "aac_true_peak_dbfs": -5.095
+    }
+  ],
+  "listening_assessment": false
+}
