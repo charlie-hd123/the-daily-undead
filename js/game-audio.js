@@ -3,8 +3,8 @@ export const SOUND_PREFERENCE_KEY = 'the-daily-undead:sound-enabled';
 export const SOUND_CUES = {
   "mystery-box-a": {
     "files": [
-      "mystery-box-a-4438f0eefe.wav",
-      "mystery-box-a-959ccdc94f.m4a"
+      "mystery-box-a-b6d6b9b106.wav",
+      "mystery-box-a-940dc68456.m4a"
     ],
     "gain": 0.86
   },
@@ -45,8 +45,8 @@ export const SOUND_CUES = {
   },
   "quest-clue-reveal": {
     "files": [
-      "quest-clue-reveal-e2480a882d.wav",
-      "quest-clue-reveal-fbe7a91ffc.m4a"
+      "quest-clue-reveal-4f6c4b9d03.wav",
+      "quest-clue-reveal-58ed62eac9.m4a"
     ],
     "gain": 0.8
   },
@@ -253,10 +253,12 @@ export function createGameAudio({
       return true;
     } catch { return false; }
   }
-  function countPoints(duration = 720, { delay = 0 } = {}) {
+  function countPoints(duration = 720, { delay = 0, reward: rewardCue } = {}) {
     stopCue('points-tick'); stopCue('points-finish');
     if (duration > 0) for (let i = 0; i < 7; i++) void play('points-tick', { delay: delay + i * duration / 8 });
     void play('points-finish', { delay: delay + duration });
+    // Let the 430ms finishing ping settle before the bonus flourish begins.
+    if (rewardCue) void reward(rewardCue, { delay: delay + duration + 500 });
   }
   function reward(cue, options) {
     for (const other of ['puzzle-solved-a', 'double-points-a']) stopCue(other);

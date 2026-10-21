@@ -1,11 +1,31 @@
-# The Daily Undead sound effects · feedback revision 2.1
+# The Daily Undead sound effects · feedback revision 2.2
 
 The active pack contains 17 original effects, all generated locally. No Treyarch
 recording, transcribed melody, door creak, speech or background music is included
 in the current playback table. No paid service or downloaded sample was used for
 this revision.
 
-## Latest listening feedback
+## Latest listening feedback · revision 2.2
+
+Only Mystery Box and clue-reveal files were replaced in this revision. The other
+15 active cue pairs, including the approved run-ended impact, and all gains are
+bit-identical to revision 2.1.
+
+- Box: the closing musical note is removed. Three notes use a darker, unresolved
+  tritone contour; the tapping follows the same animation beats. The final
+  assembly contact is now a dull tap instead of a ringing contact.
+- Clue: a brief reversed-glass glint replaces the stone/ceramic cue. No scrape,
+  paper, hollow-knock or noise layer.
+- Double Points: the accepted reward file is unchanged. It starts after the
+  720 ms count and the 430 ms finishing ping, with 70 ms of breathing room
+  (1220 ms after the result appears). Reduced motion waits 500 ms after its
+  immediate total and ping. Unscored play has no count and keeps its immediate
+  reward. Muting, leaving the page or navigating cancels the scheduled flourish.
+
+Rebuild with `python scripts/revise-audio-timing.py --feedback-r4`. The review
+player and montage are written to `audio-review/2026-10-21-r4`.
+
+## Previous listening feedback · revision 2.1
 
 Only three files were replaced. The other 14 active cue pairs and all playback
 gains are bit-identical to revision 2.0.

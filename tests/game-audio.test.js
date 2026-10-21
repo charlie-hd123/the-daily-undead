@@ -183,6 +183,26 @@ test('letter progression caps its motif and a completed answer gets a single sol
   assert.equal(letterSound({ correct: true, solved: true, streak: 3 }), 'puzzle-solved-a');
 });
 
+test('bonus flourish follows the settled points and finishing ping, including reduced motion', async () => {
+  for (const duration of [720, 0]) {
+    const f = fixture({
+      fetchAudio: async url => ({ ok: true, arrayBuffer: async () => ({ filename: String(url) }) }),
+      decode: async bytes => ({ duration: .43, filename: bytes.filename }),
+    });
+    f.audio.unlock(); await f.audio.prepare();
+    f.audio.countPoints(duration, { reward: 'double-points-a' });
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(f.starts.length, duration ? 9 : 2);
+    const ping = f.starts.at(-2), flourish = f.starts.at(-1);
+    assert.ok(ping.buffer.filename.includes('/points-finish-'));
+    assert.ok(flourish.buffer.filename.includes('/double-points-a-'));
+    assert.ok(flourish.at > ping.at + ping.buffer.duration);
+    assert.ok(flourish.at >= 10 + duration / 1000);
+    f.audio.setEnabled(false);
+    assert.equal(f.stopped.length, f.starts.length);
+  }
+});
+
 test('delayed word-result counts align with the result and are cancelled by navigation or mute', async () => {
   for (const cancel of [audio => audio.stopAll(), audio => audio.setEnabled(false)]) {
     const f = fixture(); f.audio.unlock(); await f.audio.prepare();
