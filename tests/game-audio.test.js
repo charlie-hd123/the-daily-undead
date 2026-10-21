@@ -34,7 +34,7 @@ test('no autoplay; accepted interaction unlocks warmed audio and schedules at th
   assert.equal(f.starts.length, 0);
   f.audio.unlock();
   assert.equal(await f.audio.play('mystery-box-a'), true);
-  assert.equal(await f.audio.play('highest-round', { delay: 1450 }), true);
+  assert.equal(await f.audio.play('double-points-a', { delay: 1450 }), true);
   assert.equal(f.starts[0].at, 10);
   assert.equal(f.starts[1].at, 11.45);
 });
@@ -88,7 +88,7 @@ test('muting during an asynchronous resume still cancels the first pending cue',
 
 test('muting cancels active/future sounds and persists across instances', async () => {
   const f = fixture(); f.audio.unlock(); await f.audio.prepare();
-  await f.audio.play('highest-round', { delay: 1100 });
+  await f.audio.play('double-points-a', { delay: 1100 });
   f.audio.setEnabled(false);
   assert.equal(f.stopped.length, 1);
   assert.equal(f.values.get(SOUND_PREFERENCE_KEY), 'false');
@@ -126,11 +126,43 @@ test('background tabs, unavailable audio, bad assets and stale downloads stay si
   assert.equal(await pending, false);
 });
 
-test('WAV fallback covers browsers without AAC decoding support', async () => {
+test('lossless WAV is primary, with AAC fallback if that download fails', async () => {
+  const requested = [];
   const f = fixture({ fetchAudio: async url => ({ ok: true, arrayBuffer: async () => ({ filename: String(url) }) }),
-    decode: async bytes => { if (bytes.filename.endsWith('.m4a')) throw new Error('AAC unsupported'); return { duration: .5 }; } });
+    decode: async bytes => { requested.push(bytes.filename); if (bytes.filename.endsWith('.wav')) throw new Error('WAV unavailable'); return { duration: .5 }; } });
   f.audio.unlock(); await f.audio.prepare();
   assert.equal(await f.audio.play('letter-correct'), true);
+  const correct = requested.filter(name => name.includes('/letter-correct-'));
+  assert.equal(correct.length, 2);
+  assert.ok(correct[0].endsWith('.wav')); assert.ok(correct[1].endsWith('.m4a'));
+});
+
+test('ordinary buttons get one low click after navigation cleanup; dedicated cues and disabled controls take priority', async () => {
+  const f = fixture(), handlers = new Map();
+  const document = { querySelector: () => null, addEventListener: (name, fn) => handlers.set(name, fn) };
+  const audio = initialiseGameAudio(f.platform.storage, document, { addEventListener() {} }, f.platform);
+  await audio.prepare();
+  const click = (selector, { disabled = false, trusted = true } = {}) => {
+    const button = { disabled, getAttribute: () => null,
+      matches: selectors => selectors.split(',').map(s => s.trim()).includes(selector) };
+    handlers.get('click')({ isTrusted: trusted, type: 'click', target: { closest: () => button } });
+  };
+  click('#back-to-clues'); audio.stopAll(); // The real navigation cleanup happens in the target handler.
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(f.starts.length, 1);
+  click('#lock-answer'); await new Promise(resolve => setImmediate(resolve));
+  assert.equal(f.starts.length, 2);
+  for (const selector of ['[data-letter]', '[data-bonus-step-id]', '#mb-open-trigger', '#sound-toggle', '#reveal-clue', '#confirm-map', '#submit-order']) click(selector);
+  click('#back-to-clues', { disabled: true }); click('#back-to-clues', { trusted: false });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(f.starts.length, 2);
+});
+
+test('removed heartbeat and highest-round cues cannot be scheduled', async () => {
+  const f = fixture(); f.audio.unlock(); await f.audio.prepare();
+  assert.equal(await f.audio.play('last-miss-warning'), false);
+  assert.equal(await f.audio.play('highest-round'), false);
+  assert.equal(f.starts.length, 0);
 });
 
 test('score ticks are bounded to the 720ms animation, with one final ping; reduced motion uses only the ping', async () => {
@@ -151,14 +183,21 @@ test('letter progression caps its motif and a completed answer gets a single sol
   assert.equal(letterSound({ correct: true, solved: true, streak: 3 }), 'puzzle-solved-a');
 });
 
-test('every deployed cue has content-matching AAC and WAV exports', async () => {
-  assert.equal(Object.keys(SOUND_CUES).length, 19);
+test('every deployed cue has content-matching lossless WAV and AAC exports matching the review manifest', async () => {
+  assert.equal(Object.keys(SOUND_CUES).length, 17);
+  const manifest = JSON.parse(await readFile(new URL('../assets/audio/manifest.json', import.meta.url)));
+  assert.deepEqual(manifest.cues, SOUND_CUES);
   for (const { files, gain } of Object.values(SOUND_CUES)) {
     assert.ok(gain > 0 && gain <= 1);
+    assert.ok(files[0].endsWith('.wav'));
     for (const filename of files) {
       const bytes = await readFile(new URL(`../assets/audio/${filename}`, import.meta.url));
       assert.ok(bytes.length > 44);
       assert.ok(filename.includes(createHash('sha256').update(bytes).digest('hex').slice(0,10)));
+      if (filename.endsWith('.wav')) {
+        assert.equal(bytes.readUInt16LE(22), 1); assert.equal(bytes.readUInt32LE(24), 48000);
+        assert.equal(bytes.readUInt16LE(34), 16);
+      }
     }
   }
 });

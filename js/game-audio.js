@@ -3,142 +3,135 @@ export const SOUND_PREFERENCE_KEY = 'the-daily-undead:sound-enabled';
 export const SOUND_CUES = {
   "mystery-box-a": {
     "files": [
-      "mystery-box-a-73eea105ab.m4a",
-      "mystery-box-a-f65373c6d3.wav"
+      "mystery-box-a-1ff26a32b0.wav",
+      "mystery-box-a-c7af3da689.m4a"
     ],
-    "gain": 0.82
+    "gain": 0.86
   },
   "letter-correct": {
     "files": [
-      "letter-correct-9997a6ad45.m4a",
-      "letter-correct-71f6ba1071.wav"
+      "letter-correct-f1039ca387.wav",
+      "letter-correct-531e622746.m4a"
     ],
-    "gain": 0.56
+    "gain": 0.8
   },
   "letter-streak-2": {
     "files": [
-      "letter-streak-2-6778bd3f67.m4a",
-      "letter-streak-2-86996ef9a6.wav"
+      "letter-streak-2-2560dc380d.wav",
+      "letter-streak-2-6ed93ee869.m4a"
     ],
-    "gain": 0.57
+    "gain": 0.8
   },
   "letter-streak-3": {
     "files": [
-      "letter-streak-3-11ff77d735.m4a",
-      "letter-streak-3-22aca68b74.wav"
+      "letter-streak-3-535a030e0d.wav",
+      "letter-streak-3-d51fc142e5.m4a"
     ],
-    "gain": 0.57
+    "gain": 0.8
   },
   "letter-streak-4": {
     "files": [
-      "letter-streak-4-8d1b5cbd18.m4a",
-      "letter-streak-4-30be92596b.wav"
+      "letter-streak-4-85a5275467.wav",
+      "letter-streak-4-54a031aeeb.m4a"
     ],
-    "gain": 0.57
+    "gain": 0.8
   },
   "letter-wrong": {
     "files": [
-      "letter-wrong-1934c75474.m4a",
-      "letter-wrong-e27aaf210a.wav"
+      "letter-wrong-4e3d88f213.wav",
+      "letter-wrong-dfd4364d52.m4a"
     ],
-    "gain": 0.57
-  },
-  "last-miss-warning": {
-    "files": [
-      "last-miss-warning-f86cdb31c6.m4a",
-      "last-miss-warning-476ec272cd.wav"
-    ],
-    "gain": 0.54
+    "gain": 0.83
   },
   "quest-clue-reveal": {
     "files": [
-      "quest-clue-reveal-69927ac3d7.m4a",
-      "quest-clue-reveal-2854103a2b.wav"
+      "quest-clue-reveal-b9a12642b5.wav",
+      "quest-clue-reveal-eb48790f1e.m4a"
     ],
-    "gain": 0.59
+    "gain": 0.8
   },
   "map-select": {
     "files": [
-      "map-select-e3b227f116.m4a",
-      "map-select-04723e43e4.wav"
-    ],
-    "gain": 0.5
-  },
-  "answer-lock": {
-    "files": [
-      "answer-lock-6dc008b8f4.m4a",
-      "answer-lock-2697dcc555.wav"
-    ],
-    "gain": 0.66
-  },
-  "puzzle-solved-a": {
-    "files": [
-      "puzzle-solved-a-790620ac70.m4a",
-      "puzzle-solved-a-7c2b8cd881.wav"
+      "map-select-80c02bff55.wav",
+      "map-select-5642da90e3.m4a"
     ],
     "gain": 0.78
   },
+  "answer-lock": {
+    "files": [
+      "answer-lock-1aff394e01.wav",
+      "answer-lock-3db4981896.m4a"
+    ],
+    "gain": 0.8
+  },
+  "puzzle-solved-a": {
+    "files": [
+      "puzzle-solved-a-fd5b93632a.wav",
+      "puzzle-solved-a-b3075927a0.m4a"
+    ],
+    "gain": 0.96
+  },
   "bonus-step-1": {
     "files": [
-      "bonus-step-1-74f7f6214d.m4a",
-      "bonus-step-1-90929389a9.wav"
+      "bonus-step-1-30b7ada146.wav",
+      "bonus-step-1-ddef9d1d7e.m4a"
     ],
-    "gain": 0.54
+    "gain": 0.8
   },
   "bonus-step-2": {
     "files": [
-      "bonus-step-2-3e28995d55.m4a",
-      "bonus-step-2-aae221d901.wav"
+      "bonus-step-2-8e93d9e974.wav",
+      "bonus-step-2-1bf0c08ef0.m4a"
     ],
-    "gain": 0.54
+    "gain": 0.8
   },
   "bonus-step-3": {
     "files": [
-      "bonus-step-3-0f72da27bb.m4a",
-      "bonus-step-3-b26fc82e75.wav"
+      "bonus-step-3-de776e1933.wav",
+      "bonus-step-3-182cfe85a5.m4a"
     ],
-    "gain": 0.54
+    "gain": 0.8
   },
   "double-points-a": {
     "files": [
-      "double-points-a-1e9a3df6bb.m4a",
-      "double-points-a-1b2f1749f4.wav"
+      "double-points-a-d81c85b7a7.wav",
+      "double-points-a-5644f63f18.m4a"
     ],
-    "gain": 0.88
+    "gain": 1.0
   },
   "points-tick": {
     "files": [
-      "points-tick-fb36a914c2.m4a",
-      "points-tick-b3b5953397.wav"
+      "points-tick-93b6bdcdb4.wav",
+      "points-tick-ac4cb1680d.m4a"
     ],
-    "gain": 0.32
+    "gain": 0.88
   },
   "points-finish": {
     "files": [
-      "points-finish-302ddcd4cf.m4a",
-      "points-finish-8640407817.wav"
+      "points-finish-b3c9d11bdf.wav",
+      "points-finish-328bc199b5.m4a"
     ],
-    "gain": 0.51
-  },
-  "highest-round": {
-    "files": [
-      "highest-round-ce207ba1d7.m4a",
-      "highest-round-410d45646f.wav"
-    ],
-    "gain": 0.76
+    "gain": 0.9
   },
   "run-ended": {
     "files": [
-      "run-ended-27dc8906f0.m4a",
-      "run-ended-bbf0f3138d.wav"
+      "run-ended-65b97ef178.wav",
+      "run-ended-bd57e182fd.m4a"
     ],
-    "gain": 0.72
+    "gain": 0.93
   }
 };
 
 export function letterSound({ correct, solved, streak = 0 }) {
   if (solved) return 'puzzle-solved-a';
   return correct ? streak >= 2 ? `letter-streak-${Math.min(4, streak)}` : 'letter-correct' : 'letter-wrong';
+}
+
+// Dedicated action sounds take priority over ordinary interface feedback.
+export function buttonSound(button) {
+  if (!button || button.disabled || button.getAttribute('aria-disabled') === 'true') return null;
+  if (button.matches('[data-letter], [data-bonus-step-id], #mb-open-trigger, #sound-toggle, #reveal-clue, #confirm-map, #submit-order')) return null;
+  return 'map-select';
 }
 
 export function createGameAudio({
@@ -150,14 +143,30 @@ export function createGameAudio({
 } = {}) {
   let enabled = true;
   try { enabled = storage?.getItem(SOUND_PREFERENCE_KEY) !== 'false'; } catch { /* session-only preference */ }
-  let context, unlocked = false, generation = 0;
+  let context, output, unlocked = false, generation = 0;
   let resumeReady = Promise.resolve(false);
   const buffers = new Map(), sources = new Set(), cueGenerations = new Map();
   const supported = typeof AudioContext === 'function' && typeof fetchAudio === 'function';
 
   function getContext() {
     if (!supported) return null;
-    try { context ||= new AudioContext({ latencyHint: 'interactive' }); } catch { return null; }
+    try {
+      if (!context) {
+        context = new AudioContext({ latencyHint: 'interactive' });
+        output = context.destination;
+        // Leave normal cues untouched; catch peaks when reward/count/clicks overlap.
+        if (typeof context.createDynamicsCompressor === 'function') {
+          const limiter = context.createDynamicsCompressor();
+          limiter.threshold.value = -3;
+          limiter.knee.value = 0;
+          limiter.ratio.value = 20;
+          limiter.attack.value = .001;
+          limiter.release.value = .08;
+          limiter.connect(context.destination);
+          output = limiter;
+        }
+      }
+    } catch { return null; }
     return context;
   }
   function load(cue) {
@@ -170,7 +179,7 @@ export function createGameAudio({
           const response = await fetchAudio(new URL(`../assets/audio/${filename}`, import.meta.url));
           if (!response.ok) continue;
           return await audio.decodeAudioData(await response.arrayBuffer());
-        } catch { /* Decode unsupported AAC as WAV, or continue silently on failure. */ }
+        } catch { /* Try the alternate format, or continue silently on failure. */ }
       }
       return null;
     })();
@@ -235,8 +244,8 @@ export function createGameAudio({
       if (sources.size >= 24) stopSource(sources.values().next().value);
       const source = context.createBufferSource(), gain = context.createGain();
       source.buffer = buffer;
-      gain.gain.value = SOUND_CUES[cue].gain * .7;
-      source.connect(gain); gain.connect(context.destination);
+      gain.gain.value = SOUND_CUES[cue].gain;
+      source.connect(gain); gain.connect(output);
       const entry = { source, gain, cue };
       sources.add(entry);
       source.onended = () => { sources.delete(entry); source.disconnect(); gain.disconnect(); };
@@ -250,7 +259,7 @@ export function createGameAudio({
     void play('points-finish', { delay: duration });
   }
   function reward(cue, options) {
-    for (const other of ['puzzle-solved-a', 'double-points-a', 'highest-round']) stopCue(other);
+    for (const other of ['puzzle-solved-a', 'double-points-a']) stopCue(other);
     return play(cue, options);
   }
   return { supported, get enabled() { return enabled; }, prepare, ready, unlock, play, reward, countPoints, stopCue, stopAll, setEnabled };
@@ -270,7 +279,15 @@ export function initialiseGameAudio(storage, document = globalThis.document, win
   button?.addEventListener('click', () => { audio.setEnabled(!audio.enabled); update(); });
   // Touch browsers may grant activation only at touchend/click, not pointerdown.
   // Capture click before the box/button handler requests its very first cue.
-  for (const event of ['pointerdown', 'touchend', 'click', 'keydown']) document.addEventListener(event, (event) => { if (event.isTrusted) audio.unlock(); }, { capture: true, passive: true });
+  for (const event of ['pointerdown', 'touchend', 'click', 'keydown']) document.addEventListener(event, (event) => {
+    if (!event.isTrusted) return;
+    audio.unlock();
+    if (event.type !== 'click') return;
+    const cue = buttonSound(event.target?.closest?.('button, [role="button"], [role="tab"]'));
+    // Puzzle navigation cancels the previous screen's audio synchronously.
+    // Start the new click afterwards so that cleanup doesn't swallow it.
+    if (cue) queueMicrotask(() => { void audio.play(cue); });
+  }, { capture: true, passive: true });
   document.addEventListener('visibilitychange', () => { if (document.hidden) audio.stopAll(); });
   window.addEventListener('pagehide', () => audio.stopAll());
   window.addEventListener('storage', (event) => {
@@ -281,7 +298,7 @@ export function initialiseGameAudio(storage, document = globalThis.document, win
     }
   });
   update();
-  // Decode while suspended so the first genuine box tap already has its latch ready.
+  // Decode while suspended so the first genuine box tap already has its jingle ready.
   void audio.prepare();
   return audio;
 }

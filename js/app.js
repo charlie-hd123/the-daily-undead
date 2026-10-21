@@ -1,5 +1,5 @@
-import { browserStorage } from "./browser-storage.js?v=20261020-15";
-import { rememberPlayDestination, restorePlayDestination } from "./play-destination.js?v=20261020-15";
+import { browserStorage } from "./browser-storage.js?v=20261021-1";
+import { rememberPlayDestination, restorePlayDestination } from "./play-destination.js?v=20261021-1";
 import {
   buildDailyPuzzle,
   calculateBonusPoints,
@@ -14,20 +14,20 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261020-15";
+} from "./game-core.js?v=20261021-1";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
   shouldHandleWordShortcut,
-} from "./word-puzzle-core.js?v=20261020-15";
+} from "./word-puzzle-core.js?v=20261021-1";
 import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261020-15";
+} from "./daily-challenge-core.js?v=20261021-1";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -36,29 +36,29 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261020-15";
+} from "./progression.js?v=20261021-1";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261020-15";
+} from "./account.js?v=20261021-1";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261020-15";
+} from "./community-stats.js?v=20261021-1";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261020-15";
-import { fetchWithTimeout } from "./network.js?v=20261020-15";
-import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261020-15";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261020-15";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261020-15";
-import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261020-15";
-import { createMysteryBox } from "./mystery-box.js?v=20261020-15";
-import { initialiseGameAudio, letterSound } from "./game-audio.js?v=20261020-15";
+} from "./leaderboards.js?v=20261021-1";
+import { fetchWithTimeout } from "./network.js?v=20261021-1";
+import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261021-1";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261021-1";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261021-1";
+import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261021-1";
+import { createMysteryBox } from "./mystery-box.js?v=20261021-1";
+import { initialiseGameAudio, letterSound } from "./game-audio.js?v=20261021-1";
 
 const gameAudio = initialiseGameAudio(browserStorage);
 const mysteryBox = createMysteryBox({
@@ -217,13 +217,13 @@ const puzzleTypes = {
     name: "Quest Steps",
     kicker: "Easter egg puzzle",
     description: "Can you identify the Zombies map from its Easter egg steps?",
-    image: "./assets/quest-steps-card.svg?v=20261020-15",
+    image: "./assets/quest-steps-card.svg?v=20261021-1",
   },
   word: {
     name: "Last Words",
     kicker: "Letter puzzle",
     description: "Can you identify the Zombies word or phrase by revealing its letters?",
-    image: "./assets/dead-letters-card.svg?v=20261020-15",
+    image: "./assets/dead-letters-card.svg?v=20261021-1",
   },
 };
 
@@ -1573,7 +1573,6 @@ function finishWordPuzzle(session, success) {
     if (!success) void gameAudio.play('run-ended');
     else {
       playScoreCount(points);
-      if (isOfficialPlay("word") && session.newBestRound) void gameAudio.play('highest-round', { delay: 1100 });
     }
   }
 }
@@ -1745,10 +1744,8 @@ function submitLetter(value) {
     session.correctStreak = 0;
   }
   const cue = letterSound({ correct, solved, streak: session.correctStreak });
-  gameAudio.stopCue('last-miss-warning');
   if (solved) void gameAudio.reward(cue); else void gameAudio.play(cue);
   if (solved || session.wrongGuesses >= 5) pendingWordSounds.add(session);
-  if (!correct && session.wrongGuesses === 4) void gameAudio.play('last-miss-warning', { delay: 380 });
   if (solved) {
     session.pendingResult = "success";
     saveState();
@@ -1886,7 +1883,6 @@ function renderGameSelection() {
   });
   app.querySelectorAll("[data-game-id]").forEach((button) => {
     button.addEventListener("click", () => {
-      void gameAudio.play('map-select');
       setState({
         phase: "map",
         selectedGameId: button.dataset.gameId,
@@ -1939,7 +1935,6 @@ function renderMapSelection() {
   app.querySelectorAll("[data-map-id]").forEach((button) => {
     button.addEventListener("click", () => {
       const mapId = button.dataset.mapId;
-      if (mapId !== state.selectedMapId) void gameAudio.play('map-select');
       state = { ...state, selectedMapId: mapId };
       saveState();
       app.querySelectorAll("[data-map-id]").forEach((candidate) => {
@@ -2012,7 +2007,6 @@ function renderMapSelection() {
     }
     if (isCorrect) {
       void gameAudio.reward('puzzle-solved-a', { delay: 90 });
-      if (newBestRound) void gameAudio.play('highest-round', { delay: 1450 });
     } else void gameAudio.play('run-ended', { delay: 90 });
   });
 }
@@ -2403,6 +2397,7 @@ function renderResult() {
     if (bonusSubmissionPending) return;
     if (official && !confirmAccountResultSubmission(accountController)) return;
     const bonusCorrect = isCorrectOrder(state.bonusOrder, puzzle.chronologicalSteps);
+    if (bonusCorrect) void gameAudio.play('answer-lock');
     if (official) {
       accountController.recordBonusResult({
         puzzleDate: puzzle.dateKey,

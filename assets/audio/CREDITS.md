@@ -1,6 +1,58 @@
-# The Daily Undead sound effects
+# The Daily Undead sound effects · feedback revision 2
 
-Mystery Box uses recorded wooden-door foley with original synthesis. All other effects are original local synthesis.
+The active pack contains 17 original effects, all generated locally. No Treyarch
+recording, transcribed melody, door creak, speech or background music is included
+in the current playback table. No paid service or downloaded sample was used for
+this revision.
+
+## Revision requested on 21 October 2026
+
+- Mystery Box: an original wind-up music-box jingle, timed to the existing
+  3.5-second reveal; no creak or detuned/unison layers.
+- Wrong answer: clean muted knock and short falling tones; no electrical fizzle.
+- Clue: dry page/card turnover and contact sounds instead of a supernatural sweep.
+- Ordinary buttons/maps: lower 285 Hz click, with upper contact partials for phone
+  speakers. Dedicated gameplay cues take priority, so buttons do not double up.
+- Points: clearer, substantially louder counting ticks and finishing ping.
+- Run ended: descending chamber-organ/bell sting with a restrained synthesised,
+  nonverbal creature texture.
+- Heartbeat and highest-round sounds removed from the active table and triggers.
+- Accepted letter/streak, confirmation, solve, bonus and Double Points sounds keep
+  their character, with level-only remastering.
+
+## Format, provenance and checks
+
+48 kHz mono 16-bit PCM WAV is the primary browser source; 192 kb/s AAC/M4A is the
+fallback. Filenames carry SHA-256 prefixes. Current files, triggers, durations,
+gains and measured levels are in `manifest.json`. Previous hashes remain for old
+open pages. Gameplay/scoring is unchanged.
+
+The previous quiet master multiplier is removed. Active-window RMS targets are
+about -17 to -19 dBFS before cue gain. The realistic gameplay montage peaks at
+-2.803 dBTP before the browser overlap limiter. WAVs and decoded AAC files are
+checked for silent endpoints, valid durations and no sample/four-times-interpolated
+peak clipping. These measurements are not BS.1770 LUFS or a listening assessment.
+The rewritten cues are dry mono, without chorus, flanging or detuned unisons.
+
+Rebuild with `python scripts/synthesise-feedback.py` (numpy + macOS afconvert).
+Outputs go to audio-review/2026-10-21 and the content-addressed runtime folder.
+Use `--verify` for file and decoded-signal checks without regeneration.
+
+Research references, for music-box character only:
+
+- https://www.reddit.com/r/CODZombies/comments/f9ambs/
+- https://www.youtube.com/watch?v=iWqJJPX6wk0
+- https://www.ugx-mods.com/downloads/tutorials/weapons_box.pdf
+
+Reference audio was not downloaded or used in the application. No unofficial
+origin story or licensing speculation was treated as fact. Research did not
+include direct auditory inspection; this is an original synthesised interpretation
+of the documented music-box character.
+
+## Historical retained recording
+
+The following credit applies to old Mystery Box hashes, no longer selected by
+the current playback table. The audio-review/2026-10-19 source and notes remain.
 
 
 **door creak 1.wav** by **soundofsong**, published on Freesound on 22 August 2022.
