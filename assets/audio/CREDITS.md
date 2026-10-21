@@ -1,11 +1,36 @@
-# The Daily Undead sound effects · feedback revision 2
+# The Daily Undead sound effects · feedback revision 2.1
 
 The active pack contains 17 original effects, all generated locally. No Treyarch
 recording, transcribed melody, door creak, speech or background music is included
 in the current playback table. No paid service or downloaded sample was used for
 this revision.
 
-## Revision requested on 21 October 2026
+## Latest listening feedback
+
+Only three files were replaced. The other 14 active cue pairs and all playback
+gains are bit-identical to revision 2.0.
+
+- Mystery Box: three taps follow the initial lid movement; a four-note version
+  of the accepted music-box character starts at the 620 ms icon lift and finishes
+  by 1.48 s. Small taps mark settle at 2.010 s and assembly at 2.540 s. The file
+  ends at 2.7 s instead of 3.5 s; it no longer sustains music through the reveal.
+  These beat positions are read from the actual shared `BOX_SEQUENCE` constants.
+- Clue: short hollow stone/ceramic contact and release. No paper, scrape or noise
+  layer, and no whoosh.
+- Run ended: one short, deadened hollow impact. The organ, melody and creature
+  layer are removed; duration is 720 ms instead of 1.35 s.
+
+Last Words now schedules end feedback from the accepted final guess, before a
+render normalizes the session object. This fixes the lost WeakSet membership that
+silenced the failed-word result. Its timing remains 850 ms (120 ms with reduced
+motion). Word score-count sounds are likewise scheduled for their visible result.
+Reloaded results stay silent; mute, hiding and navigation cancel scheduled cues.
+
+Rebuild this revision with `python scripts/revise-audio-timing.py` (numpy + macOS
+afconvert). It preserves every other active file and gain. Review artifacts are
+written to `audio-review/2026-10-21-r3`.
+
+## Previous revision 2.0, requested on 21 October 2026
 
 - Mystery Box: an original wind-up music-box jingle, timed to the existing
   3.5-second reveal; no creak or detuned/unison layers.

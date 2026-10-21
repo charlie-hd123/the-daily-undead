@@ -183,6 +183,18 @@ test('letter progression caps its motif and a completed answer gets a single sol
   assert.equal(letterSound({ correct: true, solved: true, streak: 3 }), 'puzzle-solved-a');
 });
 
+test('delayed word-result counts align with the result and are cancelled by navigation or mute', async () => {
+  for (const cancel of [audio => audio.stopAll(), audio => audio.setEnabled(false)]) {
+    const f = fixture(); f.audio.unlock(); await f.audio.prepare();
+    f.audio.countPoints(720, { delay: 1900 });
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(f.starts.length, 8);
+    assert.ok(Math.abs(f.starts[0].at - 11.9) < .0001);
+    assert.ok(Math.abs(f.starts[7].at - 12.62) < .0001);
+    cancel(f.audio); assert.equal(f.stopped.length, 8);
+  }
+});
+
 test('every deployed cue has content-matching lossless WAV and AAC exports matching the review manifest', async () => {
   assert.equal(Object.keys(SOUND_CUES).length, 17);
   const manifest = JSON.parse(await readFile(new URL('../assets/audio/manifest.json', import.meta.url)));
