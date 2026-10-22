@@ -2,18 +2,20 @@ import {
   buildDailyPuzzle,
   getAnswerDisplayTitle,
   getUtcDateKey,
-} from "./game-core.js?v=20261021-8";
-import { getOfficialPuzzleType } from "./daily-challenge-core.js?v=20261021-8";
-import { buildDailyWordPuzzle } from "./word-puzzle-core.js?v=20261021-8";
-import { fetchCommunityStats } from "./community-stats.js?v=20261021-8";
+} from "./game-core.js?v=20261022-1";
+import { getOfficialPuzzleType } from "./daily-challenge-core.js?v=20261022-1";
+import { buildDailyWordPuzzle } from "./word-puzzle-core.js?v=20261022-1";
+import { buildDailyBloodTiesPuzzle } from './blood-ties-core.js?v=20261022-1';
+import { fetchCommunityStats } from "./community-stats.js?v=20261022-1";
 import {
   buildMarketingCopy,
   buildWordMarketingCopy,
+  buildBloodMarketingCopy,
   formatPackDate,
   getDailyPostNumber,
   getPreviousDateKey,
   isAppleMobileDevice,
-} from "./marketing-core.js?v=20261021-8";
+} from "./marketing-core.js?v=20261022-1";
 
 const pack = document.querySelector("#marketing-pack");
 const packDate = document.querySelector("#pack-date");
@@ -140,7 +142,7 @@ function fitClue(context, clue) {
 
 async function drawQuestStepsImage(clue) {
   await document.fonts.load("500 45px Barlow");
-  const template = await loadImage("./assets/marketing-template.jpg?v=20261021-8");
+  const template = await loadImage("./assets/marketing-template.jpg?v=20261022-1");
   const context = canvas.getContext("2d", { alpha: false });
   context.drawImage(template, 0, 0, canvas.width, canvas.height);
   erasePreviousClue(context);
@@ -261,7 +263,7 @@ async function drawLastWordsImage(answer, initialLetters, category) {
     document.fonts.load("800 66px Barlow Condensed"),
     document.fonts.load("500 44px Barlow"),
   ]);
-  const template = await loadImage("./assets/marketing-last-words-template.jpg?v=20261021-8");
+  const template = await loadImage("./assets/marketing-last-words-template.jpg?v=20261022-1");
   const context = canvas.getContext("2d", { alpha: false });
   context.drawImage(template, 0, 0, canvas.width, canvas.height);
 
@@ -291,6 +293,37 @@ async function drawLastWordsImage(answer, initialLetters, category) {
   context.textAlign = "center";
   context.textBaseline = "middle";
   context.fillText(`Hint: ${category}`, canvas.width / 2, 958);
+}
+
+async function drawBloodTiesImage(puzzle) {
+  await Promise.all([document.fonts.load('800 66px Barlow Condensed'), document.fonts.load('700 32px Barlow Condensed'), document.fonts.load('500 32px Barlow')]);
+  const logo = await loadImage('./assets/zombie-logo.png?v=20261022-1');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  const background = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  background.addColorStop(0, '#102c38'); background.addColorStop(1, '#0b0d17');
+  ctx.fillStyle = background; ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(logo, 62, 55, 130, 130);
+  ctx.textAlign = 'left'; ctx.fillStyle = '#67e8ff'; ctx.font = '700 30px Barlow Condensed';
+  ctx.fillText('YOUR DAILY TREYARCH ZOMBIES CHALLENGE', 218, 96);
+  ctx.fillStyle = '#f6f7fb'; ctx.font = '800 66px Barlow Condensed'; ctx.fillText('THE DAILY UNDEAD', 218, 165);
+  ctx.textAlign = 'center'; ctx.fillText('BLOOD TIES', 627, 292);
+  ctx.fillStyle = '#b8c2d3'; ctx.font = '500 32px Barlow'; ctx.fillText('Find four groups of three connected tiles.', 627, 355);
+  // The board order is the public shuffled order, never grouped by the answers.
+  puzzle.tiles.forEach((tile, i) => {
+    const x = 68 + i % 3 * 378; const y = 410 + Math.floor(i / 3) * 158;
+    ctx.fillStyle = '#182233'; ctx.strokeStyle = '#455366'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.roundRect(x, y, 362, 142, 14); ctx.fill(); ctx.stroke();
+    let lines;
+    for (let size = 34; size >= 22; size -= 2) {
+      ctx.font = `700 ${size}px Barlow Condensed`; lines = wrapText(ctx, tile.toUpperCase(), 326);
+      if (lines.length <= 3 && lines.every((line) => ctx.measureText(line).width <= 326)) break;
+    }
+    ctx.fillStyle = '#f6f7fb'; ctx.textBaseline = 'middle';
+    lines.forEach((line, row) => ctx.fillText(line, x + 181, y + 71 + (row - (lines.length - 1) / 2) * 36));
+  });
+  ctx.fillStyle = '#67e8ff'; ctx.font = '700 32px Barlow Condensed';
+  ctx.fillText('WATCH OUT FOR OVERLAPPING THEMES · THREE MISSES END THE PUZZLE', 627, 1110);
+  ctx.fillStyle = '#f6f7fb'; ctx.font = '700 38px Barlow Condensed'; ctx.fillText('THEDAILYUNDEAD.COM', 627, 1195);
 }
 
 async function copyText(button, target) {
@@ -399,13 +432,16 @@ async function initialise() {
     ]);
     const dateKey = getUtcDateKey(now);
     const yesterdayDateKey = getPreviousDateKey(dateKey);
-    const puzzleType = getOfficialPuzzleType(dateKey);
-    const yesterdayPuzzleType = getOfficialPuzzleType(yesterdayDateKey);
-    const yesterdayPuzzleName = yesterdayPuzzleType === "word" ? "Last Words" : "Quest Steps";
+    const bloodTies = ['local', 'staging'].includes(document.querySelector('meta[name="daily-undead-environment"]')?.content);
+    const puzzleType = getOfficialPuzzleType(dateKey, { bloodTies });
+    const yesterdayPuzzleType = getOfficialPuzzleType(yesterdayDateKey, { bloodTies });
+    const yesterdayPuzzleName = { word: 'Last Words', easter: 'Quest Steps', blood: 'Blood Ties' }[yesterdayPuzzleType];
     const postNumber = getDailyPostNumber(dateKey);
     const puzzle = buildDailyPuzzle(dateKey, maps);
     const wordPuzzle = buildDailyWordPuzzle(dateKey, wordEntries);
-    const yesterdayAnswer = yesterdayPuzzleType === "word"
+    const yesterdayAnswer = yesterdayPuzzleType === 'blood'
+      ? buildDailyBloodTiesPuzzle(yesterdayDateKey).groups.map((g) => `${g.name}: ${g.answers.join(', ')}`).join('; ')
+      : yesterdayPuzzleType === "word"
       ? buildDailyWordPuzzle(yesterdayDateKey, wordEntries).entry.answer
       : getAnswerDisplayTitle(
         buildDailyPuzzle(yesterdayDateKey, maps).map,
@@ -431,7 +467,7 @@ async function initialise() {
       statsWarning = "The statistics service could not be reached, so the text shows —%. Refresh before posting.";
     }
 
-    const copy = puzzleType === "word"
+    const copy = puzzleType === 'blood' ? buildBloodMarketingCopy({ dateKey, yesterdayAnswer, solvePercentage }) : puzzleType === "word"
       ? buildWordMarketingCopy({
         dateKey,
         answer: wordPuzzle.entry.answer,
@@ -448,7 +484,9 @@ async function initialise() {
         yesterdayPuzzleName,
         solvePercentage,
       });
-    if (puzzleType === "word") {
+    if (puzzleType === 'blood') {
+      await drawBloodTiesImage(buildDailyBloodTiesPuzzle(dateKey));
+    } else if (puzzleType === "word") {
       await drawLastWordsImage(
         wordPuzzle.entry.answer,
         wordPuzzle.initialLetters,
@@ -463,7 +501,7 @@ async function initialise() {
     redditTitle.value = copy.redditTitle;
     redditBody.value = copy.redditBody;
     discordBody.value = copy.discordBody;
-    const puzzleSlug = puzzleType === "word" ? "last-words" : "quest-steps";
+    const puzzleSlug = { word: 'last-words', easter: 'quest-steps', blood: 'blood-ties' }[puzzleType];
     downloadFilename = `daily-undead-${puzzleSlug}-${dateKey}.png`;
     packStatus.textContent = statsWarning || "Today’s image and text are ready.";
     packStatus.dataset.tone = statsWarning ? "warning" : "ready";

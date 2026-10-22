@@ -1,4 +1,4 @@
-import { getUtcDateKey, isValidDateKey } from "./game-core.js?v=20261021-8";
+import { getUtcDateKey, isValidDateKey } from "./game-core.js?v=20261022-1";
 
 export const firstRedditPostDate = "2026-08-13";
 
@@ -172,4 +172,18 @@ export function buildWordMarketingCopy({
   ].join("\n");
 
   return { redditTitle, redditBody, discordBody, solved, pattern };
+}
+
+export function buildBloodMarketingCopy({ dateKey, yesterdayAnswer, solvePercentage }) {
+  if (!isValidDateKey(dateKey)) throw new Error('A valid puzzle date is required.');
+  if (typeof yesterdayAnswer !== 'string' || !yesterdayAnswer.trim()) throw new Error('Yesterday’s answer is required.');
+  const solved = Number.isInteger(solvePercentage) && solvePercentage >= 0 && solvePercentage <= 100 ? `${solvePercentage}%` : '—%';
+  const opening = [`Yesterday’s answer: ${yesterdayAnswer.trim()} 🧟`, `Yesterday’s solve rate: ${solved} 🔎`];
+  const prompt = ['Today’s puzzle: Blood Ties', 'Find four groups of three connected Zombies tiles.', 'Some tiles fit more than one theme. Three misses end the puzzle.'];
+  return {
+    redditTitle: `Can you find the Zombies connections? — ${formatDiscordDate(dateKey)}`,
+    redditBody: [...opening, '', ...prompt, '', 'Drop your connections below 👇'].join('\n'),
+    discordBody: [`🧟 __The Daily Undead · ${formatDiscordDate(dateKey)}__`, ...opening, '', ...prompt, '', '🔗 <https://thedailyundead.com/>'].join('\n'),
+    solved,
+  };
 }

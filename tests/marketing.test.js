@@ -4,12 +4,23 @@ import test from "node:test";
 import {
   buildMarketingCopy,
   buildWordMarketingCopy,
+  buildBloodMarketingCopy,
   buildWordPattern,
   formatDiscordDate,
   getDailyPostNumber,
   getPreviousDateKey,
   isAppleMobileDevice,
 } from "../js/marketing-core.js";
+
+test('Blood Ties marketing names the connection game and preserves yesterday’s answer and solve rate', () => {
+  const copy = buildBloodMarketingCopy({ dateKey: '2026-10-22', yesterdayAnswer: 'Doctor Groph', solvePercentage: 73 });
+  assert.match(copy.redditTitle, /Zombies connections/);
+  assert.match(copy.redditBody, /Today’s puzzle: Blood Ties/);
+  assert.match(copy.discordBody, /Yesterday’s answer: Doctor Groph/);
+  assert.match(copy.discordBody, /73%/);
+  assert.match(copy.discordBody, /Three misses/);
+  assert.equal(buildBloodMarketingCopy({ dateKey: '2026-10-22', yesterdayAnswer: 'Doctor Groph', solvePercentage: null }).solved, '—%');
+});
 
 test("daily Reddit post numbers are anchored to 13 August 2026", () => {
   assert.equal(getDailyPostNumber("2026-08-13"), 1);

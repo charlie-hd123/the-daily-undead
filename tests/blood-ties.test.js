@@ -13,12 +13,39 @@ import { workerMaps } from '../worker/src/generated-map-catalog.js';
 import { readLeaderboards } from '../worker/src/leaderboards.js';
 import { puzzleOptions } from '../worker/src/puzzle-environment.js';
 import { replaySavedAccountResult } from '../js/account.js';
+import { renderBloodTiesGroup, renderBloodTiesView } from '../js/blood-ties-view.js';
+import worker from '../worker/src/index.js';
 
 const puzzle = () => buildDailyBloodTiesPuzzle('2026-10-22');
 const wrongs = (p) => [[p.groups[0].answers[0], p.groups[1].answers[0], p.groups[2].answers[0]],
   [p.groups[0].answers[1], p.groups[1].answers[1], p.groups[2].answers[1]],
   [p.groups[0].answers[2], p.groups[1].answers[2], p.groups[2].answers[2]]];
 const solution = (p) => p.groups.slice(0, 3).map((g) => g.answers);
+
+test('Blood Ties renders shared miss counters, mode warnings and truthful result/reveal labels', () => {
+  const p = puzzle();
+  const render = (session, official = true) => {
+    const app = { innerHTML: '', querySelectorAll: () => [], querySelector: () => null };
+    renderBloodTiesView({ app, puzzle: p, session, official, developer: false, heading: () => '', onSave() {}, onSubmit() {}, onSound() {} });
+    return app.innerHTML;
+  };
+  const active = render(replayBloodTiesAttempts(p, [wrongs(p)[0]]));
+  assert.match(active, /<span>Misses<\/span><strong>1 \/ 3/);
+  assert.match(active, /Potential score<\/span><strong>70/);
+  assert.match(active, /blood-status is-miss/);
+  const fun = render(createBloodTiesSession(p), false);
+  assert.match(fun, /Playing just for fun\. This result will not change your stats/);
+  assert.doesNotMatch(fun, /Potential score/);
+  const won = render(replayBloodTiesAttempts(p, solution(p)));
+  assert.equal((won.match(/· Found/g) || []).length, 3);
+  assert.equal((won.match(/· Revealed/g) || []).length, 1);
+  assert.match(won, /Round Survived!/);
+  const lost = render({ ...replayBloodTiesAttempts(p, wrongs(p)), roundsSurvivedBeforeLoss: 8 });
+  assert.match(lost, /Your run ended at <strong>Round 8/);
+  assert.equal((lost.match(/· Revealed/g) || []).length, 4);
+  assert.doesNotMatch(lost, /Round score/);
+  assert.match(renderBloodTiesGroup({ name: '<script>', answers: ['A & B'], definition: '<img>' }, 0), /&lt;script&gt;/);
+});
 
 test('the first worksheet supplies 51 connections and only eligible answers', () => {
   assert.equal(bloodTiesCatalogue.worksheet, 'Blood Ties');
@@ -111,6 +138,24 @@ async function database(beforeMigration) {
   }, async batch(statements) { sqlite.exec('BEGIN'); try { const rows = []; for (const s of statements) rows.push(await s.all()); sqlite.exec('COMMIT'); return rows; } catch (e) { sqlite.exec('ROLLBACK'); throw e; } } };
   return db;
 }
+
+test('the next-day statistics API keeps Blood Ties solve rates separate from the other games', async (t) => {
+  t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-23T12:00:00Z') });
+  const db = await database();
+  const previousTotal = db.sqlite.prepare('SELECT total_games FROM community_totals WHERE id = 1').get().total_games;
+  const insert = db.sqlite.prepare('INSERT INTO puzzle_attempts(puzzle_date,puzzle_type,puzzle_id,player_hash,answer_id,answer_name,is_correct) VALUES (?,?,?,?,?,?,?)');
+  for (let i = 0; i < 4; i++) insert.run('2026-10-22', 'blood', 'blood-board', `blood-${i}`, 'blood-ties', 'Four hidden connections', i < 3 ? 1 : 0);
+  for (let i = 0; i < 2; i++) insert.run('2026-10-22', 'word', 'word-board', `word-${i}`, 'word-answer', 'Word answer', 0);
+  insert.run('2026-10-23', 'word', 'new-word-board', 'today-player', 'word-answer', 'New answer', 1);
+  const response = await worker.fetch(new Request('https://example.test/api/stats?date=2026-10-23'), { DB: db, DEPLOYMENT_ENVIRONMENT: 'local', BLOOD_TIES_DEMO: '1' });
+  assert.equal(response.status, 200);
+  const stats = await response.json();
+  assert.equal(stats.yesterday.date, '2026-10-22');
+  assert.deepEqual(stats.yesterday.blood, { attempts: 4, correct: 3, solvePercentage: 75, answerName: 'Four hidden connections' });
+  assert.equal(stats.yesterday.word.solvePercentage, 0);
+  assert.equal(stats.playersToday, 1);
+  assert.equal(stats.totalPuzzles, previousTotal + 7);
+});
 
 test('migration preserves populated results, attempts, totals, triggers, views and cascade deletion', async (t) => {
   let before;

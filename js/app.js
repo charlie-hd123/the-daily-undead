@@ -1,7 +1,7 @@
-import { browserStorage } from "./browser-storage.js?v=20261021-8";
-import { buildDailyBloodTiesPuzzle, createBloodTiesSession, normalizeBloodTiesSession, replayBloodTiesAttempts } from './blood-ties-core.js?v=20261021-8';
-import { renderBloodTiesView } from './blood-ties-view.js?v=20261021-8';
-import { rememberPlayDestination, restorePlayDestination } from "./play-destination.js?v=20261021-8";
+import { browserStorage } from "./browser-storage.js?v=20261022-1";
+import { buildDailyBloodTiesPuzzle, createBloodTiesSession, normalizeBloodTiesSession, replayBloodTiesAttempts } from './blood-ties-core.js?v=20261022-1';
+import { renderBloodTiesGroup, renderBloodTiesView } from './blood-ties-view.js?v=20261022-1';
+import { rememberPlayDestination, restorePlayDestination } from "./play-destination.js?v=20261022-1";
 import {
   buildDailyPuzzle,
   calculateBonusPoints,
@@ -16,19 +16,19 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261021-8";
+} from "./game-core.js?v=20261022-1";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
   shouldHandleWordShortcut,
-} from "./word-puzzle-core.js?v=20261021-8";
+} from "./word-puzzle-core.js?v=20261022-1";
 import {
   getOfficialPuzzleType as selectOfficialPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261021-8";
+} from "./daily-challenge-core.js?v=20261022-1";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -37,29 +37,29 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261021-8";
+} from "./progression.js?v=20261022-1";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261021-8";
+} from "./account.js?v=20261022-1";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261021-8";
+} from "./community-stats.js?v=20261022-1";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261021-8";
-import { fetchWithTimeout } from "./network.js?v=20261021-8";
-import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261021-8";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261021-8";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261021-8";
-import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261021-8";
-import { createMysteryBox } from "./mystery-box.js?v=20261021-8";
-import { initialiseGameAudio, letterSound } from "./game-audio.js?v=20261021-8";
+} from "./leaderboards.js?v=20261022-1";
+import { fetchWithTimeout } from "./network.js?v=20261022-1";
+import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261022-1";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261022-1";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261022-1";
+import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261022-1";
+import { createMysteryBox } from "./mystery-box.js?v=20261022-1";
+import { initialiseGameAudio, letterSound } from "./game-audio.js?v=20261022-1";
 
 const gameAudio = initialiseGameAudio(browserStorage);
 const mysteryBox = createMysteryBox({
@@ -96,9 +96,17 @@ const getOfficialPuzzleType = (dateKey) => selectOfficialPuzzleType(dateKey, { b
 if (bloodTiesEnabled) {
   const article = document.createElement('article');
   article.className = 'community-result'; article.dataset.communityPuzzle = 'blood'; article.hidden = true;
-  article.innerHTML = '<div class="community-result-copy"><div class="community-result-title"><span>Blood Ties ·</span><em data-yesterday-round-badge>Yesterday’s round</em></div><details class="blood-yesterday"><summary>View yesterday’s connections</summary><div id="community-yesterday-blood-answer"></div></details></div><div class="community-result-rate"><strong id="community-yesterday-blood-solved">—</strong><span>solved</span></div>';
-  document.querySelector('.community-yesterday')?.append(article);
+  article.innerHTML = '<div class="community-result-copy"><div class="community-result-title"><span>Blood Ties ·</span><em data-yesterday-round-badge>Yesterday’s round</em></div><button class="community-answer-button" id="community-yesterday-blood-open" type="button" aria-haspopup="dialog">View 4 connections ›</button></div><div class="community-result-rate"><strong id="community-yesterday-blood-solved">—</strong><span>solved</span></div>';
+  document.querySelector('.community-result-grid')?.append(article);
   yesterdayCommunityResults.push(article);
+  const dialog = document.createElement('dialog');
+  dialog.className = 'account-dialog blood-yesterday-dialog';
+  dialog.setAttribute('aria-labelledby', 'blood-yesterday-title');
+  dialog.innerHTML = '<button class="dialog-close" type="button" aria-label="Close yesterday’s connections">×</button><p class="kicker">Yesterday’s round</p><h2 id="blood-yesterday-title">Blood Ties</h2><p class="helper-text" id="blood-yesterday-date"></p><div class="blood-solved" id="community-yesterday-blood-answer"></div>';
+  document.body.append(dialog);
+  article.querySelector('button').addEventListener('click', () => dialog.showModal());
+  dialog.querySelector('button').addEventListener('click', () => dialog.close());
+  dialog.addEventListener('click', (event) => { if (event.target === dialog) { const bounds = dialog.getBoundingClientRect(); if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close(); } });
 }
 // Direct local file servers skip the environment build that normally adds these links.
 if (isLocalPreview && !document.querySelector("#advance-dev-day")) {
@@ -228,19 +236,19 @@ const puzzleTypes = {
     name: "Quest Steps",
     kicker: "Easter egg puzzle",
     description: "Can you identify the Zombies map from its Easter egg steps?",
-    image: "./assets/quest-steps-card.svg?v=20261021-8",
+    image: "./assets/quest-steps-card.svg?v=20261022-1",
   },
   word: {
     name: "Last Words",
     kicker: "Letter puzzle",
     description: "Can you identify the Zombies word or phrase by revealing its letters?",
-    image: "./assets/dead-letters-card.svg?v=20261021-8",
+    image: "./assets/dead-letters-card.svg?v=20261022-1",
   },
 };
 if (bloodTiesEnabled) puzzleTypes.blood = {
   name: 'Blood Ties', kicker: 'Connection puzzle',
   description: 'Can you uncover the hidden connections between Zombies maps, weapons and more?',
-  image: './assets/blood-ties-card.svg?v=20261021-8',
+  image: './assets/blood-ties-card.svg?v=20261022-1',
 };
 
 function escapeHtml(value) {
@@ -410,7 +418,10 @@ function updateCommunityStatsDisplay(stats) {
 
 function prepareCommunityStatsDisplay() {
   const yesterdayDateKey = getPreviousDateKey(puzzle.dateKey);
-  if (bloodTiesEnabled) document.querySelector('#community-yesterday-blood-answer').innerHTML = buildDailyBloodTiesPuzzle(yesterdayDateKey).groups.map((g) => `<p><b>${escapeHtml(g.name)}</b><br>${g.answers.map(escapeHtml).join(' · ')}</p>`).join('');
+  if (bloodTiesEnabled) {
+    document.querySelector('#community-yesterday-blood-answer').innerHTML = buildDailyBloodTiesPuzzle(yesterdayDateKey).groups.map((g, i) => renderBloodTiesGroup(g, i, true)).join('');
+    document.querySelector('#blood-yesterday-date').textContent = formatLongDate(yesterdayDateKey);
+  }
 
   try {
     const yesterdayPuzzle = buildDailyPuzzle(yesterdayDateKey, maps);
@@ -1589,7 +1600,7 @@ function renderBloodPuzzle() {
     updateNextRoundCountdown();
     bindResultAccountAction();
     app.querySelector('#return-to-puzzle-home')?.addEventListener('click', () => { renderHub(); snapPageToTop(); });
-    app.querySelector('#share-score')?.addEventListener('click', (event) => shareScore(event.currentTarget, app.querySelector('#share-score-status')));
+    app.querySelector('#share-score')?.addEventListener('click', (event) => { snapPageToTop(); void shareScore(event.currentTarget, app.querySelector('#share-score-status')); });
   }
   focusAfterRender(session.complete ? `blood-result:${session.success}` : 'blood-puzzle');
 }

@@ -13,6 +13,12 @@ The staging rotation starts on **22 October 2026 UTC**: Blood Ties, Last Words, 
 - A solve awards 100 points with no mistakes, 70 with one, or 40 with two. A failed round awards zero and ends the survival run. There is no separate bonus round.
 - Results, account recovery, public profiles, leaderboards and yesterday’s official-puzzle statistics use the existing application flows. The server replays the complete attempt transcript to verify completion and score. Duplicate result requests cannot award points twice.
 
+## Shared presentation
+
+Blood Ties uses the existing neutral cards, cyan selection/success, red miss feedback and gold potential scores. Misses count upwards like Last Words; just-for-fun play uses the same stats warning and result actions as the other games. Found connections are cyan; automatically revealed or missed connections are neutral, with explicit labels so colour is never the only signal.
+
+Yesterday’s Blood Ties summary lives inside the shared statistics grid. Its solve rate stays alongside a compact **View 4 connections** button, which opens a keyboard-accessible answer dialog without expanding the footer. The local/staging marketing pack follows the three-game schedule and can generate a Blood Ties image and copy. Production keeps its existing two-game schedule.
+
 ## Database and generator
 
 `js/blood-ties-catalogue.js` contains the 51 eligible connections imported from the **first worksheet only** of the supplied workbook. Blank cells and rows with fewer than three unique eligible answers are excluded. Category definitions and difficulty are retained, with the original research links as provenance. The workbook’s incomplete or provisional research is accepted as demo content, not independently certified.
