@@ -635,7 +635,7 @@ test("the shared daily round is date-assigned and both extra puzzles unlock afte
   assert.equal((html.match(/data-community-puzzle="(?:word|easter)" hidden/g) || []).length, 2);
   assert.match(app, /result\.hidden = !official/);
   assert.match(app, /document\.querySelector\('\.community-result-grid'\)\?\.append\(article\)/);
-  assert.match(app, /aria-haspopup="dialog">View 4 connections/);
+  assert.match(app, /aria-haspopup="dialog">View connections/);
   assert.match(app, /dialog\.showModal\(\)/);
   assert.doesNotMatch(html, /Yesterday’s puzzles|Answer and solve rate|Scored round/);
 });

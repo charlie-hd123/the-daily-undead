@@ -9,7 +9,7 @@ The staging rotation starts on **22 October 2026 UTC**: Blood Ties, Last Words, 
 - Twelve distinct tiles form four connections of three. Select three tiles, then Submit.
 - A correct trio moves into a named solved row. The remaining tiles replenish the board layout in a fresh deterministic shuffle. The board starts with all twelve tiles and shrinks as connections are found.
 - Three strikes end the puzzle. Each unique incorrect trio adds a red strike and deducts 10 potential points. A correct trio briefly flashes all three circles green, then clears the strikes without restoring potential points. Repeating the same trio in another order costs nothing. Two correct tiles give the existing “one tile away” hint.
-- After three correct connections, the final group reveals automatically.
+- All four connections must be selected and submitted, including the final three tiles.
 - Potential points start at 100. A solve awards 100 minus 10 for every incorrect submission across the whole puzzle, including strikes cleared by correct groups. A failed round awards zero and ends the survival run. There is no separate bonus round.
 - Results, account recovery, public profiles, leaderboards and yesterday’s official-puzzle statistics use the existing application flows. The server replays the complete attempt transcript to verify completion and score. Duplicate result requests cannot award points twice.
 
@@ -17,9 +17,9 @@ The staging rotation starts on **22 October 2026 UTC**: Blood Ties, Last Words, 
 
 Blood Ties uses the existing neutral cards, cyan selection/success, red strike feedback and gold potential scores. Its STRIKES display has three neutral circles, filled red by incorrect submissions and briefly green on a correct group. Just-for-fun play uses the same stats warning and result actions as the other games. Found connections are cyan; automatically revealed or missed connections are neutral, with explicit labels so colour is never the only signal.
 
-Rules version 2 stores/replays the complete submission history to reconstruct strikes and potential points on refresh. Unfinished legacy saves adopt these rules. Completed version 1 saves and already awarded server results retain their original outcomes and scores; pre-update clients remain server-verified under version 1. The daily board identity and frozen catalogue are unchanged. Leaderboard miss counts record all incorrect submissions, so a strike reset cannot turn an imperfect solve into a Perfect Solve.
+Rules version 3 requires all four connections and stores/replays the complete submission history to reconstruct strikes and potential points on refresh. Unfinished legacy saves adopt these rules. Completed version 1/2 saves and already awarded server results retain their original outcomes and scores; pre-update clients remain server-verified under their original rules. The daily board identity and frozen catalogue are unchanged. Leaderboard miss counts record all incorrect submissions, so a strike reset cannot turn an imperfect solve into a Perfect Solve.
 
-Yesterday’s Blood Ties summary lives inside the shared statistics grid. Its solve rate stays alongside a compact **View 4 connections** button, which opens a keyboard-accessible answer dialog without expanding the footer. The local/staging marketing pack follows the three-game schedule and can generate a Blood Ties image and copy. Production keeps its existing two-game schedule.
+Yesterday’s Blood Ties summary lives inside the shared statistics grid. Its solve rate stays alongside a compact **View connections** button, which opens a keyboard-accessible answer dialog without expanding the footer. The local/staging marketing pack follows the three-game schedule and can generate a Blood Ties image and copy. Production keeps its existing two-game schedule.
 
 ## Database and generator
 

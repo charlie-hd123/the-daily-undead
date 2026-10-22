@@ -20,12 +20,12 @@ const puzzle = () => buildDailyBloodTiesPuzzle('2026-10-22');
 const wrongs = (p) => [[p.groups[0].answers[0], p.groups[1].answers[0], p.groups[2].answers[0]],
   [p.groups[0].answers[1], p.groups[1].answers[1], p.groups[2].answers[1]],
   [p.groups[0].answers[2], p.groups[1].answers[2], p.groups[2].answers[2]]];
-const solution = (p) => p.groups.slice(0, 3).map((g) => g.answers);
-const interruptedSolution = (p) => p.groups.slice(0, 3).flatMap((g, i) => [
+const solution = (p) => p.groups.map((g) => g.answers);
+const interruptedSolution = (p) => [...p.groups.slice(0, 3).flatMap((g, i) => [
   [g.answers[0], g.answers[1], p.groups[i + 1].answers[0]],
   [g.answers[0], g.answers[1], p.groups[i + 1].answers[1]],
   g.answers,
-]);
+]), p.groups[3].answers];
 
 test('Blood Ties renders three strike circles, mode warnings and truthful result/reveal labels', () => {
   const p = puzzle();
@@ -48,9 +48,14 @@ test('Blood Ties renders three strike circles, mode warnings and truthful result
   const fun = render(createBloodTiesSession(p), false);
   assert.match(fun, /Playing just for fun\. This result will not change your stats/);
   assert.doesNotMatch(fun, /Potential score/);
+  const finalTiles = render(replayBloodTiesAttempts(p, solution(p).slice(0, 3)));
+  assert.equal((finalTiles.match(/data-blood-tile=/g) || []).length, 3);
+  assert.equal((finalTiles.match(/· Found/g) || []).length, 3);
+  assert.doesNotMatch(finalTiles, /· Revealed|Round Survived|revealed automatically/);
+  assert.match(finalTiles, /3 \/ 4 connections found/);
   const won = render(replayBloodTiesAttempts(p, solution(p)));
-  assert.equal((won.match(/· Found/g) || []).length, 3);
-  assert.equal((won.match(/· Revealed/g) || []).length, 1);
+  assert.equal((won.match(/· Found/g) || []).length, 4);
+  assert.equal((won.match(/· Revealed/g) || []).length, 0);
   assert.match(won, /Round Survived!/);
   const lost = render({ ...replayBloodTiesAttempts(p, wrongs(p)), roundsSurvivedBeforeLoss: 8 });
   assert.match(lost, /Your run ended at <strong>Round 8/);
@@ -100,7 +105,7 @@ test('exact cover rejects two complete solutions, without counting solve order a
   assert.equal(countBloodTiesSolutions(groups, [...tiles.slice(1), '1']), 0);
 });
 
-test('three solved trios reveal the fourth; every incorrect submission deducts ten points', () => {
+test('all four trios must be submitted; every incorrect submission deducts ten points', () => {
   const p = puzzle();
   for (const [misses, score] of [[0, 100], [1, 90], [2, 80]]) {
     const result = replayBloodTiesAttempts(p, [...wrongs(p).slice(0, misses), ...solution(p)]);
@@ -108,6 +113,12 @@ test('three solved trios reveal the fourth; every incorrect submission deducts t
     assert.equal(result.points, score); assert.equal(result.solved.length, 4);
     assert.equal(result.strikes, 0); assert.equal(result.potentialPoints, score);
   }
+  const final = replayBloodTiesAttempts(p, solution(p).slice(0, 3));
+  assert.equal(final.complete, false); assert.equal(final.points, 0);
+  assert.equal(final.solved.length, 3);
+  const restored = normalizeBloodTiesSession(p, { ...final, selected: p.groups[3].answers });
+  assert.equal(restored.complete, false); assert.deepEqual(restored.selected, p.groups[3].answers);
+  assert.match(replayBloodTiesAttempts(p, [wrongs(p)[0]]).message, /don’t match this puzzle’s connections/);
   const failed = replayBloodTiesAttempts(p, wrongs(p));
   assert.equal(failed.complete, true); assert.equal(failed.success, false); assert.equal(failed.points, 0);
   assert.throws(() => replayBloodTiesAttempts(p, [wrongs(p)[0], [...wrongs(p)[0]].reverse()]), /Invalid/);
@@ -146,24 +157,29 @@ test('correct groups reset strikes without restoring points; six total misses ca
 
 test('refresh reconstructs strikes and potential points before and after a reset', () => {
   const p = puzzle(), attempts = interruptedSolution(p);
-  for (const [count, strikes, potential] of [[2, 2, 80], [3, 0, 80], [5, 2, 60], [6, 0, 60], [9, 0, 40]]) {
+  for (const [count, strikes, potential] of [[2, 2, 80], [3, 0, 80], [5, 2, 60], [6, 0, 60], [9, 0, 40], [10, 0, 40]]) {
     const raw = { ...createBloodTiesSession(p), attempts: attempts.slice(0, count), strikes: 0, potentialPoints: 999, points: 999, misses: 0 };
     const restored = normalizeBloodTiesSession(p, JSON.parse(JSON.stringify(raw)));
     assert.equal(restored.strikes, strikes); assert.equal(restored.potentialPoints, potential);
-    assert.equal(restored.points, count === 9 ? 40 : 0);
+    assert.equal(restored.points, count === 10 ? 40 : 0);
   }
 });
 
 test('unfinished legacy saves adopt strikes while completed legacy awards retain their original rules', () => {
   const p = puzzle();
-  const attempts = [wrongs(p)[0], ...solution(p)];
+  const attempts = [wrongs(p)[0], ...solution(p).slice(0, 3)];
   const legacy = replayBloodTiesAttempts(p, attempts, 1);
   assert.equal(legacy.points, 70);
   delete legacy.rulesVersion;
   assert.equal(normalizeBloodTiesSession(p, legacy).points, 70);
+  const completedV2 = replayBloodTiesAttempts(p, attempts, 2);
+  assert.equal(normalizeBloodTiesSession(p, completedV2).points, 90);
+  assert.equal(normalizeBloodTiesSession(p, completedV2).rulesVersion, 2);
+  const activeV2 = { ...replayBloodTiesAttempts(p, attempts.slice(0, 2), 2) };
+  assert.equal(normalizeBloodTiesSession(p, activeV2).rulesVersion, 3);
   const unfinished = { key: p.key, attempts: attempts.slice(0, 2), complete: false };
   const migrated = normalizeBloodTiesSession(p, unfinished);
-  assert.equal(migrated.rulesVersion, 2); assert.equal(migrated.strikes, 0);
+  assert.equal(migrated.rulesVersion, 3); assert.equal(migrated.strikes, 0);
   assert.equal(migrated.misses, 1); assert.equal(migrated.potentialPoints, 90);
   const failed = replayBloodTiesAttempts(p, wrongs(p), 1);
   delete failed.rulesVersion;
@@ -259,8 +275,9 @@ test('verified Blood Ties scoring replays guesses, rejects forgery and credits e
   db.sqlite.exec("INSERT INTO player_profiles(user_id,username) VALUES ('blood-player','BloodPlayer'); INSERT INTO player_saves(user_id,score) VALUES ('blood-player',120)");
   const p = puzzle();
   const send = (body, options = { bloodTies: true }) => recordVerifiedBloodResult(db, new Request('https://test/api/account/results/blood', { method: 'POST', body: JSON.stringify(body) }), 'blood-player', options);
-  const payload = { puzzleDate: p.dateKey, puzzleId: p.key, attempts: solution(p), rulesVersion: 2, points: 9999, success: false };
+  const payload = { puzzleDate: p.dateKey, puzzleId: p.key, attempts: solution(p), rulesVersion: 3, points: 9999, success: false };
   assert.equal((await send({ ...payload, attempts: [] })).status, 400);
+  assert.equal((await send({ ...payload, attempts: solution(p).slice(0, 3), success: true, points: 100 })).status, 400);
   assert.equal((await send({ ...payload, attempts: [['made', 'up', 'tiles']] })).status, 400);
   assert.equal((await send({ ...payload, puzzleId: 'wrong' })).status, 400);
   assert.equal((await send(payload, {})).status, 400);
@@ -276,7 +293,7 @@ test('verified Blood Ties scoring replays guesses, rejects forgery and credits e
 test('signed-in result recovery resubmits the saved Blood Ties transcript', async () => {
   const p = puzzle(), session = replayBloodTiesAttempts(p, solution(p)); let sent;
   const progress = await replaySavedAccountResult({ puzzleDate: p.dateKey, dailyState: { dayStateVersion: 1, dateKey: p.dateKey, officialType: 'blood', officialCompleted: true, sessions: { blood: session } }, sendBloodResult: async (body) => { sent = body; return { progress: { score: 100 } }; } });
-  assert.deepEqual(sent.attempts, solution(p)); assert.equal(sent.rulesVersion, 2); assert.equal(progress.score, 100);
+  assert.deepEqual(sent.attempts, solution(p)); assert.equal(sent.rulesVersion, 3); assert.equal(progress.score, 100);
 });
 
 test('the server awards only remaining potential points once after strike resets and records total misses on leaderboards', async (t) => {
@@ -284,8 +301,9 @@ test('the server awards only remaining potential points once after strike resets
   const db = await database(); t.after(() => db.sqlite.close());
   db.sqlite.exec("INSERT INTO player_profiles(user_id,username) VALUES ('strike-player','StrikePlayer'); INSERT INTO player_saves(user_id,score,total_rounds,current_round,best_round,round_anchor_date,round_anchor_value) VALUES ('strike-player',500,4,7,9,'2026-10-21',7)");
   const p = puzzle(), attempts = interruptedSolution(p);
-  const send = (body) => recordVerifiedBloodResult(db, new Request('https://test/result', { method: 'POST', body: JSON.stringify({ puzzleDate: p.dateKey, puzzleId: p.key, rulesVersion: 2, ...body }) }), 'strike-player', { bloodTies: true });
+  const send = (body) => recordVerifiedBloodResult(db, new Request('https://test/result', { method: 'POST', body: JSON.stringify({ puzzleDate: p.dateKey, puzzleId: p.key, rulesVersion: 3, ...body }) }), 'strike-player', { bloodTies: true });
   assert.equal((await send({ attempts: attempts.slice(0, 6), success: true, points: 100 })).status, 400);
+  assert.equal((await send({ attempts: attempts.slice(0, 9), success: true, points: 100 })).status, 400);
   assert.equal((await send({ attempts, rulesVersion: 99 })).status, 400);
   const result = await send({ attempts, points: 9999, strikes: 0, misses: 0, potentialPoints: 100 });
   assert.equal(result.status, 200); assert.equal(result.body.result.pointsEarned, 40);
@@ -309,7 +327,7 @@ test('three new strikes after a reset end the run, preserving lifetime score and
   const attempts = [...interruptedSolution(p).slice(0, 6), ...[0, 1, 2].map((i) => [p.groups[2].answers[0], p.groups[2].answers[1], p.groups[3].answers[i]])];
   const replay = replayBloodTiesAttempts(p, attempts);
   assert.equal(replay.strikes, 3); assert.equal(replay.misses, 7); assert.equal(replay.points, 0); assert.equal(replay.complete, true);
-  const result = await recordVerifiedBloodResult(db, new Request('https://test/result', { method: 'POST', body: JSON.stringify({ puzzleDate: p.dateKey, puzzleId: p.key, attempts, rulesVersion: 2, points: 100, success: true }) }), 'strike-fail', { bloodTies: true });
+  const result = await recordVerifiedBloodResult(db, new Request('https://test/result', { method: 'POST', body: JSON.stringify({ puzzleDate: p.dateKey, puzzleId: p.key, attempts, rulesVersion: 3, points: 100, success: true }) }), 'strike-fail', { bloodTies: true });
   assert.equal(result.status, 200); assert.equal(result.body.result.pointsEarned, 0);
   assert.equal(result.body.result.bloodMisses, 7);
   assert.equal(result.body.progress.score, 500); assert.equal(result.body.progress.solves, 4); assert.equal(result.body.progress.currentRound, 1);
@@ -320,9 +338,10 @@ test('anonymous statistics verify strike-rule transcripts and reject forged comp
   t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-22T12:00:00Z') });
   const db = await database(); t.after(() => db.sqlite.close());
   const p = puzzle(), env = { DB: db, DEPLOYMENT_ENVIRONMENT: 'local', BLOOD_TIES_DEMO: '1' };
-  const body = { playerId: '07ce720f-48dd-470e-90d9-85650ff1edeb', puzzleDate: p.dateKey, puzzleType: 'blood', puzzleId: p.key, mapId: 'blood-ties', mapName: 'Connections', attempts: interruptedSolution(p), rulesVersion: 2, isCorrect: true };
+  const body = { playerId: '07ce720f-48dd-470e-90d9-85650ff1edeb', puzzleDate: p.dateKey, puzzleType: 'blood', puzzleId: p.key, mapId: 'blood-ties', mapName: 'Connections', attempts: interruptedSolution(p), rulesVersion: 3, isCorrect: true };
   const send = (values) => worker.fetch(new Request('https://test/api/attempts', { method: 'POST', body: JSON.stringify(values) }), env);
   assert.equal((await send({ ...body, isCorrect: false })).status, 400);
+  assert.equal((await send({ ...body, attempts: body.attempts.slice(0, 9) })).status, 400);
   assert.equal((await send({ ...body, rulesVersion: 1 })).status, 400);
   assert.equal((await send(body)).status, 200);
   assert.equal((await send(body)).status, 200);
@@ -335,7 +354,7 @@ test('verified failure credits no points and the staging schedule also verifies 
   db.sqlite.exec("INSERT INTO player_profiles(user_id,username) VALUES ('verify-player','VerifyPlayer'); INSERT INTO player_saves(user_id,score,current_round,best_round) VALUES ('verify-player',500,7,9)");
   const p = puzzle();
   const req = (body) => new Request('https://test/result', { method: 'POST', body: JSON.stringify(body) });
-  const failed = await recordVerifiedBloodResult(db, req({ puzzleDate: p.dateKey, puzzleId: p.key, attempts: wrongs(p), rulesVersion: 2, success: true, points: 100 }), 'verify-player', { bloodTies: true });
+  const failed = await recordVerifiedBloodResult(db, req({ puzzleDate: p.dateKey, puzzleId: p.key, attempts: wrongs(p), rulesVersion: 3, success: true, points: 100 }), 'verify-player', { bloodTies: true });
   assert.equal(failed.status, 200); assert.equal(failed.body.progress.score, 500);
   assert.equal(failed.body.progress.currentRound, 1); assert.equal(failed.body.progress.bestRound, 9);
   assert.equal(failed.body.result.bloodMisses, 3);
