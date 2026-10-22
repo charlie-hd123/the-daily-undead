@@ -37,8 +37,8 @@ export function revealHeight(elapsed, closedHeight, puzzleHeight) {
 // Painted bounds, including strokes, in the original 240px SVG viewBoxes.
 export const ICON_INK = Object.freeze({
   word: Object.freeze({ left: 28 / 240, top: 72 / 240, width: 184 / 240, height: 101 / 240, visualScale: 1.25 }),
-  easter: Object.freeze({ left: 38.5 / 240, top: 50.5 / 240, width: 163 / 240, height: 141 / 240, visualScale: .9 }),
-  blood: Object.freeze({ left: 22 / 240, top: 49 / 240, width: 196 / 240, height: 140 / 240, visualScale: .9 }),
+  easter: Object.freeze({ left: 28 / 240, top: 64 / 240, width: 184 / 240, height: 116 / 240, visualScale: 1.25 }),
+  blood: Object.freeze({ left: 28 / 240, top: 59 / 240, width: 184 / 240, height: 122 / 240, visualScale: 1.25 }),
 });
 const tallestIcon = Math.max(...Object.values(ICON_INK).map((ink) => ink.height / ink.width * Math.max(1, ink.visualScale)));
 const widestIcon = Math.max(...Object.values(ICON_INK).map((ink) => ink.visualScale));
@@ -52,7 +52,7 @@ export function createIconFlight({ target, mouth, stage, viewDirection, ink = IC
     (x - mouth.left.x) / (mouth.right.x - mouth.left.x));
   const openingWidth = Math.abs(mouth.right.x - mouth.left.x);
   const availableHeight = Math.max(30, Math.min(mouth.left.y, mouth.right.y) - stage.top - 40);
-  // Optical balance: the shallow letter tiles need more width to match the map's visual weight.
+  // Shared painted width keeps the three icons equally prominent throughout the reveal.
   const peakInkWidth = Math.min(168, (stage.width - 40) / widestIcon, openingWidth * .62, availableHeight / tallestIcon);
   const peakSize = peakInkWidth * ink.visualScale / ink.width;
   const peakScale = peakSize / target.width;
