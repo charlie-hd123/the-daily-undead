@@ -655,7 +655,8 @@ test("official result actions link signed-out players to accounts and omit the a
   assert.match(account, /signedIn: false,[\s\S]*?openAccountAccess: \(\) => openDialog\(accessDialog\)/);
   assert.match(css, /\.result-account-button\.is-save-progress \{[\s\S]*?border-color: rgb\(247 200 92 \/ 58%\);[\s\S]*?color: #f7c85c/);
   assert.doesNotMatch(css, /\.result-account-button\.is-leaderboards \{/);
-  assert.equal((app.match(/snapPageToTop\(\);/g) || []).length, 7);
+  assert.match(app, /function bindResultAccountAction\(\)[\s\S]*?snapPageToTop\(\);[\s\S]*?accountController\.openAccountAccess\?\.\(\)/);
+  assert.match(app, /querySelector\('#share-score'\)[^\n]*snapPageToTop\(\);[^\n]*shareScore\(/);
 });
 
 test("community statistics are placed near the bottom and contain no frontend credentials", async () => {
