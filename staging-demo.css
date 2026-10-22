@@ -424,10 +424,13 @@
 .puzzle-choice-art {
   position: absolute;
   z-index: 0;
-  top: 0.85rem;
-  right: 0.75rem;
-  width: 7.5rem;
-  height: 7.5rem;
+  --puzzle-choice-art-size: 7.5rem;
+  --puzzle-choice-art-inset: .75rem;
+  /* Balance the painted edges, allowing for the SVGs' larger transparent top margin. */
+  top: calc(var(--puzzle-choice-art-inset) - var(--puzzle-choice-art-size) * .17);
+  right: var(--puzzle-choice-art-inset);
+  width: var(--puzzle-choice-art-size);
+  height: var(--puzzle-choice-art-size);
   object-fit: contain;
   opacity: 0.12;
   pointer-events: none;
@@ -2018,10 +2021,8 @@
   }
 
   .puzzle-choice-art {
-    top: 0.75rem;
-    right: 0.55rem;
-    width: 5.4rem;
-    height: 5.4rem;
+    --puzzle-choice-art-size: 5.4rem;
+    --puzzle-choice-art-inset: .55rem;
     opacity: 0.12;
   }
 
@@ -2220,7 +2221,7 @@ body:has(.word-puzzle-panel) .community-stats-demo {
 .puzzle-choice-copy > p:not(.kicker) { font-size: 0.96rem; line-height: 1.5; }
 .puzzle-choice-status-row { margin: 0 1.25rem 0.85rem; }
 .puzzle-choice-actions { padding: 0 1.25rem 1.25rem; }
-.puzzle-choice-art { width: 6.5rem; height: 6.5rem; }
+.puzzle-choice-art { --puzzle-choice-art-size: 6.5rem; }
 
 .public-profile-header > div { min-width: 0; }
 .public-profile-header h2 { overflow-wrap: anywhere; }
@@ -2320,7 +2321,7 @@ body:has(.word-puzzle-panel) .community-stats-demo {
   .puzzle-choice-copy { padding: 1.1rem 7rem 1rem 1.1rem; }
   .puzzle-choice-status-row { margin-inline: 1.1rem; }
   .puzzle-choice-actions { padding: 0 1.1rem 1.1rem; }
-  .puzzle-choice-art { width: 5.25rem; height: 5.25rem; }
+  .puzzle-choice-art { --puzzle-choice-art-size: 5.25rem; }
   .quest-clue-panel .clue-card { min-height: 0; }
   .quest-clue-panel .clue-card.is-hidden { min-height: 3.25rem; }
 }
@@ -2358,7 +2359,7 @@ body:has(.word-puzzle-panel) .community-stats-demo {
   .puzzle-choice-copy { padding-right: 1.1rem; }
   .puzzle-choice-copy .kicker,
   .puzzle-choice-copy h3 { padding-right: 4.25rem; }
-  .puzzle-choice-art { width: 4rem; height: 4rem; }
+  .puzzle-choice-art { --puzzle-choice-art-size: 4rem; }
   .public-profile-header h2 { font-size: clamp(1.4rem, 6.5vw, 2rem); }
   .answer-selection-panel .card-button { min-height: 5rem; padding: 0.75rem; grid-template-columns: minmax(0, 1fr) 1.4rem; }
   .answer-selection-panel .card-title { font-size: 1.25rem; }
@@ -2391,7 +2392,7 @@ body:has(.word-puzzle-panel) .community-stats-demo {
 .panel > .puzzle-panel-art {
   position: absolute;
   z-index: 0;
-  top: .85rem;
+  top: calc(1.4rem - var(--puzzle-panel-art-size) * .17);
   right: 1.4rem;
   width: var(--puzzle-panel-art-size);
   height: var(--puzzle-panel-art-size);
