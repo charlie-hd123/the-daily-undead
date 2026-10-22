@@ -238,7 +238,7 @@ async function handleAttempt(request, env) {
     if (!puzzleOptions(env).bloodTies) return errorResponse(request, env, 'Blood Ties is available only in the staging demo.', 400);
     const puzzle = buildDailyBloodTiesPuzzle(todayDateKey);
     let result;
-    try { result = replayBloodTiesAttempts(puzzle, payload.attempts); }
+    try { result = replayBloodTiesAttempts(puzzle, payload.attempts, payload.rulesVersion ?? 1); }
     catch { return errorResponse(request, env, 'Invalid Blood Ties attempts.', 400); }
     if (payload.puzzleId !== puzzle.key || !Array.isArray(payload.attempts) || !result.complete || result.success !== payload.isCorrect) return errorResponse(request, env, 'Invalid Blood Ties result.', 400);
     payload.mapId = 'blood-ties'; payload.mapName = 'Four hidden connections';

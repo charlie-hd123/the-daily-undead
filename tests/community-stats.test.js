@@ -94,6 +94,17 @@ test("a successful attempt is sent once per browser and puzzle", async () => {
   assert.equal(requests[0].body.isCorrect, true);
 });
 
+test('Blood Ties sends the replay rules version alongside its submission history', async () => {
+  let sent;
+  await submitCommunityAttempt({
+    apiUrl: 'https://stats.example.com', puzzleDate: '2026-10-22', puzzleId: 'blood-board', puzzleType: 'blood',
+    mapId: 'blood-ties', mapName: 'Connections', isCorrect: true, rulesVersion: 2, attempts: [['A', 'B', 'C']],
+    storage: createStorage(), cryptoApi: { randomUUID: () => '07ce720f-48dd-470e-90d9-85650ff1edeb' },
+    fetchImpl: async (_url, options) => { sent = JSON.parse(options.body); return { ok: true, json: async () => ({}) }; },
+  });
+  assert.equal(sent.rulesVersion, 2); assert.deepEqual(sent.attempts, [['A', 'B', 'C']]);
+});
+
 test("Quest Steps and Last Words attempts are independently counted on the same day", async () => {
   const storage = createStorage();
   const requests = [];

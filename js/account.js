@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261022-1";
+import { browserStorage } from "./browser-storage.js?v=20261022-2";
 import {
   accountMemoryStorageKey,
   clearPendingProgress,
@@ -7,9 +7,9 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261022-1";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261022-1";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261022-1";
+} from "./account-session.js?v=20261022-2";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261022-2";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261022-2";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -371,7 +371,7 @@ export async function replaySavedAccountResult({
     const session = dailyState.sessions?.[officialType];
     if (!dailyState.officialCompleted || !isPuzzleSessionComplete(officialType, session)) return null;
     if (officialType === 'blood') {
-      const result = await sendBloodResult?.({ puzzleDate, puzzleId: session.key, attempts: session.attempts });
+      const result = await sendBloodResult?.({ puzzleDate, puzzleId: session.key, attempts: session.attempts, rulesVersion: session.rulesVersion ?? 1 });
       return result?.progress || null;
     }
     if (officialType === "word") {
@@ -740,7 +740,7 @@ export async function initialiseAccount({
   try {
     clerk = await withTimeout(
       supabaseConfigured
-        ? import("./supabase-auth.js?v=20261022-1").then(({ loadSupabaseAuth }) => (
+        ? import("./supabase-auth.js?v=20261022-2").then(({ loadSupabaseAuth }) => (
           loadSupabaseAuth(documentObject)
         ))
         : loadClerk(publishableKey),

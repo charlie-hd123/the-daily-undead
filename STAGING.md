@@ -29,7 +29,7 @@ Browser puzzle data is packaged from the existing map index, map JSON and word b
 
 ## Put a complete candidate on staging
 
-The third-game demo is documented in [BLOOD-TIES.md](BLOOD-TIES.md). Local/staging rotate Blood Ties, Last Words and Quest Steps from 22 October 2026 UTC. Production retains its two-game rotation. The shared UI and API include the new game, while its environment guard prevents production scoring or assignment changes. Migration 0015 needs separate production authorization before any future promotion.
+The third-game demo is documented in [BLOOD-TIES.md](BLOOD-TIES.md). Local/staging rotate Blood Ties, Last Words and Quest Steps from 22 October 2026 UTC. Production retains its two-game rotation. The shared UI and API include the new game, while its environment guard prevents production scoring or assignment changes. Migrations 0015 and 0016 need separate production authorization before any future promotion.
 
 ```sh
 npm run release:prepare

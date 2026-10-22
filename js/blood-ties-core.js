@@ -2,7 +2,8 @@ import { createRng, hashString, isValidDateKey, shuffle } from './game-core.js';
 import { bloodTiesCatalogue } from './blood-ties-catalogue.js';
 
 export const BLOOD_TIES_LAUNCH_DATE = '2026-10-22';
-export const BLOOD_TIES_MAX_MISSES = 3;
+export const BLOOD_TIES_RULES_VERSION = 2;
+export const BLOOD_TIES_MAX_STRIKES = 3;
 const epoch = Date.parse('2026-10-01T00:00:00Z') / 86400000;
 const catalogues = new WeakMap();
 const trioKey = (tiles) => [...tiles].sort().join('\u001f');
@@ -88,18 +89,21 @@ export function buildDailyBloodTiesPuzzle(dateKey, catalogue = bloodTiesCatalogu
   return { dateKey, key, groups, tiles: shuffle(selected.tiles, createRng(hashString(`${key}:display`))), redHerrings: [...selected.redHerrings] };
 }
 
-export function createBloodTiesSession(puzzle) {
-  return { key: puzzle.key, attempts: [], selected: [], solved: [], misses: 0, complete: false, success: null, points: 0, message: '', shuffleCount: 0 };
+export function createBloodTiesSession(puzzle, rulesVersion = BLOOD_TIES_RULES_VERSION) {
+  if (![1, BLOOD_TIES_RULES_VERSION].includes(rulesVersion)) throw new Error('Invalid Blood Ties rules version.');
+  return { key: puzzle.key, rulesVersion, attempts: [], selected: [], solved: [], misses: 0, strikes: 0, potentialPoints: 100, complete: false, success: null, points: 0, message: '', shuffleCount: 0 };
 }
 
-export function calculateBloodTiesPoints(misses) {
-  return [100, 70, 40][misses] ?? 0;
+export function calculateBloodTiesPoints(misses, rulesVersion = BLOOD_TIES_RULES_VERSION) {
+  if (!Number.isInteger(misses) || misses < 0) return 0;
+  return rulesVersion === 1 ? [100, 70, 40][misses] ?? 0 : Math.max(0, 100 - 10 * misses);
 }
 
 // Shared replay is authoritative for browser restores, account saves and scoring.
-export function replayBloodTiesAttempts(puzzle, attempts = []) {
-  const session = createBloodTiesSession(puzzle);
-  if (!Array.isArray(attempts) || attempts.length > 5) throw new Error('Invalid Blood Ties attempt history.');
+export function replayBloodTiesAttempts(puzzle, attempts = [], rulesVersion = BLOOD_TIES_RULES_VERSION) {
+  const session = createBloodTiesSession(puzzle, rulesVersion);
+  // Two misses can precede each of three solves; a third consecutive miss ends play.
+  if (!Array.isArray(attempts) || attempts.length > (rulesVersion === 1 ? 5 : 9)) throw new Error('Invalid Blood Ties attempt history.');
   const seen = new Set();
   for (const attempt of attempts) {
     if (session.complete || !Array.isArray(attempt) || attempt.length !== 3 || new Set(attempt).size !== 3
@@ -110,20 +114,23 @@ export function replayBloodTiesAttempts(puzzle, attempts = []) {
     const match = puzzle.groups.find((g) => trioKey(g.answers) === trioKey(attempt));
     if (match) {
       session.solved.push(match.id);
+      if (rulesVersion !== 1) session.strikes = 0;
       session.message = `${match.name}. Connection found!`;
       if (session.solved.length === 3) {
         session.solved.push(puzzle.groups.find((g) => !session.solved.includes(g.id)).id);
         session.complete = true;
         session.success = true;
-        session.points = calculateBloodTiesPoints(session.misses);
+        session.points = session.potentialPoints;
         session.message = 'Three connections found. The final Blood Tie is revealed.';
       }
     } else {
       session.misses++;
+      session.strikes++;
+      session.potentialPoints = calculateBloodTiesPoints(session.misses, rulesVersion);
       const near = puzzle.groups.some((g) => !session.solved.includes(g.id) && attempt.filter((t) => g.answers.includes(t)).length === 2);
       session.message = near ? 'One tile away. Try a different connection.' : 'Those tiles do not form a connection. Try again.';
-      if (session.misses === BLOOD_TIES_MAX_MISSES) {
-        session.complete = true; session.success = false; session.message = 'No attempts remaining. Here are the connections.';
+      if (session.strikes === BLOOD_TIES_MAX_STRIKES) {
+        session.complete = true; session.success = false; session.message = 'Three strikes. Here are the connections.';
       }
     }
   }
@@ -133,7 +140,10 @@ export function replayBloodTiesAttempts(puzzle, attempts = []) {
 export function normalizeBloodTiesSession(puzzle, value) {
   if (!value || value.key !== puzzle.key) return null;
   try {
-    const replay = replayBloodTiesAttempts(puzzle, value.attempts);
+    // Completed pre-update saves retain their verified old result. Unfinished
+    // saves adopt the new rules by replaying their original submission history.
+    const rulesVersion = value.rulesVersion ?? (value.complete ? 1 : BLOOD_TIES_RULES_VERSION);
+    const replay = replayBloodTiesAttempts(puzzle, value.attempts, rulesVersion);
     const remaining = puzzle.groups.filter((g) => !replay.solved.includes(g.id)).flatMap((g) => g.answers);
     return { ...replay, selected: Array.isArray(value.selected) ? [...new Set(value.selected)].filter((t) => remaining.includes(t)).slice(0, 3) : [],
       shuffleCount: Number.isInteger(value.shuffleCount) && value.shuffleCount >= 0 ? value.shuffleCount : 0,

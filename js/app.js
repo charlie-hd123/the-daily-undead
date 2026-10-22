@@ -1,7 +1,7 @@
-import { browserStorage } from "./browser-storage.js?v=20261022-1";
-import { buildDailyBloodTiesPuzzle, createBloodTiesSession, normalizeBloodTiesSession, replayBloodTiesAttempts } from './blood-ties-core.js?v=20261022-1';
-import { renderBloodTiesGroup, renderBloodTiesView } from './blood-ties-view.js?v=20261022-1';
-import { rememberPlayDestination, restorePlayDestination } from "./play-destination.js?v=20261022-1";
+import { browserStorage } from "./browser-storage.js?v=20261022-2";
+import { buildDailyBloodTiesPuzzle, createBloodTiesSession, normalizeBloodTiesSession, replayBloodTiesAttempts } from './blood-ties-core.js?v=20261022-2';
+import { renderBloodTiesGroup, renderBloodTiesView } from './blood-ties-view.js?v=20261022-2';
+import { rememberPlayDestination, restorePlayDestination } from "./play-destination.js?v=20261022-2";
 import {
   buildDailyPuzzle,
   calculateBonusPoints,
@@ -16,19 +16,19 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261022-1";
+} from "./game-core.js?v=20261022-2";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
   shouldHandleWordShortcut,
-} from "./word-puzzle-core.js?v=20261022-1";
+} from "./word-puzzle-core.js?v=20261022-2";
 import {
   getOfficialPuzzleType as selectOfficialPuzzleType,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261022-1";
+} from "./daily-challenge-core.js?v=20261022-2";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -37,29 +37,29 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261022-1";
+} from "./progression.js?v=20261022-2";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261022-1";
+} from "./account.js?v=20261022-2";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261022-1";
+} from "./community-stats.js?v=20261022-2";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261022-1";
-import { fetchWithTimeout } from "./network.js?v=20261022-1";
-import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261022-1";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261022-1";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261022-1";
-import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261022-1";
-import { createMysteryBox } from "./mystery-box.js?v=20261022-1";
-import { initialiseGameAudio, letterSound } from "./game-audio.js?v=20261022-1";
+} from "./leaderboards.js?v=20261022-2";
+import { fetchWithTimeout } from "./network.js?v=20261022-2";
+import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261022-2";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261022-2";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261022-2";
+import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261022-2";
+import { createMysteryBox } from "./mystery-box.js?v=20261022-2";
+import { initialiseGameAudio, letterSound } from "./game-audio.js?v=20261022-2";
 
 const gameAudio = initialiseGameAudio(browserStorage);
 const mysteryBox = createMysteryBox({
@@ -236,19 +236,19 @@ const puzzleTypes = {
     name: "Quest Steps",
     kicker: "Easter egg puzzle",
     description: "Can you identify the Zombies map from its Easter egg steps?",
-    image: "./assets/quest-steps-card.svg?v=20261022-1",
+    image: "./assets/quest-steps-card.svg?v=20261022-2",
   },
   word: {
     name: "Last Words",
     kicker: "Letter puzzle",
     description: "Can you identify the Zombies word or phrase by revealing its letters?",
-    image: "./assets/dead-letters-card.svg?v=20261022-1",
+    image: "./assets/dead-letters-card.svg?v=20261022-2",
   },
 };
 if (bloodTiesEnabled) puzzleTypes.blood = {
   name: 'Blood Ties', kicker: 'Connection puzzle',
   description: 'Can you uncover the hidden connections between Zombies maps, weapons and more?',
-  image: './assets/blood-ties-card.svg?v=20261022-1',
+  image: './assets/blood-ties-card.svg?v=20261022-2',
 };
 
 function escapeHtml(value) {
@@ -475,6 +475,7 @@ function recordCommunityAttemptFor(type, isCorrect) {
     mapName: answerName,
     isCorrect,
     attempts: type === 'blood' ? dayState.sessions.blood?.attempts : undefined,
+    rulesVersion: type === 'blood' ? dayState.sessions.blood?.rulesVersion : undefined,
   })
     .then((stats) => {
       if (stats) updateCommunityStatsDisplay(stats);
@@ -1552,12 +1553,12 @@ function renderWordSlots(answer, revealedLetters, { revealLetter = "", finalReve
   `).join('<span class="word-space" aria-hidden="true"></span>');
 }
 
-function renderBloodPuzzle() {
+function renderBloodPuzzle({ flashStrikes = false } = {}) {
   mysteryBox.cancel();
   const session = ensureSession('blood');
   const official = isOfficialPlay('blood');
   renderBloodTiesView({
-    app, puzzle: bloodPuzzle, session, official, developer: isLocalPreview, heading: renderHeading,
+    app, puzzle: bloodPuzzle, session, official, developer: isLocalPreview, heading: renderHeading, flashStrikes,
     resultActions: `<div class="actions share-score-actions">${official ? renderResultAccountAction() : ''}${official ? '<button id="share-score" class="button share-score-button" type="button">Share with your squad</button>' : ''}<button id="return-to-puzzle-home" class="button" type="button">${areAllPuzzlesCompleted() ? 'View puzzles' : 'Play another puzzle'}</button></div><p id="share-score-status" class="share-score-status" aria-live="polite"></p>`,
     nextRound: renderNextRoundScreen(),
     onSound: (cue) => void gameAudio.play(cue),
@@ -1565,7 +1566,7 @@ function renderBloodPuzzle() {
     onSubmit: () => {
       if (session.complete || session.selected.length !== 3) return;
       let next;
-      try { next = replayBloodTiesAttempts(bloodPuzzle, [...session.attempts, session.selected]); }
+      try { next = replayBloodTiesAttempts(bloodPuzzle, [...session.attempts, session.selected], session.rulesVersion); }
       catch { session.message = 'You already tried that trio. Choose a different connection.'; saveState(); renderBloodPuzzle(); return; }
       if (official && next.complete && !confirmAccountResultSubmission(accountController)) return;
       const correct = next.solved.length > session.solved.length;
@@ -1582,17 +1583,32 @@ function renderBloodPuzzle() {
           dayState.progressionApplied = true;
           dayState.officialCompleted = true;
           dayState.officialResult = { type: 'blood', puzzleType: 'blood', success: session.success, points: session.points };
-          void accountController.recordBloodResult?.({ puzzleDate: puzzle.dateKey, puzzleId: bloodPuzzle.key, attempts: session.attempts });
+          void accountController.recordBloodResult?.({ puzzleDate: puzzle.dateKey, puzzleId: bloodPuzzle.key, attempts: session.attempts, rulesVersion: session.rulesVersion });
         }
         dayState.lastCompleted = { type: 'blood', mode: activePlay.mode, success: session.success, points: session.points };
         recordCommunityAttemptFor('blood', session.success);
       }
-      saveState(); renderBloodPuzzle();
-      if (session.complete) {
-        snapPageToTop();
-        if (session.success) playScoreCount(session.points); else void gameAudio.play('run-ended');
-      } else void gameAudio.play(correct ? 'answer-lock' : 'letter-wrong');
-      if (!session.complete) app.querySelector('[data-blood-tile]')?.focus({ preventScroll: true });
+      saveState();
+      const present = () => {
+        renderBloodPuzzle({ flashStrikes: correct });
+        if (session.complete) {
+          snapPageToTop();
+          if (session.success) playScoreCount(session.points); else void gameAudio.play('run-ended');
+        } else {
+          void gameAudio.play(correct ? 'answer-lock' : 'letter-wrong');
+          app.querySelector('[data-blood-tile]')?.focus({ preventScroll: true });
+        }
+      };
+      // Persist completion immediately. Hold the existing board only long enough
+      // to show the same green strike reset on the third correct submission.
+      const circles = app.querySelector('.blood-strike-circles');
+      if (correct && session.complete && circles) {
+        app.querySelectorAll('button').forEach((button) => { button.disabled = true; });
+        circles.querySelectorAll('i').forEach((circle) => circle.classList.remove('is-active'));
+        circles.setAttribute('aria-label', '0 of 3 strikes');
+        circles.classList.add('is-clearing');
+        window.setTimeout(() => { if (app.contains(circles)) present(); }, 520);
+      } else present();
     },
   });
   if (session.complete) {

@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261022-1";
+import { browserStorage } from "./browser-storage.js?v=20261022-2";
 const playerIdStorageKey = "the-daily-undead:community-player-id";
 const submittedPuzzleStoragePrefix = "the-daily-undead:community-submitted:";
 
@@ -113,6 +113,7 @@ export async function submitCommunityAttempt({
   mapName,
   isCorrect,
   attempts,
+  rulesVersion,
   storage = browserStorage,
   cryptoApi = globalThis.crypto,
   fetchImpl,
@@ -135,7 +136,7 @@ export async function submitCommunityAttempt({
         mapId,
         mapName,
         isCorrect,
-        ...(puzzleType === 'blood' ? { attempts } : {}),
+        ...(puzzleType === 'blood' ? { attempts, rulesVersion } : {}),
       }),
     },
     fetchImpl,

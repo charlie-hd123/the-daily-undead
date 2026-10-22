@@ -2,11 +2,11 @@ import {
   buildDailyPuzzle,
   getAnswerDisplayTitle,
   getUtcDateKey,
-} from "./game-core.js?v=20261022-1";
-import { getOfficialPuzzleType } from "./daily-challenge-core.js?v=20261022-1";
-import { buildDailyWordPuzzle } from "./word-puzzle-core.js?v=20261022-1";
-import { buildDailyBloodTiesPuzzle } from './blood-ties-core.js?v=20261022-1';
-import { fetchCommunityStats } from "./community-stats.js?v=20261022-1";
+} from "./game-core.js?v=20261022-2";
+import { getOfficialPuzzleType } from "./daily-challenge-core.js?v=20261022-2";
+import { buildDailyWordPuzzle } from "./word-puzzle-core.js?v=20261022-2";
+import { buildDailyBloodTiesPuzzle } from './blood-ties-core.js?v=20261022-2';
+import { fetchCommunityStats } from "./community-stats.js?v=20261022-2";
 import {
   buildMarketingCopy,
   buildWordMarketingCopy,
@@ -15,7 +15,7 @@ import {
   getDailyPostNumber,
   getPreviousDateKey,
   isAppleMobileDevice,
-} from "./marketing-core.js?v=20261022-1";
+} from "./marketing-core.js?v=20261022-2";
 
 const pack = document.querySelector("#marketing-pack");
 const packDate = document.querySelector("#pack-date");
@@ -142,7 +142,7 @@ function fitClue(context, clue) {
 
 async function drawQuestStepsImage(clue) {
   await document.fonts.load("500 45px Barlow");
-  const template = await loadImage("./assets/marketing-template.jpg?v=20261022-1");
+  const template = await loadImage("./assets/marketing-template.jpg?v=20261022-2");
   const context = canvas.getContext("2d", { alpha: false });
   context.drawImage(template, 0, 0, canvas.width, canvas.height);
   erasePreviousClue(context);
@@ -263,7 +263,7 @@ async function drawLastWordsImage(answer, initialLetters, category) {
     document.fonts.load("800 66px Barlow Condensed"),
     document.fonts.load("500 44px Barlow"),
   ]);
-  const template = await loadImage("./assets/marketing-last-words-template.jpg?v=20261022-1");
+  const template = await loadImage("./assets/marketing-last-words-template.jpg?v=20261022-2");
   const context = canvas.getContext("2d", { alpha: false });
   context.drawImage(template, 0, 0, canvas.width, canvas.height);
 
@@ -297,7 +297,7 @@ async function drawLastWordsImage(answer, initialLetters, category) {
 
 async function drawBloodTiesImage(puzzle) {
   await Promise.all([document.fonts.load('800 66px Barlow Condensed'), document.fonts.load('700 32px Barlow Condensed'), document.fonts.load('500 32px Barlow')]);
-  const logo = await loadImage('./assets/zombie-logo.png?v=20261022-1');
+  const logo = await loadImage('./assets/zombie-logo.png?v=20261022-2');
   const ctx = canvas.getContext('2d', { alpha: false });
   const background = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
   background.addColorStop(0, '#102c38'); background.addColorStop(1, '#0b0d17');
@@ -322,7 +322,7 @@ async function drawBloodTiesImage(puzzle) {
     lines.forEach((line, row) => ctx.fillText(line, x + 181, y + 71 + (row - (lines.length - 1) / 2) * 36));
   });
   ctx.fillStyle = '#67e8ff'; ctx.font = '700 32px Barlow Condensed';
-  ctx.fillText('WATCH OUT FOR OVERLAPPING THEMES · THREE MISSES END THE PUZZLE', 627, 1110);
+  ctx.fillText('WATCH OUT FOR OVERLAPPING THEMES · THREE STRIKES END THE PUZZLE', 627, 1110);
   ctx.fillStyle = '#f6f7fb'; ctx.font = '700 38px Barlow Condensed'; ctx.fillText('THEDAILYUNDEAD.COM', 627, 1195);
 }
 

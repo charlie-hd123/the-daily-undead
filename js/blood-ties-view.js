@@ -1,4 +1,3 @@
-import { calculateBloodTiesPoints } from './blood-ties-core.js?v=20261022-1';
 import { createRng, hashString, shuffle } from './game-core.js';
 
 const html = (value) => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
@@ -10,7 +9,7 @@ export function renderBloodTiesGroup(group, index, revealed = false) {
     <details><summary>About this connection</summary><p>${html(group.definition)}</p></details></article>`;
 }
 
-export function renderBloodTiesView({ app, puzzle, session, official, developer, heading, resultActions = '', nextRound = '', onSave, onSubmit, onSound }) {
+export function renderBloodTiesView({ app, puzzle, session, official, developer, heading, flashStrikes = false, resultActions = '', nextRound = '', onSave, onSubmit, onSound }) {
   const remaining = puzzle.tiles.filter((tile) => !puzzle.groups.some((g) => session.solved.includes(g.id) && g.answers.includes(tile)));
   const tiles = shuffle(remaining, createRng(hashString(`${puzzle.key}:shuffle:${session.shuffleCount}`)));
   const groupRow = renderBloodTiesGroup;
@@ -21,15 +20,15 @@ export function renderBloodTiesView({ app, puzzle, session, official, developer,
   const resultTitle = official ? session.success ? 'Round Survived!' : 'Run ended' : session.success ? 'Puzzle Complete!' : 'Not quite';
   app.innerHTML = `<section class="panel blood-puzzle-panel${session.complete ? ' blood-result-panel' : ''}">
     ${session.complete ? `<div class="result-banner ${session.success ? 'correct' : 'failed'} animate"><h2>${resultTitle}</h2>
-      <p>${session.success ? `You found three connections with ${session.misses === 0 ? 'no misses' : `${session.misses} ${session.misses === 1 ? 'miss' : 'misses'}`}. The final connection was revealed automatically.` : `You found ${session.solved.length} of four connections before your third miss. All four connections are shown below.`}
+      <p>${session.success ? `You found three connections with ${session.misses === 0 ? 'no incorrect submissions' : `${session.misses} incorrect ${session.misses === 1 ? 'submission' : 'submissions'}`}. The final connection was revealed automatically.` : `You found ${session.solved.length} of four connections before three strikes. All four connections are shown below.`}
       ${official ? session.success ? '' : ' Your permanent Score and Solves are safe.' : ' This result did not affect your stats.'}</p>
       ${official && session.success ? `<div class="result-score-total"><span>Round score</span><strong data-count-to="${session.points}">${session.points}</strong></div>` : ''}
       ${official && !session.success ? `<p class="survival-summary">${Math.max(1, session.roundsSurvivedBeforeLoss || 1) === 1 ? 'Your Round remains at <strong>Round 1</strong>.' : `Your run ended at <strong>Round ${session.roundsSurvivedBeforeLoss}</strong>. Your next game starts at <strong>Round 1</strong>.`}</p>` : ''}</div><p class="word-result-category blood-result-heading">Blood Ties · Today’s connections</p>`
-      : `<img class="puzzle-panel-art" src="./assets/blood-ties-card.svg?v=20261022-1" alt="" width="240" height="240" aria-hidden="true">
-      ${heading('Blood Ties', 'Find the hidden connections between Zombies maps, weapons and more. Three misses end the puzzle.', official ? 'Today’s round' : 'Just for fun', true)}
+      : `<img class="puzzle-panel-art" src="./assets/blood-ties-card.svg?v=20261022-2" alt="" width="240" height="240" aria-hidden="true">
+      ${heading('Blood Ties', 'Find the hidden connections between Zombies maps, weapons and more.', official ? 'Today’s round' : 'Just for fun', true)}
       ${official ? '' : '<p class="puzzle-mode-note">Playing just for fun. This result will not change your stats.</p>'}
-      <div class="word-scoreboard${official ? '' : ' is-single'}" role="group" aria-label="Connection puzzle progress"><div class="word-mistakes danger-level-${Math.ceil(session.misses * 5 / 3)}"><span>Misses</span><strong>${session.misses} / 3</strong><div class="word-danger-meter blood-danger-meter" aria-hidden="true">${[1, 2, 3].map((i) => `<i class="${i <= session.misses ? 'is-active' : ''}"></i>`).join('')}</div></div>
-      ${official ? `<div><span>Potential score</span><strong>${calculateBloodTiesPoints(session.misses)}</strong></div>` : ''}</div>
+      <div class="word-scoreboard${official ? '' : ' is-single'}" role="group" aria-label="Connection puzzle progress"><div class="blood-strikes"><span>Strikes</span><div class="blood-strike-circles${flashStrikes ? ' is-clearing' : ''}" role="img" aria-label="${session.strikes} of 3 strikes">${[1, 2, 3].map((i) => `<i class="${i <= session.strikes ? 'is-active' : ''}"></i>`).join('')}</div></div>
+      ${official ? `<div><span>Potential score</span><strong>${session.potentialPoints}</strong></div>` : ''}</div>
       <p class="blood-instruction">Select <strong>3 tiles</strong> that share a connection. Watch out for overlapping themes.</p>`}
     <div class="blood-solved" aria-label="${session.complete ? 'Today’s connections' : 'Solved connections'}">${session.complete
       ? puzzle.groups.map((g, i) => groupRow(g, i, !session.solved.includes(g.id) || session.success && g.id === session.solved.at(-1))).join('')

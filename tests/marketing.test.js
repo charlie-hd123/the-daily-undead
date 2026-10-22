@@ -18,7 +18,7 @@ test('Blood Ties marketing names the connection game and preserves yesterday’s
   assert.match(copy.redditBody, /Today’s puzzle: Blood Ties/);
   assert.match(copy.discordBody, /Yesterday’s answer: Doctor Groph/);
   assert.match(copy.discordBody, /73%/);
-  assert.match(copy.discordBody, /Three misses/);
+  assert.match(copy.discordBody, /Three strikes/);
   assert.equal(buildBloodMarketingCopy({ dateKey: '2026-10-22', yesterdayAnswer: 'Doctor Groph', solvePercentage: null }).solved, '—%');
 });
 

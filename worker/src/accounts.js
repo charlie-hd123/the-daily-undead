@@ -312,7 +312,9 @@ export async function recordVerifiedBloodResult(db, request, userId, options = {
   const puzzle = buildDailyBloodTiesPuzzle(today);
   if (body.puzzleId !== puzzle.key || !Array.isArray(body.attempts)) return { status: 400, body: { error: 'The submitted Blood Ties puzzle is invalid.' } };
   let result;
-  try { result = replayBloodTiesAttempts(puzzle, body.attempts); }
+  // Missing versions come only from pre-update clients/saves. Both rule sets
+  // are server-replayed; submitted points, strikes and success are never trusted.
+  try { result = replayBloodTiesAttempts(puzzle, body.attempts, body.rulesVersion ?? 1); }
   catch { return { status: 400, body: { error: 'The Blood Ties attempt history is invalid.' } }; }
   if (!result.complete) return { status: 400, body: { error: 'The Blood Ties attempt is not complete.' } };
   return persistSimpleResult(db, userId, { today, puzzleId: puzzle.key, answerId: 'blood-ties', success: result.success, points: result.points, misses: result.misses, type: 'blood' });
