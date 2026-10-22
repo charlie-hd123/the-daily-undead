@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-labelledby="title">
   <title id="title">Quest Steps treasure map with three connected X marks</title>
-  <path fill="#183d62" stroke="#67e8ff" stroke-linejoin="round" stroke-width="6" d="m31 85 59-18 59 18 60-18v92l-60 18-59-18-59 18z"/>
-  <path fill="none" stroke="#67e8ff" stroke-width="6" opacity=".35" d="M90 67v92m59-74v92"/>
-  <path fill="none" stroke="#67e8ff" stroke-linecap="round" stroke-width="6" stroke-dasharray="4 10" d="M57 140c4-28 34 0 62-35s65-8 65 31"/>
-  <path fill="none" stroke="#183d62" stroke-linecap="round" stroke-width="13" d="m48 131 18 18m0-18-18 18m62-53 18 18m0-18-18 18m65 13 18 18m0-18-18 18"/>
-  <path fill="none" stroke="#67e8ff" stroke-linecap="round" stroke-width="7" d="m48 131 18 18m0-18-18 18m62-53 18 18m0-18-18 18m65 13 18 18m0-18-18 18"/>
+  <path fill="#183d62" stroke="#67e8ff" stroke-linejoin="round" stroke-width="6" d="m36 88 56-15 56 15 56-15v86l-56 15-56-15-56 15z"/>
+  <path fill="none" stroke="#67e8ff" stroke-width="6" opacity=".35" d="M92 73v86m56-71v86"/>
+  <path fill="none" stroke="#67e8ff" stroke-linecap="round" stroke-width="6" stroke-dasharray="4 10" d="M61 139c9-22 35 2 59-27C136 104 160 112 178 139"/>
+  <path fill="none" stroke="#183d62" stroke-linecap="round" stroke-width="13" d="M53 131l16 16m0-16-16 16M112 104l16 16m0-16-16 16M170 131l16 16m0-16-16 16"/>
+  <path fill="none" stroke="#67e8ff" stroke-linecap="round" stroke-width="7" d="M53 131l16 16m0-16-16 16M112 104l16 16m0-16-16 16M170 131l16 16m0-16-16 16"/>
 </svg>

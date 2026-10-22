@@ -63,19 +63,22 @@ test('every millisecond of the opening keeps the projected lid within the approv
   }
 });
 
-test('all three icons have equal painted width throughout the mystery-box lift', () => {
+test('all three icons keep similar visible width and height through the lift and landing', () => {
   for (const size of [[288, 250], [343, 250], [736, 310], [1056, 480], [797, 200]]) {
     const stage = { left: 20, top: 150, width: size[0], height: size[1] };
     const input = { ...desktop, stage, mouth: {
       left: { x: stage.left + stage.width * .2, y: stage.top + stage.height * .52 },
       right: { x: stage.left + stage.width * .8, y: stage.top + stage.height * .62 },
       center: { x: stage.left + stage.width / 2, y: stage.top + stage.height * .55 } } };
-    for (const elapsed of [timing.liftAt, timing.liftAt + timing.liftFor / 2, timing.settleAt]) {
-      const widths = Object.values(ICON_INK).map((ink) => {
+    for (const elapsed of [timing.liftAt, timing.liftAt + timing.liftFor / 2, timing.settleAt, timing.settleAt + timing.settleFor / 2, timing.finishAt]) {
+      const sizes = Object.values(ICON_INK).map((ink) => {
         const pose = createIconFlight({ ...input, ink })(elapsed);
-        return ink.width * input.target.width * pose.scale;
+        return [ink.width * input.target.width * pose.scale, ink.height * input.target.height * pose.scale];
       });
-      for (const width of widths) assert.ok(Math.abs(width - widths[0]) < 1e-10);
+      for (const dimension of [0, 1]) {
+        const lengths = sizes.map((size) => size[dimension]);
+        assert.ok(Math.max(...lengths) / Math.min(...lengths) < 1.08, `unbalanced dimension ${dimension} at ${elapsed}ms`);
+      }
     }
   }
 });

@@ -37,8 +37,8 @@ export function revealHeight(elapsed, closedHeight, puzzleHeight) {
 // Painted bounds, including strokes, in the original 240px SVG viewBoxes.
 export const ICON_INK = Object.freeze({
   word: Object.freeze({ left: 28 / 240, top: 72 / 240, width: 184 / 240, height: 101 / 240, visualScale: 1.25 }),
-  easter: Object.freeze({ left: 28 / 240, top: 64 / 240, width: 184 / 240, height: 116 / 240, visualScale: 1.25 }),
-  blood: Object.freeze({ left: 28 / 240, top: 59 / 240, width: 184 / 240, height: 122 / 240, visualScale: 1.25 }),
+  easter: Object.freeze({ left: 33 / 240, top: 70 / 240, width: 174 / 240, height: 107 / 240, visualScale: 1.2 }),
+  blood: Object.freeze({ left: 30 / 240, top: 70 / 240, width: 180 / 240, height: 104 / 240, visualScale: 1.23 }),
 });
 const tallestIcon = Math.max(...Object.values(ICON_INK).map((ink) => ink.height / ink.width * Math.max(1, ink.visualScale)));
 const widestIcon = Math.max(...Object.values(ICON_INK).map((ink) => ink.visualScale));
@@ -52,7 +52,7 @@ export function createIconFlight({ target, mouth, stage, viewDirection, ink = IC
     (x - mouth.left.x) / (mouth.right.x - mouth.left.x));
   const openingWidth = Math.abs(mouth.right.x - mouth.left.x);
   const availableHeight = Math.max(30, Math.min(mouth.left.y, mouth.right.y) - stage.top - 40);
-  // Shared painted width keeps the three icons equally prominent throughout the reveal.
+  // Optical scales balance visible width and height across the three compact silhouettes.
   const peakInkWidth = Math.min(168, (stage.width - 40) / widestIcon, openingWidth * .62, availableHeight / tallestIcon);
   const peakSize = peakInkWidth * ink.visualScale / ink.width;
   const peakScale = peakSize / target.width;
