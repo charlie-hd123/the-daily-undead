@@ -196,7 +196,7 @@ pack=dict(title='The Daily Undead · Sound auditions',version='auditions-2' if R
 (OUT/'manifest.json').write_text(json.dumps(pack,indent=2)+'\n')
 (OUT/'manifest-data.js').write_text('window.SOUND_AUDITIONS = '+json.dumps(pack,separators=(',',':'))+';\n')
 with (OUT/'manifest.csv').open('w',newline='') as stream:
-    writer=csv.DictWriter(stream,fieldnames=['label','title','group','wav','compressed','duration','volume','note'],extrasaction='ignore')
+    writer=csv.DictWriter(stream,fieldnames=['label','title','group','wav','compressed','duration','volume','note'],extrasaction='ignore',lineterminator='\n')
     writer.writeheader();writer.writerows(sounds)
 (OUT/'CREDITS.md').write_text('# Original sound auditions\n\nOriginal local synthesis candidates by the Daily Undead project. No samples or third-party melodies were used. These options are not selected in game. In round two, 1A is copied bit-identically for comparison.\n\nRebuild: `python scripts/build-audio-auditions.py`'+(' `--round-two`' if ROUND_TWO else '')+' with numpy and macOS afconvert. Primary: 48 kHz mono 16-bit PCM WAV. Fallback/download: 192 kb/s AAC. Levels use active-window RMS and existing game gains; clipping and decoded-file checks are in qa-report.json. No subjective listening was possible.\n')
 s.verify()
