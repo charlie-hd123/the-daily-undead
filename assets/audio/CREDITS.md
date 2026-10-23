@@ -1,6 +1,10 @@
-# The Daily Undead sound effects · feedback revision 2.5
+# The Daily Undead sound effects · feedback revision 2.6
 
-## Selected clue 8E and brighter box auditions · 23 October 2026
+## Selected original box 1G · 23 October 2026
+
+Mystery Box opening now uses the approved **1G · Gentle lift**, copied byte-for-byte from `auditions-2026-10-23-lift/`. Its original melody, taps, 2.70-second duration and .86 playback gain are preserved. The layered 1G+ is not selected. Clue 8E and every other cue are unchanged. The original audition QA checks cover these identical WAV/AAC bytes; no subjective listening assessment was possible.
+
+## Previous selection: clue 8E and brighter box auditions · 23 October 2026
 
 Quest clue reveal now uses the approved **8E · Wooden roll**: three small dry
 wooden contacts, 230 ms. Its WAV and AAC bytes are copied exactly from the audition;
