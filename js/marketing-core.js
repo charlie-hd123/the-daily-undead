@@ -179,11 +179,12 @@ export function buildBloodMarketingCopy({ dateKey, yesterdayAnswer, solvePercent
   if (typeof yesterdayAnswer !== 'string' || !yesterdayAnswer.trim()) throw new Error('Yesterday’s answer is required.');
   const solved = Number.isInteger(solvePercentage) && solvePercentage >= 0 && solvePercentage <= 100 ? `${solvePercentage}%` : '—%';
   const opening = [`Yesterday’s answer: ${yesterdayAnswer.trim()} 🧟`, `Yesterday’s solve rate: ${solved} 🔎`];
-  const prompt = ['Today’s puzzle: Blood Ties', 'Find four groups of three connected Zombies tiles.', 'Some tiles fit more than one theme. Three strikes end the puzzle.'];
+  const prompt = ['Today’s puzzle: Blood Ties', 'Can you identify three tiles that form a connection? There are four total.', 'Some tiles fit more than one theme. Three strikes end the puzzle on the website.'];
+  const commentPrompt = 'Found a connection? Comment your three tiles and what connects them 👇';
   return {
     redditTitle: `Can you find the Zombies connections? — ${formatDiscordDate(dateKey)}`,
-    redditBody: [...opening, '', ...prompt, '', 'Drop your connections below 👇'].join('\n'),
-    discordBody: [`🧟 __The Daily Undead · ${formatDiscordDate(dateKey)}__`, ...opening, '', ...prompt, '', '🔗 <https://thedailyundead.com/>'].join('\n'),
+    redditBody: [...opening, '', ...prompt, '', commentPrompt].join('\n'),
+    discordBody: [`🧟 __The Daily Undead · ${formatDiscordDate(dateKey)}__`, ...opening, '', ...prompt, '', commentPrompt, '', '🔗 <https://thedailyundead.com/>'].join('\n'),
     solved,
   };
 }
