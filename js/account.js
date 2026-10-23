@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261023-5";
+import { browserStorage } from "./browser-storage.js?v=20261023-6";
 import {
   accountMemoryStorageKey,
   clearPendingProgress,
@@ -7,9 +7,9 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261023-5";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261023-5";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261023-5";
+} from "./account-session.js?v=20261023-6";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261023-6";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261023-6";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -740,7 +740,7 @@ export async function initialiseAccount({
   try {
     clerk = await withTimeout(
       supabaseConfigured
-        ? import("./supabase-auth.js?v=20261023-5").then(({ loadSupabaseAuth }) => (
+        ? import("./supabase-auth.js?v=20261023-6").then(({ loadSupabaseAuth }) => (
           loadSupabaseAuth(documentObject)
         ))
         : loadClerk(publishableKey),

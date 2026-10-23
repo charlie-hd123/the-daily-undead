@@ -2,11 +2,11 @@ import {
   buildDailyPuzzle,
   getAnswerDisplayTitle,
   getUtcDateKey,
-} from "./game-core.js?v=20261023-5";
-import { getOfficialPuzzleType } from "./daily-challenge-core.js?v=20261023-5";
-import { buildDailyWordPuzzle } from "./word-puzzle-core.js?v=20261023-5";
-import { buildDailyBloodTiesPuzzle } from './blood-ties-core.js?v=20261023-5';
-import { fetchCommunityStats } from "./community-stats.js?v=20261023-5";
+} from "./game-core.js?v=20261023-6";
+import { getOfficialPuzzleType } from "./daily-challenge-core.js?v=20261023-6";
+import { buildDailyWordPuzzle } from "./word-puzzle-core.js?v=20261023-6";
+import { buildDailyBloodTiesPuzzle } from './blood-ties-core.js?v=20261023-6';
+import { fetchCommunityStats } from "./community-stats.js?v=20261023-6";
 import {
   buildMarketingCopy,
   buildWordMarketingCopy,
@@ -15,7 +15,7 @@ import {
   getDailyPostNumber,
   getPreviousDateKey,
   isAppleMobileDevice,
-} from "./marketing-core.js?v=20261023-5";
+} from "./marketing-core.js?v=20261023-6";
 
 const pack = document.querySelector("#marketing-pack");
 const packDate = document.querySelector("#pack-date");
@@ -142,7 +142,7 @@ function fitClue(context, clue) {
 
 async function drawQuestStepsImage(clue) {
   await document.fonts.load("500 45px Barlow");
-  const template = await loadImage("./assets/marketing-template.jpg?v=20261023-5");
+  const template = await loadImage("./assets/marketing-template.jpg?v=20261023-6");
   const context = canvas.getContext("2d", { alpha: false });
   context.drawImage(template, 0, 0, canvas.width, canvas.height);
   erasePreviousClue(context);
@@ -263,7 +263,7 @@ async function drawLastWordsImage(answer, initialLetters, category) {
     document.fonts.load("800 66px Barlow Condensed"),
     document.fonts.load("500 44px Barlow"),
   ]);
-  const template = await loadImage("./assets/marketing-last-words-template.jpg?v=20261023-5");
+  const template = await loadImage("./assets/marketing-last-words-template.jpg?v=20261023-6");
   const context = canvas.getContext("2d", { alpha: false });
   context.drawImage(template, 0, 0, canvas.width, canvas.height);
 
@@ -297,7 +297,7 @@ async function drawLastWordsImage(answer, initialLetters, category) {
 
 async function drawBloodTiesImage(puzzle) {
   await Promise.all([document.fonts.load('800 66px Barlow Condensed'), document.fonts.load('700 32px Barlow Condensed'), document.fonts.load('500 32px Barlow')]);
-  const logo = await loadImage('./assets/zombie-logo.png?v=20261023-5');
+  const logo = await loadImage('./assets/zombie-logo.png?v=20261023-6');
   const ctx = canvas.getContext('2d', { alpha: false });
   const background = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
   background.addColorStop(0, '#102c38'); background.addColorStop(1, '#0b0d17');

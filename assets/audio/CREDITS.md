@@ -1,6 +1,12 @@
-# The Daily Undead sound effects · feedback revision 2.7
+# The Daily Undead sound effects · feedback revision 2.8
 
-## Reward texture cleanup · 23 October 2026
+## Recorded chest and atmospheric 1G · 23 October 2026
+
+Mystery Box now combines the existing 1G melody with a CC0 recording of an actual wooden chest opening. The initial synthetic knock and the two post-jingle thuds are removed. A dark diffuse reverb and quiet E/B harmonic layer add depth, fading to silence at 3.42 seconds before the 3.50-second animation finishes. The active-window RMS remains -18 dBFS and cue gain remains .86. All other 16 cues, including the cleaned reward flourish, are unchanged.
+
+Recording: [Wooden Chest Open.wav by The_Frisbee_of_Peace](https://freesound.org/people/The_Frisbee_of_Peace/sounds/573654/), CC0. The public HQ MP3 preview is retained; the login-gated original WAV was not downloaded. Full source hash, licence and processing details: [sources/CREDITS.md](sources/CREDITS.md). Rebuild with `python scripts/revise-box-atmosphere.py`. No direct listening assessment; PCM/AAC decoding, finite samples, duration, silent endpoints and 4x true peaks checked.
+
+## Previous reward texture cleanup · 23 October 2026
 
 The papery air sweep embedded in Double Points (190–610 ms into its clip) has been removed by reconstructing and subtracting that original component. The existing chimes, echoes, 1.65-second duration, playback gain and post-count trigger timing remain. Loudness is matched to the accepted file. This shared flourish is cleaned wherever it plays. All other cues, including selected box 1G and clue 8E, are byte-identical. Rebuild with `python scripts/remove-reward-sweep.py` (numpy + macOS afconvert). Source/AAC decoding and true-peak checks passed; no subjective listening assessment.
 
