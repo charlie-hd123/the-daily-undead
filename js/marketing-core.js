@@ -49,54 +49,35 @@ export function formatDiscordDate(dateKey) {
     .replace(/\bSep\b/, "Sept");
 }
 
-export function buildMarketingCopy({
-  dateKey,
-  clue,
-  yesterdayAnswer,
-  yesterdayPuzzleName = "Quest Steps",
-  solvePercentage,
-}) {
-  if (!isValidDateKey(dateKey)) throw new Error("A valid puzzle date is required.");
-  if (typeof clue !== "string" || !clue.trim()) throw new Error("Today’s clue is required.");
-  if (typeof yesterdayAnswer !== "string" || !yesterdayAnswer.trim()) {
-    throw new Error("Yesterday’s answer is required.");
-  }
+function previousPuzzleLines(yesterdayAnswer, yesterdayPuzzleName, solved, platform) {
+  const answerLines = yesterdayPuzzleName === 'Blood Ties'
+    ? ['Yesterday’s connections: 🧟', ...yesterdayAnswer.trim().split('\n')]
+    : [`Yesterday’s answer: ${yesterdayAnswer.trim()} 🧟`];
+  const names = platform === 'reddit' ? 'u/____, u/____, u/____' : '@____, @____, @____';
+  return [...answerLines, `Yesterday’s solve rate: ${solved} 🔎`, `First correct here: ${names} 👏`];
+}
 
-  const solved = Number.isInteger(solvePercentage) && solvePercentage >= 0 && solvePercentage <= 100
-    ? `${solvePercentage}%`
-    : "—%";
-  const cleanClue = clue.trim();
-  const cleanAnswer = yesterdayAnswer.trim();
-  const redditTitle = `Which Zombies map is it? — ${formatDiscordDate(dateKey)}`;
-  const redditBody = [
-    `Yesterday’s answer: ${cleanAnswer} 🧟`,
-    `Yesterday’s solve rate: ${solved} 🔎`,
-    "First correct here: u/____, u/____, u/____ 👏",
-    "",
-    "Today’s puzzle:",
-    "Which Treyarch Zombies map is it?",
-    "",
-    "Try to get it before reading the comments 👀",
-    "",
-    "Drop your guess below👇",
-  ].join("\n");
-  const discordBody = [
-    `🧟 __The Daily Undead · ${formatDiscordDate(dateKey)}__`,
-    `Yesterday’s answer: ${cleanAnswer} 🧟`,
-    `Yesterday’s solve rate: ${solved} 🔎`,
-    "First correct here: @____, @____, @____ 👏",
-    "",
-    "Today’s puzzle:",
-    "**Which Treyarch Zombies map is it?**",
-    "",
-    "Drop your guess below 👇",
-    "",
-    "Need another clue, or want to lock in your answer on the website?",
-    "",
-    "🔗 <https://thedailyundead.com/>",
-  ].join("\n");
+function solveRate(value) {
+  return Number.isInteger(value) && value >= 0 && value <= 100 ? `${value}%` : '—%';
+}
 
-  return { redditTitle, redditBody, discordBody, solved };
+function validateCopyInput(dateKey, yesterdayAnswer) {
+  if (!isValidDateKey(dateKey)) throw new Error('A valid puzzle date is required.');
+  if (typeof yesterdayAnswer !== 'string' || !yesterdayAnswer.trim()) throw new Error('Yesterday’s answer is required.');
+}
+
+export function buildMarketingCopy({ dateKey, clue, yesterdayAnswer, yesterdayPuzzleName = 'Quest Steps', solvePercentage }) {
+  validateCopyInput(dateKey, yesterdayAnswer);
+  if (typeof clue !== 'string' || !clue.trim()) throw new Error('Today’s clue is required.');
+  const solved = solveRate(solvePercentage);
+  const title = 'Which Zombies map is it?';
+  const question = 'Can you identify the map from one of its main quest steps?';
+  return {
+    redditTitle: `${title} — ${formatDiscordDate(dateKey)}`,
+    redditBody: [...previousPuzzleLines(yesterdayAnswer, yesterdayPuzzleName, solved, 'reddit'), '', title, '', question, '', 'Try to get it before reading the comments 👀', '', 'Drop your guess below 👇'].join('\n'),
+    discordBody: [`🧟 __The Daily Undead · ${formatDiscordDate(dateKey)}__`, '', ...previousPuzzleLines(yesterdayAnswer, yesterdayPuzzleName, solved, 'discord'), '', `**${title}**`, '', question, '', 'Drop your guess below 👇', '', 'Need another clue? Continue the puzzle on the website.', '', '🔗 <https://thedailyundead.com/>'].join('\n'),
+    solved,
+  };
 }
 
 export function buildWordPattern(answer, initialLetters) {
@@ -120,71 +101,31 @@ export function buildWordPattern(answer, initialLetters) {
     .join(" ");
 }
 
-export function buildWordMarketingCopy({
-  dateKey,
-  answer,
-  initialLetters,
-  category,
-  yesterdayAnswer,
-  yesterdayPuzzleName = "Quest Steps",
-  solvePercentage,
-}) {
-  if (!isValidDateKey(dateKey)) throw new Error("A valid puzzle date is required.");
-  if (typeof category !== "string" || !category.trim()) {
-    throw new Error("Today’s word category is required.");
-  }
-  if (typeof yesterdayAnswer !== "string" || !yesterdayAnswer.trim()) {
-    throw new Error("Yesterday’s answer is required.");
-  }
-
-  const solved = Number.isInteger(solvePercentage) && solvePercentage >= 0 && solvePercentage <= 100
-    ? `${solvePercentage}%`
-    : "—%";
-  const pattern = buildWordPattern(answer, initialLetters);
-  const cleanAnswer = yesterdayAnswer.trim();
-  const redditTitle = `Which Zombies word is it? — ${formatDiscordDate(dateKey)}`;
-  const redditBody = [
-    `Yesterday’s answer: ${cleanAnswer} 🧟`,
-    `Yesterday’s solve rate: ${solved} 🔎`,
-    "First correct here: u/____, u/____, u/____ 👏",
-    "",
-    "Today’s puzzle:",
-    "Which Zombies word or phrase is it?",
-    "",
-    "Try to get it before reading the comments 👀",
-    "",
-    "Drop your guess below👇",
-  ].join("\n");
-  const discordBody = [
-    `🧟 __The Daily Undead · ${formatDiscordDate(dateKey)}__`,
-    `Yesterday’s answer: ${cleanAnswer} 🧟`,
-    `Yesterday’s solve rate: ${solved} 🔎`,
-    "First correct here: @____, @____, @____ 👏",
-    "",
-    "Today’s puzzle:",
-    "**Which Zombies word or phrase is it?**",
-    "",
-    "Drop your guess below 👇",
-    "",
-    "Need another letter, or want to lock in your answer on the website?",
-    "",
-    "🔗 <https://thedailyundead.com/>",
-  ].join("\n");
-
-  return { redditTitle, redditBody, discordBody, solved, pattern };
+export function buildWordMarketingCopy({ dateKey, answer, initialLetters, category, yesterdayAnswer, yesterdayPuzzleName = 'Quest Steps', solvePercentage }) {
+  validateCopyInput(dateKey, yesterdayAnswer);
+  if (typeof category !== 'string' || !category.trim()) throw new Error('Today’s word category is required.');
+  const solved = solveRate(solvePercentage);
+  const title = 'Which Zombies word is it?';
+  const question = 'Try to solve the Zombies word or phrase with these limited letters.';
+  return {
+    redditTitle: `${title} — ${formatDiscordDate(dateKey)}`,
+    redditBody: [...previousPuzzleLines(yesterdayAnswer, yesterdayPuzzleName, solved, 'reddit'), '', title, '', question, '', 'Try to get it before reading the comments 👀', '', 'Drop your guess below 👇'].join('\n'),
+    discordBody: [`🧟 __The Daily Undead · ${formatDiscordDate(dateKey)}__`, '', ...previousPuzzleLines(yesterdayAnswer, yesterdayPuzzleName, solved, 'discord'), '', `**${title}**`, '', question, '', 'Drop your guess below 👇', '', 'Need another letter? Continue the puzzle on the website.', '', '🔗 <https://thedailyundead.com/>'].join('\n'),
+    solved,
+    pattern: buildWordPattern(answer, initialLetters),
+  };
 }
 
-export function buildBloodMarketingCopy({ dateKey, yesterdayAnswer, solvePercentage }) {
-  if (!isValidDateKey(dateKey)) throw new Error('A valid puzzle date is required.');
-  if (typeof yesterdayAnswer !== 'string' || !yesterdayAnswer.trim()) throw new Error('Yesterday’s answer is required.');
-  const solved = Number.isInteger(solvePercentage) && solvePercentage >= 0 && solvePercentage <= 100 ? `${solvePercentage}%` : '—%';
-  const opening = [`Yesterday’s answer: ${yesterdayAnswer.trim()} 🧟`, `Yesterday’s solve rate: ${solved} 🔎`];
-  const prompt = ['Today’s puzzle: Blood Ties', 'Can you identify three tiles that form a connection? There are four total.', 'Some tiles fit more than one theme. Three strikes end the puzzle on the website.'];
+export function buildBloodMarketingCopy({ dateKey, yesterdayAnswer, yesterdayPuzzleName = 'Quest Steps', solvePercentage }) {
+  validateCopyInput(dateKey, yesterdayAnswer);
+  const solved = solveRate(solvePercentage);
+  const title = 'Spot a Zombies connection?';
+  const question = 'Can you identify three tiles that form a connection? There are four total.';
   const commentPrompt = 'Found a connection? Comment your three tiles and what connects them 👇';
   return {
-    redditTitle: `Can you find the Zombies connections? — ${formatDiscordDate(dateKey)}`,
-    redditBody: [...opening, '', ...prompt, '', commentPrompt].join('\n'),
-    discordBody: [`🧟 __The Daily Undead · ${formatDiscordDate(dateKey)}__`, ...opening, '', ...prompt, '', commentPrompt, '', '🔗 <https://thedailyundead.com/>'].join('\n'),
+    redditTitle: `${title} — ${formatDiscordDate(dateKey)}`,
+    redditBody: [...previousPuzzleLines(yesterdayAnswer, yesterdayPuzzleName, solved, 'reddit'), '', title, '', question, '', 'Try to spot one before reading the comments 👀', '', commentPrompt].join('\n'),
+    discordBody: [`🧟 __The Daily Undead · ${formatDiscordDate(dateKey)}__`, '', ...previousPuzzleLines(yesterdayAnswer, yesterdayPuzzleName, solved, 'discord'), '', `**${title}**`, '', question, '', commentPrompt, '', 'Want to find all four? Complete the puzzle on the website.', '', '🔗 <https://thedailyundead.com/>'].join('\n'),
     solved,
   };
 }

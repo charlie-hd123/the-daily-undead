@@ -2,11 +2,11 @@ import {
   buildDailyPuzzle,
   getAnswerDisplayTitle,
   getUtcDateKey,
-} from "./game-core.js?v=20261023-15";
-import { getOfficialPuzzleType } from "./daily-challenge-core.js?v=20261023-15";
-import { buildDailyWordPuzzle } from "./word-puzzle-core.js?v=20261023-15";
-import { buildDailyBloodTiesPuzzle } from './blood-ties-core.js?v=20261023-15';
-import { fetchCommunityStats } from "./community-stats.js?v=20261023-15";
+} from "./game-core.js?v=20261023-17";
+import { getOfficialPuzzleType } from "./daily-challenge-core.js?v=20261023-17";
+import { buildDailyWordPuzzle } from "./word-puzzle-core.js?v=20261023-17";
+import { buildDailyBloodTiesPuzzle } from './blood-ties-core.js?v=20261023-17';
+import { fetchCommunityStats } from "./community-stats.js?v=20261023-17";
 import {
   buildMarketingCopy,
   buildWordMarketingCopy,
@@ -15,7 +15,9 @@ import {
   getDailyPostNumber,
   getPreviousDateKey,
   isAppleMobileDevice,
-} from "./marketing-core.js?v=20261023-15";
+} from "./marketing-core.js?v=20261023-17";
+
+import { drawMarketingImage } from "./marketing-art.js?v=20261023-17";
 
 const pack = document.querySelector("#marketing-pack");
 const packDate = document.querySelector("#pack-date");
@@ -69,261 +71,6 @@ async function loadPuzzleData() {
     }),
   );
   return { catalog, maps, wordEntries: wordBank.words };
-}
-
-function loadImage(source) {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error("Could not load the image template."));
-    image.src = source;
-  });
-}
-
-function erasePreviousClue(context) {
-  const image = context.getImageData(0, 0, canvas.width, canvas.height);
-  const { data, width } = image;
-  const left = 98;
-  const right = 1156;
-  const top = 523;
-  const bottom = 672;
-  const sampleTop = 514;
-  const sampleBottom = 682;
-
-  for (let y = top; y <= bottom; y += 1) {
-    const ratio = (y - top) / (bottom - top);
-    for (let x = left; x <= right; x += 1) {
-      const target = (y * width + x) * 4;
-      const upper = (sampleTop * width + x) * 4;
-      const lower = (sampleBottom * width + x) * 4;
-      for (let channel = 0; channel < 3; channel += 1) {
-        data[target + channel] = Math.round(
-          data[upper + channel] * (1 - ratio) + data[lower + channel] * ratio,
-        );
-      }
-      data[target + 3] = 255;
-    }
-  }
-
-  context.putImageData(image, 0, 0);
-}
-
-function wrapText(context, text, maximumWidth) {
-  const words = text.split(/\s+/);
-  const lines = [];
-  let line = "";
-
-  for (const word of words) {
-    const candidate = line ? `${line} ${word}` : word;
-    if (line && context.measureText(candidate).width > maximumWidth) {
-      lines.push(line);
-      line = word;
-    } else {
-      line = candidate;
-    }
-  }
-  if (line) lines.push(line);
-  return lines;
-}
-
-function fitClue(context, clue) {
-  for (let fontSize = 45; fontSize >= 31; fontSize -= 1) {
-    context.font = `500 ${fontSize}px Barlow`;
-    const lines = wrapText(context, clue, 1010);
-    const lineHeight = Math.round(fontSize * 1.48);
-    if (lines.length <= 3 && lines.length * lineHeight <= 148) {
-      return { fontSize, lineHeight, lines };
-    }
-  }
-
-  context.font = "500 31px Barlow";
-  return { fontSize: 31, lineHeight: 46, lines: wrapText(context, clue, 1010).slice(0, 3) };
-}
-
-async function drawQuestStepsImage(clue) {
-  await document.fonts.load("500 45px Barlow");
-  const template = await loadImage("./assets/marketing-template.jpg?v=20261023-15");
-  const context = canvas.getContext("2d", { alpha: false });
-  context.drawImage(template, 0, 0, canvas.width, canvas.height);
-  erasePreviousClue(context);
-
-  const fitted = fitClue(context, clue);
-  const visualHeight = fitted.fontSize + (fitted.lines.length - 1) * fitted.lineHeight;
-  const blockTop = 596 - visualHeight / 2;
-  context.font = `500 ${fitted.fontSize}px Barlow`;
-  context.fillStyle = "#f1f4f8";
-  context.textBaseline = "top";
-  context.textAlign = "left";
-  fitted.lines.forEach((line, index) => {
-    context.fillText(line, 122, blockTop + index * fitted.lineHeight);
-  });
-}
-
-function getPatternCharacterWidth(character, fontSize) {
-  if (/^[A-Z]$/i.test(character)) return Math.round(fontSize * 0.76);
-  if (/['’“”]/.test(character)) return Math.round(fontSize * 0.28);
-  if (character === "-") return Math.round(fontSize * 0.42);
-  return Math.round(fontSize * 0.52);
-}
-
-function measurePatternWord(word, fontSize) {
-  const gap = Math.max(5, Math.round(fontSize * 0.13));
-  const characters = [...word];
-  return characters.reduce(
-    (width, character, index) => width + getPatternCharacterWidth(character, fontSize) +
-      (index === characters.length - 1 ? 0 : gap),
-    0,
-  );
-}
-
-function layoutWordPattern(answer, fontSize, maximumWidth) {
-  const wordGap = Math.round(fontSize * 0.72);
-  const words = answer.trim().split(/\s+/);
-  const lines = [];
-  let current = [];
-  let currentWidth = 0;
-
-  words.forEach((word) => {
-    const width = measurePatternWord(word, fontSize);
-    const candidateWidth = current.length ? currentWidth + wordGap + width : width;
-    if (current.length && candidateWidth > maximumWidth) {
-      lines.push({ words: current, width: currentWidth });
-      current = [word];
-      currentWidth = width;
-    } else {
-      current.push(word);
-      currentWidth = candidateWidth;
-    }
-  });
-  if (current.length) lines.push({ words: current, width: currentWidth });
-
-  return { lines, wordGap };
-}
-
-function fitWordPattern(answer) {
-  for (let fontSize = 84; fontSize >= 42; fontSize -= 2) {
-    const layout = layoutWordPattern(answer, fontSize, 840);
-    const lineHeight = Math.round(fontSize * 1.62);
-    if (layout.lines.length <= 3 && layout.lines.length * lineHeight <= 300) {
-      return { ...layout, fontSize, lineHeight };
-    }
-  }
-
-  const fontSize = 40;
-  return {
-    ...layoutWordPattern(answer, fontSize, 840),
-    fontSize,
-    lineHeight: 66,
-  };
-}
-
-function drawPatternLine(context, words, totalWidth, wordGap, y, fontSize, revealedLetters) {
-  const characterGap = Math.max(5, Math.round(fontSize * 0.13));
-  const slotInset = Math.max(4, Math.round(fontSize * 0.08));
-  const underlineY = y + Math.round(fontSize * 1.08);
-  let x = (canvas.width - totalWidth) / 2;
-
-  context.font = `800 ${fontSize}px "Barlow Condensed"`;
-  context.textAlign = "center";
-  context.textBaseline = "alphabetic";
-  context.lineCap = "round";
-
-  words.forEach((word, wordIndex) => {
-    [...word].forEach((character, characterIndex) => {
-      const width = getPatternCharacterWidth(character, fontSize);
-      const letter = /^[A-Z]$/i.test(character) ? character.toUpperCase() : null;
-      if (letter) {
-        context.strokeStyle = "#cbd5e9";
-        context.lineWidth = Math.max(4, Math.round(fontSize * 0.075));
-        context.beginPath();
-        context.moveTo(x + slotInset, underlineY);
-        context.lineTo(x + width - slotInset, underlineY);
-        context.stroke();
-
-        if (revealedLetters.has(letter)) {
-          context.fillStyle = "#f7f9ff";
-          context.shadowColor = "rgb(103 232 255 / 35%)";
-          context.shadowBlur = 12;
-          context.fillText(letter, x + width / 2, y + Math.round(fontSize * 0.86));
-          context.shadowBlur = 0;
-        }
-      } else {
-        context.fillStyle = "#b9c5dc";
-        context.fillText(character, x + width / 2, y + Math.round(fontSize * 0.86));
-      }
-      x += width;
-      if (characterIndex < [...word].length - 1) x += characterGap;
-    });
-    if (wordIndex < words.length - 1) x += wordGap;
-  });
-}
-
-async function drawLastWordsImage(answer, initialLetters, category) {
-  await Promise.all([
-    document.fonts.load("800 66px Barlow Condensed"),
-    document.fonts.load("500 44px Barlow"),
-  ]);
-  const template = await loadImage("./assets/marketing-last-words-template.jpg?v=20261023-15");
-  const context = canvas.getContext("2d", { alpha: false });
-  context.drawImage(template, 0, 0, canvas.width, canvas.height);
-
-  const revealedLetters = new Set(initialLetters.map((letter) => letter.toUpperCase()));
-  const fitted = fitWordPattern(answer);
-  const patternHeight = fitted.lines.length * fitted.lineHeight;
-  const blockTop = 720 - patternHeight / 2;
-  fitted.lines.forEach((line, index) => {
-    drawPatternLine(
-      context,
-      line.words,
-      line.width,
-      fitted.wordGap,
-      blockTop + index * fitted.lineHeight,
-      fitted.fontSize,
-      revealedLetters,
-    );
-  });
-
-  let hintFontSize = 44;
-  do {
-    context.font = `500 ${hintFontSize}px Barlow`;
-    if (context.measureText(`Hint: ${category}`).width <= 820) break;
-    hintFontSize -= 2;
-  } while (hintFontSize > 30);
-  context.fillStyle = "#48dff5";
-  context.textAlign = "center";
-  context.textBaseline = "middle";
-  context.fillText(`Hint: ${category}`, canvas.width / 2, 958);
-}
-
-async function drawBloodTiesImage(puzzle) {
-  await Promise.all([document.fonts.load('800 66px Barlow Condensed'), document.fonts.load('700 32px Barlow Condensed'), document.fonts.load('500 32px Barlow')]);
-  const logo = await loadImage('./assets/zombie-logo.png?v=20261023-15');
-  const ctx = canvas.getContext('2d', { alpha: false });
-  const background = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-  background.addColorStop(0, '#102c38'); background.addColorStop(1, '#0b0d17');
-  ctx.fillStyle = background; ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(logo, 62, 55, 130, 130);
-  ctx.textAlign = 'left'; ctx.fillStyle = '#67e8ff'; ctx.font = '700 30px Barlow Condensed';
-  ctx.fillText('YOUR DAILY TREYARCH ZOMBIES CHALLENGE', 218, 96);
-  ctx.fillStyle = '#f6f7fb'; ctx.font = '800 66px Barlow Condensed'; ctx.fillText('THE DAILY UNDEAD', 218, 165);
-  ctx.textAlign = 'center'; ctx.fillText('BLOOD TIES', 627, 292);
-  ctx.fillStyle = '#b8c2d3'; ctx.font = '500 32px Barlow'; ctx.fillText('Find four groups of three connected tiles.', 627, 355);
-  // The board order is the public shuffled order, never grouped by the answers.
-  puzzle.tiles.forEach((tile, i) => {
-    const x = 68 + i % 3 * 378; const y = 410 + Math.floor(i / 3) * 158;
-    ctx.fillStyle = '#182233'; ctx.strokeStyle = '#455366'; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.roundRect(x, y, 362, 142, 14); ctx.fill(); ctx.stroke();
-    let lines;
-    for (let size = 34; size >= 22; size -= 2) {
-      ctx.font = `700 ${size}px Barlow Condensed`; lines = wrapText(ctx, tile.toUpperCase(), 326);
-      if (lines.length <= 3 && lines.every((line) => ctx.measureText(line).width <= 326)) break;
-    }
-    ctx.fillStyle = '#f6f7fb'; ctx.textBaseline = 'middle';
-    lines.forEach((line, row) => ctx.fillText(line, x + 181, y + 71 + (row - (lines.length - 1) / 2) * 36));
-  });
-  ctx.fillStyle = '#67e8ff'; ctx.font = '700 32px Barlow Condensed';
-  ctx.fillText('WATCH OUT FOR OVERLAPPING THEMES · THREE STRIKES END THE PUZZLE', 627, 1110);
-  ctx.fillStyle = '#f6f7fb'; ctx.font = '700 38px Barlow Condensed'; ctx.fillText('THEDAILYUNDEAD.COM', 627, 1195);
 }
 
 async function copyText(button, target) {
@@ -440,7 +187,7 @@ async function initialise() {
     const puzzle = buildDailyPuzzle(dateKey, maps);
     const wordPuzzle = buildDailyWordPuzzle(dateKey, wordEntries);
     const yesterdayAnswer = yesterdayPuzzleType === 'blood'
-      ? buildDailyBloodTiesPuzzle(yesterdayDateKey).groups.map((g) => `${g.name}: ${g.answers.join(', ')}`).join('; ')
+      ? buildDailyBloodTiesPuzzle(yesterdayDateKey).groups.map((g) => `${g.name}: ${g.answers.join(', ')}`).join('\n')
       : yesterdayPuzzleType === "word"
       ? buildDailyWordPuzzle(yesterdayDateKey, wordEntries).entry.answer
       : getAnswerDisplayTitle(
@@ -467,7 +214,7 @@ async function initialise() {
       statsWarning = "The statistics service could not be reached, so the text shows —%. Refresh before posting.";
     }
 
-    const copy = puzzleType === 'blood' ? buildBloodMarketingCopy({ dateKey, yesterdayAnswer, solvePercentage }) : puzzleType === "word"
+    const copy = puzzleType === 'blood' ? buildBloodMarketingCopy({ dateKey, yesterdayAnswer, yesterdayPuzzleName, solvePercentage }) : puzzleType === "word"
       ? buildWordMarketingCopy({
         dateKey,
         answer: wordPuzzle.entry.answer,
@@ -484,17 +231,12 @@ async function initialise() {
         yesterdayPuzzleName,
         solvePercentage,
       });
-    if (puzzleType === 'blood') {
-      await drawBloodTiesImage(buildDailyBloodTiesPuzzle(dateKey));
-    } else if (puzzleType === "word") {
-      await drawLastWordsImage(
-        wordPuzzle.entry.answer,
-        wordPuzzle.initialLetters,
-        wordPuzzle.entry.category,
-      );
-    } else {
-      await drawQuestStepsImage(clue);
-    }
+    const imagePuzzle = puzzleType === 'blood'
+      ? buildDailyBloodTiesPuzzle(dateKey)
+      : puzzleType === 'word'
+      ? { answer: wordPuzzle.entry.answer, initialLetters: wordPuzzle.initialLetters, category: wordPuzzle.entry.category }
+      : { clue };
+    await drawMarketingImage(canvas, puzzleType, imagePuzzle);
 
     packDate.textContent = formatPackDate(dateKey);
     roundBadge.textContent = `#${postNumber}`;

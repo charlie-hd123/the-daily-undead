@@ -14,11 +14,13 @@ import {
 
 test('Blood Ties marketing names the connection game and preserves yesterday’s answer and solve rate', () => {
   const copy = buildBloodMarketingCopy({ dateKey: '2026-10-22', yesterdayAnswer: 'Doctor Groph', solvePercentage: 73 });
-  assert.match(copy.redditTitle, /Zombies connections/);
-  assert.match(copy.redditBody, /Today’s puzzle: Blood Ties/);
+  assert.equal(copy.redditTitle, 'Spot a Zombies connection? — 22 Oct');
+  assert.match(copy.redditBody, /Can you identify three tiles that form a connection\? There are four total\./);
+  assert.match(copy.redditBody, /Found a connection\? Comment your three tiles and what connects them 👇/);
+  assert.match(copy.discordBody, /First correct here: @____, @____, @____/);
   assert.match(copy.discordBody, /Yesterday’s answer: Doctor Groph/);
   assert.match(copy.discordBody, /73%/);
-  assert.match(copy.discordBody, /Three strikes/);
+  assert.match(copy.discordBody, /Want to find all four\? Complete the puzzle on the website\./);
   assert.equal(buildBloodMarketingCopy({ dateKey: '2026-10-22', yesterdayAnswer: 'Doctor Groph', solvePercentage: null }).solved, '—%');
 });
 
@@ -50,32 +52,35 @@ test("marketing copy fills daily data but leaves usernames blank", () => {
     "Yesterday’s solve rate: 67% 🔎",
     "First correct here: u/____, u/____, u/____ 👏",
     "",
-    "Today’s puzzle:",
-    "Which Treyarch Zombies map is it?",
+    "Which Zombies map is it?",
+    "",
+    "Can you identify the map from one of its main quest steps?",
     "",
     "Try to get it before reading the comments 👀",
     "",
-    "Drop your guess below👇",
+    "Drop your guess below 👇",
   ].join("\n"));
   assert.doesNotMatch(copy.redditBody, /Today’s Quest Steps clue|Defeat the boss/);
-  assert.match(copy.redditBody, /Which Treyarch Zombies map is it\?/);
+  assert.match(copy.redditBody, /Which Zombies map is it\?/);
   assert.equal(copy.discordBody, [
     "🧟 __The Daily Undead · 10 Sept__",
+    "",
     "Yesterday’s answer: Juggernog 🧟",
     "Yesterday’s solve rate: 67% 🔎",
     "First correct here: @____, @____, @____ 👏",
     "",
-    "Today’s puzzle:",
-    "**Which Treyarch Zombies map is it?**",
+    "**Which Zombies map is it?**",
+    "",
+    "Can you identify the map from one of its main quest steps?",
     "",
     "Drop your guess below 👇",
     "",
-    "Need another clue, or want to lock in your answer on the website?",
+    "Need another clue? Continue the puzzle on the website.",
     "",
     "🔗 <https://thedailyundead.com/>",
   ].join("\n"));
   assert.doesNotMatch(copy.discordBody, /Today’s Quest Steps clue|Defeat the boss/);
-  assert.match(copy.discordBody, /on the website\?/);
+  assert.match(copy.discordBody, /on the website\./);
   assert.match(copy.discordBody, /@____, @____, @____/);
   assert.match(copy.discordBody, /🔗 <https:\/\/thedailyundead\.com\/>$/);
   assert.doesNotMatch(copy.discordBody, /in-app browser|rounds, points and progress/);
@@ -118,26 +123,29 @@ test("Last Words marketing copy reveals only the daily starting letters", () => 
     "Yesterday’s solve rate: 76% 🔎",
     "First correct here: u/____, u/____, u/____ 👏",
     "",
-    "Today’s puzzle:",
-    "Which Zombies word or phrase is it?",
+    "Which Zombies word is it?",
+    "",
+    "Try to solve the Zombies word or phrase with these limited letters.",
     "",
     "Try to get it before reading the comments 👀",
     "",
-    "Drop your guess below👇",
+    "Drop your guess below 👇",
   ].join("\n"));
   assert.doesNotMatch(copy.redditBody, /Today’s Last Words puzzle|Hint: Character|______ __C__O___/);
   assert.equal(copy.discordBody, [
     "🧟 __The Daily Undead · 17 Oct__",
+    "",
     "Yesterday’s answer: Tag der Toten 🧟",
     "Yesterday’s solve rate: 76% 🔎",
     "First correct here: @____, @____, @____ 👏",
     "",
-    "Today’s puzzle:",
-    "**Which Zombies word or phrase is it?**",
+    "**Which Zombies word is it?**",
+    "",
+    "Try to solve the Zombies word or phrase with these limited letters.",
     "",
     "Drop your guess below 👇",
     "",
-    "Need another letter, or want to lock in your answer on the website?",
+    "Need another letter? Continue the puzzle on the website.",
     "",
     "🔗 <https://thedailyundead.com/>",
   ].join("\n"));
@@ -150,6 +158,18 @@ test("Apple mobile devices are detected for the Photos save flow", () => {
   assert.equal(isAppleMobileDevice({ userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)" }), true);
   assert.equal(isAppleMobileDevice({ platform: "MacIntel", maxTouchPoints: 5 }), true);
   assert.equal(isAppleMobileDevice({ userAgent: "Mozilla/5.0 (Macintosh)", platform: "MacIntel", maxTouchPoints: 0 }), false);
+});
+
+test('the previous Blood Ties board is labelled as connections for every post type', () => {
+  const input = { dateKey: '2026-10-23', yesterdayAnswer: 'Revive perks: Quick Revive, Tombstone Soda, Dying Wish\nPack-a-Punch: Wall Power, Crate Power, Bullet Boost', yesterdayPuzzleName: 'Blood Ties', solvePercentage: 70 };
+  const copies = [buildMarketingCopy({ ...input, clue: 'A clue' }), buildWordMarketingCopy({ ...input, answer: 'Mystery Box', initialLetters: ['M'], category: 'Object' }), buildBloodMarketingCopy(input)];
+  copies.forEach(copy => {
+    for (const text of [copy.redditBody, copy.discordBody]) {
+      assert.match(text, /Yesterday’s connections: 🧟\nRevive perks:/);
+      assert.doesNotMatch(text, /Yesterday’s answer:/);
+      assert.match(text, /70%/);
+    }
+  });
 });
 
 test("marketing page keeps its source and controls wired", async () => {
