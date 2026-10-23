@@ -1,0 +1,8 @@
+label,title,group,wav,compressed,duration,volume,note
+1A,Original 1A,Mystery Box,box-a-b73d80ca0d.wav,box-a-4efa737812.m4a,2.7,0.86,"Your closest option, kept exactly for comparison."
+1D,Slower toy box,Mystery Box,box-d-3313768807.wav,box-d-8e243d6583.m4a,2.7,0.86,"The same crooked tune, with more space between notes."
+1E,Darker toy box,Mystery Box,box-e-9ab999c9d7.wav,box-e-a5e8cfa7b0.m4a,2.7,0.86,The same comb character in a lower register.
+1F,Uneven toy box,Mystery Box,box-f-aa5c42cba8.wav,box-f-1f0cefe966.m4a,2.7,0.86,A related phrase with a slightly stumbling rhythm.
+8D,Felt key,Clue reveal,clue-d-b0ce11e4c3.wav,clue-d-b4b22ebae8.m4a,0.3,0.8,"One soft, damped piano-like contact."
+8E,Wooden roll,Clue reveal,clue-e-0f65106f58.wav,clue-e-29bcb335dd.m4a,0.23,0.8,"Three small, dry wooden contacts."
+8F,Magnetic tuck,Clue reveal,clue-f-2891e2cd94.wav,clue-f-2f3e1df11b.m4a,0.24,0.8,"A short, rounded downward electronic tuck."

@@ -1272,7 +1272,7 @@
       "id": "double-points-a",
       "title": "Double Points \u00b7 Survival amplified",
       "group": "Rewards",
-      "trigger": "After the visible points count and finishing ping: 1220 ms after the result appears, or 500 ms with reduced motion. Unscored play has no count to wait for.",
+      "trigger": "After a fresh 100-point Last Words or Blood Ties result, or a successful Quest Steps bonus. Starts after the visible count and finishing ping (1220 ms after the scored result appears; 500 ms with reduced motion). Existing unscored Quest bonus feedback stays immediate.",
       "wav": "double-points-a-d81c85b7a7.wav",
       "compressed": "double-points-a-5644f63f18.m4a",
       "duration": 1.65,

@@ -11,10 +11,10 @@ function appFunction(name) {
   const end = source.indexOf('\nfunction ', start + 1);
   return source.slice(start, end < 0 ? undefined : end);
 }
-function fixture({ official = true, reducedMotion = false } = {}) {
+function fixture({ official = true, reducedMotion = false, mapPoints = 50 } = {}) {
   const calls = [];
   const context = vm.createContext({
-    state: { mapPoints: 50, bonusPointsRecorded: false }, dayState: {},
+    state: { mapPoints, bonusPointsRecorded: false }, dayState: {},
     activePlay: { mode: official ? 'official' : 'for_fun' }, bonusSubmissionPending: true,
     puzzleStats: { easter: { score: 0 } }, calculateBonusPoints,
     app: { querySelector: () => official ? {} : null },
@@ -40,6 +40,31 @@ test('a fresh Double Points result counts first and requests the reward as the e
     assert.equal(calls[0].duration, reducedMotion ? 0 : 720);
     assert.equal(calls[0].options.reward, 'double-points-a');
   }
+});
+
+test('successful Quest Steps bonuses below 100 retain the already approved flourish', () => {
+  const { context, calls } = fixture({ mapPoints: 20 });
+  context.finaliseBonusSubmission(true, true);
+  assert.equal(context.state.points, 40);
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].options.reward, 'double-points-a');
+});
+
+test('visible final score counts celebrate exactly 100, with no flourish on other totals or unscored pages', () => {
+  for (const reducedMotion of [false, true]) {
+    for (const total of [0,50,90,99,100,101]) {
+      const { context, calls } = fixture({ reducedMotion });
+      context.playScoreCount(total);
+      assert.equal(calls.length, total > 0 ? 1 : 0);
+      if (total > 0) {
+        assert.equal(calls[0].duration, reducedMotion ? 0 : 720);
+        assert.equal(calls[0].options.reward, total === 100 ? 'double-points-a' : undefined);
+      }
+    }
+  }
+  const fun = fixture({ official: false });
+  fun.context.playScoreCount(100);
+  assert.equal(fun.calls.length, 0);
 });
 
 test('failed bonus has no flourish; unscored play preserves the immediate reward without a nonexistent score count', () => {

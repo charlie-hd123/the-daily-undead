@@ -1,5 +1,20 @@
 # The Daily Undead sound effects · feedback revision 2.4
 
+## Perfect-score reward update · 23 October 2026
+
+The accepted reward flourish now follows a fresh scored 100-point final result
+in Last Words and Blood Ties, using the existing Quest Steps bonus sequence:
+720 ms count, 430 ms finishing ping and 70 ms breathing room, then the flourish.
+Reduced motion uses the immediate total/ping and a 500 ms wait. Reopening a saved
+result and unscored Last Words/Blood Ties play do not start a new flourish.
+Existing successful Quest Steps bonus feedback, including lower totals, remains.
+Scheduling a later flourish preserves the solve sting playing before it; mute,
+navigation and hidden-page cancellation still stop the complete sequence.
+
+All 17 active sound files and gains remain unchanged. New box variations of 1A
+and three new clue options are separate auditions at
+`assets/audio/auditions-2026-10-23/`; no new audition is selected in gameplay.
+
 The active pack contains 17 original effects, all generated locally. No Treyarch
 recording, transcribed melody, door creak, speech or background music is included
 in the current playback table. No paid service or downloaded sample was used for

@@ -15,9 +15,9 @@ function appFunction(name) {
   return appSource.slice(start, end < 0 ? undefined : end);
 }
 
-function fixture({ solved = false, official = true, reducedMotion = false } = {}) {
+function fixture({ solved = false, official = true, reducedMotion = false, misses = 0 } = {}) {
   const calls = [];
-  const initial = { key: '2026-10-29:ray-gun', guesses: solved ? ['Y','G','U'] : ['B','C','D','E'], wrongGuesses: solved ? 0 : 4 };
+  const initial = { key: '2026-10-29:ray-gun', guesses: solved ? [...['B','C','D','E'].slice(0,misses),'Y','G','U'] : ['B','C','D','E'], wrongGuesses: solved ? misses : 4 };
   const context = vm.createContext({
     pendingWordSounds: new WeakSet(), // Present only to reproduce the previous handler.
     activePlay: { type: 'word', mode: official ? 'official' : 'for_fun' },
@@ -63,9 +63,19 @@ test('fresh word success schedules the accepted points cues for the visible resu
     assert.equal(count.length, 1);
     assert.equal(count[0].duration, reducedMotion ? 0 : 720);
     assert.equal(count[0].options.delay, app.getWordCompletionDelay(true));
+    assert.equal(count[0].options.reward, 'double-points-a');
     app.finishWordPuzzle(app.dayState.sessions.word, true);
     assert.equal(calls.filter(c => c.type === 'count' || c.type === 'legacy-count').length, 1);
   }
+});
+
+test('a fresh word solve below 100 keeps its count and solve sting without the maximum-score flourish', () => {
+  const { context: app, calls } = fixture({ solved: true, misses: 1 });
+  app.submitLetter('N');
+  assert.equal(calls.filter(c => c.cue === 'puzzle-solved-a').length, 1);
+  const counts = calls.filter(c => c.type === 'count');
+  assert.equal(counts.length, 1);
+  assert.equal(counts[0].options.reward, undefined);
 });
 
 test('restored word results remain silent and just-for-fun wins do not count points', () => {

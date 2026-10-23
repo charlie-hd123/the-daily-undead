@@ -192,7 +192,7 @@ for item in pack['sounds']:
     buffers[cue]=x
     item.update(wav=f'wav/{cue}.wav',compressed=f'm4a/{cue}.m4a')
     if R4 and cue=='double-points-a':
-        item['trigger']='After the visible points count and finishing ping: 1220 ms after the result appears, or 500 ms with reduced motion. Unscored play has no count to wait for.'
+        item['trigger']='After a fresh 100-point Last Words or Blood Ties result, or a successful Quest Steps bonus. Starts after the visible count and finishing ping (1220 ms after the scored result appears; 500 ms with reduced motion). Existing unscored Quest bonus feedback stays immediate.'
     if R5 and cue=='map-select':
         item.update(title='Puzzle selection · Low click',group='Puzzle controls',
                     trigger='Puzzle cards, result navigation, map/game selection, back to clues/games, and Blood Ties shuffle/deselect. Other puzzle actions use dedicated cues.',

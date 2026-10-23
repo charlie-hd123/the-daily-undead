@@ -219,6 +219,21 @@ test('delayed word-result counts align with the result and are cancelled by navi
   }
 });
 
+test('the delayed maximum-score flourish preserves the immediate solve sting and replaces only duplicate count feedback', async () => {
+  const f = fixture(); f.audio.unlock(); await f.audio.prepare();
+  await f.audio.reward('puzzle-solved-a');
+  f.audio.countPoints(720, { delay: 1900, reward: 'double-points-a' });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(f.starts.length, 10);
+  assert.equal(f.stopped.length, 0);
+  assert.ok(Math.abs(f.starts.at(-1).at - 13.12) < .000001);
+  f.audio.countPoints(720, { delay: 1900, reward: 'double-points-a' });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(f.stopped.length, 9); // Seven ticks, finishing ping and old flourish.
+  f.audio.stopAll();
+  assert.equal(f.stopped.length, 19);
+});
+
 test('every deployed cue has content-matching lossless WAV and AAC exports matching the review manifest', async () => {
   assert.equal(Object.keys(SOUND_CUES).length, 17);
   const manifest = JSON.parse(await readFile(new URL('../assets/audio/manifest.json', import.meta.url)));

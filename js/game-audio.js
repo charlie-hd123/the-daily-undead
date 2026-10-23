@@ -257,8 +257,12 @@ export function createGameAudio({
     stopCue('points-tick'); stopCue('points-finish');
     if (duration > 0) for (let i = 0; i < 7; i++) void play('points-tick', { delay: delay + i * duration / 8 });
     void play('points-finish', { delay: delay + duration });
-    // Let the 430ms finishing ping settle before the bonus flourish begins.
-    if (rewardCue) void reward(rewardCue, { delay: delay + duration + 500 });
+    // Let the 430ms finishing ping settle before the reward flourish begins.
+    // A future flourish must not cancel the solve sting playing right now.
+    if (rewardCue) {
+      stopCue(rewardCue);
+      void play(rewardCue, { delay: delay + duration + 500 });
+    }
   }
   function reward(cue, options) {
     for (const other of ['puzzle-solved-a', 'double-points-a']) stopCue(other);
