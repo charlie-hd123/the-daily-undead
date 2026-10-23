@@ -1,6 +1,10 @@
-# The Daily Undead sound effects · feedback revision 3.1
+# The Daily Undead sound effects · feedback revision 3.2
 
-## Quieter tune, fuller reverb · 23 October 2026
+## Drier recorded box only · 23 October 2026
+
+Reduced only the recorded chest reverb return to 30% of its previous level (-10.46 dB), including the recording’s contribution through the delay-to-reverb send. The direct recording and its audible delays are unchanged. Melody, chimes, atmosphere and their reverb remain at the exact previous mastering gain; the new mix is deliberately not RMS-renormalised. Before subtraction, the reconstructed reference matches the previous PCM within its 16-bit quantisation/dither tolerance. Duration remains 3.42 seconds; all other 16 cue files and all gains are unchanged.
+
+## Previous quieter tune, fuller reverb · 23 October 2026
 
 Reduced the 1G jingle and its delay sends by 5.04 dB relative to the mix. Raised the shared reverb from .44 to .78 against the original tune reference (+4.97 dB), so lowering the tune does not also turn down the room. Extended the reverb decay, increased the recorded-contact and atmosphere sends, and used a 450 ms final fade. Other layer sources, four delay timings, 3.42-second duration, -18 dBFS overall active-window RMS and .86 game gain remain. All other 16 effects are unchanged.
 
