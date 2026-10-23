@@ -1,4 +1,8 @@
-# The Daily Undead sound effects · feedback revision 2.6
+# The Daily Undead sound effects · feedback revision 2.7
+
+## Reward texture cleanup · 23 October 2026
+
+The papery air sweep embedded in Double Points (190–610 ms into its clip) has been removed by reconstructing and subtracting that original component. The existing chimes, echoes, 1.65-second duration, playback gain and post-count trigger timing remain. Loudness is matched to the accepted file. This shared flourish is cleaned wherever it plays. All other cues, including selected box 1G and clue 8E, are byte-identical. Rebuild with `python scripts/remove-reward-sweep.py` (numpy + macOS afconvert). Source/AAC decoding and true-peak checks passed; no subjective listening assessment.
 
 ## Selected original box 1G · 23 October 2026
 

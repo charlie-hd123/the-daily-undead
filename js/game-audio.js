@@ -94,8 +94,8 @@ export const SOUND_CUES = {
   },
   "double-points-a": {
     "files": [
-      "double-points-a-d81c85b7a7.wav",
-      "double-points-a-5644f63f18.m4a"
+      "double-points-a-750be695ce.wav",
+      "double-points-a-cba765026d.m4a"
     ],
     "gain": 1.0
   },
