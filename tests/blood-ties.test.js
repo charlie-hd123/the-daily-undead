@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
 import { readFile, readdir } from 'node:fs/promises';
 import { bloodTiesCatalogue } from '../js/blood-ties-catalogue.js';
+import { bloodTiesCatalogue as historicalCatalogue } from '../js/blood-ties-catalogue-v1.js';
 import { buildDailyBloodTiesPuzzle, countBloodTiesSolutions, createBloodTiesSession, normalizeBloodTiesSession, replayBloodTiesAttempts } from '../js/blood-ties-core.js';
 import { getOfficialPuzzleType } from '../js/daily-challenge-core.js';
 import { recordVerifiedBloodResult, recordVerifiedWordResult, recordVerifiedMapResult, sanitizeDailyState, getAccount } from '../worker/src/accounts.js';
@@ -64,10 +65,12 @@ test('Blood Ties renders three strike circles, mode warnings and truthful result
   assert.match(renderBloodTiesGroup({ name: '<script>', answers: ['A & B'], definition: '<img>' }, 0), /&lt;script&gt;/);
 });
 
-test('the first worksheet supplies 51 connections and only eligible answers', () => {
+test('the final first worksheet replaces the active database with 164 connections', () => {
   assert.equal(bloodTiesCatalogue.worksheet, 'Blood Ties');
-  assert.equal(bloodTiesCatalogue.connections.length, 51);
-  assert.equal(new Set(bloodTiesCatalogue.connections.map((g) => g.id)).size, 51);
+  assert.equal(bloodTiesCatalogue.connections.length, 164);
+  assert.equal(new Set(bloodTiesCatalogue.connections.map((g) => g.id)).size, 164);
+  assert.equal(bloodTiesCatalogue.version, 2);
+  assert.equal(new Set(bloodTiesCatalogue.connections.flatMap(g => g.tiles)).size, 477);
   assert.match(bloodTiesCatalogue.sourceSha256, /^[a-f0-9]{64}$/);
   for (const g of bloodTiesCatalogue.connections) assert.ok(g.tiles.length >= 3);
 });
@@ -81,12 +84,12 @@ test('a full year has deterministic unique solutions, deliberate traps and three
     assert.equal(countBloodTiesSolutions(p.groups.map((g) => ({ tiles: g.eligibleTiles })), p.tiles), 1, date);
     assert.ok(p.redHerrings.length >= 2, date);
     for (const g of p.groups) {
-      const source = bloodTiesCatalogue.connections.find((c) => c.id === g.id);
+      const source = (date < '2026-10-23' ? historicalCatalogue : bloodTiesCatalogue).connections.find((c) => c.id === g.id);
       assert.ok(g.answers.every((tile) => source.tiles.includes(tile)));
     }
     for (const previous of history.slice(-3)) {
-      assert.ok(p.groups.every((g) => !previous.groups.some((before) => before.id === g.id)), date);
-      assert.ok(p.tiles.every((tile) => !previous.tiles.includes(tile)), date);
+      if (date < '2026-10-23' || previous.dateKey >= '2026-10-23') assert.ok(p.groups.every((g) => !previous.groups.some((before) => before.id === g.id)), date);
+      if (date < '2026-10-23' || previous.dateKey >= '2026-10-22') assert.ok(p.tiles.every((tile) => !previous.tiles.includes(tile)), date);
     }
     history.push(p);
   }
@@ -368,4 +371,35 @@ test('verified failure credits no points and the staging schedule also verifies 
   const mapPayload = { puzzleDate: map.dateKey, puzzleId: map.key, selectedMapId: map.map.id, cluesUsed: 1 };
   assert.equal((await recordVerifiedMapResult(db, req(mapPayload), 'verify-player')).status, 400);
   assert.equal((await recordVerifiedMapResult(db, req(mapPayload), 'verify-player', { bloodTies: true })).status, 200);
+});
+
+test('new workbook boards use the same secure account, refresh, statistics and leaderboard flows', async (t) => {
+  t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-25T12:00:00Z') });
+  const db = await database(); t.after(() => db.sqlite.close());
+  db.sqlite.exec("INSERT INTO player_profiles(user_id,username) VALUES ('content-player','ContentPlayer'); INSERT INTO player_saves(user_id,score,total_rounds,current_round,best_round) VALUES ('content-player',500,4,7,9)");
+  const p = buildDailyBloodTiesPuzzle('2026-10-25');
+  const attempts = [wrongs(p)[0], ...solution(p)];
+  const payload = { puzzleDate: p.dateKey, puzzleId: p.key, attempts, rulesVersion: 3, points: 9999, success: false };
+  const req = body => new Request('https://test/result', { method: 'POST', body: JSON.stringify(body) });
+  const send = body => recordVerifiedBloodResult(db, req(body), 'content-player', { bloodTies: true });
+  assert.equal((await send({ ...payload, rulesVersion: 2 })).status, 400);
+  assert.equal((await send({ ...payload, attempts: attempts.slice(0, 4) })).status, 400);
+  assert.equal((await send({ ...payload, puzzleId: puzzle().key })).status, 400);
+  const result = await send(payload);
+  assert.equal(result.status, 200);
+  assert.equal(result.body.result.pointsEarned, 90);
+  assert.equal(result.body.progress.score, 590);
+  assert.equal(result.body.progress.solves, 5);
+  assert.equal(result.body.progress.currentRound, 7);
+  const repeated = await send(payload);
+  assert.equal(repeated.body.progress.score, 590);
+  const board = await readLeaderboards(db, p.dateKey);
+  assert.equal(board.today.elite.find(e => e.username === 'ContentPlayer').points, 90);
+  const saved = sanitizeDailyState({ dayStateVersion: 1, dateKey: p.dateKey, officialType: 'blood', sessions: { blood: { ...replayBloodTiesAttempts(p, attempts.slice(0, 2)), points: 9999 } } }, p.dateKey);
+  assert.equal(saved.sessions.blood.points, 0);
+  assert.equal(saved.sessions.blood.potentialPoints, 90);
+  const anonymous = { playerId: '07ce720f-48dd-470e-90d9-85650ff1edeb', puzzleDate: p.dateKey, puzzleType: 'blood', puzzleId: p.key, mapId: 'blood-ties', mapName: 'Connections', attempts, rulesVersion: 3, isCorrect: true };
+  const env = { DB: db, DEPLOYMENT_ENVIRONMENT: 'local', BLOOD_TIES_DEMO: '1' };
+  assert.equal((await worker.fetch(new Request('https://test/api/attempts', { method: 'POST', body: JSON.stringify(anonymous) }), env)).status, 200);
+  assert.equal((await worker.fetch(new Request('https://test/api/attempts', { method: 'POST', body: JSON.stringify({ ...anonymous, rulesVersion: 1 }) }), env)).status, 400);
 });

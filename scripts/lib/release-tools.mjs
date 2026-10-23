@@ -23,7 +23,7 @@ export function isWebsiteFile(name) {
     || ["index.html", "marketing.html", "maintenance.html", "staging-demo.html", "styles.css", "marketing.css", "staging-demo.css", "release.json", "CNAME", ".nojekyll"].includes(name);
 }
 export function isApiFile(name) {
-  return name.startsWith("worker/src/") || /^js\/(game-core|word-puzzle-core|blood-ties-core|blood-ties-catalogue|daily-challenge-core|progression)\.js$/.test(name);
+  return name.startsWith("worker/src/") || /^js\/(game-core|word-puzzle-core|blood-ties-[a-z0-9-]+|daily-challenge-core|progression)\.js$/.test(name);
 }
 export async function sourceFiles(root, { ref = null } = {}) {
   const files = new Map();
