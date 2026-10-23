@@ -1,0 +1,19 @@
+{
+  "result": "PASS",
+  "format": "48 kHz mono 16-bit PCM WAV primary, 192 kb/s AAC fallback",
+  "source_and_aac_decode_checks": [
+    {
+      "id": "box-g",
+      "duration": 2.7,
+      "true_peak_dbfs": -7.613,
+      "aac_true_peak_dbfs": -7.602
+    },
+    {
+      "id": "box-g-layered",
+      "duration": 2.7,
+      "true_peak_dbfs": -7.634,
+      "aac_true_peak_dbfs": -7.64
+    }
+  ],
+  "listening_assessment": false
+}

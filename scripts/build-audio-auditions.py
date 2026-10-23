@@ -20,7 +20,8 @@ s = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(s)
 ROUND_TWO = '--round-two' in sys.argv
 ROUND_THREE = '--rewarding-endings' in sys.argv
-OUT = ROOT/('assets/audio/auditions-2026-10-23-lift' if ROUND_THREE else 'assets/audio/auditions-2026-10-23' if ROUND_TWO else 'assets/audio/auditions-2026-10-21')
+LAYERED = '--layered-1g' in sys.argv
+OUT = ROOT/('assets/audio/auditions-2026-10-23-layered' if LAYERED else 'assets/audio/auditions-2026-10-23-lift' if ROUND_THREE else 'assets/audio/auditions-2026-10-23' if ROUND_TWO else 'assets/audio/auditions-2026-10-21')
 s.REVIEW = OUT
 beats = {key: int(value)/1000 for key,value in re.findall(
     r'(\w+):\s*(\d+)', (ROOT/'js/mystery-box-motion.js').read_text().split('});',1)[0])}
@@ -135,6 +136,28 @@ def felt_key():
                for k in range(1,8))
 
 
+def layered_g():
+    """Keep 1G's exact phrase; refine contacts and add one quiet lift bloom."""
+    x=toy_box_variant('gentle-lift')
+    # Replace the existing contacts, rather than stack more knocks over them.
+    for at,f,duration,gain in [(0,250,.11,.17),
+                               (beats['settleAt'],210,.11,.12),
+                               (beats['assembleAt'],185,.09,.15)]:
+        s.put(x,s.knock(f,duration),at,-gain)
+    s.put(x,s.knock(245,.12),0,.16)
+    s.put(x,s.knock(1180,.035),.012,.037)  # Small latch release.
+    s.put(x,s.knock(365,.07),.047,.047)    # Muted wooden contact.
+    # Stable, clean harmonics, well beneath the comb melody; no detuned voices.
+    duration=beats['liftFor']; times=s.t(duration)
+    bloom=(np.sin(2*np.pi*hz(64)*times)+.32*np.sin(2*np.pi*hz(71)*times))
+    bloom*=np.sin(np.pi*times/duration)**2
+    s.put(x,bloom,beats['liftAt'],.021)
+    s.put(x,s.knock(195,.12),beats['settleAt'],.105)
+    s.put(x,s.knock(270,.095),beats['assembleAt'],.12)
+    s.put(x,s.knock(730,.035),beats['assembleAt']+.012,.025)
+    return x
+
+
 def wooden_roll():
     x=s.canvas(.23)
     for at,f,gain in [(0,560,.55),(.034,470,.34),(.079,395,.24)]:
@@ -177,11 +200,16 @@ if ROUND_THREE:
         ('1I','box-i','Mystery Box','Open lift','An upward suspended ending that keeps some mystery.',lambda:toy_box_variant('open-lift'),.86),
         ('8E','clue-e','Clue reveal','Selected · Wooden roll','Your chosen clue sound, kept exactly as auditioned.',None,.80),
     ]
+if LAYERED:
+    specs=[
+        ('1G','box-g','Mystery Box','Original 1G','Your selected melody, copied exactly for comparison.',None,.86),
+        ('1G+','box-g-layered','Mystery Box','1G · Subtle layers','The same melody, with a latch release, quiet lift shimmer and refined contacts.',layered_g,.86),
+    ]
 OUT.mkdir(parents=True,exist_ok=True)
 sounds=[]
 for label,cue,group,title,note,generate,gain in specs:
     if generate is None:
-        previous=ROOT/('assets/audio/auditions-2026-10-23' if ROUND_THREE else 'assets/audio/auditions-2026-10-21')
+        previous=ROOT/('assets/audio/auditions-2026-10-23-lift' if LAYERED else 'assets/audio/auditions-2026-10-23' if ROUND_THREE else 'assets/audio/auditions-2026-10-21')
         original=next(item for item in json.loads((previous/'manifest.json').read_text())['sounds'] if item['id']==cue)
         files=[original['wav'],original['compressed']]
         for filename in files: shutil.copy2(previous/filename,OUT/filename)
@@ -199,7 +227,7 @@ for label,cue,group,title,note,generate,gain in specs:
                        active_rms_dbfs=s.db(s.active_rms(x)),peak_dbfs=s.db(max(abs(x))),
                        true_peak_4x_dbfs=s.db(s.true_peak(x)),
                        waveform=[round(float(np.max(abs(a))),4) for a in np.array_split(x,80)]))
-pack=dict(title='The Daily Undead · Sound auditions',version='auditions-3' if ROUND_THREE else 'auditions-2' if ROUND_TWO else 'auditions-1',sample_rate=s.SR,
+pack=dict(title='The Daily Undead · Sound auditions',version='1g-layered' if LAYERED else 'auditions-3' if ROUND_THREE else 'auditions-2' if ROUND_TWO else 'auditions-1',sample_rate=s.SR,
           channels=1,pcm_bits=16,sounds=sounds,sequences=[],
           source_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
           provenance='Original local synthesised alternatives. No downloaded samples, paid services, copied melodies or recordings.',
@@ -209,6 +237,6 @@ pack=dict(title='The Daily Undead · Sound auditions',version='auditions-3' if R
 with (OUT/'manifest.csv').open('w',newline='') as stream:
     writer=csv.DictWriter(stream,fieldnames=['label','title','group','wav','compressed','duration','volume','note'],extrasaction='ignore',lineterminator='\n')
     writer.writeheader();writer.writerows(sounds)
-(OUT/'CREDITS.md').write_text('# Original sound auditions\n\nOriginal local synthesis candidates by the Daily Undead project. No samples or third-party melodies were used. '+('Box endings are auditions; 8E is the selected in-game clue sound, copied bit-identically.' if ROUND_THREE else 'These options are not selected in game. In round two, 1A is copied bit-identically for comparison.')+'\n\nRebuild: `python scripts/build-audio-auditions.py'+(' --rewarding-endings' if ROUND_THREE else ' --round-two' if ROUND_TWO else '')+'` with numpy and macOS afconvert. Primary: 48 kHz mono 16-bit PCM WAV. Fallback/download: 192 kb/s AAC. Levels use active-window RMS and existing game gains; clipping and decoded-file checks are in qa-report.json. No subjective listening was possible.\n')
+(OUT/'CREDITS.md').write_text('# Original sound auditions\n\nOriginal local synthesis candidates by the Daily Undead project. No samples or third-party melodies were used. '+('Original 1G is copied bit-identically. 1G+ preserves its phrase and adds subtle animation-timed layers. Neither audition changes active game audio.' if LAYERED else 'Box endings are auditions; 8E is the selected in-game clue sound, copied bit-identically.' if ROUND_THREE else 'These options are not selected in game. In round two, 1A is copied bit-identically for comparison.')+'\n\nRebuild: `python scripts/build-audio-auditions.py'+(' --layered-1g' if LAYERED else ' --rewarding-endings' if ROUND_THREE else ' --round-two' if ROUND_TWO else '')+'` with numpy and macOS afconvert. Primary: 48 kHz mono 16-bit PCM WAV. Fallback/download: 192 kb/s AAC. Levels use active-window RMS and existing game gains; clipping and decoded-file checks are in qa-report.json. No subjective listening was possible.\n')
 s.verify()
 print(f'{len(sounds)} audition candidates rendered. Active runtime files and gains are untouched.')
