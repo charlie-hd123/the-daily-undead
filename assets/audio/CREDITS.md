@@ -1,4 +1,18 @@
-# The Daily Undead sound effects · feedback revision 2.4
+# The Daily Undead sound effects · feedback revision 2.5
+
+## Selected clue 8E and brighter box auditions · 23 October 2026
+
+Quest clue reveal now uses the approved **8E · Wooden roll**: three small dry
+wooden contacts, 230 ms. Its WAV and AAC bytes are copied exactly from the audition;
+the existing 80% gain and reveal trigger are unchanged. The other 16 active cue
+pairs, button routing and maximum-score/bonus reward behavior are unchanged.
+
+Box options 1G, 1H and 1I preserve the 1A comb timbre and opening phrase, but
+replace the falling ending with an upward minor arpeggio, warmer major arpeggio
+or open suspended lift. No extra closing chord or longer coda is appended. They
+remain auditions at `assets/audio/auditions-2026-10-23-lift/`; no new box choice
+has been selected. Rebuild with `python scripts/build-audio-auditions.py
+--rewarding-endings`. No subjective listening was available.
 
 ## Perfect-score reward update · 23 October 2026
 

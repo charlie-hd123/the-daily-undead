@@ -45,8 +45,8 @@ export const SOUND_CUES = {
   },
   "quest-clue-reveal": {
     "files": [
-      "quest-clue-reveal-c1f190285d.wav",
-      "quest-clue-reveal-b3d34b2956.m4a"
+      "quest-clue-reveal-0f65106f58.wav",
+      "quest-clue-reveal-29bcb335dd.m4a"
     ],
     "gain": 0.8
   },

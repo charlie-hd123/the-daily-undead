@@ -19,7 +19,8 @@ spec = importlib.util.spec_from_file_location('synthesis', ROOT/'scripts/synthes
 s = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(s)
 ROUND_TWO = '--round-two' in sys.argv
-OUT = ROOT/('assets/audio/auditions-2026-10-23' if ROUND_TWO else 'assets/audio/auditions-2026-10-21')
+ROUND_THREE = '--rewarding-endings' in sys.argv
+OUT = ROOT/('assets/audio/auditions-2026-10-23-lift' if ROUND_THREE else 'assets/audio/auditions-2026-10-23' if ROUND_TWO else 'assets/audio/auditions-2026-10-21')
 s.REVIEW = OUT
 beats = {key: int(value)/1000 for key,value in re.findall(
     r'(\w+):\s*(\d+)', (ROOT/'js/mystery-box-motion.js').read_text().split('});',1)[0])}
@@ -113,6 +114,9 @@ def toy_box_variant(variant):
     if variant=='uneven':
         notes=[76,79,83,78,75,74,71,73]
         times=[.14,.285,.46,.62,.81,.955,1.19,1.34]
+    if variant=='gentle-lift': notes[-3:]=[76,79,83]
+    if variant=='bright-lift': notes[-3:]=[74,78,81]
+    if variant=='open-lift': notes[-3:]=[76,81,83]
     for i,(at,note) in enumerate(zip(times,notes)):
         t=s.t(.39); f=hz(note)
         # Preserve 1A's comb timbre, register and unresolved phrase structure.
@@ -166,11 +170,18 @@ if ROUND_TWO:
         ('8E','clue-e','Clue reveal','Wooden roll','Three small, dry wooden contacts.',wooden_roll,.80),
         ('8F','clue-f','Clue reveal','Magnetic tuck','A short, rounded downward electronic tuck.',magnetic_snap,.80),
     ]
+if ROUND_THREE:
+    specs=[
+        ('1G','box-g','Mystery Box','Gentle lift','The 1A character, ending with a rising minor arpeggio.',lambda:toy_box_variant('gentle-lift'),.86),
+        ('1H','box-h','Mystery Box','Brighter lift','A warmer rising ending, with a little more reward.',lambda:toy_box_variant('bright-lift'),.86),
+        ('1I','box-i','Mystery Box','Open lift','An upward suspended ending that keeps some mystery.',lambda:toy_box_variant('open-lift'),.86),
+        ('8E','clue-e','Clue reveal','Selected · Wooden roll','Your chosen clue sound, kept exactly as auditioned.',None,.80),
+    ]
 OUT.mkdir(parents=True,exist_ok=True)
 sounds=[]
 for label,cue,group,title,note,generate,gain in specs:
     if generate is None:
-        previous=ROOT/'assets/audio/auditions-2026-10-21'
+        previous=ROOT/('assets/audio/auditions-2026-10-23' if ROUND_THREE else 'assets/audio/auditions-2026-10-21')
         original=next(item for item in json.loads((previous/'manifest.json').read_text())['sounds'] if item['id']==cue)
         files=[original['wav'],original['compressed']]
         for filename in files: shutil.copy2(previous/filename,OUT/filename)
@@ -188,7 +199,7 @@ for label,cue,group,title,note,generate,gain in specs:
                        active_rms_dbfs=s.db(s.active_rms(x)),peak_dbfs=s.db(max(abs(x))),
                        true_peak_4x_dbfs=s.db(s.true_peak(x)),
                        waveform=[round(float(np.max(abs(a))),4) for a in np.array_split(x,80)]))
-pack=dict(title='The Daily Undead · Sound auditions',version='auditions-2' if ROUND_TWO else 'auditions-1',sample_rate=s.SR,
+pack=dict(title='The Daily Undead · Sound auditions',version='auditions-3' if ROUND_THREE else 'auditions-2' if ROUND_TWO else 'auditions-1',sample_rate=s.SR,
           channels=1,pcm_bits=16,sounds=sounds,sequences=[],
           source_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
           provenance='Original local synthesised alternatives. No downloaded samples, paid services, copied melodies or recordings.',
@@ -198,6 +209,6 @@ pack=dict(title='The Daily Undead · Sound auditions',version='auditions-2' if R
 with (OUT/'manifest.csv').open('w',newline='') as stream:
     writer=csv.DictWriter(stream,fieldnames=['label','title','group','wav','compressed','duration','volume','note'],extrasaction='ignore',lineterminator='\n')
     writer.writeheader();writer.writerows(sounds)
-(OUT/'CREDITS.md').write_text('# Original sound auditions\n\nOriginal local synthesis candidates by the Daily Undead project. No samples or third-party melodies were used. These options are not selected in game. In round two, 1A is copied bit-identically for comparison.\n\nRebuild: `python scripts/build-audio-auditions.py`'+(' `--round-two`' if ROUND_TWO else '')+' with numpy and macOS afconvert. Primary: 48 kHz mono 16-bit PCM WAV. Fallback/download: 192 kb/s AAC. Levels use active-window RMS and existing game gains; clipping and decoded-file checks are in qa-report.json. No subjective listening was possible.\n')
+(OUT/'CREDITS.md').write_text('# Original sound auditions\n\nOriginal local synthesis candidates by the Daily Undead project. No samples or third-party melodies were used. '+('Box endings are auditions; 8E is the selected in-game clue sound, copied bit-identically.' if ROUND_THREE else 'These options are not selected in game. In round two, 1A is copied bit-identically for comparison.')+'\n\nRebuild: `python scripts/build-audio-auditions.py'+(' --rewarding-endings' if ROUND_THREE else ' --round-two' if ROUND_TWO else '')+'` with numpy and macOS afconvert. Primary: 48 kHz mono 16-bit PCM WAV. Fallback/download: 192 kb/s AAC. Levels use active-window RMS and existing game gains; clipping and decoded-file checks are in qa-report.json. No subjective listening was possible.\n')
 s.verify()
 print(f'{len(sounds)} audition candidates rendered. Active runtime files and gains are untouched.')
