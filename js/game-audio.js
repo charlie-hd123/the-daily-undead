@@ -3,8 +3,8 @@ export const SOUND_PREFERENCE_KEY = 'the-daily-undead:sound-enabled';
 export const SOUND_CUES = {
   "mystery-box-a": {
     "files": [
-      "mystery-box-a-f45d738cd5.wav",
-      "mystery-box-a-e03d5ba5af.m4a"
+      "mystery-box-a-59d6a2824c.wav",
+      "mystery-box-a-b849e6573b.m4a"
     ],
     "gain": 0.86
   },
