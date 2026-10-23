@@ -1,6 +1,10 @@
-# The Daily Undead sound effects · feedback revision 3.0
+# The Daily Undead sound effects · feedback revision 3.1
 
-## Deep space and fading delays · 23 October 2026
+## Quieter tune, fuller reverb · 23 October 2026
+
+Reduced the 1G jingle and its delay sends by 5.04 dB relative to the mix. Raised the shared reverb from .44 to .78 against the original tune reference (+4.97 dB), so lowering the tune does not also turn down the room. Extended the reverb decay, increased the recorded-contact and atmosphere sends, and used a 450 ms final fade. Other layer sources, four delay timings, 3.42-second duration, -18 dBFS overall active-window RMS and .86 game gain remain. All other 16 effects are unchanged.
+
+## Previous deep space and fading delays · 23 October 2026
 
 Mystery Box now has a longer, darker reverb across its melody, chimes, ethereal tones and recorded opening. The reverb bus is raised from .22 to .44 relative to the dry jingle, with a longer decay. Four progressively damped delays at 180/360/540/720 ms add gentle repeats; recorded-contact echoes are reduced so the opening stays tactile. The complete mix fades over its final 400 ms and still ends at 3.42 seconds. Overall active-window RMS remains -18 dBFS and cue gain remains .86. All other 16 effects are unchanged.
 

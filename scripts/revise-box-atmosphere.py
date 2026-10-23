@@ -29,6 +29,8 @@ jingle[:round(.12*rate)] = 0
 edge = round(.008*rate)
 jingle[round(.12*rate):round(.12*rate)+edge] *= np.linspace(0,1,edge)
 assert not np.any(jingle[round(1.85*rate):])
+jingle_reference_rms = s.active_rms(jingle)
+jingle *= .56  # Lower the main tune by 5.04 dB, including its delay sends.
 
 with tempfile.TemporaryDirectory(prefix='undead-box-') as directory:
     decoded = Path(directory)/'chest.wav'
@@ -81,20 +83,22 @@ for index,(at,gain) in enumerate(delay_taps):
 
 # Longer, darker diffuse reverb surrounds every layer, including the repeats.
 rng = np.random.default_rng(23102026)
-t = s.t(1.90)
-impulse = rng.normal(size=len(t))*np.exp(-t/.44)*(-np.expm1(-t/.012))
+t = s.t(2.15)
+impulse = rng.normal(size=len(t))*np.exp(-t/.56)*(-np.expm1(-t/.012))
 bins = np.fft.rfftfreq(len(impulse), 1/rate)
 impulse = np.fft.irfft(np.fft.rfft(impulse)*(bins*bins/(bins*bins+230**2))
                        /np.sqrt(1+(bins/2900)**6), n=len(impulse))
 size = 1 << (len(jingle)+len(impulse)-1).bit_length()
-room_bus = jingle+chimes+atmosphere+foley*.35+echoes*.45
+room_bus = jingle+chimes+atmosphere*1.20+foley*.50+echoes*.55
 response = np.fft.irfft(np.fft.rfft(room_bus,size)*np.fft.rfft(impulse,size),n=size)
 wet = s.canvas(length)
 s.put(wet,response,.045)
-wet *= s.active_rms(jingle)*.44/max(s.active_rms(wet),1e-12)
+# Reference the original tune level so lowering the melody does not also lower
+# the reverb: the room gets 4.97 dB more presence than the previous mix.
+wet *= jingle_reference_rms*.78/max(s.active_rms(wet),1e-12)
 
 mix = jingle+foley+wet+atmosphere+chimes+echoes
-mix[-round(.40*rate):] *= np.linspace(1,0,round(.40*rate))
+mix[-round(.45*rate):] *= np.linspace(1,0,round(.45*rate))
 mix = s.master(mix,-18,original=True)
 
 with tempfile.TemporaryDirectory(prefix='undead-box-master-') as directory:
@@ -121,13 +125,13 @@ item = next(x for x in pack['sounds'] if x['id']=='mystery-box-a')
 old_files = [item['wav'],item['compressed']]
 item.update(title='Mystery Box · Recorded chest and spectral 1G',
             trigger='Recorded chest contact on activation, lid movement under the 850 ms opening, original 1G phrase, quiet lift atmosphere and reverb fading before the 3.5-second sequence ends.',
-            note='Original 1G melody, recorded chest opening, raised E/B atmosphere and three soft chimes. Deeper diffuse reverb across all layers with four darkening delays. Both post-jingle thuds remain removed.',
+            note='1G melody lowered 5.04 dB relative to the mix. Fuller, longer reverb across the recorded opening, ethereal tones, chimes and tune, with four darkening delays. Both post-jingle thuds remain removed.',
             wav=files[0],compressed=files[1],duration=len(mix)/rate,
             peak_dbfs=s.db(max(abs(mix))),true_peak_4x_dbfs=s.db(s.true_peak(mix)),
             active_rms_dbfs=s.db(s.active_rms(mix)),effective_rms_dbfs=s.db(s.active_rms(mix)*item['volume']),
             waveform=[round(float(np.max(abs(a))),4) for a in np.array_split(mix,80)])
 pack['cues']['mystery-box-a']['files'] = files
-pack.update(version='3.0',date='2026-10-23',revised_cues=['mystery-box-a'],sources=[source],
+pack.update(version='3.1',date='2026-10-23',revised_cues=['mystery-box-a'],sources=[source],
             provenance='Original local synthesis plus a CC0 wooden-chest recording by The_Frisbee_of_Peace / Freesound 573654. Public HQ MP3 preview used; source original WAV requires login. Licence and processing in sources/CREDITS.md. Other cues unchanged.',
             source_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip())
 (assets/'manifest.json').write_text(json.dumps(pack,indent=2)+'\n')
@@ -153,11 +157,11 @@ li{{margin:8px 0}}footer{{margin-top:32px;border-top:1px solid #354139;padding-t
 </style></head><body><main>
 <header><strong>The Daily Undead</strong><a href="../../../">Back to staging game</a></header>
 <p class="eyebrow">Current staging sound</p><h1>Mystery Box opening.</h1>
-<p>The 1G melody, recorded chest opening, ethereal tones and subtle chimes, wrapped in deep reverb and drifting delays.</p>
+<p>A quieter 1G melody sits inside a fuller wash of reverb, ethereal tones, soft chimes and drifting delays.</p>
 <section class="player" aria-label="Mystery Box sound preview"><strong>Recorded chest + spectral 1G</strong>
 <audio controls preload="metadata" aria-label="Play current Mystery Box opening"><source src="../{files[0]}" type="audio/wav"><source src="../{files[1]}" type="audio/mp4"></audio>
 <div class="files"><a href="../{files[0]}" download>Download WAV</a><a href="../{files[1]}" download>Download AAC</a><span>3.42 s</span></div></section>
-<ul><li>Recorded chest contact and lid movement at the start.</li><li>Fuller ethereal tones and three soft chimes.</li><li>Deeper reverb across all layers, with soft fading echoes.</li><li>Both trailing thuds remain removed; the atmosphere fades through the reveal.</li></ul>
+<ul><li>The main jingle sits further back in the mix.</li><li>More reverb across the recorded chest, melody, tones and chimes.</li><li>Longer, softer ambience with gently fading delays.</li><li>Both trailing thuds remain removed; the atmosphere fades through the reveal.</li></ul>
 <footer>Recording: <a href="{source['page']}">Wooden Chest Open.wav by The_Frisbee_of_Peace</a> · CC0.
 Public HQ preview used. <a href="../sources/CREDITS.md">Source and processing credits</a>.
 Signal and decoder checks passed; no direct listening assessment. Preview starts at the game's 86% cue gain.</footer>
@@ -165,8 +169,9 @@ Signal and decoder checks passed; no direct listening assessment. Preview starts
 report = dict(result='PASS',files=files,duration=len(mix)/rate,volume=item['volume'],
               active_rms_dbfs=s.db(s.active_rms(mix)),wav_true_peak_dbfs=s.db(s.true_peak(mix)),
               aac_true_peak_dbfs=s.db(s.true_peak(aac)),late_impacts_removed=[2.01,2.54],
-              reverb_predelay_seconds=.045,reverb_relative_level=.44,reverb_decay_seconds=.44,
-              delay_taps=delay_taps,fade_seconds=.40,atmosphere_increase_db=round(float(20*np.log10(.034/.020)),2),
+              reverb_predelay_seconds=.045,reverb_relative_level=.78,reverb_decay_seconds=.56,
+              jingle_gain=.56,jingle_change_db=round(float(20*np.log10(.56)),2),
+              delay_taps=delay_taps,fade_seconds=.45,atmosphere_increase_db=round(float(20*np.log10(.034/.020)),2),
               chime_onsets_seconds=[.72,1.06,1.43],recording=source,listening_assessment=False)
 review = ROOT/'.releases/reviews/box-atmosphere-qa.json'
 review.parent.mkdir(parents=True,exist_ok=True)
