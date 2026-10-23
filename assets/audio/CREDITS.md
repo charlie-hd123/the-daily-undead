@@ -1,6 +1,10 @@
-# The Daily Undead sound effects · feedback revision 2.8
+# The Daily Undead sound effects · feedback revision 2.9
 
-## Recorded chest and atmospheric 1G · 23 October 2026
+## Fuller atmosphere and quiet chimes · 23 October 2026
+
+Raised the Mystery Box ethereal layer by 4.61 dB relative to its previous mix, with three soft bell glints at 0.72, 1.06 and 1.43 seconds. The chimes share the existing dark room reverb. The recorded opening, 1G phrase and 3.42-second fade remain; no late impacts are added. Overall active-window loudness remains -18 dBFS and in-game gain remains .86. All other 16 cues are unchanged. Rebuild with `python scripts/revise-box-atmosphere.py`.
+
+## Previous recorded chest and atmospheric 1G · 23 October 2026
 
 Mystery Box now combines the existing 1G melody with a CC0 recording of an actual wooden chest opening. The initial synthetic knock and the two post-jingle thuds are removed. A dark diffuse reverb and quiet E/B harmonic layer add depth, fading to silence at 3.42 seconds before the 3.50-second animation finishes. The active-window RMS remains -18 dBFS and cue gain remains .86. All other 16 cues, including the cleaned reward flourish, are unchanged.
 
