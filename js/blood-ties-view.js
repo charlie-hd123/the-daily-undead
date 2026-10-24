@@ -4,7 +4,7 @@ const html = (value) => String(value).replaceAll('&', '&amp;').replaceAll('<', '
 
 export function renderBloodTiesGroup(group, index, revealed = false) {
   return `<article class="blood-group${revealed ? ' is-revealed' : ''}">
-    <span class="blood-group-number" aria-label="Connection ${index + 1} · ${revealed ? 'Revealed' : 'Found'}">${index + 1}<span aria-hidden="true">${revealed ? '—' : '✓'}</span></span>
+    <span class="blood-group-mark" aria-label="Connection ${index + 1} · ${revealed ? 'Revealed' : 'Found'}"><span aria-hidden="true">${revealed ? '—' : '✓'}</span></span>
     <div class="blood-group-copy"><h3>${html(group.name)}</h3><p>${group.answers.map(html).join(' · ')}</p></div>
     <details><summary aria-label="About this connection"><span aria-hidden="true">i</span></summary><p>${html(group.definition)}</p></details></article>`;
 }
@@ -23,8 +23,8 @@ export function renderBloodTiesView({ app, puzzle, session, official, developer,
       <p>${session.success ? `You found ${session.rulesVersion < 3 ? 'three' : 'all four'} connections with ${session.misses === 0 ? 'no incorrect submissions' : `${session.misses} incorrect ${session.misses === 1 ? 'submission' : 'submissions'}`}.${session.rulesVersion < 3 ? ' The final connection was revealed automatically.' : ''}` : `You found ${session.solved.length} of four connections before three strikes. All four connections are shown below.`}
       ${official ? session.success ? '' : ' Your permanent Score and Solves are safe.' : ' This result did not affect your stats.'}</p>
       ${official && session.success ? `<div class="result-score-total"><span>Round score</span><strong data-count-to="${session.points}">${session.points}</strong></div>` : ''}
-      ${official && !session.success ? `<p class="survival-summary">${Math.max(1, session.roundsSurvivedBeforeLoss || 1) === 1 ? 'Your Round remains at <strong>Round 1</strong>.' : `Your run ended at <strong>Round ${session.roundsSurvivedBeforeLoss}</strong>. Your next game starts at <strong>Round 1</strong>.`}</p>` : ''}</div><p class="word-result-category blood-result-heading">Blood Ties · Today’s connections</p>`
-      : `<img class="puzzle-panel-art" src="./assets/blood-ties-card.svg?v=20261024-5" alt="" width="240" height="240" aria-hidden="true">
+      ${official && !session.success ? `<p class="survival-summary">${Math.max(1, session.roundsSurvivedBeforeLoss || 1) === 1 ? 'Your Round remains at <strong>Round 1</strong>.' : `Your run ended at <strong>Round ${session.roundsSurvivedBeforeLoss}</strong>. Your next game starts at <strong>Round 1</strong>.`}</p>` : ''}</div>`
+      : `<img class="puzzle-panel-art" src="./assets/blood-ties-card.svg?v=20261024-6" alt="" width="240" height="240" aria-hidden="true">
       ${heading('Blood Ties', 'Select 3 tiles that share a hidden Zombies connection. Find all four, and watch out for overlapping themes.', official ? 'Today’s round' : 'Just for fun', true)}
       ${official ? '' : '<p class="puzzle-mode-note">Playing just for fun. This result will not change your stats.</p>'}
       <div class="word-scoreboard${official ? '' : ' is-single'}" role="group" aria-label="Connection puzzle progress"><div class="blood-strikes"><span>Strikes</span><div class="blood-strike-circles${flashStrikes ? ' is-clearing' : ''}" role="img" aria-label="${session.strikes} of 3 strikes">${[1, 2, 3].map((i) => `<i class="${i <= session.strikes ? 'is-active' : ''}"></i>`).join('')}</div></div>

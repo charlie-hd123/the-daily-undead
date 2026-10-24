@@ -3,7 +3,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("./assets/fonts/barlow-400.ttf?v=20261024-5") format("truetype");
+  src: url("./assets/fonts/barlow-400.ttf?v=20261024-6") format("truetype");
 }
 
 @font-face {
@@ -11,7 +11,7 @@
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url("./assets/fonts/barlow-500.ttf?v=20261024-5") format("truetype");
+  src: url("./assets/fonts/barlow-500.ttf?v=20261024-6") format("truetype");
 }
 
 @font-face {
@@ -19,7 +19,7 @@
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url("./assets/fonts/barlow-600.ttf?v=20261024-5") format("truetype");
+  src: url("./assets/fonts/barlow-600.ttf?v=20261024-6") format("truetype");
 }
 
 @font-face {
@@ -27,7 +27,7 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("./assets/fonts/barlow-700.ttf?v=20261024-5") format("truetype");
+  src: url("./assets/fonts/barlow-700.ttf?v=20261024-6") format("truetype");
 }
 
 @font-face {
@@ -35,7 +35,7 @@
   font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url("./assets/fonts/barlow-800.ttf?v=20261024-5") format("truetype");
+  src: url("./assets/fonts/barlow-800.ttf?v=20261024-6") format("truetype");
 }
 
 @font-face {
@@ -43,7 +43,7 @@
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-600.ttf?v=20261024-5") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-600.ttf?v=20261024-6") format("truetype");
 }
 
 @font-face {
@@ -51,7 +51,7 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-700.ttf?v=20261024-5") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-700.ttf?v=20261024-6") format("truetype");
 }
 
 @font-face {
@@ -59,7 +59,7 @@
   font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-800.ttf?v=20261024-5") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-800.ttf?v=20261024-6") format("truetype");
 }
 
 @font-face {
@@ -67,7 +67,7 @@
   font-style: normal;
   font-weight: 900;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-900.ttf?v=20261024-5") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-900.ttf?v=20261024-6") format("truetype");
 }
 
 :root {
@@ -1504,35 +1504,35 @@ h1 {
     linear-gradient(145deg, #122233, #05080d);
 }
 
-.zombie-avatar[data-avatar="richtofen"] { background-image: url("./assets/avatars/richtofen.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="dempsey"] { background-image: url("./assets/avatars/dempsey.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="takeo"] { background-image: url("./assets/avatars/takeo.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="nikolai"] { background-image: url("./assets/avatars/nikolai.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="samantha"] { background-image: url("./assets/avatars/samantha.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="dr-maxis"] { background-image: url("./assets/avatars/dr-maxis.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="dr-monty"] { background-image: url("./assets/avatars/dr-monty.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="warden"] { background-image: url("./assets/avatars/warden.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="misty"] { background-image: url("./assets/avatars/misty.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="stuhlinger"] { background-image: url("./assets/avatars/stuhlinger.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="marlton"] { background-image: url("./assets/avatars/marlton.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="russman"] { background-image: url("./assets/avatars/russman.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="scarlett"] { background-image: url("./assets/avatars/scarlett.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="diego"] { background-image: url("./assets/avatars/diego.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="bruno"] { background-image: url("./assets/avatars/bruno.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="stanton"] { background-image: url("./assets/avatars/stanton.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="weaver"] { background-image: url("./assets/avatars/weaver.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="grey"] { background-image: url("./assets/avatars/grey.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="carver"] { background-image: url("./assets/avatars/carver.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="maya"] { background-image: url("./assets/avatars/maya.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="shadowman"] { background-image: url("./assets/avatars/shadowman.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="tedd"] { background-image: url("./assets/avatars/tedd.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="brutus"] { background-image: url("./assets/avatars/brutus.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="scientist"] { background-image: url("./assets/avatars/richtofen.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="soldier"] { background-image: url("./assets/avatars/dempsey.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="warrior"] { background-image: url("./assets/avatars/takeo.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="explorer"] { background-image: url("./assets/avatars/nikolai.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="punk"] { background-image: url("./assets/avatars/misty.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="hazmat"] { background-image: url("./assets/avatars/carver.png?v=20261024-5"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="richtofen"] { background-image: url("./assets/avatars/richtofen.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="dempsey"] { background-image: url("./assets/avatars/dempsey.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="takeo"] { background-image: url("./assets/avatars/takeo.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="nikolai"] { background-image: url("./assets/avatars/nikolai.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="samantha"] { background-image: url("./assets/avatars/samantha.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="dr-maxis"] { background-image: url("./assets/avatars/dr-maxis.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="dr-monty"] { background-image: url("./assets/avatars/dr-monty.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="warden"] { background-image: url("./assets/avatars/warden.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="misty"] { background-image: url("./assets/avatars/misty.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="stuhlinger"] { background-image: url("./assets/avatars/stuhlinger.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="marlton"] { background-image: url("./assets/avatars/marlton.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="russman"] { background-image: url("./assets/avatars/russman.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="scarlett"] { background-image: url("./assets/avatars/scarlett.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="diego"] { background-image: url("./assets/avatars/diego.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="bruno"] { background-image: url("./assets/avatars/bruno.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="stanton"] { background-image: url("./assets/avatars/stanton.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="weaver"] { background-image: url("./assets/avatars/weaver.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="grey"] { background-image: url("./assets/avatars/grey.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="carver"] { background-image: url("./assets/avatars/carver.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="maya"] { background-image: url("./assets/avatars/maya.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="shadowman"] { background-image: url("./assets/avatars/shadowman.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="tedd"] { background-image: url("./assets/avatars/tedd.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="brutus"] { background-image: url("./assets/avatars/brutus.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="scientist"] { background-image: url("./assets/avatars/richtofen.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="soldier"] { background-image: url("./assets/avatars/dempsey.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="warrior"] { background-image: url("./assets/avatars/takeo.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="explorer"] { background-image: url("./assets/avatars/nikolai.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="punk"] { background-image: url("./assets/avatars/misty.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="hazmat"] { background-image: url("./assets/avatars/carver.png?v=20261024-6"), linear-gradient(145deg, #122233, #05080d); }
 
 .avatar-choice .zombie-avatar {
   width: 100%;
@@ -3487,13 +3487,13 @@ body:has(.blood-puzzle-panel) .community-stats-demo { max-width: 54rem; }
 .blood-tile.is-selected::after { position: absolute; top: .3rem; right: .4rem; color: var(--aether); font: 700 .8rem/1 sans-serif; content: "✓" / ""; }
 .blood-tile:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
 .blood-solved { display: grid; gap: .55rem; margin-bottom: .55rem; }
-.blood-group { position: relative; display: grid; grid-template-columns: 1.75rem minmax(0, 1fr); column-gap: .7rem; align-items: center; text-align: left; padding: .75rem 3rem .75rem .8rem; border-radius: .75rem; border: 1px solid rgb(158 119 255 / 46%); background: linear-gradient(115deg, rgb(73 44 120 / 54%), rgb(27 23 46 / 94%)); }
-.blood-group-number { display: grid; gap: .1rem; place-items: center; align-self: start; color: #c9b5ff; font: 800 1rem/1.1 var(--font-display); padding-top: .12rem; }
-.blood-group-number > span { font: 700 .7rem/1 sans-serif; }
+.blood-group { position: relative; display: grid; grid-template-columns: 1rem minmax(0, 1fr); column-gap: .65rem; align-items: center; text-align: left; padding: .75rem 3rem .75rem .8rem; border-radius: .75rem; border: 1px solid rgb(158 119 255 / 46%); background: linear-gradient(115deg, rgb(73 44 120 / 54%), rgb(27 23 46 / 94%)); }
+.blood-group-mark { display: grid; place-items: center; align-self: start; color: #c9b5ff; padding-top: .15rem; }
+.blood-group-mark > span { font: 700 .85rem/1 sans-serif; }
 .blood-group h3 { margin: 0 0 .2rem; color: #d2bfff; font: 800 1.4rem/1.15 var(--font-display); text-transform: uppercase; overflow-wrap: anywhere; }
 .blood-group p { margin: 0; color: var(--text); font-size: .86rem; line-height: 1.5; overflow-wrap: anywhere; }
 .blood-group.is-revealed { border-color: var(--border); background: rgb(13 17 29 / 72%); }
-.blood-group.is-revealed :is(.blood-group-number, h3) { color: #c2cbd8; }
+.blood-group.is-revealed :is(.blood-group-mark, h3) { color: #c2cbd8; }
 .blood-group details { grid-column: 2; font-size: .75rem; color: var(--muted); }
 .blood-group details p { margin-top: .65rem; font-size: .8rem; color: var(--muted); }
 .blood-group summary { position: absolute; right: .35rem; top: .35rem; display: grid; place-items: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; color: #c9b5ff; list-style: none; }
@@ -3515,7 +3515,7 @@ body:has(.blood-puzzle-panel) .community-stats-demo { max-width: 54rem; }
 .blood-progress-track { display: flex; gap: .35rem; }
 .blood-progress-track > span { display: grid; place-items: center; width: 1.8rem; height: 1.8rem; border: 1px solid rgb(158 119 255 / 30%); border-radius: .4rem; background: rgb(158 119 255 / 5%); color: var(--muted); font: 700 .8rem/1 var(--font-display); }
 .blood-progress-track > .is-found { border-color: var(--aether-violet); background: rgb(158 119 255 / 25%); color: #e1d5ff; }
-.blood-result-heading { margin-top: 1.5rem; }
+.blood-result-panel > .blood-solved { margin-top: 1.25rem; }
 .blood-dev { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed var(--border); font-size: .75rem; color: var(--muted); }
 .blood-dev p { line-height: 1.5; overflow-wrap: anywhere; }
 .blood-dev strong { color: #c2cbd8; }
@@ -3529,7 +3529,7 @@ body:has(.blood-puzzle-panel) .community-stats-demo { max-width: 54rem; }
 @media (max-width: 600px) {
   .blood-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .4rem; }
   .blood-tile { min-height: 5rem; padding: .85rem .4rem; font-size: clamp(.75rem, calc(10rem / var(--blood-longest-word, 10)), 1rem); }
-  .blood-group { padding: .65rem 2.7rem .65rem .6rem; column-gap: .4rem; grid-template-columns: 1.35rem minmax(0, 1fr); }
+  .blood-group { padding: .65rem 2.7rem .65rem .6rem; column-gap: .4rem; grid-template-columns: 1rem minmax(0, 1fr); }
   .blood-group h3 { font-size: 1.25rem; }
   .blood-group p { font-size: .8rem; }
   .blood-controls { gap: .4rem; }
