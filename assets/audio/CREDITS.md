@@ -1,3 +1,9 @@
+# Volume feedback revision · 24 October 2026
+
+Correct-letter and streak sounds (02–05) raised by 3dB. Clue reveal (07) and bonus selections (11–13) lowered by 3dB. Reward flourish (14) lowered by 6dB, with a smooth 5dB treble shelf above 2.5kHz and gentle high-frequency rolloff. Pitch, timing, stereo and existing effects retained. The other eight active sound pairs are unchanged.
+
+Rebuild from the committed original import using `python scripts/adjust-audio-levels.py` (numpy and macOS afconvert). Processing levels and WAV/AAC peaks: [level-feedback-qa-2026-10-24.json](level-feedback-qa-2026-10-24.json). Decoder, endpoint and true-peak checks passed; no subjective listening assessment was possible. The fourth successful Blood Ties connection now receives the same confirmation cue as the preceding connections, alongside its result count.
+
 # Current user-selected sound pack · 24 October 2026
 
 All 17 active cues now use replacement WAVs supplied by the site owner in `NEW AUDIO`. The original files remain untouched in the supplied folder. This import did not generate sounds, fetch external recordings, or independently establish the supplied files’ authorship/licence. Prior locally synthesised and CC0 credits below describe archived versions, not the new active pack.

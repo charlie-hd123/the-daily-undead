@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { createGameAudio, initialiseGameAudio, letterSound, SOUND_CUES, SOUND_PREFERENCE_KEY } from '../js/game-audio.js';
+import { createGameAudio, initialiseGameAudio, letterSound, bloodConnectionSound, SOUND_CUES, SOUND_PREFERENCE_KEY } from '../js/game-audio.js';
 
 function fixture({ muted = false, unavailable = false, fetchAudio, decode } = {}) {
   let time = 0, hidden = false;
@@ -185,6 +185,22 @@ test('letter progression caps its motif and a completed answer gets a single sol
   assert.equal(letterSound({ correct: true, streak: 2 }), 'letter-streak-2');
   assert.equal(letterSound({ correct: true, streak: 12 }), 'letter-streak-4');
   assert.equal(letterSound({ correct: true, solved: true, streak: 3 }), 'puzzle-solved-a');
+});
+
+test('Blood Ties gives the fourth correct connection the same cue and keeps failure feedback', async () => {
+  const f = fixture(); f.audio.unlock(); await f.audio.prepare();
+  for (let connection = 1; connection <= 4; connection++) {
+    const cue = bloodConnectionSound({ correct: true, complete: connection === 4 });
+    assert.equal(cue, 'answer-lock');
+    assert.equal(await f.audio.play(cue), true);
+  }
+  assert.equal(f.starts.length, 4);
+  f.audio.countPoints(720, { reward: 'double-points-a' });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(f.starts.length, 13);
+  assert.equal(f.stopped.length, 0); // The result count must preserve the final connection cue.
+  assert.equal(bloodConnectionSound({ correct: false, complete: false }), 'letter-wrong');
+  assert.equal(bloodConnectionSound({ correct: false, complete: true }), 'run-ended');
 });
 
 test('bonus flourish follows the settled points and finishing ping, including reduced motion', async () => {

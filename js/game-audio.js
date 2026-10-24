@@ -10,29 +10,29 @@ export const SOUND_CUES = {
   },
   "letter-correct": {
     "files": [
-      "letter-correct-f0cf2c0199.wav",
-      "letter-correct-0113364a3a.m4a"
+      "letter-correct-19fdeea99f.wav",
+      "letter-correct-d57b1e87d4.m4a"
     ],
     "gain": 0.8
   },
   "letter-streak-2": {
     "files": [
-      "letter-streak-2-b246f5a2e6.wav",
-      "letter-streak-2-2acec367a7.m4a"
+      "letter-streak-2-827025c99f.wav",
+      "letter-streak-2-1f21154242.m4a"
     ],
     "gain": 0.8
   },
   "letter-streak-3": {
     "files": [
-      "letter-streak-3-a40e20bec0.wav",
-      "letter-streak-3-1821c7f0c0.m4a"
+      "letter-streak-3-e83498e014.wav",
+      "letter-streak-3-7d55815666.m4a"
     ],
     "gain": 0.8
   },
   "letter-streak-4": {
     "files": [
-      "letter-streak-4-2c5e049b44.wav",
-      "letter-streak-4-eb88c6a034.m4a"
+      "letter-streak-4-7d5006da14.wav",
+      "letter-streak-4-9ef455cc56.m4a"
     ],
     "gain": 0.8
   },
@@ -45,8 +45,8 @@ export const SOUND_CUES = {
   },
   "quest-clue-reveal": {
     "files": [
-      "quest-clue-reveal-0a6e4dd0b0.wav",
-      "quest-clue-reveal-4ab35e819a.m4a"
+      "quest-clue-reveal-7f98745761.wav",
+      "quest-clue-reveal-4b5ee4d55c.m4a"
     ],
     "gain": 0.8
   },
@@ -73,29 +73,29 @@ export const SOUND_CUES = {
   },
   "bonus-step-1": {
     "files": [
-      "bonus-step-1-9c21ee0acd.wav",
-      "bonus-step-1-0c21ffee41.m4a"
+      "bonus-step-1-028f3c51b1.wav",
+      "bonus-step-1-851e543788.m4a"
     ],
     "gain": 0.8
   },
   "bonus-step-2": {
     "files": [
-      "bonus-step-2-f278071801.wav",
-      "bonus-step-2-29d8988b3b.m4a"
+      "bonus-step-2-9bf4607021.wav",
+      "bonus-step-2-f7f72af383.m4a"
     ],
     "gain": 0.8
   },
   "bonus-step-3": {
     "files": [
-      "bonus-step-3-ca50885e0a.wav",
-      "bonus-step-3-6fa59231b4.m4a"
+      "bonus-step-3-00ac7098f1.wav",
+      "bonus-step-3-8abe5f9abb.m4a"
     ],
     "gain": 0.8
   },
   "double-points-a": {
     "files": [
-      "double-points-a-3dcfafc25b.wav",
-      "double-points-a-72fcfe36ad.m4a"
+      "double-points-a-5a90318aa7.wav",
+      "double-points-a-2873664362.m4a"
     ],
     "gain": 1.0
   },
@@ -126,6 +126,10 @@ export const SOUND_CUES = {
 export function letterSound({ correct, solved, streak = 0 }) {
   if (solved) return 'puzzle-solved-a';
   return correct ? streak >= 2 ? `letter-streak-${Math.min(4, streak)}` : 'letter-correct' : 'letter-wrong';
+}
+
+export function bloodConnectionSound({ correct, complete }) {
+  return correct ? 'answer-lock' : complete ? 'run-ended' : 'letter-wrong';
 }
 
 // Only puzzle navigation opts into the low click. Dedicated puzzle handlers

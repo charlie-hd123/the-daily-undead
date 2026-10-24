@@ -1,0 +1,125 @@
+{
+  "baseline": "1d8b4ae073f037d71546f3c27424833a33656c28",
+  "subjective_listening": false,
+  "unchanged_cues": [
+    "answer-lock",
+    "letter-wrong",
+    "map-select",
+    "mystery-box-a",
+    "points-finish",
+    "points-tick",
+    "puzzle-solved-a",
+    "run-ended"
+  ],
+  "changes": [
+    {
+      "cue": "letter-correct",
+      "gain_change_db": 3,
+      "before_weighted_playback_dbfs": -20.0,
+      "after_weighted_playback_dbfs": -17.001,
+      "wav_playback_true_peak_dbfs": -5.717,
+      "aac_playback_true_peak_dbfs": -5.74,
+      "files": [
+        "letter-correct-19fdeea99f.wav",
+        "letter-correct-d57b1e87d4.m4a"
+      ]
+    },
+    {
+      "cue": "letter-streak-2",
+      "gain_change_db": 3,
+      "before_weighted_playback_dbfs": -20.0,
+      "after_weighted_playback_dbfs": -17.001,
+      "wav_playback_true_peak_dbfs": -5.154,
+      "aac_playback_true_peak_dbfs": -5.191,
+      "files": [
+        "letter-streak-2-827025c99f.wav",
+        "letter-streak-2-1f21154242.m4a"
+      ]
+    },
+    {
+      "cue": "letter-streak-3",
+      "gain_change_db": 3,
+      "before_weighted_playback_dbfs": -20.0,
+      "after_weighted_playback_dbfs": -17.001,
+      "wav_playback_true_peak_dbfs": -5.371,
+      "aac_playback_true_peak_dbfs": -5.317,
+      "files": [
+        "letter-streak-3-e83498e014.wav",
+        "letter-streak-3-7d55815666.m4a"
+      ]
+    },
+    {
+      "cue": "letter-streak-4",
+      "gain_change_db": 3,
+      "before_weighted_playback_dbfs": -20.0,
+      "after_weighted_playback_dbfs": -17.001,
+      "wav_playback_true_peak_dbfs": -5.691,
+      "aac_playback_true_peak_dbfs": -5.639,
+      "files": [
+        "letter-streak-4-7d5006da14.wav",
+        "letter-streak-4-9ef455cc56.m4a"
+      ]
+    },
+    {
+      "cue": "quest-clue-reveal",
+      "gain_change_db": -3,
+      "before_weighted_playback_dbfs": -24.759,
+      "after_weighted_playback_dbfs": -27.76,
+      "wav_playback_true_peak_dbfs": -6.5,
+      "aac_playback_true_peak_dbfs": -6.4,
+      "files": [
+        "quest-clue-reveal-7f98745761.wav",
+        "quest-clue-reveal-4b5ee4d55c.m4a"
+      ]
+    },
+    {
+      "cue": "bonus-step-1",
+      "gain_change_db": -3,
+      "before_weighted_playback_dbfs": -21.0,
+      "after_weighted_playback_dbfs": -24.001,
+      "wav_playback_true_peak_dbfs": -11.194,
+      "aac_playback_true_peak_dbfs": -11.289,
+      "files": [
+        "bonus-step-1-028f3c51b1.wav",
+        "bonus-step-1-851e543788.m4a"
+      ]
+    },
+    {
+      "cue": "bonus-step-2",
+      "gain_change_db": -3,
+      "before_weighted_playback_dbfs": -21.0,
+      "after_weighted_playback_dbfs": -24.001,
+      "wav_playback_true_peak_dbfs": -11.04,
+      "aac_playback_true_peak_dbfs": -11.046,
+      "files": [
+        "bonus-step-2-9bf4607021.wav",
+        "bonus-step-2-f7f72af383.m4a"
+      ]
+    },
+    {
+      "cue": "bonus-step-3",
+      "gain_change_db": -3,
+      "before_weighted_playback_dbfs": -21.0,
+      "after_weighted_playback_dbfs": -24.001,
+      "wav_playback_true_peak_dbfs": -11.382,
+      "aac_playback_true_peak_dbfs": -11.349,
+      "files": [
+        "bonus-step-3-00ac7098f1.wav",
+        "bonus-step-3-8abe5f9abb.m4a"
+      ]
+    },
+    {
+      "cue": "double-points-a",
+      "gain_change_db": -6,
+      "before_weighted_playback_dbfs": -18.276,
+      "after_weighted_playback_dbfs": -24.661,
+      "wav_playback_true_peak_dbfs": -11.659,
+      "aac_playback_true_peak_dbfs": -11.5,
+      "files": [
+        "double-points-a-5a90318aa7.wav",
+        "double-points-a-2873664362.m4a"
+      ]
+    }
+  ],
+  "mixed_sequence_true_peak_dbfs": -11.003
+}
