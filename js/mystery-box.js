@@ -1,6 +1,6 @@
-import { BOX_SEQUENCE, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261024-4';
+import { BOX_SEQUENCE, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261024-5';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261024-4';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261024-5';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () => {} } = {}) {
@@ -31,6 +31,9 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
   let rewardTypes = [];
   let puzzleType;
   let skipPending = false;
+  let settleRequested = false;
+  let skipToReward;
+  let skipAudioWait;
   const later = (callback, delay) => timers.push(window.setTimeout(callback, delay));
   function positionTrigger() {
     if (!visual || !trigger || progress) return;
@@ -42,8 +45,8 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
   }
   function syncTrigger() {
     if (!trigger) return;
-    trigger.disabled = false;
-    trigger.setAttribute('aria-label', activation.requested ? 'Skip animation and play today’s puzzle' : 'Open box to reveal today’s puzzle');
+    trigger.disabled = settleRequested;
+    trigger.setAttribute('aria-label', activation.requested ? 'Skip spin and reveal today’s icon' : 'Open box to reveal today’s puzzle');
     const waiting = activation.requested && (!wrapper || wrapper.dataset.phase === 'closed');
     // Touch browsers can retain :hover after a tap; hide the prompt independently of CSS.
     if (caption) caption.hidden = unavailable || activation.requested;
@@ -53,10 +56,11 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     if (unavailable || review) return;
     if (activation.requested) {
       if (!wrapper) { skipPending = true; return; }
-      if (activeEligibility && !history.markOpened(activeEligibility.dateKey)) { cancel(); return; }
-      const currentPanel = panel;
-      cancel();
-      currentPanel?.querySelector('button, [tabindex="0"]')?.focus({ preventScroll: true });
+      if (settleRequested) return;
+      settleRequested = true;
+      trigger.hidden = true;
+      if (copy) copy.hidden = true;
+      onCancel(); skipAudioWait?.(); skipToReward?.();
       return;
     }
     activation.request(); syncTrigger();
@@ -88,7 +92,7 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     if (renderingReady) return renderingReady;
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261024-4')
+      import('./mystery-box-scene.js?v=20261024-5')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -124,6 +128,8 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
 
   function cancel() {
     onCancel();
+    settleRequested = false;
+    skipToReward = skipAudioWait = null;
     activeEligibility = null;
     if (wrapper) {
       activation.cancel(); activation = createBoxActivation(() => beginReveal?.());
@@ -202,11 +208,11 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
       // Exchange the silhouettes only while edge-on. One visible object avoids
       // a ghosted double outline; predecoded faces never change source in flight.
       const turn = incoming ? (current.blend - .5) * 2 : current.blend * 2;
-      const yaw = !exchanging ? pose.rotateY : incoming
-        ? 90 + (pose.rotateY - 90) * turn : pose.rotateY + (-90 - pose.rotateY) * turn;
+      const pitch = !exchanging ? pose.rotateX : incoming
+        ? -90 + (pose.rotateX + 90) * turn : pose.rotateX + (90 - pose.rotateX) * turn;
       traveller.style.transform = `translate3d(${pose.left - target.left}px,${pose.top - target.top}px,0) scale(${pose.scale})`;
       traveller.style.opacity = pose.opacity * weight;
-      object.style.transform = `rotateX(${pose.rotateX}deg) rotateY(${yaw}deg) rotateZ(0deg)`;
+      object.style.transform = `rotateX(${pitch}deg) rotateY(${pose.rotateY}deg) rotateZ(0deg)`;
       traveller.style.setProperty('--mb-light', pose.light);
       traveller.style.setProperty('--mb-depth', pose.depth);
     }
@@ -216,6 +222,7 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
   }
   function showSequenceAt(elapsed) {
     intro?.setAttribute('aria-hidden', 'true');
+    if (settleRequested && copy) copy.hidden = true;
     const lid = lidOpenness(elapsed);
     if (lid !== progress) { progress = lid; visual.draw(progress); }
     if (elapsed >= BOX_SEQUENCE.liftAt) {
@@ -231,9 +238,22 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
   }
   function animateSequence(focused) {
     const started = performance.now();
+    const holdAt = BOX_SEQUENCE.cycleAt + BOX_SEQUENCE.cycleFor;
+    let offset = settleRequested ? holdAt : 0;
+    let lastElapsed = offset;
+    skipToReward = () => {
+      const elapsed = Math.max(lastElapsed, performance.now() - started + offset);
+      // A late tap must never rewind an icon already travelling to its corner.
+      if (elapsed >= holdAt) return;
+      offset += holdAt - elapsed;
+      lastElapsed = holdAt;
+      showSequenceAt(holdAt);
+    };
+    if (settleRequested) showSequenceAt(holdAt);
     function tick(now) {
       if (!wrapper?.isConnected) return;
-      const elapsed = now - started;
+      const elapsed = Math.max(lastElapsed, now - started + offset);
+      lastElapsed = elapsed;
       showSequenceAt(elapsed);
       if (!wrapper) return;
       if (elapsed >= BOX_SEQUENCE.finishAt) {
@@ -247,17 +267,15 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
   }
   const iconSource = (type) => new URL(`../assets/${{ word: 'dead-letters', easter: 'quest-steps', blood: 'blood-ties' }[type]}-card.svg`, import.meta.url).href;
   function open({ dateKey, type, fresh, official, storage, availableTypes = ['word', 'easter'] }) {
+    const earlySettle = skipPending;
     cancel();
+    skipPending = false;
+    settleRequested = earlySettle;
     if (!history || historyStorage !== storage) {
       history = createDailyBoxHistory(storage); historyStorage = storage;
     }
     const eligible = review ? official && fresh : history.canOpen({ dateKey, official, fresh });
     if (!stage || !trigger || !caption || unavailable || !eligible || reducedMotion()) {
-      activation.cancel(); activation = createBoxActivation(() => beginReveal?.()); syncTrigger();
-      return;
-    }
-    if (skipPending) {
-      skipPending = false; history.markOpened(dateKey);
       activation.cancel(); activation = createBoxActivation(() => beginReveal?.()); syncTrigger();
       return;
     }
@@ -310,19 +328,21 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
         // second tap works even while the chest fades or the icon travels.
         wrapper.append(trigger); trigger.classList.add('is-skipping');
         Object.assign(trigger.style, { left: '0', top: '0', width: '100%', height: '100%' });
-        trigger.hidden = false;
+        trigger.hidden = settleRequested;
         wrapper.dataset.phase = 'opening'; syncTrigger();
-        onOpen();
+        if (!settleRequested) onOpen();
         animateSequence(focused);
       };
       beginReveal = () => {
+        if (settleRequested) { reveal(); return; }
         let preparation;
         try { preparation = beforeOpen?.(); } catch { /* Sound cannot block the puzzle. */ }
         if (preparation && typeof preparation.then === 'function') {
           // Keep the recorded latch and the lid in sync on the first browser tap.
           // Missing/blocked audio has a short ceiling, so the real game still opens.
           const audioDeadline = new Promise(resolve => later(resolve, 750));
-          void Promise.race([preparation, audioDeadline]).catch(() => false).then(reveal);
+          const skipAudio = new Promise(resolve => { skipAudioWait = resolve; });
+          void Promise.race([preparation, audioDeadline, skipAudio]).catch(() => false).then(reveal);
         } else reveal();
       };
     } else trigger.hidden = true;

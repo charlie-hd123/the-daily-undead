@@ -120,29 +120,44 @@ test('a fresh account puzzle with blocked graphics stays native without insertin
   assert.equal(f.copy.hidden, true);
 });
 
-test('a second tap skips loading, audio preparation, cycling or landing and cannot reopen later', async () => {
+test('a second tap fast-forwards to the final icon hold, then completes the normal landing', async () => {
+  const holdAt = BOX_SEQUENCE.cycleAt + BOX_SEQUENCE.cycleFor;
   for (const elapsed of [null, 0, 750, 1700, 2700, 3200, 3900, 4600, 5300, 5700]) {
     let opens = 0;
     const f = boxFixture({ slow: elapsed === null, onOpen: () => opens++ });
     f.open(); if (elapsed !== null) await f.flush();
-    f.trigger.click();
-    if (elapsed) f.frame(elapsed);
-    f.trigger.click();
-    assert.equal(f.panel.inert, false);
-    assert.equal(f.controller.isPresenting, false);
-    assert.equal(f.frameCount, 0);
-    assert.equal(f.icon.getAttribute('src'), './assets/dead-letters-card.svg');
-    assert.equal(f.icon.inert, false);
+    f.trigger.click(); if (elapsed) f.frame(elapsed);
+    f.trigger.click(); f.ready(); await f.flush();
+    assert.equal(f.controller.isPresenting, true, 'the chosen icon and landing remain on screen');
+    assert.equal(f.panel.inert, true, 'hidden puzzle controls remain blocked during the hold');
+    assert.equal(f.frameCount, 1);
+    assert.equal(f.trigger.hidden, true, 'the skip hint disappears after using it');
+    // A frame queued before the tap must not take the timeline back into the spin.
+    f.frame((elapsed ?? 0) - 1);
+    const winner = f.iconLayers.filter(layer => Number(layer.style.opacity) > 0);
+    assert.equal(winner.length, 1); assert.equal(winner[0].dataset.icon, 'word');
+    if ((elapsed ?? 0) < holdAt) assert.equal(Number(winner[0].style.opacity), 1);
     assert.equal(f.values.get('the-daily-undead:mystery-box-opened:2026-10-19'), '1');
-    f.ready(); await f.flush();
-    assert.equal(f.controller.isPresenting, false);
     assert.equal(opens, elapsed === null ? 0 : 1);
+    // Only the skipped part is removed. A late tap never rewinds the flight.
+    const skipped = Math.max(0, holdAt - (elapsed ?? 0));
+    f.frame(BOX_SEQUENCE.finishAt - skipped);
+    assert.equal(f.controller.isPresenting, false); assert.equal(f.panel.inert, false);
+    assert.equal(f.icon.parentElement, f.panel); assert.equal(f.icon.inert, false);
+    assert.equal(f.icon.getAttribute('src'), './assets/dead-letters-card.svg');
     f.open(); await f.flush(); assert.equal(f.controller.isPresenting, false);
   }
-  let ready;
-  const f = boxFixture({ beforeOpen: () => new Promise(resolve => { ready = resolve; }) });
-  f.open(); await f.flush(); f.trigger.click(); f.trigger.click(); ready(); await f.flush();
-  assert.equal(f.frameCount, 0); assert.equal(f.panel.inert, false);
+});
+
+test('skipping an audio wait shows the final icon without a late sound or duplicate sequence', async () => {
+  let ready, opens = 0;
+  const f = boxFixture({ beforeOpen: () => new Promise(resolve => { ready = resolve; }), onOpen: () => opens++ });
+  f.open(); await f.flush(); f.trigger.click(); f.trigger.click(); await f.flush();
+  assert.equal(f.controller.isPresenting, true); assert.equal(f.frameCount, 1);
+  assert.equal(opens, 0);
+  ready(); await f.flush(); assert.equal(opens, 0); assert.equal(f.frameCount, 1);
+  f.frame(BOX_SEQUENCE.finishAt - BOX_SEQUENCE.cycleAt - BOX_SEQUENCE.cycleFor);
+  assert.equal(f.panel.inert, false); assert.equal(f.frameCount, 0);
 });
 
 test('decoded icon objects exchange edge-on without ghosting and restore the untouched native icon', async () => {
@@ -168,4 +183,33 @@ test('decoded icon objects exchange edge-on without ghosting and restore the unt
     assert.equal(f.icon.parentElement, f.panel); assert.equal(f.icon.inert, false);
     assert.equal(f.icon.getAttribute('src'), './assets/dead-letters-card.svg');
   }
+});
+
+test('two taps on the initial poster wait for assets and then show the chosen icon hold', async () => {
+  let opens = 0;
+  const f = boxFixture({ onOpen: () => opens++ });
+  f.trigger.click(); f.trigger.click(); f.open(); await f.flush();
+  assert.equal(opens, 0); assert.equal(f.controller.isPresenting, true);
+  const winner = f.iconLayers.filter(layer => Number(layer.style.opacity) > 0);
+  assert.equal(winner.length, 1); assert.equal(winner[0].dataset.icon, 'word');
+  assert.equal(Number(winner[0].style.opacity), 1);
+  f.frame(BOX_SEQUENCE.finishAt - BOX_SEQUENCE.cycleAt - BOX_SEQUENCE.cycleFor);
+  assert.equal(f.panel.inert, false);
+});
+
+test('the exchange tumbles vertically while keeping its horizontal camera angle fixed', async () => {
+  const f = boxFixture(); f.open({ availableTypes: ['word', 'easter', 'blood'] }); await f.flush(); f.trigger.click();
+  const angle = (name) => {
+    const visible = f.iconLayers.find(layer => Number(layer.style.opacity) > 0);
+    return Number(visible.children[0].style.transform.match(new RegExp(name + '\\((-?[\\d.]+)deg\\)'))[1]);
+  };
+  f.frame(BOX_SEQUENCE.cycleAt);
+  const restingPitch = angle('rotateX'), restingYaw = angle('rotateY');
+  let turned = false;
+  for (let at = BOX_SEQUENCE.cycleAt; at < BOX_SEQUENCE.cycleAt + 250; at += 5) {
+    f.frame(at);
+    assert.equal(angle('rotateY'), restingYaw);
+    if (Math.abs(angle('rotateX') - restingPitch) > 30) turned = true;
+  }
+  assert.ok(turned, 'the vertical turn is visible at the beginning of the spin');
 });

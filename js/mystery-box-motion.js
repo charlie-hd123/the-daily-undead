@@ -1,5 +1,5 @@
 export const BOX_SEQUENCE = Object.freeze({
-  lid: 850, liftAt: 620, liftFor: 1100, cycleAt: 1250, cycleFor: 2500,
+  lid: 850, liftAt: 450, liftFor: 1000, cycleAt: 950, cycleFor: 2800,
   settleAt: 4300, settleFor: 1000, growFor: 600, fadeFor: 600,
   assembleAt: 4900, finishAt: 5800,
 });
@@ -13,7 +13,7 @@ export function boxRewardAt(elapsed, finalType, availableTypes) {
   // One continuous ease-out makes each successive icon dwell longer. End on an
   // exact whole slot, so the last transition cannot flash or repeat the winner.
   const slots = types.length * 3 - 1;
-  const cursor = slots * (1 - (1 - time) ** 2);
+  const cursor = slots * (1 - (1 - time) ** 2.7);
   const step = Math.floor(cursor);
   const fromType = types[(types.indexOf(finalType) + step + 1) % types.length];
   const toType = time === 1 ? finalType : types[(types.indexOf(finalType) + step + 2) % types.length];
