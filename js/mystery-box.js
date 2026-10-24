@@ -1,6 +1,6 @@
-import { BOX_SEQUENCE, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261024-3';
+import { BOX_SEQUENCE, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261024-4';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261024-3';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261024-4';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () => {} } = {}) {
@@ -88,7 +88,7 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     if (renderingReady) return renderingReady;
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261024-3')
+      import('./mystery-box-scene.js?v=20261024-4')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -164,38 +164,55 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     const slot = document.createComment('Puzzle icon');
     const context = document.createElement('div'); context.className = 'mb-icon-portal';
     context.setAttribute('aria-hidden', 'true'); context.inert = true;
-    const traveller = document.createElement('div'); traveller.className = 'mb-icon-traveller';
-    const object = document.createElement('div'); object.className = 'mb-icon-object';
-    for (let layer = 4; layer >= 1; layer--) {
-      const side = node.cloneNode(false); side.className = 'mb-icon-side';
-      side.setAttribute('aria-hidden', 'true'); side.style.setProperty('--layer', layer); object.append(side);
-    }
-    reward = { node, slot, context, traveller, object, target, source: node.getAttribute('src'), type: puzzleType, style: node.style.cssText,
-      hidden: node.getAttribute('aria-hidden'), inert: node.inert,
-      flights: Object.fromEntries(rewardTypes.map(type => [type, createIconFlight({ target, mouth: visual.aperture(), stage: stageRect, viewDirection: visual.viewDirection(), ink: ICON_INK[type] })])) };
-    node.replaceWith(slot); object.append(node); traveller.append(object); context.append(traveller); wrapper.append(context);
+    const original = { source: node.getAttribute('src'), style: node.style.cssText,
+      hidden: node.getAttribute('aria-hidden'), inert: node.inert };
+    const layers = rewardTypes.map(type => {
+      const traveller = document.createElement('div'); traveller.className = 'mb-icon-traveller';
+      traveller.dataset.icon = type;
+      const object = document.createElement('div'); object.className = 'mb-icon-object';
+      const face = type === puzzleType ? node : node.cloneNode(false);
+      face.setAttribute('src', type === puzzleType ? node.getAttribute('src') : iconSource(type));
+      for (let layer = 4; layer >= 1; layer--) {
+        const side = face.cloneNode(false); side.className = 'mb-icon-side';
+        side.setAttribute('aria-hidden', 'true'); side.style.setProperty('--layer', layer); object.append(side);
+      }
+      if (type === puzzleType) node.replaceWith(slot);
+      face.classList.add('mb-icon-face'); face.inert = true; face.setAttribute('aria-hidden', 'true');
+      object.append(face); traveller.append(object); context.append(traveller);
+      Object.assign(traveller.style, { left: `${target.left - stageRect.left}px`, top: `${target.top - stageRect.top}px`,
+        width: `${target.width}px`, height: `${target.height}px`, opacity: '0' });
+      return { type, traveller, object,
+        flight: createIconFlight({ target, mouth: visual.aperture(), stage: stageRect, viewDirection: visual.viewDirection(), ink: ICON_INK[type] }) };
+    });
+    reward = { node, slot, context, target, layers, ...original };
+    wrapper.append(context);
     context.style.cssText = `left:${stageRect.left - origin.left}px;top:${stageRect.top - origin.top}px;width:${stageRect.width}px;height:${Math.max(stageRect.height, panel.offsetHeight)}px;`;
-    node.classList.add('mb-icon-face'); node.inert = true; node.setAttribute('aria-hidden', 'true');
-    Object.assign(traveller.style, { left: `${target.left - stageRect.left}px`, top: `${target.top - stageRect.top}px`,
-      width: `${target.width}px`, height: `${target.height}px` });
     return true;
   }
   function positionReward(elapsed) {
-    const { traveller, object, context, target, flights } = reward;
+    const { context, target, layers } = reward;
     const current = boxRewardAt(elapsed, puzzleType, rewardTypes);
-    if (reward.type !== current.type) {
-      const source = iconSource(current.type);
-      for (const image of object.children) image.setAttribute('src', source);
-      reward.type = current.type;
+    context.dataset.reward = current.type;
+    for (const { type, traveller, object, flight } of layers) {
+      const exchanging = !current.locked && current.fromType !== current.toType;
+      const incoming = exchanging && current.blend >= .5;
+      const visibleType = incoming ? current.toType : current.fromType;
+      const weight = type === visibleType ? 1 : 0;
+      const pose = flight(elapsed);
+      // Exchange the silhouettes only while edge-on. One visible object avoids
+      // a ghosted double outline; predecoded faces never change source in flight.
+      const turn = incoming ? (current.blend - .5) * 2 : current.blend * 2;
+      const yaw = !exchanging ? pose.rotateY : incoming
+        ? 90 + (pose.rotateY - 90) * turn : pose.rotateY + (-90 - pose.rotateY) * turn;
+      traveller.style.transform = `translate3d(${pose.left - target.left}px,${pose.top - target.top}px,0) scale(${pose.scale})`;
+      traveller.style.opacity = pose.opacity * weight;
+      object.style.transform = `rotateX(${pose.rotateX}deg) rotateY(${yaw}deg) rotateZ(0deg)`;
+      traveller.style.setProperty('--mb-light', pose.light);
+      traveller.style.setProperty('--mb-depth', pose.depth);
     }
-    const pose = flights[current.type](elapsed);
-    traveller.style.transform = `translate3d(${pose.left - target.left}px,${pose.top - target.top}px,0) scale(${pose.scale})`;
-    traveller.style.opacity = pose.opacity * (elapsed < BOX_SEQUENCE.settleAt ? current.opacity : 1);
-    object.style.transform = `rotateX(${pose.rotateX}deg) rotateY(${pose.rotateY}deg) rotateZ(${pose.rotateZ}deg)`;
+    const pose = layers[0].flight(elapsed);
     context.style.clipPath = elapsed < BOX_SEQUENCE.settleAt
       ? `polygon(0 0,100% 0,100% ${pose.clipRight}px,0 ${pose.clipLeft}px)` : 'none';
-    traveller.style.setProperty('--mb-light', pose.light);
-    traveller.style.setProperty('--mb-depth', pose.depth);
   }
   function showSequenceAt(elapsed) {
     intro?.setAttribute('aria-hidden', 'true');
@@ -322,7 +339,11 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
         if (wrapper !== currentWrapper) return;
         if (!scene || !visual) { skipPresentation(); return; }
         progress = 1; visual.draw(1);
-        showSequenceAt(review === 'lift' ? 1070 : review === 'reward' ? BOX_SEQUENCE.settleAt - 100 : BOX_SEQUENCE.finishAt - 200);
+        const requestedFrame = new URLSearchParams(location.search).get('boxFrame');
+        const elapsed = requestedFrame !== null && Number.isFinite(Number(requestedFrame))
+          ? Math.max(BOX_SEQUENCE.liftAt, Math.min(BOX_SEQUENCE.finishAt, Number(requestedFrame)))
+          : review === 'lift' ? 1400 : review === 'reward' ? BOX_SEQUENCE.settleAt - 100 : BOX_SEQUENCE.finishAt - 200;
+        showSequenceAt(elapsed);
       });
       return;
     }

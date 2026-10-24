@@ -240,7 +240,7 @@ export async function drawMarketingImage(canvas, type, puzzle) {
     const image = new Image();
     image.onload = () => resolve(image);
     image.onerror = () => reject(new Error('The original brand logo could not be loaded.'));
-    image.src = new URL('../assets/zombie-logo.png?v=20261024-3', import.meta.url).href;
+    image.src = new URL('../assets/zombie-logo.png?v=20261024-4', import.meta.url).href;
   });
   const [logo] = await Promise.all([logoPromise, fontsPromise]);
   const ctx = canvas.getContext('2d', { alpha: false });

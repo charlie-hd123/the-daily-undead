@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { boxFixture } from './helpers/mystery-box-fixture.js';
+import { BOX_SEQUENCE } from '../js/mystery-box-motion.js';
 
 test('the lid waits for audio readiness so the first recorded creak stays aligned', async () => {
   let ready, opens = 0;
@@ -56,7 +57,7 @@ test('a fresh ready box waits, records its opening before any frame, and cannot 
   assert.equal(f.copy.parentElement, f.stage.parentElement);
   assert.equal(f.loads, 1); assert.equal(f.frameCount, 0); assert.equal(f.controller.isPresenting, true);
   f.trigger.click(); assert.equal(f.caption.hidden, true); assert.equal(f.values.get('the-daily-undead:mystery-box-opened:2026-10-19'), '1');
-  f.frame(3800); assert.equal(f.controller.isPresenting, false); assert.equal(f.panel.inert, false);
+  f.frame(BOX_SEQUENCE.finishAt); assert.equal(f.controller.isPresenting, false); assert.equal(f.panel.inert, false);
   assert.equal(f.copy.isConnected, false); assert.equal(f.stage.isConnected, false);
   f.open(); await f.flush(); assert.equal(f.loads, 1); assert.equal(f.controller.isPresenting, false);
 });
@@ -120,7 +121,7 @@ test('a fresh account puzzle with blocked graphics stays native without insertin
 });
 
 test('a second tap skips loading, audio preparation, cycling or landing and cannot reopen later', async () => {
-  for (const elapsed of [null, 0, 750, 1700, 2700, 3200]) {
+  for (const elapsed of [null, 0, 750, 1700, 2700, 3200, 3900, 4600, 5300, 5700]) {
     let opens = 0;
     const f = boxFixture({ slow: elapsed === null, onOpen: () => opens++ });
     f.open(); if (elapsed !== null) await f.flush();
@@ -131,6 +132,7 @@ test('a second tap skips loading, audio preparation, cycling or landing and cann
     assert.equal(f.controller.isPresenting, false);
     assert.equal(f.frameCount, 0);
     assert.equal(f.icon.getAttribute('src'), './assets/dead-letters-card.svg');
+    assert.equal(f.icon.inert, false);
     assert.equal(f.values.get('the-daily-undead:mystery-box-opened:2026-10-19'), '1');
     f.ready(); await f.flush();
     assert.equal(f.controller.isPresenting, false);
@@ -141,4 +143,29 @@ test('a second tap skips loading, audio preparation, cycling or landing and cann
   const f = boxFixture({ beforeOpen: () => new Promise(resolve => { ready = resolve; }) });
   f.open(); await f.flush(); f.trigger.click(); f.trigger.click(); ready(); await f.flush();
   assert.equal(f.frameCount, 0); assert.equal(f.panel.inert, false);
+});
+
+test('decoded icon objects exchange edge-on without ghosting and restore the untouched native icon', async () => {
+  for (const availableTypes of [['word', 'easter'], ['word', 'easter', 'blood']]) {
+    const f = boxFixture(); f.open({ availableTypes }); await f.flush(); f.trigger.click();
+    const shown = new Set();
+    for (let at = BOX_SEQUENCE.cycleAt; at <= BOX_SEQUENCE.cycleAt + BOX_SEQUENCE.cycleFor; at += 13) {
+      f.frame(at);
+      const weights = f.iconLayers.map(layer => Number(layer.style.opacity));
+      assert.equal(weights.length, availableTypes.length);
+      assert.ok(weights.every(weight => Number.isFinite(weight) && weight >= 0 && weight <= 1));
+      assert.ok(Math.abs(weights.reduce((sum, weight) => sum + weight, 0) - 1) < 1e-9);
+      assert.equal(weights.filter(weight => weight > 0).length, 1, 'one crisp silhouette at every frame');
+      const visible = f.iconLayers.find(layer => Number(layer.style.opacity) > 0);
+      shown.add(visible.dataset.icon);
+      assert.equal(f.icon.getAttribute('src'), './assets/dead-letters-card.svg');
+    }
+    assert.equal(shown.size, availableTypes.length, 'all enabled games visibly participate');
+    f.frame(BOX_SEQUENCE.settleAt + BOX_SEQUENCE.settleFor);
+    const winner = f.iconLayers.filter(layer => Number(layer.style.opacity) > 0);
+    assert.equal(winner.length, 1); assert.equal(winner[0].dataset.icon, 'word');
+    f.frame(BOX_SEQUENCE.finishAt);
+    assert.equal(f.icon.parentElement, f.panel); assert.equal(f.icon.inert, false);
+    assert.equal(f.icon.getAttribute('src'), './assets/dead-letters-card.svg');
+  }
 });

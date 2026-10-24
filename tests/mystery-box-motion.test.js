@@ -245,11 +245,18 @@ test('the reward cycles only available games, slows down and settles on the assi
         seen.add(reward.type);
         if (reward.type !== previous) changes.push(elapsed);
         previous = reward.type;
-        if (elapsed >= 1960) assert.equal(reward.type, finalType);
+        if (elapsed >= timing.cycleAt + timing.cycleFor) {
+          assert.equal(reward.type, finalType);
+          assert.equal(reward.blend, 0);
+          assert.equal(reward.locked, true);
+        }
       }
       assert.equal(seen.size, types.length);
-      const gaps = changes.slice(1).map((at, i) => at - changes[i]);
+      // Initial emergence is a separate beat before the wheel begins turning.
+      const wheelChanges = changes.filter(at => at >= timing.cycleAt);
+      const gaps = wheelChanges.slice(1).map((at, i) => at - wheelChanges[i]);
       for (let i = 1; i < gaps.length; i++) assert.ok(gaps[i] >= gaps[i - 1]);
+      assert.ok(gaps.at(-1) > gaps[0] * 2, 'the slowing must be clearly visible');
       assert.ok(timing.settleAt - changes.at(-1) >= 350, 'hold the final game for recognition');
     }
   }

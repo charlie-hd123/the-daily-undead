@@ -1,24 +1,31 @@
 export const BOX_SEQUENCE = Object.freeze({
-  lid: 850, liftAt: 620, liftFor: 1050, settleAt: 2310, settleFor: 880,
-  growFor: 500, fadeFor: 550, assembleAt: 2840, finishAt: 3800,
+  lid: 850, liftAt: 620, liftFor: 1100, cycleAt: 1250, cycleFor: 2500,
+  settleAt: 4300, settleFor: 1000, growFor: 600, fadeFor: 600,
+  assembleAt: 4900, finishAt: 5800,
 });
 
 // A slowing carousel of the available games, ending on the already assigned puzzle.
 // This is presentation only: it never changes the daily selection.
-const REWARD_SWAPS = [620, 750, 910, 1110, 1360, 1660, 1960];
 export function boxRewardAt(elapsed, finalType, availableTypes) {
   const types = [...new Set(availableTypes)].filter(type => ICON_INK[type]);
   if (!types.includes(finalType)) types.push(finalType);
-  const step = Math.max(0, REWARD_SWAPS.findLastIndex(at => elapsed >= at));
-  const final = step === REWARD_SWAPS.length - 1;
-  const type = final ? finalType : types[(types.indexOf(finalType) + step + 1) % types.length];
-  const sinceSwap = Math.max(0, elapsed - REWARD_SWAPS[step]);
-  return { type, opacity: .65 + .35 * Math.min(1, sinceSwap / 65) };
+  const time = clamp((elapsed - BOX_SEQUENCE.cycleAt) / BOX_SEQUENCE.cycleFor);
+  // One continuous ease-out makes each successive icon dwell longer. End on an
+  // exact whole slot, so the last transition cannot flash or repeat the winner.
+  const slots = types.length * 3 - 1;
+  const cursor = slots * (1 - (1 - time) ** 2);
+  const step = Math.floor(cursor);
+  const fromType = types[(types.indexOf(finalType) + step + 1) % types.length];
+  const toType = time === 1 ? finalType : types[(types.indexOf(finalType) + step + 2) % types.length];
+  // Hold each silhouette before a restrained depth turn to the next one.
+  const blend = time === 1 ? 0 : smoother(clamp((cursor - step - .4) / .6));
+  return { fromType, toType, blend, type: blend < .5 ? fromType : toType, locked: time === 1 };
 }
 
 const clamp = (value, low = 0, high = 1) => Math.max(low, Math.min(high, value));
 const mix = (a, b, amount) => a + (b - a) * amount;
 const smooth = (value) => value < .5 ? 4 * value ** 3 : 1 - (-2 * value + 2) ** 3 / 2;
+const smoother = (value) => value ** 3 * (value * (value * 6 - 15) + 10);
 
 export function lidOpenness(elapsed) {
   const opening = smooth(clamp(elapsed / BOX_SEQUENCE.lid));
@@ -66,7 +73,7 @@ export function createIconFlight({ target, mouth, stage, viewDirection, ink = IC
   const openingWidth = Math.abs(mouth.right.x - mouth.left.x);
   const availableHeight = Math.max(30, Math.min(mouth.left.y, mouth.right.y) - stage.top - 40);
   // Optical scales balance visible width and height across the three compact silhouettes.
-  const peakInkWidth = .85 * Math.min(168, (stage.width - 40) / widestIcon, openingWidth * .62, availableHeight / tallestIcon);
+  const peakInkWidth = .65 * Math.min(168, (stage.width - 40) / widestIcon, openingWidth * .62, availableHeight / tallestIcon);
   const peakSize = peakInkWidth * ink.visualScale / ink.width;
   const peakScale = peakSize / target.width;
   const startScale = peakScale * .62;
@@ -75,8 +82,8 @@ export function createIconFlight({ target, mouth, stage, viewDirection, ink = IC
     - (ink.top + ink.height) * target.height * peakScale;
 
   return (elapsed) => {
-    const lift = 1 - (1 - clamp((elapsed - BOX_SEQUENCE.liftAt) / BOX_SEQUENCE.liftFor)) ** 3;
-    const settle = smooth(clamp((elapsed - BOX_SEQUENCE.settleAt) / BOX_SEQUENCE.settleFor));
+    const lift = smoother(clamp((elapsed - BOX_SEQUENCE.liftAt) / BOX_SEQUENCE.liftFor));
+    const settle = smoother(clamp((elapsed - BOX_SEQUENCE.settleAt) / BOX_SEQUENCE.settleFor));
     const fade = smooth(clamp((elapsed - BOX_SEQUENCE.settleAt - BOX_SEQUENCE.settleFor * .3) / (BOX_SEQUENCE.settleFor * .7)));
     const floatingScale = mix(startScale, peakScale, lift);
     const scale = mix(floatingScale, 1, settle);

@@ -65,6 +65,7 @@ export function boxFixture(options = {}) {
     .replace(/import\('\.\/mystery-box-scene\.js\?v=[^']+'\)/g, 'loadScene()');
   vm.runInNewContext(source + '\nglobalThis.controller = createMysteryBox({ beforeOpen: beforeBoxOpen, onOpen: onBoxOpen, onCancel: onBoxCancel });', context);
   return { controller: context.controller, panel, stage, trigger, caption, intro, copy, icon, storage, values,
+    get iconLayers() { return panel.parentElement?.children.find(node => node.className === 'mb-icon-portal')?.children ?? []; },
     get loads() { return loads; }, get draws() { return draws; }, get disposed() { return disposed; },
     open(extra = {}) { context.controller.open({ dateKey: '2026-10-19', type: 'word', official: true, fresh: true, storage, ...extra }); },
     flush: () => new Promise((resolve) => setImmediate(resolve)),
