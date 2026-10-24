@@ -94,14 +94,15 @@ test('the icon starts below the front rim and rises clear of it with visible dep
   assert.equal(raised.opacity, 1);
   assert.equal(raised.rotateZ, 0);
   assert.ok(ink.right - ink.left <= (desktop.mouth.right.x - desktop.mouth.left.x) * .62);
-  assert.ok(raised.rotateX < 0 && raised.rotateY < 0 && raised.depth === 1);
+  assert.equal(Math.abs(raised.rotateX), 0); assert.equal(Math.abs(raised.rotateY), 0);
+  assert.equal(raised.depth, 1);
 });
 
 
-test('the front face and depth face the same way as the chest camera throughout emergence', () => {
+test('the icon emerges in the chest perspective and faces the player before rolling', () => {
   const flight = createIconFlight(desktop);
   const view = camera.matrixWorldInverse.elements;
-  for (const elapsed of [timing.liftAt, timing.liftAt + timing.liftFor / 2, timing.settleAt]) {
+  for (const elapsed of [timing.liftAt]) {
     const pose = flight(elapsed);
     const x = pose.rotateX * Math.PI / 180, y = pose.rotateY * Math.PI / 180;
     // Columns of the CSS front-plane rotation, including the normal that controls extrusion.
@@ -110,6 +111,17 @@ test('the front face and depth face the same way as the chest camera throughout 
     // Convert the actual Three.js view basis to CSS's downwards image Y axis.
     const projected = [view[0], -view[1], view[2], -view[4], view[5], -view[6], view[8], -view[9], view[10]];
     css.forEach((value, index) => assert.ok(Math.abs(value - projected[index]) < 1e-10));
+  }
+  let previousYaw = Math.abs(flight(timing.liftAt).rotateY);
+  for (let elapsed = timing.liftAt; elapsed <= timing.finishAt; elapsed += 5) {
+    const pose = flight(elapsed);
+    assert.ok(Math.abs(pose.rotateY) <= previousYaw);
+    previousYaw = Math.abs(pose.rotateY);
+    if (elapsed >= timing.cycleAt) {
+      assert.equal(Math.abs(pose.rotateX), 0);
+      assert.equal(Math.abs(pose.rotateY), 0);
+      assert.equal(pose.rotateZ, 0);
+    }
   }
 });
 

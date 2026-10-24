@@ -1,6 +1,6 @@
-import { BOX_SEQUENCE, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261024-7';
+import { BOX_SEQUENCE, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261024-8';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261024-7';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261024-8';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () => {} } = {}) {
@@ -46,7 +46,7 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
   function syncTrigger() {
     if (!trigger) return;
     trigger.disabled = settleRequested;
-    trigger.setAttribute('aria-label', activation.requested ? 'Skip spin and reveal today’s icon' : 'Open box to reveal today’s puzzle');
+    trigger.setAttribute('aria-label', activation.requested ? 'Skip roll and reveal today’s icon' : 'Open box to reveal today’s puzzle');
     const waiting = activation.requested && (!wrapper || wrapper.dataset.phase === 'closed');
     // Touch browsers can retain :hover after a tap; hide the prompt independently of CSS.
     if (caption) caption.hidden = unavailable || activation.requested;
@@ -92,7 +92,7 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     if (renderingReady) return renderingReady;
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261024-7')
+      import('./mystery-box-scene.js?v=20261024-8')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -207,9 +207,7 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
       const pose = flight(elapsed);
       // Exchange the silhouettes only while edge-on. One visible object avoids
       // a ghosted double outline; predecoded faces never change source in flight.
-      const turn = incoming ? (current.blend - .5) * 2 : current.blend * 2;
-      const pitch = !exchanging ? pose.rotateX : incoming
-        ? -90 + (pose.rotateX + 90) * turn : pose.rotateX + (90 - pose.rotateX) * turn;
+      const pitch = pose.rotateX + (exchanging ? current.rollX : 0);
       traveller.style.transform = `translate3d(${pose.left - target.left}px,${pose.top - target.top}px,0) scale(${pose.scale})`;
       traveller.style.opacity = pose.opacity * weight;
       object.style.transform = `rotateX(${pitch}deg) rotateY(${pose.rotateY}deg) rotateZ(0deg)`;

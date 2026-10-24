@@ -197,19 +197,27 @@ test('two taps on the initial poster wait for assets and then show the chosen ic
   assert.equal(f.panel.inert, false);
 });
 
-test('the exchange tumbles vertically while keeping its horizontal camera angle fixed', async () => {
+test('icons roll forward around a horizontal screen axis and exchange only edge-on', async () => {
   const f = boxFixture(); f.open({ availableTypes: ['word', 'easter', 'blood'] }); await f.flush(); f.trigger.click();
   const angle = (name) => {
     const visible = f.iconLayers.find(layer => Number(layer.style.opacity) > 0);
     return Number(visible.children[0].style.transform.match(new RegExp(name + '\\((-?[\\d.]+)deg\\)'))[1]);
   };
-  f.frame(BOX_SEQUENCE.cycleAt);
-  const restingPitch = angle('rotateX'), restingYaw = angle('rotateY');
-  let turned = false;
-  for (let at = BOX_SEQUENCE.cycleAt; at < BOX_SEQUENCE.cycleAt + 250; at += 5) {
+  let previous, exchanges = 0;
+  for (let at = BOX_SEQUENCE.cycleAt; at <= BOX_SEQUENCE.cycleAt + BOX_SEQUENCE.cycleFor; at += 5) {
     f.frame(at);
-    assert.equal(angle('rotateY'), restingYaw);
-    if (Math.abs(angle('rotateX') - restingPitch) > 30) turned = true;
+    assert.equal(Math.abs(angle('rotateY')), 0, 'yaw would tilt the rolling edge diagonally');
+    assert.equal(Math.abs(angle('rotateZ')), 0);
+    const pitch = angle('rotateX');
+    const type = f.iconLayers.find(layer => Number(layer.style.opacity) > 0).dataset.icon;
+    if (previous?.type === type) assert.ok(pitch <= previous.pitch + 1e-8, 'every turn continues forward');
+    else if (previous) {
+      assert.ok(previous.pitch < -75 && pitch > 75, 'artwork switches at the horizontal edge');
+      exchanges++;
+    }
+    previous = { type, pitch };
   }
-  assert.ok(turned, 'the vertical turn is visible at the beginning of the spin');
+  assert.ok(exchanges >= 4, 'the icons roll repeatedly before settling');
+  assert.equal(previous.type, 'word');
+  assert.equal(Math.abs(previous.pitch), 0);
 });
