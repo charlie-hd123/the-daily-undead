@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { OrthographicCamera, Vector3 } from 'three';
-import { BOX_SEQUENCE as timing, ICON_INK, createIconFlight, createBoxActivation, BOX_FRAME, fitBoxCamera, revealHeight, lidOpenness, lidDepthScale } from '../js/mystery-box-motion.js';
+import { BOX_SEQUENCE as timing, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, BOX_FRAME, fitBoxCamera, revealHeight, lidOpenness, lidDepthScale } from '../js/mystery-box-motion.js';
 
 const camera = new OrthographicCamera(-4.6, 4.6, 2.3, -2.3, .1, 60);
 camera.position.set(7.8, 5.7, 14); camera.lookAt(0, 1.7, 0); camera.updateMatrixWorld();
@@ -117,7 +117,7 @@ test('the travelling icon becomes its exact faint corner watermark without resid
   const pose = createIconFlight(desktop)(timing.settleAt + timing.settleFor);
   assert.equal(pose.left, desktop.target.left); assert.equal(pose.top, desktop.target.top);
   assert.equal(pose.scale, 1); assert.equal(pose.light, 0); assert.equal(pose.depth, 0);
-  assert.equal(pose.opacity, .12);
+  assert.ok(Math.abs(pose.opacity - .18) < 1e-12);
   assert.equal(Math.abs(pose.rotateX), 0); assert.equal(Math.abs(pose.rotateY), 0); assert.equal(Math.abs(pose.rotateZ), 0);
 });
 
@@ -233,4 +233,24 @@ test('each new puzzle requires its own activation', () => {
   assert.equal(openings, 1);
   second.request();
   assert.equal(openings, 2);
+});
+
+test('the reward cycles only available games, slows down and settles on the assigned game', () => {
+  for (const types of [['word', 'easter'], ['word', 'easter', 'blood']]) {
+    for (const finalType of types) {
+      const seen = new Set(), changes = []; let previous;
+      for (let elapsed = timing.liftAt; elapsed <= timing.finishAt; elapsed += 10) {
+        const reward = boxRewardAt(elapsed, finalType, types);
+        assert.ok(types.includes(reward.type));
+        seen.add(reward.type);
+        if (reward.type !== previous) changes.push(elapsed);
+        previous = reward.type;
+        if (elapsed >= 1960) assert.equal(reward.type, finalType);
+      }
+      assert.equal(seen.size, types.length);
+      const gaps = changes.slice(1).map((at, i) => at - changes[i]);
+      for (let i = 1; i < gaps.length; i++) assert.ok(gaps[i] >= gaps[i - 1]);
+      assert.ok(timing.settleAt - changes.at(-1) >= 350, 'hold the final game for recognition');
+    }
+  }
 });

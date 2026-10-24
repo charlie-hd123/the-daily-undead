@@ -2397,11 +2397,11 @@ body:has(.word-puzzle-panel) .community-stats-demo {
   width: var(--puzzle-panel-art-size);
   height: var(--puzzle-panel-art-size);
   object-fit: contain;
-  opacity: .12;
+  opacity: .18;
   pointer-events: none;
   user-select: none;
 }
 :is(.word-puzzle-panel, .quest-clue-panel, .blood-puzzle-panel) > .screen-heading > :is(.kicker, h2) {
   padding-inline-end: calc(var(--puzzle-panel-art-size) + .9rem);
 }
-.mb-reveal[data-phase="assembling"] > .panel > .puzzle-panel-art { opacity: .12; transform: none; }
+.mb-reveal[data-phase="assembling"] > .panel > .puzzle-panel-art { opacity: .18; transform: none; }

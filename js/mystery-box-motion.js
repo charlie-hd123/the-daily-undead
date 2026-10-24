@@ -1,7 +1,20 @@
 export const BOX_SEQUENCE = Object.freeze({
-  lid: 850, liftAt: 620, liftFor: 1050, settleAt: 2010, settleFor: 880,
-  growFor: 500, fadeFor: 550, assembleAt: 2540, finishAt: 3500,
+  lid: 850, liftAt: 620, liftFor: 1050, settleAt: 2310, settleFor: 880,
+  growFor: 500, fadeFor: 550, assembleAt: 2840, finishAt: 3800,
 });
+
+// A slowing carousel of the available games, ending on the already assigned puzzle.
+// This is presentation only: it never changes the daily selection.
+const REWARD_SWAPS = [620, 750, 910, 1110, 1360, 1660, 1960];
+export function boxRewardAt(elapsed, finalType, availableTypes) {
+  const types = [...new Set(availableTypes)].filter(type => ICON_INK[type]);
+  if (!types.includes(finalType)) types.push(finalType);
+  const step = Math.max(0, REWARD_SWAPS.findLastIndex(at => elapsed >= at));
+  const final = step === REWARD_SWAPS.length - 1;
+  const type = final ? finalType : types[(types.indexOf(finalType) + step + 1) % types.length];
+  const sinceSwap = Math.max(0, elapsed - REWARD_SWAPS[step]);
+  return { type, opacity: .65 + .35 * Math.min(1, sinceSwap / 65) };
+}
 
 const clamp = (value, low = 0, high = 1) => Math.max(low, Math.min(high, value));
 const mix = (a, b, amount) => a + (b - a) * amount;
@@ -53,7 +66,7 @@ export function createIconFlight({ target, mouth, stage, viewDirection, ink = IC
   const openingWidth = Math.abs(mouth.right.x - mouth.left.x);
   const availableHeight = Math.max(30, Math.min(mouth.left.y, mouth.right.y) - stage.top - 40);
   // Optical scales balance visible width and height across the three compact silhouettes.
-  const peakInkWidth = Math.min(168, (stage.width - 40) / widestIcon, openingWidth * .62, availableHeight / tallestIcon);
+  const peakInkWidth = .85 * Math.min(168, (stage.width - 40) / widestIcon, openingWidth * .62, availableHeight / tallestIcon);
   const peakSize = peakInkWidth * ink.visualScale / ink.width;
   const peakScale = peakSize / target.width;
   const startScale = peakScale * .62;
@@ -76,7 +89,7 @@ export function createIconFlight({ target, mouth, stage, viewDirection, ink = IC
       rotateY: yaw * (1 - settle),
       rotateZ: 0,
       depth: 1 - settle, light: (.8 - .45 * lift) * (1 - settle),
-      opacity: mix(1, .12, fade),
+      opacity: mix(1, .18, fade),
       clipLeft: lipY(stage.left) - stage.top,
       clipRight: lipY(stage.left + stage.width) - stage.top,
     };

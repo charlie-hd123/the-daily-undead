@@ -53,7 +53,7 @@ test('Blood Ties renders three strike circles, mode warnings and truthful result
   assert.equal((finalTiles.match(/data-blood-tile=/g) || []).length, 3);
   assert.equal((finalTiles.match(/· Found/g) || []).length, 3);
   assert.doesNotMatch(finalTiles, /· Revealed|Round Survived|revealed automatically/);
-  assert.match(finalTiles, /3 \/ 4 connections found/);
+  assert.match(finalTiles, /aria-label="3 of 4 connections found"/);
   const won = render(replayBloodTiesAttempts(p, solution(p)));
   assert.equal((won.match(/· Found/g) || []).length, 4);
   assert.equal((won.match(/· Revealed/g) || []).length, 0);
