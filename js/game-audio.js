@@ -3,120 +3,121 @@ export const SOUND_PREFERENCE_KEY = 'the-daily-undead:sound-enabled';
 export const SOUND_CUES = {
   "mystery-box-a": {
     "files": [
-      "mystery-box-a-8332806deb.wav",
-      "mystery-box-a-c0e79abc03.m4a"
+      "mystery-box-a-d84479db4b.wav",
+      "mystery-box-a-78fc03ec37.m4a"
     ],
     "gain": 0.86
   },
   "letter-correct": {
     "files": [
-      "letter-correct-f1039ca387.wav",
-      "letter-correct-531e622746.m4a"
+      "letter-correct-f0cf2c0199.wav",
+      "letter-correct-0113364a3a.m4a"
     ],
     "gain": 0.8
   },
   "letter-streak-2": {
     "files": [
-      "letter-streak-2-2560dc380d.wav",
-      "letter-streak-2-6ed93ee869.m4a"
+      "letter-streak-2-b246f5a2e6.wav",
+      "letter-streak-2-2acec367a7.m4a"
     ],
     "gain": 0.8
   },
   "letter-streak-3": {
     "files": [
-      "letter-streak-3-535a030e0d.wav",
-      "letter-streak-3-d51fc142e5.m4a"
+      "letter-streak-3-a40e20bec0.wav",
+      "letter-streak-3-1821c7f0c0.m4a"
     ],
     "gain": 0.8
   },
   "letter-streak-4": {
     "files": [
-      "letter-streak-4-85a5275467.wav",
-      "letter-streak-4-54a031aeeb.m4a"
+      "letter-streak-4-2c5e049b44.wav",
+      "letter-streak-4-eb88c6a034.m4a"
     ],
     "gain": 0.8
   },
   "letter-wrong": {
     "files": [
-      "letter-wrong-4e3d88f213.wav",
-      "letter-wrong-dfd4364d52.m4a"
+      "letter-wrong-83dee964da.wav",
+      "letter-wrong-2ddee7c899.m4a"
     ],
     "gain": 0.83
   },
   "quest-clue-reveal": {
     "files": [
-      "quest-clue-reveal-0f65106f58.wav",
-      "quest-clue-reveal-29bcb335dd.m4a"
+      "quest-clue-reveal-0a6e4dd0b0.wav",
+      "quest-clue-reveal-4ab35e819a.m4a"
     ],
     "gain": 0.8
   },
   "map-select": {
     "files": [
-      "map-select-80c02bff55.wav",
-      "map-select-5642da90e3.m4a"
+      "map-select-ed526ca1bc.wav",
+      "map-select-aa4c70ee42.m4a"
     ],
     "gain": 0.78
   },
   "answer-lock": {
     "files": [
-      "answer-lock-1aff394e01.wav",
-      "answer-lock-3db4981896.m4a"
+      "answer-lock-8c89979dc5.wav",
+      "answer-lock-4e84ac3354.m4a"
     ],
     "gain": 0.8
   },
   "puzzle-solved-a": {
     "files": [
-      "puzzle-solved-a-fd5b93632a.wav",
-      "puzzle-solved-a-b3075927a0.m4a"
+      "puzzle-solved-a-02cac0d6cd.wav",
+      "puzzle-solved-a-8776b7939b.m4a"
     ],
     "gain": 0.96
   },
   "bonus-step-1": {
     "files": [
-      "bonus-step-1-30b7ada146.wav",
-      "bonus-step-1-ddef9d1d7e.m4a"
+      "bonus-step-1-9c21ee0acd.wav",
+      "bonus-step-1-0c21ffee41.m4a"
     ],
     "gain": 0.8
   },
   "bonus-step-2": {
     "files": [
-      "bonus-step-2-8e93d9e974.wav",
-      "bonus-step-2-1bf0c08ef0.m4a"
+      "bonus-step-2-f278071801.wav",
+      "bonus-step-2-29d8988b3b.m4a"
     ],
     "gain": 0.8
   },
   "bonus-step-3": {
     "files": [
-      "bonus-step-3-de776e1933.wav",
-      "bonus-step-3-182cfe85a5.m4a"
+      "bonus-step-3-ca50885e0a.wav",
+      "bonus-step-3-6fa59231b4.m4a"
     ],
     "gain": 0.8
   },
   "double-points-a": {
     "files": [
-      "double-points-a-750be695ce.wav",
-      "double-points-a-cba765026d.m4a"
+      "double-points-a-3dcfafc25b.wav",
+      "double-points-a-72fcfe36ad.m4a"
     ],
     "gain": 1.0
   },
   "points-tick": {
     "files": [
-      "points-tick-93b6bdcdb4.wav",
-      "points-tick-ac4cb1680d.m4a"
+      "points-tick-978fd27506.wav",
+      "points-tick-ea7acf22fe.m4a"
     ],
     "gain": 0.88
   },
   "points-finish": {
     "files": [
-      "points-finish-b3c9d11bdf.wav",
-      "points-finish-328bc199b5.m4a"
+      "points-finish-6b552b26b6.wav",
+      "points-finish-e27ca46a01.m4a"
     ],
-    "gain": 0.9
+    "gain": 0.9,
+    "duration": 0.66
   },
   "run-ended": {
     "files": [
-      "run-ended-fc45b8974f.wav",
-      "run-ended-4cbf95aa7d.m4a"
+      "run-ended-a7e5b00d23.wav",
+      "run-ended-af85216adc.m4a"
     ],
     "gain": 0.93
   }
@@ -257,11 +258,12 @@ export function createGameAudio({
     stopCue('points-tick'); stopCue('points-finish');
     if (duration > 0) for (let i = 0; i < 7; i++) void play('points-tick', { delay: delay + i * duration / 8 });
     void play('points-finish', { delay: delay + duration });
-    // Let the 430ms finishing ping settle before the reward flourish begins.
+    // Let the current finishing ping settle before the reward flourish begins.
     // A future flourish must not cancel the solve sting playing right now.
     if (rewardCue) {
       stopCue(rewardCue);
-      void play(rewardCue, { delay: delay + duration + 500 });
+      const finishWait = Math.max(500, Math.ceil(SOUND_CUES['points-finish'].duration * 1000) + 70);
+      void play(rewardCue, { delay: delay + duration + finishWait });
     }
   }
   function reward(cue, options) {

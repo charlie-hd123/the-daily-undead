@@ -191,7 +191,7 @@ test('bonus flourish follows the settled points and finishing ping, including re
   for (const duration of [720, 0]) {
     const f = fixture({
       fetchAudio: async url => ({ ok: true, arrayBuffer: async () => ({ filename: String(url) }) }),
-      decode: async bytes => ({ duration: .43, filename: bytes.filename }),
+      decode: async bytes => ({ duration: SOUND_CUES['points-finish'].duration, filename: bytes.filename }),
     });
     f.audio.unlock(); await f.audio.prepare();
     f.audio.countPoints(duration, { reward: 'double-points-a' });
@@ -226,7 +226,8 @@ test('the delayed maximum-score flourish preserves the immediate solve sting and
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(f.starts.length, 10);
   assert.equal(f.stopped.length, 0);
-  assert.ok(Math.abs(f.starts.at(-1).at - 13.12) < .000001);
+  const finishWait = Math.max(500, Math.ceil(SOUND_CUES['points-finish'].duration * 1000) + 70);
+  assert.ok(Math.abs(f.starts.at(-1).at - (12.62 + finishWait / 1000)) < .000001);
   f.audio.countPoints(720, { delay: 1900, reward: 'double-points-a' });
   await new Promise(resolve => setImmediate(resolve));
   assert.equal(f.stopped.length, 9); // Seven ticks, finishing ping and old flourish.
@@ -238,7 +239,8 @@ test('every deployed cue has content-matching lossless WAV and AAC exports match
   assert.equal(Object.keys(SOUND_CUES).length, 17);
   const manifest = JSON.parse(await readFile(new URL('../assets/audio/manifest.json', import.meta.url)));
   assert.deepEqual(manifest.cues, SOUND_CUES);
-  for (const { files, gain } of Object.values(SOUND_CUES)) {
+  for (const [cue, { files, gain }] of Object.entries(SOUND_CUES)) {
+    const metadata = manifest.sounds.find(sound => sound.id === cue);
     assert.ok(gain > 0 && gain <= 1);
     assert.ok(files[0].endsWith('.wav'));
     for (const filename of files) {
@@ -246,8 +248,10 @@ test('every deployed cue has content-matching lossless WAV and AAC exports match
       assert.ok(bytes.length > 44);
       assert.ok(filename.includes(createHash('sha256').update(bytes).digest('hex').slice(0,10)));
       if (filename.endsWith('.wav')) {
-        assert.equal(bytes.readUInt16LE(22), 1); assert.equal(bytes.readUInt32LE(24), 48000);
+        assert.equal(bytes.readUInt16LE(22), metadata.channels);
+        assert.equal(bytes.readUInt32LE(24), metadata.sample_rate);
         assert.equal(bytes.readUInt16LE(34), 16);
+        assert.ok(Math.abs(bytes.readUInt32LE(40) / (metadata.channels * 2 * metadata.sample_rate) - metadata.duration) < .000001);
       }
     }
   }

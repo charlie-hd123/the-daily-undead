@@ -1,3 +1,13 @@
+# Current user-selected sound pack · 24 October 2026
+
+All 17 active cues now use replacement WAVs supplied by the site owner in `NEW AUDIO`. The original files remain untouched in the supplied folder. This import did not generate sounds, fetch external recordings, or independently establish the supplied files’ authorship/licence. Prior locally synthesised and CC0 credits below describe archived versions, not the new active pack.
+
+Source filenames and SHA-256 hashes, processing levels, durations, channel layout, 4x true peaks and AAC decoder results are recorded in [replacement-qa-2026-10-24.json](replacement-qa-2026-10-24.json). Rebuild with `python scripts/import-user-audio.py /path/to/NEW\ AUDIO` using numpy and macOS afconvert. Source 44.1kHz PCM, pitch and mono/stereo layout are retained; exports are 16-bit WAV and 192kb/s AAC.
+
+Frequent controls/counting sit below puzzle outcomes and rewards. Levels use frequency-weighted, gated 40ms RMS, with stereo-linked transient control for isolated spikes and -3.5dB effective true-peak headroom. This is not a certified LUFS measurement. Very quiet tail padding is trimmed with edge fades; the count tick is a repeatable 150ms excerpt. The finishing-ping duration determines the wait before the reward flourish. No subjective listening assessment was possible; signal, mixed-sequence and decoder checks were performed.
+
+## Archived pack history
+
 # The Daily Undead sound effects · feedback revision 3.2
 
 ## Drier recorded box only · 23 October 2026

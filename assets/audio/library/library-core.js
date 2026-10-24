@@ -10,16 +10,16 @@ export function changed(draft) {
   return Boolean(draft && (draft.blob || draft.notes?.trim() || Object.keys(DEFAULT_SETTINGS).some(key => settings(draft.settings)[key] !== DEFAULT_SETTINGS[key])));
 }
 const details = {
-  'mystery-box-a': ['Mystery Box opening', 'Recorded chest + spectral 1G', 'The chest opens, its lid rises, and the puzzle appears.', ['Opening', 'Last Words', 'Quest Steps', 'Blood Ties']],
+  'mystery-box-a': ['Mystery Box opening', 'New selection · October 24', 'The chest opens, its lid rises, and the puzzle appears.', ['Opening', 'Last Words', 'Quest Steps', 'Blood Ties']],
   'letter-correct': ['Correct letter', 'Last Words', 'A correct letter in Last Words.', ['Last Words']],
   'letter-streak-2': ['Correct streak · 2', 'Last Words', 'The second consecutive correct letter.', ['Last Words']],
   'letter-streak-3': ['Correct streak · 3', 'Last Words', 'The third consecutive correct letter.', ['Last Words']],
   'letter-streak-4': ['Correct streak · 4+', 'Last Words', 'The fourth consecutive correct letter; repeats for longer streaks.', ['Last Words']],
   'letter-wrong': ['Wrong answer', 'Everyday feedback', 'A wrong letter, an incorrect bonus order, or an incorrect Blood Ties trio.', ['Last Words', 'Quest Steps', 'Blood Ties']],
-  'quest-clue-reveal': ['Clue reveal', 'Wooden roll · 8E', 'A new Quest Steps clue is revealed.', ['Quest Steps']],
+  'quest-clue-reveal': ['Clue reveal', 'New selection · October 24', 'A new Quest Steps clue is revealed.', ['Quest Steps']],
   'map-select': ['Selection & deselection', 'Puzzle controls', 'Map and puzzle choices, Blood Ties tiles, shuffle and deselect, and puzzle navigation.', ['Controls', 'Last Words', 'Quest Steps', 'Blood Ties']],
   'answer-lock': ['Answer lock-in / connection', 'Puzzle feedback', 'Confirming a map, submitting a correct bonus order, or finding a Blood Ties connection.', ['Quest Steps', 'Blood Ties']],
-  'puzzle-solved-a': ['Puzzle solved', 'Survival signal', 'A Last Words solve or a correct Quest Steps map answer.', ['Rewards', 'Last Words', 'Quest Steps']],
+  'puzzle-solved-a': ['Puzzle solved', 'Puzzle success', 'A Last Words solve or a correct Quest Steps map answer.', ['Rewards', 'Last Words', 'Quest Steps']],
   'bonus-step-1': ['Bonus selection · first', 'Quest Steps', 'The first selected bonus step.', ['Quest Steps']],
   'bonus-step-2': ['Bonus selection · second', 'Quest Steps', 'The second selected bonus step.', ['Quest Steps']],
   'bonus-step-3': ['Bonus selection · third', 'Quest Steps', 'The third selected bonus step.', ['Quest Steps']],
