@@ -1,5 +1,5 @@
-import * as T from './vendor/mystery-box-three.js?v=20261024-6';
-import { BOX_FRAME, fitBoxCamera, lidDepthScale } from './mystery-box-motion.js?v=20261024-6';
+import * as T from './vendor/mystery-box-three.js?v=20261024-7';
+import { BOX_FRAME, fitBoxCamera, lidDepthScale } from './mystery-box-motion.js?v=20261024-7';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
@@ -51,8 +51,8 @@ export async function createMysteryBoxScene(host) {
   host.dataset.renderer = 'texture';
   const loader = new T.TextureLoader();
   const [woodMap, paintMap] = await Promise.all([
-    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261024-6', import.meta.url).href),
-    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261024-6', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261024-7', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261024-7', import.meta.url).href),
   ]);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;
@@ -136,8 +136,7 @@ export async function createMysteryBoxScene(host) {
   paintMap.colorSpace = T.SRGBColorSpace;
   const paint = new T.MeshStandardMaterial({ map: paintMap, transparent: true, roughness: .94, metalness: 0, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 });
   const markGeometry = new T.PlaneGeometry(.78, .90);
-  for (const [i, x] of [-1.62, 0, 1.62].entries()) {
-    const frontMark = new T.Mesh(markGeometry, paint); frontMark.position.set(x, .76, 1.087); frontMark.rotation.z = [ .055, -.035, -.065 ][i]; caseGroup.add(frontMark);
+  for (const x of [-1.62, 0, 1.62]) {
     const topMark = new T.Mesh(markGeometry, paint); topMark.position.set(x, .207, 1.09); topMark.rotation.x = -Math.PI / 2; lid.add(topMark);
   }
 
