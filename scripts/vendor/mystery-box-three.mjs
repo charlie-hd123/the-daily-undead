@@ -4,7 +4,7 @@ export {
   CylinderGeometry, DirectionalLight, DoubleSide, Group, HemisphereLight,
   LinearFilter, Mesh, MeshBasicMaterial, MeshStandardMaterial, OrthographicCamera,
   PCFSoftShadowMap, PlaneGeometry, PMREMGenerator, PointLight, RepeatWrapping,
-  Scene, ShaderMaterial, ShadowMaterial, SRGBColorSpace, TextureLoader, Vector3,
+  Scene, ShaderMaterial, ShadowMaterial, SpotLight, SRGBColorSpace, TextureLoader, Vector3,
   WebGLRenderer,
 } from 'three';
 export { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';

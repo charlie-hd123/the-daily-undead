@@ -1,5 +1,5 @@
-import * as T from './vendor/mystery-box-three.js?v=20261024-11';
-import { BOX_FRAME, fitBoxCamera, lidDepthScale } from './mystery-box-motion.js?v=20261024-11';
+import * as T from './vendor/mystery-box-three.js?v=20261024-12';
+import { BOX_FRAME, fitBoxCamera, lidDepthScale } from './mystery-box-motion.js?v=20261024-12';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
@@ -37,6 +37,7 @@ export async function createMysteryBoxScene(host) {
   const key = new T.DirectionalLight(0xffeddb, 3.4);
   key.position.set(-3, 7, 6);
   key.castShadow = true;
+  key.shadow.autoUpdate = false;
   key.shadow.mapSize.set(mobile ? 512 : 1024, mobile ? 512 : 1024);
   key.shadow.camera.left = -6; key.shadow.camera.right = 6;
   key.shadow.camera.top = 6; key.shadow.camera.bottom = -6;
@@ -52,8 +53,8 @@ export async function createMysteryBoxScene(host) {
   host.dataset.renderer = 'texture';
   const loader = new T.TextureLoader();
   const [woodMap, paintMap] = await Promise.all([
-    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261024-11', import.meta.url).href),
-    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261024-11', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261024-12', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261024-12', import.meta.url).href),
   ]);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;
@@ -144,6 +145,15 @@ export async function createMysteryBoxScene(host) {
   const inner = new T.Mesh(new T.PlaneGeometry(5.86, 1.80), new T.MeshBasicMaterial({ color: 0xe6f7ff, transparent: true, opacity: .6, side: T.DoubleSide }));
   inner.rotation.x = -Math.PI / 2; inner.position.set(0, 1.30, 0); caseGroup.add(inner);
   const innerLight = new T.PointLight(0xc8eeff, 0, 9, 2); innerLight.position.set(0, 1.52, .05); caseGroup.add(innerLight);
+  // A broad source along the luminous front edge can cast a faint shadow back
+  // onto the open lid. One small map avoids six point-light shadow passes.
+  const lidLight = new T.SpotLight(0xc8eeff, 0, 8, Math.PI / 3, .8, 2);
+  lidLight.position.set(0, 1.52, .95); lidLight.target.position.set(0, 2.5, -1.3);
+  lidLight.castShadow = true; lidLight.shadow.mapSize.set(mobile ? 256 : 512, mobile ? 256 : 512);
+  lidLight.shadow.autoUpdate = false;
+  lidLight.shadow.intensity = .45; lidLight.shadow.normalBias = .015;
+  lidLight.shadow.bias = -.0002; lidLight.shadow.radius = 3;
+  caseGroup.add(lidLight, lidLight.target);
   const glowMat = new T.ShaderMaterial({
     transparent: true, depthWrite: false, blending: T.AdditiveBlending, side: T.DoubleSide,
     uniforms: { strength: { value: 0 } },
@@ -168,6 +178,20 @@ export async function createMysteryBoxScene(host) {
   const floor = new T.Mesh(new T.PlaneGeometry(15, 10), new T.MeshBasicMaterial({ map: floorTexture, transparent: true, depthWrite: false, toneMapped: false }));
   floor.rotation.x = -Math.PI / 2; floor.position.y = -.025; floor.renderOrder = -2; scene.add(floor);
   const ground = new T.Mesh(new T.PlaneGeometry(25, 25), new T.ShadowMaterial({ opacity: .3 })); ground.rotation.x = -Math.PI / 2; ground.position.y = -.01; ground.renderOrder = -1; ground.receiveShadow = true; scene.add(ground);
+  // The floor receives the original directional shadow only. ShadowMaterial's
+  // combined mask otherwise applies the lid spotlight even when its light is off.
+  ground.material.onBeforeCompile = (shader) => {
+    shader.fragmentShader = shader.fragmentShader.replace(
+      'gl_FragColor = vec4( color, opacity * ( 1.0 - getShadowMask() ) );',
+      `float floorShadow = 1.;
+      #if defined(USE_SHADOWMAP) && NUM_DIR_LIGHT_SHADOWS > 0
+        floorShadow = getShadow(directionalShadowMap[0], directionalLightShadows[0].shadowMapSize,
+          directionalLightShadows[0].shadowIntensity, directionalLightShadows[0].shadowBias,
+          directionalLightShadows[0].shadowRadius, vDirectionalShadowCoord[0]);
+      #endif
+      gl_FragColor = vec4(color, opacity * (1. - floorShadow));`);
+  };
+  ground.material.customProgramCacheKey = () => 'box-floor-directional-shadow-only';
   const contactCanvas = document.createElement('canvas'); contactCanvas.width = contactCanvas.height = 128;
   const contactCtx = contactCanvas.getContext('2d');
   const contactGradient = contactCtx.createRadialGradient(64,64,4,64,64,64);
@@ -176,54 +200,55 @@ export async function createMysteryBoxScene(host) {
   const contactTexture = new T.CanvasTexture(contactCanvas);
   const contact = new T.Mesh(new T.PlaneGeometry(8.3,4.4), new T.MeshBasicMaterial({ map: contactTexture, transparent: true, depthWrite: false }));
   contact.rotation.x = -Math.PI/2; contact.position.y = .003; scene.add(contact);
-  // Project a softened SVG silhouette onto the inside of the lid. This decal
-  // cannot shadow the floor and needs no extra light or shadow-map pass.
-  const iconShadowMaterial = new T.ShaderMaterial({
-    transparent: true, depthWrite: false, side: T.DoubleSide,
-    polygonOffset: true, polygonOffsetFactor: -1,
-    uniforms: { silhouette: { value: null }, strength: { value: 0 } },
-    vertexShader: 'varying vec2 vUv; varying vec2 lidPoint; void main(){vUv=uv;lidPoint=position.xz;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader: `varying vec2 vUv; varying vec2 lidPoint; uniform sampler2D silhouette; uniform float strength;
-      void main(){
-        float edge=smoothstep(-2.94,-2.88,lidPoint.x)*(1.-smoothstep(2.88,2.94,lidPoint.x))
-          *smoothstep(.165,.215,lidPoint.y)*(1.-smoothstep(1.985,2.035,lidPoint.y));
-        if(edge<=0.) discard;
-        float ink=texture2D(silhouette,vUv).a*.4;
-        ink+=(texture2D(silhouette,vUv+vec2(.008,0.)).a+texture2D(silhouette,vUv-vec2(.008,0.)).a
-          +texture2D(silhouette,vUv+vec2(0.,.008)).a+texture2D(silhouette,vUv-vec2(0.,.008)).a)*.15;
-        gl_FragColor=vec4(.01,.015,.025,ink*edge*strength);
-      }`,
-  });
-  const iconShadow = new T.Mesh(new T.PlaneGeometry(1, 1), iconShadowMaterial);
-  iconShadow.visible = false; iconShadow.frustumCulled = false; iconShadow.renderOrder = 2; lid.add(iconShadow);
+  // Invisible, alpha-masked copies restore the original lid-light shadows.
+  // The real lid receives them only where the light ray hits it.
+  // There is no permanent rendering loop.
   const iconShadows = new Map();
   let latestIconShadow = null;
   let lastShadowFrame = -Infinity;
   let lastShadowKey = '';
+  function invalidateIconShadow() {
+    lidLight.shadow.needsUpdate = true; renderer.shadowMap.needsUpdate = true;
+  }
   let disposed = false;
   async function prepareIconShadows(icons) {
     await Promise.all(icons.map(async ({ type, source }) => {
       if (iconShadows.has(type)) return;
       const texture = await loader.loadAsync(source);
       if (disposed) { texture.dispose(); return; }
-      iconShadows.set(type, { texture });
+      const material = new T.MeshBasicMaterial({ map: texture, alphaTest: .18,
+        side: T.DoubleSide, colorWrite: false, depthWrite: false });
+      const mesh = new T.Mesh(new T.PlaneGeometry(1, 1), material);
+      mesh.castShadow = true; mesh.visible = false; scene.add(mesh);
+      // These icons belong only to the lid light's map, so the cached floor/key
+      // shadow never picks up a frozen silhouette from a moving icon.
+      mesh.onBeforeShadow = (_renderer, _object, _camera, shadowCamera, _geometry, depthMaterial) => {
+        depthMaterial.colorWrite = depthMaterial.depthWrite = shadowCamera === lidLight.shadow.camera;
+      };
+      mesh.onAfterShadow = (_renderer, _object, _camera, _shadowCamera, _geometry, depthMaterial) => {
+        depthMaterial.colorWrite = depthMaterial.depthWrite = true;
+      };
+      iconShadows.set(type, { mesh, texture });
       if (latestIconShadow?.type === type) { positionIconShadow(latestIconShadow); draw(); }
     }));
   }
   function clearIconShadow() {
     latestIconShadow = null;
-    iconShadow.visible = false; lastShadowFrame = -Infinity; lastShadowKey = '';
+    lastShadowFrame = -Infinity; lastShadowKey = '';
+    for (const { mesh } of iconShadows.values()) mesh.visible = false;
+    invalidateIconShadow();
   }
   function positionIconShadow(shadow) {
     latestIconShadow = shadow;
-    const { type, pose, target, stage: rect, roll, elapsed, openness } = shadow;
+    const { type, pose, target, stage: rect, roll, elapsed } = shadow;
     const proxy = iconShadows.get(type);
     if (!proxy || disposed) return false;
-    if (pose.depth <= .03) { const changed = iconShadow.visible; iconShadow.visible = false; return changed; }
-    const key = [type, Math.round(pose.left * 2), Math.round(pose.top * 2), Math.round(pose.scale * 1000), Math.round(roll * 2), Math.round(pose.depth * 100)].join(':');
+    const key = [type, Math.round(pose.left * 2), Math.round(pose.top * 2), Math.round(pose.scale * 1000), Math.round(roll * 2), pose.depth > .03].join(':');
     if (key === lastShadowKey || (elapsed >= lastShadowFrame && elapsed - lastShadowFrame < 1000 / 24)) return false;
     lastShadowFrame = elapsed; lastShadowKey = key;
-    if (!rect.width || !rect.height) return false;
+    for (const { mesh } of iconShadows.values()) mesh.visible = false;
+    invalidateIconShadow();
+    if (pose.depth <= .03 || !rect.width || !rect.height) return true;
     // Register the CSS icon's centre with the orthographic scene, on a plane
     // inside the aperture behind its light. The full SVG retains its alpha mask.
     const pixels = target.width * pose.scale;
@@ -233,22 +258,10 @@ export async function createMysteryBoxScene(host) {
     const direction = camera.getWorldDirection(new T.Vector3());
     center.addScaledVector(direction, (-.25 - center.z) / direction.z);
     const units = pixels * (camera.right - camera.left) / rect.width;
-    setLidPose(openness); lid.updateWorldMatrix(true, false);
-    const light = lid.worldToLocal(new T.Vector3(0, 1.52, .95));
-    const angle = -roll * Math.PI / 180;
-    const positions = iconShadow.geometry.attributes.position;
-    for (const [index, x, y] of [[0,-.5,.5],[1,.5,.5],[2,-.5,-.5],[3,.5,-.5]]) {
-      const corner = lid.worldToLocal(center.clone().add(new T.Vector3(x * units, y * units * Math.cos(angle), y * units * Math.sin(angle))));
-      const ray = corner.clone().sub(light);
-      const distance = (-.024 - light.y) / ray.y;
-      if (!Number.isFinite(distance) || distance <= 1 || distance > 20) { iconShadow.visible = false; return true; }
-      corner.copy(light).addScaledVector(ray, distance);
-      positions.setXYZ(index, corner.x, -.024, corner.z);
-    }
-    positions.needsUpdate = true;
-    iconShadowMaterial.uniforms.silhouette.value = proxy.texture;
-    iconShadowMaterial.uniforms.strength.value = .13 * pose.depth;
-    iconShadow.visible = true;
+    proxy.mesh.position.copy(center);
+    proxy.mesh.scale.set(units, units, 1);
+    proxy.mesh.rotation.x = -roll * Math.PI / 180;
+    proxy.mesh.visible = true;
     return true;
   }
   let lastProgress = 0;
@@ -268,8 +281,11 @@ export async function createMysteryBoxScene(host) {
     const ease = t;
     setLidPose(ease);
     // Only the lid changes the original scene's real directional shadows.
-    if (t !== lastShadowProgress) { renderer.shadowMap.needsUpdate = true; lastShadowProgress = t; }
+    if (t !== lastShadowProgress) {
+      key.shadow.needsUpdate = true; invalidateIconShadow(); lastShadowProgress = t;
+    }
     innerLight.intensity = 17 * Math.pow(ease, .75);
+    lidLight.intensity = 4.5 * Math.pow(ease, .75);
     inner.material.opacity = .65 + ease * .35;
     glowMat.uniforms.strength.value = ease * .95;
     renderer.render(scene, camera);
@@ -317,7 +333,7 @@ export async function createMysteryBoxScene(host) {
     const bounds = { top: Infinity, bottom: -Infinity, left: Infinity, right: -Infinity };
     const point = new T.Vector3();
     group.traverse((mesh) => {
-      if (!mesh.isMesh || mesh === glow || mesh === iconShadow) return;
+      if (!mesh.isMesh || mesh === glow) return;
       const positions = mesh.geometry.attributes.position;
       for (let index = 0; index < positions.count; index++) {
         point.fromBufferAttribute(positions, index).applyMatrix4(mesh.matrixWorld).project(camera);
@@ -358,7 +374,7 @@ export async function createMysteryBoxScene(host) {
     prepareIconShadows, positionIconShadow, clearIconShadow, dispose() {
     disposed = true;
     observer.disconnect();
-    key.shadow.dispose();
+    key.shadow.dispose(); lidLight.shadow.dispose();
     scene.traverse((node) => { if (node.isMesh) { node.geometry.dispose(); for (const material of [].concat(node.material)) material.dispose(); } });
     for (const { texture } of iconShadows.values()) texture.dispose();
     woodMap.dispose(); paintMap.dispose(); floorTexture.dispose(); contactTexture.dispose(); env.dispose(); renderer.dispose(); canvas.remove();
