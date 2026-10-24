@@ -1,5 +1,5 @@
-import * as T from './vendor/mystery-box-three.js?v=20261024-13';
-import { BOX_FRAME, fitBoxCamera, lidDepthScale } from './mystery-box-motion.js?v=20261024-13';
+import * as T from './vendor/mystery-box-three.js?v=20261024-14';
+import { BOX_FRAME, fitBoxCamera, lidDepthScale } from './mystery-box-motion.js?v=20261024-14';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
@@ -53,8 +53,8 @@ export async function createMysteryBoxScene(host) {
   host.dataset.renderer = 'texture';
   const loader = new T.TextureLoader();
   const [woodMap, paintMap] = await Promise.all([
-    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261024-13', import.meta.url).href),
-    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261024-13', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261024-14', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261024-14', import.meta.url).href),
   ]);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;
@@ -207,8 +207,9 @@ export async function createMysteryBoxScene(host) {
   let latestIconShadow = null;
   let lastShadowFrame = -Infinity;
   let lastShadowKey = '';
+  // Moving icons must invalidate both of the original casting lights.
   function invalidateIconShadow() {
-    lidLight.shadow.needsUpdate = true; renderer.shadowMap.needsUpdate = true;
+    key.shadow.needsUpdate = true; lidLight.shadow.needsUpdate = true; renderer.shadowMap.needsUpdate = true;
   }
   let disposed = false;
   async function prepareIconShadows(icons) {
@@ -220,14 +221,6 @@ export async function createMysteryBoxScene(host) {
         side: T.DoubleSide, colorWrite: false, depthWrite: false });
       const mesh = new T.Mesh(new T.PlaneGeometry(1, 1), material);
       mesh.castShadow = true; mesh.visible = false; scene.add(mesh);
-      // These icons belong only to the lid light's map, so the cached floor/key
-      // shadow never picks up a frozen silhouette from a moving icon.
-      mesh.onBeforeShadow = (_renderer, _object, _camera, shadowCamera, _geometry, depthMaterial) => {
-        depthMaterial.colorWrite = depthMaterial.depthWrite = shadowCamera === lidLight.shadow.camera;
-      };
-      mesh.onAfterShadow = (_renderer, _object, _camera, _shadowCamera, _geometry, depthMaterial) => {
-        depthMaterial.colorWrite = depthMaterial.depthWrite = true;
-      };
       iconShadows.set(type, { mesh, texture });
       if (latestIconShadow?.type === type) { positionIconShadow(latestIconShadow); draw(); }
     }));
