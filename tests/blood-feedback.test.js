@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import vm from 'node:vm';
 import { replayBloodTiesAttempts } from '../js/blood-ties-core.js';
+import { bloodConnectionSound } from '../js/game-audio.js';
 
 const source = await readFile(new URL('../js/app.js', import.meta.url), 'utf8');
 function appFunction(name) {
@@ -20,7 +21,7 @@ function fixture({ misses = 0, official = true, reducedMotion = false, failure =
   session.selected = failure ? wrong[2] : groups[3].answers;
   const calls = []; let submit;
   const context = vm.createContext({
-    bloodPuzzle: puzzle, puzzle: { dateKey: '2026-10-25' }, replayBloodTiesAttempts,
+    bloodPuzzle: puzzle, puzzle: { dateKey: '2026-10-25' }, replayBloodTiesAttempts, bloodConnectionSound,
     ensureSession: () => session, isOfficialPlay: () => official,
     activePlay: { mode: official ? 'official' : 'for_fun' }, dayState: {},
     puzzleStats: { blood: { plays: 0, solves: 0, score: 0 } }, streakCount: 1,
@@ -44,28 +45,31 @@ function fixture({ misses = 0, official = true, reducedMotion = false, failure =
   return { context, session, calls, submit: () => submit() };
 }
 
-test('fresh Blood Ties 100-point final submission ends its count with one flourish; restored results are silent', () => {
+test('fresh Blood Ties final submission plays its connection cue then counts with one flourish; restored results are silent', () => {
   for (const reducedMotion of [false,true]) {
     const f = fixture({ reducedMotion }); f.submit();
     assert.equal(f.session.points, 100);
-    assert.equal(f.calls.length, 1);
-    assert.equal(f.calls[0].duration, reducedMotion ? 0 : 720);
-    assert.equal(f.calls[0].options.reward, 'double-points-a');
+    assert.equal(f.calls.length, 2);
+    assert.deepEqual(f.calls[0], { type: 'play', cue: 'answer-lock' });
+    assert.equal(f.calls[1].duration, reducedMotion ? 0 : 720);
+    assert.equal(f.calls[1].options.reward, 'double-points-a');
     f.context.renderBloodPuzzle(); f.submit();
-    assert.equal(f.calls.length, 1);
+    assert.equal(f.calls.length, 2);
   }
 });
 
 test('lower-score, failed and just-for-fun Blood Ties results do not gain the 100-point flourish', () => {
   const lower = fixture({ misses: 1 }); lower.submit();
   assert.equal(lower.session.points, 90);
-  assert.equal(lower.calls.length, 1);
-  assert.equal(lower.calls[0].options.reward, undefined);
+  assert.equal(lower.calls.length, 2);
+  assert.deepEqual(lower.calls[0], { type: 'play', cue: 'answer-lock' });
+  assert.equal(lower.calls[1].options.reward, undefined);
   const failed = fixture({ failure: true }); failed.submit();
   assert.equal(failed.session.success, false);
   assert.equal(failed.calls.length, 1);
   assert.equal(failed.calls[0].cue, 'run-ended');
   const fun = fixture({ official: false }); fun.submit();
   assert.equal(fun.session.success, true);
-  assert.equal(fun.calls.length, 0);
+  assert.equal(fun.calls.length, 1);
+  assert.deepEqual(fun.calls[0], { type: 'play', cue: 'answer-lock' });
 });
