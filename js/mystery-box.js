@@ -1,6 +1,6 @@
-import { BOX_SEQUENCE, ICON_INK, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261023-15';
+import { BOX_SEQUENCE, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261024-2';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261023-15';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261024-2';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () => {} } = {}) {
@@ -28,6 +28,9 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
   let history;
   let historyStorage;
   let activeEligibility;
+  let rewardTypes = [];
+  let puzzleType;
+  let skipPending = false;
   const later = (callback, delay) => timers.push(window.setTimeout(callback, delay));
   function positionTrigger() {
     if (!visual || !trigger || progress) return;
@@ -39,14 +42,23 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
   }
   function syncTrigger() {
     if (!trigger) return;
-    trigger.disabled = activation.requested;
-    const waiting = activation.requested && !trigger.hidden;
+    trigger.disabled = false;
+    trigger.setAttribute('aria-label', activation.requested ? 'Skip animation and play today’s puzzle' : 'Open box to reveal today’s puzzle');
+    const waiting = activation.requested && (!wrapper || wrapper.dataset.phase === 'closed');
     // Touch browsers can retain :hover after a tap; hide the prompt independently of CSS.
     if (caption) caption.hidden = unavailable || activation.requested;
     if (waiting) trigger.setAttribute('aria-busy', 'true'); else trigger.removeAttribute('aria-busy');
   }
   trigger?.addEventListener('click', () => {
     if (unavailable || review) return;
+    if (activation.requested) {
+      if (!wrapper) { skipPending = true; return; }
+      if (activeEligibility && !history.markOpened(activeEligibility.dateKey)) { cancel(); return; }
+      const currentPanel = panel;
+      cancel();
+      currentPanel?.querySelector('button, [tabindex="0"]')?.focus({ preventScroll: true });
+      return;
+    }
     activation.request(); syncTrigger();
   });
   // Announce the opening control on entry, but draw its focus ring after keyboard interaction.
@@ -76,7 +88,7 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     if (renderingReady) return renderingReady;
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261023-15')
+      import('./mystery-box-scene.js?v=20261024-2')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -121,11 +133,16 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     timers.forEach(window.clearTimeout); timers = [];
     window.cancelAnimationFrame(frame);
     if (reward) {
-      const { node, slot, context, style, hidden, inert } = reward;
+      const { node, slot, context, style, hidden, inert, source } = reward;
+      node.setAttribute('src', source);
       slot.replaceWith(node);
       node.classList.remove('mb-icon-face'); node.style.cssText = style; node.inert = inert;
       if (hidden === null) node.removeAttribute('aria-hidden'); else node.setAttribute('aria-hidden', hidden);
       context.remove(); reward = null;
+    }
+    if (trigger) {
+      trigger.classList.remove('is-skipping'); trigger.style.cssText = '';
+      stage.append(trigger);
     }
     if (panel) panel.inert = false;
     if (wrapper?.isConnected && panel) {
@@ -153,10 +170,9 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
       const side = node.cloneNode(false); side.className = 'mb-icon-side';
       side.setAttribute('aria-hidden', 'true'); side.style.setProperty('--layer', layer); object.append(side);
     }
-    reward = { node, slot, context, traveller, object, target, style: node.style.cssText,
+    reward = { node, slot, context, traveller, object, target, source: node.getAttribute('src'), type: puzzleType, style: node.style.cssText,
       hidden: node.getAttribute('aria-hidden'), inert: node.inert,
-      flight: createIconFlight({ target, mouth: visual.aperture(), stage: stageRect, viewDirection: visual.viewDirection(),
-        ink: ICON_INK[panel.classList.contains('word-puzzle-panel') ? 'word' : panel.classList.contains('blood-puzzle-panel') ? 'blood' : 'easter'] }) };
+      flights: Object.fromEntries(rewardTypes.map(type => [type, createIconFlight({ target, mouth: visual.aperture(), stage: stageRect, viewDirection: visual.viewDirection(), ink: ICON_INK[type] })])) };
     node.replaceWith(slot); object.append(node); traveller.append(object); context.append(traveller); wrapper.append(context);
     context.style.cssText = `left:${stageRect.left - origin.left}px;top:${stageRect.top - origin.top}px;width:${stageRect.width}px;height:${Math.max(stageRect.height, panel.offsetHeight)}px;`;
     node.classList.add('mb-icon-face'); node.inert = true; node.setAttribute('aria-hidden', 'true');
@@ -165,10 +181,16 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     return true;
   }
   function positionReward(elapsed) {
-    const { traveller, object, context, target, flight } = reward;
-    const pose = flight(elapsed);
+    const { traveller, object, context, target, flights } = reward;
+    const current = boxRewardAt(elapsed, puzzleType, rewardTypes);
+    if (reward.type !== current.type) {
+      const source = iconSource(current.type);
+      for (const image of object.children) image.setAttribute('src', source);
+      reward.type = current.type;
+    }
+    const pose = flights[current.type](elapsed);
     traveller.style.transform = `translate3d(${pose.left - target.left}px,${pose.top - target.top}px,0) scale(${pose.scale})`;
-    traveller.style.opacity = pose.opacity;
+    traveller.style.opacity = pose.opacity * (elapsed < BOX_SEQUENCE.settleAt ? current.opacity : 1);
     object.style.transform = `rotateX(${pose.rotateX}deg) rotateY(${pose.rotateY}deg) rotateZ(${pose.rotateZ}deg)`;
     context.style.clipPath = elapsed < BOX_SEQUENCE.settleAt
       ? `polygon(0 0,100% 0,100% ${pose.clipRight}px,0 ${pose.clipLeft}px)` : 'none';
@@ -206,7 +228,8 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     }
     frame = window.requestAnimationFrame(tick);
   }
-  function open({ dateKey, type, fresh, official, storage }) {
+  const iconSource = (type) => new URL(`../assets/${{ word: 'dead-letters', easter: 'quest-steps', blood: 'blood-ties' }[type]}-card.svg`, import.meta.url).href;
+  function open({ dateKey, type, fresh, official, storage, availableTypes = ['word', 'easter'] }) {
     cancel();
     if (!history || historyStorage !== storage) {
       history = createDailyBoxHistory(storage); historyStorage = storage;
@@ -216,6 +239,13 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
       activation.cancel(); activation = createBoxActivation(() => beginReveal?.()); syncTrigger();
       return;
     }
+    if (skipPending) {
+      skipPending = false; history.markOpened(dateKey);
+      activation.cancel(); activation = createBoxActivation(() => beginReveal?.()); syncTrigger();
+      return;
+    }
+    puzzleType = type;
+    rewardTypes = [...new Set([...availableTypes, type])].filter(type => ICON_INK[type]);
     // Remembered accounts start quietly; their first genuine fresh box must also
     // pass the real graphics check before a visible wrapper is inserted.
     if (globalThis.dailyUndeadEntry?.acquireGraphics && !globalThis.dailyUndeadEntry.acquireGraphics()) {
@@ -259,7 +289,11 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
         // Another tab may have opened this day's box while this one was waiting.
         if (!history.canOpen({ dateKey, official, fresh })) { cancel(); return; }
         if (!history.markOpened(dateKey)) { cancel(); return; }
-        trigger.hidden = true;
+        // Keep a real, keyboard-accessible control above the whole reveal so a
+        // second tap works even while the chest fades or the icon travels.
+        wrapper.append(trigger); trigger.classList.add('is-skipping');
+        Object.assign(trigger.style, { left: '0', top: '0', width: '100%', height: '100%' });
+        trigger.hidden = false;
         wrapper.dataset.phase = 'opening'; syncTrigger();
         onOpen();
         animateSequence(focused);
@@ -277,7 +311,10 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     } else trigger.hidden = true;
     // Decode the actual SVG before the reveal; a missing asset goes directly to play.
     const icon = panel.querySelector('.puzzle-panel-art');
-    const presentationReady = Promise.all([rendererReady, icon ? icon.decode() : Promise.reject()])
+    const previews = icon ? rewardTypes.filter(type => type !== puzzleType).map(type => {
+      const image = icon.cloneNode(false); image.setAttribute('src', iconSource(type)); return image.decode();
+    }) : [];
+    const presentationReady = Promise.all([rendererReady, icon ? icon.decode() : Promise.reject(), ...previews])
       .then(([scene]) => scene).catch(() => null);
     if (['lift', 'reward', 'landed'].includes(review)) {
       wrapper.dataset.review = review;
@@ -285,7 +322,7 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
         if (wrapper !== currentWrapper) return;
         if (!scene || !visual) { skipPresentation(); return; }
         progress = 1; visual.draw(1);
-        showSequenceAt(review === 'lift' ? 1070 : review === 'reward' ? 1900 : 3100);
+        showSequenceAt(review === 'lift' ? 1070 : review === 'reward' ? BOX_SEQUENCE.settleAt - 100 : BOX_SEQUENCE.finishAt - 200);
       });
       return;
     }

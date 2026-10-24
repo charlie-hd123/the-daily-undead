@@ -56,7 +56,7 @@ test('a fresh ready box waits, records its opening before any frame, and cannot 
   assert.equal(f.copy.parentElement, f.stage.parentElement);
   assert.equal(f.loads, 1); assert.equal(f.frameCount, 0); assert.equal(f.controller.isPresenting, true);
   f.trigger.click(); assert.equal(f.caption.hidden, true); assert.equal(f.values.get('the-daily-undead:mystery-box-opened:2026-10-19'), '1');
-  f.frame(3500); assert.equal(f.controller.isPresenting, false); assert.equal(f.panel.inert, false);
+  f.frame(3800); assert.equal(f.controller.isPresenting, false); assert.equal(f.panel.inert, false);
   assert.equal(f.copy.isConnected, false); assert.equal(f.stage.isConnected, false);
   f.open(); await f.flush(); assert.equal(f.loads, 1); assert.equal(f.controller.isPresenting, false);
 });
@@ -117,4 +117,28 @@ test('a fresh account puzzle with blocked graphics stays native without insertin
   assert.equal(f.panel.inert, false); assert.equal(f.panel.parentElement.className, 'app');
   assert.equal(f.stage.hidden, true);
   assert.equal(f.copy.hidden, true);
+});
+
+test('a second tap skips loading, audio preparation, cycling or landing and cannot reopen later', async () => {
+  for (const elapsed of [null, 0, 750, 1700, 2700, 3200]) {
+    let opens = 0;
+    const f = boxFixture({ slow: elapsed === null, onOpen: () => opens++ });
+    f.open(); if (elapsed !== null) await f.flush();
+    f.trigger.click();
+    if (elapsed) f.frame(elapsed);
+    f.trigger.click();
+    assert.equal(f.panel.inert, false);
+    assert.equal(f.controller.isPresenting, false);
+    assert.equal(f.frameCount, 0);
+    assert.equal(f.icon.getAttribute('src'), './assets/dead-letters-card.svg');
+    assert.equal(f.values.get('the-daily-undead:mystery-box-opened:2026-10-19'), '1');
+    f.ready(); await f.flush();
+    assert.equal(f.controller.isPresenting, false);
+    assert.equal(opens, elapsed === null ? 0 : 1);
+    f.open(); await f.flush(); assert.equal(f.controller.isPresenting, false);
+  }
+  let ready;
+  const f = boxFixture({ beforeOpen: () => new Promise(resolve => { ready = resolve; }) });
+  f.open(); await f.flush(); f.trigger.click(); f.trigger.click(); ready(); await f.flush();
+  assert.equal(f.frameCount, 0); assert.equal(f.panel.inert, false);
 });

@@ -31,13 +31,14 @@ export function boxFixture(options = {}) {
     focus() { document.activeElement = this; }
     getBoundingClientRect() { return this === icon ? { left: 900, top: 170, width: 88, height: 88 } : { left: 20, top: 150, width: 1056, height: 480 }; }
     get offsetHeight() { return 480; }
-    cloneNode() { return new Node(this.className); }
+    cloneNode() { const node = new Node(this.className); node.decode = () => Promise.resolve(); return node; }
     querySelector(s) { return this === stage && s === '.mb-open-trigger' ? trigger : this === panel && s === '.puzzle-panel-art' ? icon : null; }
   }
   const body = new Node('body'), app = new Node('app'), initial = new Node('initial'); body.append(app); app.append(initial);
   const stage = new Node('mb-scene'), trigger = new Node('mb-open-trigger'), caption = new Node('mb-caption'), intro = new Node('mb-intro-title'), copy = new Node('mb-copy');
   initial.append(stage, copy); copy.append(intro, caption); stage.append(trigger);
   const panel = new Node('panel word-puzzle-panel'), icon = new Node('puzzle-panel-art');
+  icon.setAttribute('src', './assets/dead-letters-card.svg');
   icon.decode = () => options.iconFails ? Promise.reject(new Error('icon unavailable')) : Promise.resolve(); panel.append(icon); app.append(panel);
   document = { body, activeElement: panel, fonts: { load: () => Promise.resolve(), check: () => !options.fontFails },
     createElement: () => new Node(), createComment: () => new Node(),
@@ -55,14 +56,15 @@ export function boxFixture(options = {}) {
   const context = { ...motion, createDailyBoxHistory, document, window, location: { hostname: 'example.com', search: '' },
     ResizeObserver: options.resize === false ? undefined : class { observe() {} disconnect() {} }, dailyUndeadEntry: options.entry, performance: { now: () => 0 }, WebGL2RenderingContext: options.webgl === false ? undefined : class {},
     beforeBoxOpen: options.beforeOpen, onBoxOpen: options.onOpen, onBoxCancel: options.onCancel,
-    console: { warn() {} }, loadScene() { loads++; if (options.sceneFails) return Promise.reject(new Error('renderer unavailable'));
+    URL, console: { warn() {} }, loadScene() { loads++; if (options.sceneFails) return Promise.reject(new Error('renderer unavailable'));
       if (options.slow) return new Promise((resolve) => { settleLoader = () => resolve({ createMysteryBoxScene: async () => visual }); });
       return Promise.resolve({ createMysteryBoxScene: async () => visual }); } };
   const source = readFileSync(new URL('../../js/mystery-box.js', import.meta.url), 'utf8')
     .replace(/^import[^\n]+\n/gm, '').replace('export function createMysteryBox', 'function createMysteryBox')
+    .replaceAll('import.meta.url', JSON.stringify(new URL('../../js/mystery-box.js', import.meta.url).href))
     .replace(/import\('\.\/mystery-box-scene\.js\?v=[^']+'\)/g, 'loadScene()');
   vm.runInNewContext(source + '\nglobalThis.controller = createMysteryBox({ beforeOpen: beforeBoxOpen, onOpen: onBoxOpen, onCancel: onBoxCancel });', context);
-  return { controller: context.controller, panel, stage, trigger, caption, intro, copy, storage, values,
+  return { controller: context.controller, panel, stage, trigger, caption, intro, copy, icon, storage, values,
     get loads() { return loads; }, get draws() { return draws; }, get disposed() { return disposed; },
     open(extra = {}) { context.controller.open({ dateKey: '2026-10-19', type: 'word', official: true, fresh: true, storage, ...extra }); },
     flush: () => new Promise((resolve) => setImmediate(resolve)),

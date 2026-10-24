@@ -4,9 +4,9 @@ const html = (value) => String(value).replaceAll('&', '&amp;').replaceAll('<', '
 
 export function renderBloodTiesGroup(group, index, revealed = false) {
   return `<article class="blood-group${revealed ? ' is-revealed' : ''}">
-    <span class="blood-group-label">Connection ${index + 1} · ${revealed ? 'Revealed' : 'Found'}</span>
-    <h3>${html(group.name)}</h3><p>${group.answers.map(html).join(' · ')}</p>
-    <details><summary>About this connection</summary><p>${html(group.definition)}</p></details></article>`;
+    <span class="blood-group-number" aria-label="Connection ${index + 1} · ${revealed ? 'Revealed' : 'Found'}">${index + 1}<span aria-hidden="true">${revealed ? '—' : '✓'}</span></span>
+    <div class="blood-group-copy"><h3>${html(group.name)}</h3><p>${group.answers.map(html).join(' · ')}</p></div>
+    <details><summary aria-label="About this connection"><span aria-hidden="true">i</span></summary><p>${html(group.definition)}</p></details></article>`;
 }
 
 export function renderBloodTiesView({ app, puzzle, session, official, developer, heading, flashStrikes = false, resultActions = '', nextRound = '', onSave, onSubmit, onSound }) {
@@ -24,19 +24,19 @@ export function renderBloodTiesView({ app, puzzle, session, official, developer,
       ${official ? session.success ? '' : ' Your permanent Score and Solves are safe.' : ' This result did not affect your stats.'}</p>
       ${official && session.success ? `<div class="result-score-total"><span>Round score</span><strong data-count-to="${session.points}">${session.points}</strong></div>` : ''}
       ${official && !session.success ? `<p class="survival-summary">${Math.max(1, session.roundsSurvivedBeforeLoss || 1) === 1 ? 'Your Round remains at <strong>Round 1</strong>.' : `Your run ended at <strong>Round ${session.roundsSurvivedBeforeLoss}</strong>. Your next game starts at <strong>Round 1</strong>.`}</p>` : ''}</div><p class="word-result-category blood-result-heading">Blood Ties · Today’s connections</p>`
-      : `<img class="puzzle-panel-art" src="./assets/blood-ties-card.svg?v=20261023-15" alt="" width="240" height="240" aria-hidden="true">
-      ${heading('Blood Ties', 'Find the hidden connections between Zombies maps, weapons and more.', official ? 'Today’s round' : 'Just for fun', true)}
+      : `<img class="puzzle-panel-art" src="./assets/blood-ties-card.svg?v=20261024-2" alt="" width="240" height="240" aria-hidden="true">
+      ${heading('Blood Ties', 'Select 3 tiles that share a hidden Zombies connection. Find all four, and watch out for overlapping themes.', official ? 'Today’s round' : 'Just for fun', true)}
       ${official ? '' : '<p class="puzzle-mode-note">Playing just for fun. This result will not change your stats.</p>'}
       <div class="word-scoreboard${official ? '' : ' is-single'}" role="group" aria-label="Connection puzzle progress"><div class="blood-strikes"><span>Strikes</span><div class="blood-strike-circles${flashStrikes ? ' is-clearing' : ''}" role="img" aria-label="${session.strikes} of 3 strikes">${[1, 2, 3].map((i) => `<i class="${i <= session.strikes ? 'is-active' : ''}"></i>`).join('')}</div></div>
       ${official ? `<div><span>Potential score</span><strong>${session.potentialPoints}</strong></div>` : ''}</div>
-      <p class="blood-instruction">Select <strong>3 tiles</strong> that share a connection. Watch out for overlapping themes.</p>`}
+      <div class="blood-progress" role="status" aria-label="${session.solved.length} of 4 connections found"><div class="blood-progress-copy"><strong>${session.solved.length}<span> / 4</span></strong><span>Connections found</span></div><div class="blood-progress-track" aria-hidden="true">${[1, 2, 3, 4].map(i => `<span class="${i <= session.solved.length ? 'is-found' : ''}">${i <= session.solved.length ? '✓' : i}</span>`).join('')}</div></div>`}
     <div class="blood-solved" aria-label="${session.complete ? 'Today’s connections' : 'Solved connections'}">${session.complete
       ? puzzle.groups.map((g, i) => groupRow(g, i, !session.solved.includes(g.id) || session.success && session.rulesVersion < 3 && g.id === session.solved.at(-1))).join('')
       : solvedGroups.map((g) => groupRow(g, puzzle.groups.indexOf(g))).join('')}</div>
     ${session.complete ? resultActions : `<div class="blood-grid" role="group" aria-label="Connection tiles">${tiles.map((tile, i) => `<button class="blood-tile${session.selected.includes(tile) ? ' is-selected' : ''}" style="--blood-longest-word:${Math.max(10, ...tile.split(/[\s-]/u).map(word => [...word].length))}" type="button" data-blood-tile="${i}" aria-pressed="${session.selected.includes(tile)}">${html(tile)}</button>`).join('')}</div>
       <p id="blood-status" class="blood-status${feedback}" role="status" aria-live="polite">${html(session.message || 'Find the first connection.')}</p>
       <div class="blood-controls"><button class="button" id="blood-shuffle" type="button">Shuffle</button><button class="button" id="blood-clear" type="button" ${session.selected.length ? '' : 'disabled'}>Deselect</button><button class="button primary" id="blood-submit" type="button" ${session.selected.length === 3 ? '' : 'disabled'}>Submit <span id="blood-selection-count">${session.selected.length}/3</span></button></div>
-      <p class="helper-text blood-progress">${session.solved.length} / 4 connections found.</p>`}
+      `}
     ${developer ? `<details class="blood-dev"><summary>Developer · inspect answers</summary><p>UTC ${html(puzzle.dateKey)} · ${html(puzzle.key)}</p>${puzzle.groups.map((g) => `<p><strong>${html(g.id)} · ${html(g.name)}</strong><br>${g.answers.map(html).join(' · ')}</p>`).join('')}<p>Overlap traps: ${puzzle.redHerrings.map(html).join(', ')}</p><p>Use Advance a day in the footer to test the three-game rotation. Preview dates have separate progress and do not upload results.</p></details>` : ''}
   </section>${session.complete ? nextRound : ''}`;
   function updateSelection() {
