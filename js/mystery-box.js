@@ -1,6 +1,6 @@
-import { BOX_SEQUENCE, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261024-16';
+import { BOX_SEQUENCE, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261024-17';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261024-16';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261024-17';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () => {} } = {}) {
@@ -24,6 +24,7 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
   let beginReveal;
   let activation = createBoxActivation(() => beginReveal?.());
   let renderingReady;
+  let iconShadowReady = Promise.resolve();
   let timers = [];
   let history;
   let historyStorage;
@@ -92,7 +93,7 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     if (renderingReady) return renderingReady;
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261024-16')
+      import('./mystery-box-scene.js?v=20261024-17')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -361,14 +362,52 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     const presentationReady = Promise.all([rendererReady, icon ? icon.decode() : Promise.reject(), ...previews])
       .then(([scene]) => {
         // Shadow preparation is decorative and may never block the real puzzle.
-        void scene?.prepareIconShadows?.(rewardTypes.map(type => ({ type, source: iconSource(type) }))).catch(() => {});
+        iconShadowReady = scene?.prepareIconShadows?.(rewardTypes.map(type => ({ type, source: iconSource(type) }))) ?? Promise.resolve();
+        void iconShadowReady.catch(() => {});
         return scene;
       }).catch(() => null);
-    if (['lift', 'reward', 'landed'].includes(review)) {
+    if (['lift', 'reward', 'landed', 'timeline'].includes(review)) {
       wrapper.dataset.review = review;
-      void presentationReady.then((scene) => {
+      void presentationReady.then(async (scene) => {
+        if (review === 'timeline') await iconShadowReady.catch(() => {});
         if (wrapper !== currentWrapper) return;
         if (!scene || !visual) { skipPresentation(); return; }
+        if (review === 'timeline') {
+          // Local-only frame stepping drives the real component and renderer.
+          const controls = document.createElement('label'); controls.className = 'mb-frame-review';
+          controls.textContent = 'Animation frame (ms) ';
+          const input = document.createElement('input');
+          input.type = 'number'; input.min = '0'; input.max = String(BOX_SEQUENCE.finishAt);
+          input.step = 'any'; input.value = '0'; input.setAttribute('aria-label', 'Animation frame (ms)');
+          const seek = () => {
+            const elapsed = Math.max(0, Math.min(BOX_SEQUENCE.finishAt, Number(input.value) || 0));
+            if (reward) {
+              reward.context.hidden = elapsed < BOX_SEQUENCE.liftAt;
+              if (elapsed < BOX_SEQUENCE.liftAt) {
+                visual.clearIconShadow?.(); wrapper.style.height = `${layout.closedHeight}px`;
+              }
+            }
+            showSequenceAt(elapsed); wrapper.dataset.reviewTime = elapsed.toFixed(3);
+            // Seek the browser's real CSS transitions too, so frame captures
+            // include fades and assembly delays rather than only geometry.
+            for (const animation of wrapper.getAnimations({ subtree: true })) {
+              if (!('transitionProperty' in animation)) continue;
+              const target = animation.effect?.target;
+              if (!target || controls.contains(target)) continue;
+              const invitation = target === copy || copy?.contains(target);
+              const start = target === stage ? BOX_SEQUENCE.settleAt : invitation ? 0 : BOX_SEQUENCE.assembleAt;
+              const timing = animation.effect.getTiming();
+              animation.pause();
+              animation.currentTime = !invitation && target !== stage && elapsed < BOX_SEQUENCE.assembleAt
+                ? Number(timing.delay) + Number(timing.duration) : Math.max(0, elapsed - start);
+            }
+          };
+          input.addEventListener('input', seek); controls.append(input); wrapper.append(controls);
+          progress = 0; visual.draw(0);
+          if (copy) void getComputedStyle(copy).opacity;
+          seek();
+          return;
+        }
         progress = 1; visual.draw(1);
         const requestedFrame = new URLSearchParams(location.search).get('boxFrame');
         const elapsed = requestedFrame !== null && Number.isFinite(Number(requestedFrame))

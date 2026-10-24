@@ -1,5 +1,5 @@
-import * as T from './vendor/mystery-box-three.js?v=20261024-16';
-import { BOX_FRAME, fitBoxCamera, lidDepthScale } from './mystery-box-motion.js?v=20261024-16';
+import * as T from './vendor/mystery-box-three.js?v=20261024-17';
+import { BOX_FRAME, fitBoxCamera, lidDepthScale, iconShadowNeedsUpdate } from './mystery-box-motion.js?v=20261024-17';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
@@ -53,8 +53,8 @@ export async function createMysteryBoxScene(host) {
   host.dataset.renderer = 'texture';
   const loader = new T.TextureLoader();
   const [woodMap, paintMap] = await Promise.all([
-    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261024-16', import.meta.url).href),
-    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261024-16', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261024-17', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261024-17', import.meta.url).href),
   ]);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;
@@ -205,8 +205,7 @@ export async function createMysteryBoxScene(host) {
   // There is no permanent rendering loop.
   const iconShadows = new Map();
   let latestIconShadow = null;
-  let lastShadowFrame = -Infinity;
-  let lastShadowKey = '';
+  let lastShadowPose = null;
   // Moving icons must invalidate both of the original casting lights.
   function invalidateIconShadow() {
     key.shadow.needsUpdate = true; lidLight.shadow.needsUpdate = true; renderer.shadowMap.needsUpdate = true;
@@ -227,7 +226,7 @@ export async function createMysteryBoxScene(host) {
   }
   function clearIconShadow() {
     latestIconShadow = null;
-    lastShadowFrame = -Infinity; lastShadowKey = '';
+    lastShadowPose = null;
     for (const { mesh } of iconShadows.values()) mesh.visible = false;
     invalidateIconShadow();
   }
@@ -236,9 +235,10 @@ export async function createMysteryBoxScene(host) {
     const { type, pose, target, stage: rect, roll, elapsed } = shadow;
     const proxy = iconShadows.get(type);
     if (!proxy || disposed) return false;
-    const key = [type, Math.round(pose.left * 2), Math.round(pose.top * 2), Math.round(pose.scale * 1000), Math.round(roll * 2), pose.depth > .03].join(':');
-    if (key === lastShadowKey || (elapsed >= lastShadowFrame && elapsed - lastShadowFrame < 1000 / 24)) return false;
-    lastShadowFrame = elapsed; lastShadowKey = key;
+    const nextShadowPose = { type, left: pose.left, top: pose.top, scale: pose.scale, width: target.width,
+      depth: pose.depth, roll, elapsed };
+    if (!iconShadowNeedsUpdate(lastShadowPose, nextShadowPose)) return false;
+    lastShadowPose = nextShadowPose;
     for (const { mesh } of iconShadows.values()) mesh.visible = false;
     invalidateIconShadow();
     if (pose.depth <= .03 || !rect.width || !rect.height) return true;
@@ -250,6 +250,8 @@ export async function createMysteryBoxScene(host) {
       1 - ((pose.top + pixels / 2 - rect.top) / rect.height) * 2, 0).unproject(camera);
     const direction = camera.getWorldDirection(new T.Vector3());
     center.addScaledVector(direction, (-.25 - center.z) / direction.z);
+    // A small art-direction lift affects only the shadow, fading out on landing.
+    center.y += .08 * pose.depth;
     const units = pixels * (camera.right - camera.left) / rect.width;
     proxy.mesh.position.copy(center);
     proxy.mesh.scale.set(units, units, 1);
@@ -283,6 +285,9 @@ export async function createMysteryBoxScene(host) {
     glowMat.uniforms.strength.value = ease * .95;
     renderer.render(scene, camera);
     if (capture) {
+      const shadow = [...iconShadows].find(([, value]) => value.mesh.visible);
+      host.dataset.shadowIcon = shadow?.[0] ?? '';
+      host.dataset.shadowRoll = shadow ? (-shadow[1].mesh.rotation.x * 180 / Math.PI).toFixed(4) : '';
       const bounds = propBounds();
       host.dataset.propTop = bounds.top.toFixed(3);
       host.dataset.propBottom = bounds.bottom.toFixed(3);

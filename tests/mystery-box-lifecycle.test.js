@@ -222,7 +222,7 @@ test('CSS icon rolling and confirmation do not redraw an unchanged WebGL scene e
   assert.equal(f.panel.inert, false);
 });
 
-test('icons keep a fixed box angle while an independent inner frame rolls forward', async () => {
+test('icons keep a fixed box angle while an independent inner frame rolls backward', async () => {
   const f = boxFixture(); f.open({ availableTypes: ['word', 'easter', 'blood'] }); await f.flush(); f.trigger.click();
   const angle = (name, rolling = false) => {
     const visible = f.iconLayers.find(layer => Number(layer.style.opacity) > 0);
@@ -242,7 +242,7 @@ test('icons keep a fixed box angle while an independent inner frame rolls forwar
     assert.equal(Math.abs(angle('rotateZ')), 0);
     const pitch = angle('rotateX', true);
     const type = f.iconLayers.find(layer => Number(layer.style.opacity) > 0).dataset.icon;
-    if (previous?.type === type) assert.ok(pitch <= previous.pitch + 1e-8, 'every turn continues forward');
+    if (previous?.type === type) assert.ok(pitch >= previous.pitch - 1e-8, 'every turn continues backward');
     else if (previous) {
       assert.ok(frontNormal(previous.pitch) < .15 && frontNormal(pitch) < .15, 'artwork switches at the actual tilted edge');
       exchanges++;

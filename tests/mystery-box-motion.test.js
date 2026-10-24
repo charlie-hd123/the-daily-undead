@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { OrthographicCamera, Vector3 } from 'three';
-import { BOX_SEQUENCE as timing, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, BOX_FRAME, fitBoxCamera, revealHeight, lidOpenness, lidDepthScale } from '../js/mystery-box-motion.js';
+import { BOX_SEQUENCE as timing, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, BOX_FRAME, fitBoxCamera, revealHeight, lidOpenness, lidDepthScale, iconShadowNeedsUpdate } from '../js/mystery-box-motion.js';
 
 const camera = new OrthographicCamera(-4.6, 4.6, 2.3, -2.3, .1, 60);
 camera.position.set(7.8, 5.7, 14); camera.lookAt(0, 1.7, 0); camera.updateMatrixWorld();
@@ -271,6 +271,30 @@ test('the reward cycles only available games, slows down and settles on the assi
       for (let i = 1; i < gaps.length; i++) assert.ok(gaps[i] >= gaps[i - 1]);
       assert.ok(gaps.at(-1) > gaps[0] * 2, 'the slowing must be clearly visible');
       assert.ok(timing.settleAt - changes.at(-1) >= 350, 'hold the final game for recognition');
+    }
+  }
+});
+
+test('every 60Hz motion frame keeps the correct shadow icon and bounds shadow lag', () => {
+  for (const types of [['word', 'easter'], ['word', 'easter', 'blood']]) {
+    for (const finalType of types) {
+      const flight = createIconFlight(desktop);
+      let rendered;
+      for (let frame = Math.ceil(timing.liftAt * 60 / 1000); frame <= Math.ceil(timing.finishAt * 60 / 1000); frame++) {
+        const elapsed = Math.min(timing.finishAt, frame * 1000 / 60);
+        const pose = flight(elapsed), reward = boxRewardAt(elapsed, finalType, types, pose);
+        const next = { type: reward.type, left: pose.left, top: pose.top, scale: pose.scale, width: desktop.target.width,
+          depth: pose.depth, roll: reward.locked ? 0 : reward.rollX, elapsed };
+        if (iconShadowNeedsUpdate(rendered, next)) rendered = next;
+        assert.equal(rendered.type, next.type, `wrong shadow at ${elapsed}ms`);
+        if (next.depth > .03) {
+          assert.ok(Math.abs(rendered.roll - next.roll) < 6, `turn lag at ${elapsed}ms`);
+          assert.ok(Math.abs(rendered.left - next.left) < .75, `horizontal lag at ${elapsed}ms`);
+          assert.ok(Math.abs(rendered.top - next.top) < .75, `vertical lag at ${elapsed}ms`);
+        }
+      }
+      assert.equal(rendered.type, finalType);
+      assert.ok(!iconShadowNeedsUpdate(rendered, { ...rendered, elapsed: rendered.elapsed + 1000 }), 'a stationary pose stays cached');
     }
   }
 });

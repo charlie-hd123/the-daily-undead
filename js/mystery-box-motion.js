@@ -1,7 +1,7 @@
 export const BOX_SEQUENCE = Object.freeze({
-  lid: 850, liftAt: 450, liftFor: 1000, cycleAt: 950, cycleFor: 2800,
-  settleAt: 4300, settleFor: 1000, growFor: 600, fadeFor: 600,
-  assembleAt: 4900, finishAt: 5800,
+  lid: 850, liftAt: 450, liftFor: 1000, cycleAt: 950, cycleFor: 2950,
+  settleAt: 4450, settleFor: 1000, growFor: 600, fadeFor: 600,
+  assembleAt: 5050, finishAt: 5950,
 });
 
 // A slowing carousel of the available games, ending on the already assigned puzzle.
@@ -17,15 +17,15 @@ export function boxRewardAt(elapsed, finalType, availableTypes, facing = { rotat
   const step = Math.floor(cursor);
   const fromType = types[(types.indexOf(finalType) + step + 1) % types.length];
   const toType = time === 1 ? finalType : types[(types.indexOf(finalType) + step + 2) % types.length];
-  // One continuous forward roll. Swap artwork at the horizontal edge, then
+  // One continuous backward roll. Swap artwork at the horizontal edge, then
   // continue in the same direction; the cursor supplies the gradual slowdown.
   const blend = time === 1 ? 0 : cursor - step;
   // A tilted face reaches its visual edge before a screen-facing one. Exchange
   // at that actual edge so the fixed box angle cannot create a flash or backface.
   const pitch = facing.rotateX * Math.PI / 180, yaw = facing.rotateY * Math.PI / 180;
-  const edge = Math.atan2(Math.cos(pitch) * Math.cos(yaw), -Math.sin(pitch)) / Math.PI;
+  const edge = 1 - Math.atan2(Math.cos(pitch) * Math.cos(yaw), -Math.sin(pitch)) / Math.PI;
   const incoming = blend >= edge;
-  const rollX = (incoming ? 180 : 0) - 180 * blend;
+  const rollX = 180 * blend - (incoming ? 180 : 0);
   const confirmation = (elapsed - BOX_SEQUENCE.cycleAt - BOX_SEQUENCE.cycleFor) / 420;
   const glow = confirmation > 0 && confirmation < 1 ? Math.sin(Math.PI * confirmation) ** 2 : 0;
   return { fromType, toType, blend, rollX, glow, type: incoming ? toType : fromType, locked: time === 1 };
@@ -35,6 +35,19 @@ const clamp = (value, low = 0, high = 1) => Math.max(low, Math.min(high, value))
 const mix = (a, b, amount) => a + (b - a) * amount;
 const smooth = (value) => value < .5 ? 4 * value ** 3 : 1 - (-2 * value + 2) ** 3 / 2;
 const smoother = (value) => value ** 3 * (value * (value * 6 - 15) + 10);
+
+// Keep gentle shadow motion economical, but never defer a new icon, a visibly
+// different turn, or a movement large enough to separate it from its caster.
+export function iconShadowNeedsUpdate(previous, next) {
+  if (!previous) return true;
+  const movement = Math.max(Math.abs(next.left - previous.left), Math.abs(next.top - previous.top),
+    Math.abs(next.scale - previous.scale) * next.width);
+  const turn = Math.abs(next.roll - previous.roll);
+  const visibilityChanged = (next.depth > .03) !== (previous.depth > .03);
+  if (next.type !== previous.type || visibilityChanged || next.elapsed < previous.elapsed) return true;
+  if (movement < .25 && turn < .25) return false;
+  return movement >= .75 || turn >= 6 || next.elapsed - previous.elapsed >= 1000 / 24;
+}
 
 export function lidOpenness(elapsed) {
   const opening = smooth(clamp(elapsed / BOX_SEQUENCE.lid));
