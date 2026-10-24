@@ -47,6 +47,7 @@ export function boxFixture(options = {}) {
   const storage = options.storage || { getItem: (k) => values.get(k) ?? null, setItem: (k, v) => values.set(k, String(v)) };
   const visual = { draw() { draws++; }, resize() {}, dispose() { disposed++; },
     prepareIconShadows: () => options.shadowPreparation?.() ?? Promise.resolve(),
+    positionIconShadow: () => false,
     closedBounds: () => ({ left: 250, top: 220, width: 500, height: 230 }),
     aperture: () => ({ left: { x: 250, y: 400 }, right: { x: 750, y: 440 }, center: { x: 500, y: 410 } }),
     viewDirection: () => ({ x: -.47, y: -.24, z: -.85 }) };

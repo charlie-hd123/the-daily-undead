@@ -208,6 +208,20 @@ test('failed or stalled decorative shadow textures never delay the reveal or the
   }
 });
 
+test('CSS icon rolling and confirmation do not redraw an unchanged WebGL scene every frame', async () => {
+  const f = boxFixture(); f.open(); await f.flush(); f.trigger.click();
+  f.frame(1500);
+  const renders = f.draws;
+  const before = f.iconLayers.map(layer => layer.children[0].children[0].style.transform);
+  for (let at = 1516; at <= 4200; at += 16) f.frame(at);
+  assert.equal(f.draws, renders, 'unchanged scene and shadow must stay cached during the CSS animation');
+  assert.notDeepEqual(f.iconLayers.map(layer => layer.children[0].children[0].style.transform), before);
+  f.frame(BOX_SEQUENCE.settleAt + 150);
+  assert.ok(f.draws > renders, 'the closing lid still renders');
+  f.frame(BOX_SEQUENCE.finishAt);
+  assert.equal(f.panel.inert, false);
+});
+
 test('icons keep a fixed box angle while an independent inner frame rolls forward', async () => {
   const f = boxFixture(); f.open({ availableTypes: ['word', 'easter', 'blood'] }); await f.flush(); f.trigger.click();
   const angle = (name, rolling = false) => {

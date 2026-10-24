@@ -1,6 +1,6 @@
-import { BOX_SEQUENCE, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261024-9';
+import { BOX_SEQUENCE, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261024-11';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261024-9';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261024-11';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () => {} } = {}) {
@@ -92,7 +92,7 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     if (renderingReady) return renderingReady;
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261024-9')
+      import('./mystery-box-scene.js?v=20261024-11')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -192,14 +192,15 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
       return { type, traveller, object, rolling,
         flight: createIconFlight({ target, mouth: visual.aperture(), stage: stageRect, viewDirection: visual.viewDirection(), ink: ICON_INK[type] }) };
     });
-    reward = { node, slot, context, target, layers, ...original };
+    reward = { node, slot, context, target, stageRect, layers, ...original };
     wrapper.append(context);
     context.style.cssText = `left:${stageRect.left - origin.left}px;top:${stageRect.top - origin.top}px;width:${stageRect.width}px;height:${Math.max(stageRect.height, panel.offsetHeight)}px;`;
     return true;
   }
   function positionReward(elapsed) {
-    const { context, target, layers } = reward;
+    const { context, target, stageRect, layers } = reward;
     const current = boxRewardAt(elapsed, puzzleType, rewardTypes, layers[0].flight(elapsed));
+    let shadowChanged = false;
     context.dataset.reward = current.type;
     for (const { type, traveller, object, rolling, flight } of layers) {
       const exchanging = !current.locked && current.fromType !== current.toType;
@@ -216,11 +217,12 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
       traveller.style.setProperty('--mb-confirm', weight ? current.glow : 0);
       traveller.style.setProperty('--mb-light', pose.light);
       traveller.style.setProperty('--mb-depth', pose.depth);
-      if (weight) visual.positionIconShadow?.({ type, pose, target, roll });
+      if (weight) shadowChanged = visual.positionIconShadow?.({ type, pose, target, stage: stageRect, roll, elapsed, openness: progress }) || false;
     }
     const pose = layers[0].flight(elapsed);
     context.style.clipPath = elapsed < BOX_SEQUENCE.settleAt
       ? `polygon(0 0,100% 0,100% ${pose.clipRight}px,0 ${pose.clipLeft}px)` : 'none';
+    return shadowChanged;
   }
   function showSequenceAt(elapsed) {
     intro?.setAttribute('aria-hidden', 'true');
@@ -228,12 +230,13 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     const lid = lidOpenness(elapsed);
     const lidChanged = lid !== progress;
     progress = lid;
+    let shadowChanged = false;
     if (elapsed >= BOX_SEQUENCE.liftAt) {
       if (!reward && !prepareReward()) { cancel(); return; }
       wrapper.style.height = `${revealHeight(elapsed, layout.closedHeight, layout.puzzleHeight)}px`;
-      positionReward(elapsed);
+      shadowChanged = positionReward(elapsed);
     }
-    if (lidChanged || reward) visual.draw(progress);
+    if (lidChanged || shadowChanged) visual.draw(progress);
     const phase = elapsed >= BOX_SEQUENCE.assembleAt ? 'assembling'
       : elapsed >= BOX_SEQUENCE.settleAt ? 'settling'
       : elapsed >= BOX_SEQUENCE.liftAt + BOX_SEQUENCE.liftFor ? 'reward'
