@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="color-scheme" content="dark">
+  <title>Sound library · The Daily Undead</title>
+  <link rel="stylesheet" href="library.css?v=20261024-1">
+  <script type="module" src="library.js?v=20261024-1"></script>
+</head>
+<body>
+  <main>
+    <header class="masthead">
+      <a class="brand" href="../../../"><span class="brand-mark" aria-hidden="true">DU</span><span>The Daily Undead<span class="brand-sub">Sound room</span></span></a>
+      <a class="back-link" href="../../../">Back to game <span aria-hidden="true">↗</span></a>
+    </header>
+    <section class="intro" aria-labelledby="page-title">
+      <div><p class="eyebrow"><span class="status-dot"></span> The current collection</p><h1 id="page-title">The sound of survival.</h1><p class="lede">Every cue, in one place. Listen, download, and try a different direction.</p></div>
+      <div class="collection-stat"><strong id="sound-count">—</strong><span>sounds in the game</span></div>
+    </section>
+    <div class="transport" aria-label="Playback controls">
+      <button id="play-all" class="button compact" disabled><span aria-hidden="true">▶</span> Play collection</button>
+      <button id="stop" class="button quiet compact" disabled>Stop</button>
+      <p id="playback-status" role="status" aria-live="polite">Loading the collection…</p>
+      <label class="master-volume">Preview volume <input id="master-volume" type="range" min="0" max="100" value="100"><output id="master-value" for="master-volume">100%</output></label>
+    </div>
+    <div class="room">
+      <section class="collection" aria-label="Sound collection">
+        <div class="collection-tools"><label class="search"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Find a sound or game…" aria-label="Find a sound"></label><button id="export-list" class="text-button" disabled>Sound list ↓</button></div>
+        <div id="filters" class="filters" role="group" aria-label="Filter sounds by use"></div>
+        <div class="list-heading"><span id="showing">Loading sounds</span><span>WAV + AAC</span></div>
+        <div id="sound-list" aria-label="Sounds"></div>
+        <p id="empty" class="empty" hidden>No sounds match. Try another name or game.</p>
+        <p id="load-error" class="empty" role="alert" hidden>The sound library could not load. Refresh to try again.</p>
+      </section>
+      <aside class="workbench" aria-labelledby="workbench-title">
+        <div class="bench-top"><span class="eyebrow">Make it yours</span><span id="draft-badge" class="badge">Experiment</span></div>
+        <button id="back-to-collection" class="text-button bench-back">↑ Back to sounds</button>
+        <h2 id="workbench-title">The workbench.</h2>
+        <p class="bench-intro">Try a new sound or reshape the current one. Experiments stay here; the game stays unchanged.</p>
+        <div id="bench-content" hidden>
+          <div class="chosen"><span id="bench-number" class="sound-number"></span><div><h3 id="bench-name"></h3><p id="bench-source"></p></div></div>
+          <label class="upload" id="drop-zone"><span class="upload-symbol" aria-hidden="true">＋</span><strong>Try a replacement file</strong><span>Choose or drop audio · up to 20 seconds / 20 MB</span><input id="replacement" type="file" accept="audio/*,.wav,.mp3,.m4a,.ogg,.flac" aria-label="Choose replacement audio"></label>
+          <button id="remove-file" class="text-button" hidden>Use the current sound instead</button>
+          <div class="knobs">
+            <label for="level">Sound level <output id="level-value" for="level">100%</output></label><input id="level" type="range" min="0" max="200" value="100" step="5">
+            <label for="pitch">Pitch <output id="pitch-value" for="pitch">Original</output></label><input id="pitch" type="range" min="-6" max="6" value="0" step="1">
+            <label for="reverb">Extra reverb <output id="reverb-value" for="reverb">0%</output></label><input id="reverb" type="range" min="0" max="60" value="0" step="5">
+            <label for="delay">Extra delay <output id="delay-value" for="delay">0%</output></label><input id="delay" type="range" min="0" max="45" value="0" step="5">
+          </div>
+          <p class="control-note">Pitch also changes speed. Added effects build on any reverb already in the file.</p>
+          <div class="compare"><button id="play-current" class="button quiet">▶ Current</button><button id="play-draft" class="button">▶ Your version</button></div>
+          <label class="notes-label" for="notes">What would you change?</label><textarea id="notes" rows="2" maxlength="1000" placeholder="e.g. softer attack, less echo…"></textarea>
+          <p id="draft-status" class="draft-status" role="status" aria-live="polite">Ready to experiment.</p>
+          <div class="bench-actions"><button id="download-draft" class="text-button">Download your WAV ↓</button><button id="reset-draft" class="text-button muted">Reset</button></div>
+        </div>
+        <p id="bench-loading" class="bench-intro">Choose a sound to start experimenting.</p>
+        <div class="draft-footer"><p id="saved-status">Drafts are saved on this device.</p><button id="export-drafts" class="button quiet" disabled>Export drafts ↓ <span id="draft-count">0</span></button><p class="export-note">Exports a ZIP of your edited WAVs and notes, ready to share for a future game update.</p></div>
+      </aside>
+    </div>
+    <footer class="page-footer"><p>Previews use the game’s relative volumes. WAV and AAC downloads are the current source files. Your draft WAV includes your edits.</p><nav><a href="../CREDITS.md">Sound credits</a><a href="../manifest.json">Current manifest</a></nav></footer>
+    <noscript><p class="empty">Enable JavaScript to browse and preview the sounds. The <a href="../manifest.json">current manifest</a> lists every file.</p></noscript>
+  </main>
+</body>
+</html>

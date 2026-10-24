@@ -45,6 +45,10 @@ After upload, the command verifies the hosted release identity, API identity, cu
 
 Review the normal staging address. Use the cumulative diff to select browser checks under AGENTS.md. Later edits accumulate on the same branch and site. Commit-based checks cannot silently include unfinished local files. Ordinary copy changes do not require a new full manual game walkthrough.
 
+## Sound library
+
+The current sound collection is available at `https://daily-undead-staging.pages.dev/assets/audio/library/` behind the usual staging password. It reads the runtime cue list, with individual previews, current WAV/AAC downloads, filters and a local experimentation workbench. Replacement uploads and effect settings are saved only in this browser's dedicated IndexedDB store. Download a draft WAV or export all drafts as a ZIP with cue IDs, settings and notes. This page never updates the game, account progress or server-side audio assets; integrating approved replacements is a separate website change.
+
 ## Persistent, current fictional activity
 
 The footer's **Advance a day** and **Return to today** controls are injected only into staging/local builds. Production source and output omit their HTML, and shared JavaScript additionally requires a local host or the exact staging host with staging metadata. A preview uses isolated per-day browser progress and disables account progress/result uploads; the normal staging account stays intact. Server result-date validation still rejects future results. Return to today restores the ordinary game and account sync. Future-day community statistics can legitimately be unavailable until that real UTC day.

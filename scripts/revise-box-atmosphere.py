@@ -188,7 +188,7 @@ li{{margin:8px 0}}footer{{margin-top:32px;border-top:1px solid #354139;padding-t
 <audio controls preload="metadata" aria-label="Play current Mystery Box opening"><source src="../{files[0]}" type="audio/wav"><source src="../{files[1]}" type="audio/mp4"></audio>
 <div class="files"><a href="../{files[0]}" download>Download WAV</a><a href="../{files[1]}" download>Download AAC</a><span>3.42 s</span></div></section>
 <ul><li>Less reverb on the recorded chest opening only.</li><li>The quiet melody, chimes and ethereal reverb keep their previous levels.</li><li>Direct sounds and gently fading delays are unchanged.</li><li>Both trailing thuds remain removed; the atmosphere fades through the reveal.</li></ul>
-<footer>Recording: <a href="{source['page']}">Wooden Chest Open.wav by The_Frisbee_of_Peace</a> · CC0.
+<footer><a href="../library/">Browse all game sounds</a><br>Recording: <a href="{source['page']}">Wooden Chest Open.wav by The_Frisbee_of_Peace</a> · CC0.
 Public HQ preview used. <a href="../sources/CREDITS.md">Source and processing credits</a>.
 Signal and decoder checks passed; no direct listening assessment. Preview starts at the game's 86% cue gain.</footer>
 </main><script>document.querySelector('audio').volume=.86;</script></body></html>''')
