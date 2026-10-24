@@ -6,7 +6,7 @@ export const BOX_SEQUENCE = Object.freeze({
 
 // A slowing carousel of the available games, ending on the already assigned puzzle.
 // This is presentation only: it never changes the daily selection.
-export function boxRewardAt(elapsed, finalType, availableTypes) {
+export function boxRewardAt(elapsed, finalType, availableTypes, facing = { rotateX: 0, rotateY: 0 }) {
   const types = [...new Set(availableTypes)].filter(type => ICON_INK[type]);
   if (!types.includes(finalType)) types.push(finalType);
   const time = clamp((elapsed - BOX_SEQUENCE.cycleAt) / BOX_SEQUENCE.cycleFor);
@@ -20,8 +20,15 @@ export function boxRewardAt(elapsed, finalType, availableTypes) {
   // One continuous forward roll. Swap artwork at the horizontal edge, then
   // continue in the same direction; the cursor supplies the gradual slowdown.
   const blend = time === 1 ? 0 : cursor - step;
-  const rollX = blend < .5 ? -180 * blend : 180 * (1 - blend);
-  return { fromType, toType, blend, rollX, type: blend < .5 ? fromType : toType, locked: time === 1 };
+  // A tilted face reaches its visual edge before a screen-facing one. Exchange
+  // at that actual edge so the fixed box angle cannot create a flash or backface.
+  const pitch = facing.rotateX * Math.PI / 180, yaw = facing.rotateY * Math.PI / 180;
+  const edge = Math.atan2(Math.cos(pitch) * Math.cos(yaw), -Math.sin(pitch)) / Math.PI;
+  const incoming = blend >= edge;
+  const rollX = (incoming ? 180 : 0) - 180 * blend;
+  const confirmation = (elapsed - BOX_SEQUENCE.cycleAt - BOX_SEQUENCE.cycleFor) / 420;
+  const glow = confirmation > 0 && confirmation < 1 ? Math.sin(Math.PI * confirmation) ** 2 : 0;
+  return { fromType, toType, blend, rollX, glow, type: incoming ? toType : fromType, locked: time === 1 };
 }
 
 const clamp = (value, low = 0, high = 1) => Math.max(low, Math.min(high, value));
@@ -85,7 +92,6 @@ export function createIconFlight({ target, mouth, stage, viewDirection, ink = IC
 
   return (elapsed) => {
     const lift = smoother(clamp((elapsed - BOX_SEQUENCE.liftAt) / BOX_SEQUENCE.liftFor));
-    const faceOn = smoother(clamp((elapsed - BOX_SEQUENCE.liftAt) / (BOX_SEQUENCE.cycleAt - BOX_SEQUENCE.liftAt)));
     const settle = smoother(clamp((elapsed - BOX_SEQUENCE.settleAt) / BOX_SEQUENCE.settleFor));
     const fade = smooth(clamp((elapsed - BOX_SEQUENCE.settleAt - BOX_SEQUENCE.settleFor * .3) / (BOX_SEQUENCE.settleFor * .7)));
     const floatingScale = mix(startScale, peakScale, lift);
@@ -93,11 +99,11 @@ export function createIconFlight({ target, mouth, stage, viewDirection, ink = IC
     const left = mix(mouth.center.x - (ink.left + ink.width / 2) * target.width * floatingScale, target.left, settle);
     const arc = settle > 0 && settle < 1 ? Math.sin(Math.PI * settle) * Math.min(28, stage.height * .08) : 0;
     const top = mix(mix(startTop, peakTop, lift), target.top, settle) - arc;
-    // Emerge in the chest's perspective, then face the player before rolling.
-    // A horizontal screen axis prevents yaw from making the flips diagonal.
+    // The outer frame keeps the chest's perspective; an independent inner frame
+    // rolls forward about the box's horizontal axis without changing that angle.
     return { left, top, scale,
-      rotateX: pitch * (1 - faceOn) * (1 - settle),
-      rotateY: yaw * (1 - faceOn) * (1 - settle),
+      rotateX: pitch * (1 - settle),
+      rotateY: yaw * (1 - settle),
       rotateZ: 0,
       depth: 1 - settle, light: (.8 - .45 * lift) * (1 - settle),
       opacity: mix(1, .18, fade),

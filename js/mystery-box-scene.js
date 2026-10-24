@@ -1,5 +1,5 @@
-import * as T from './vendor/mystery-box-three.js?v=20261024-8';
-import { BOX_FRAME, fitBoxCamera, lidDepthScale } from './mystery-box-motion.js?v=20261024-8';
+import * as T from './vendor/mystery-box-three.js?v=20261024-9';
+import { BOX_FRAME, fitBoxCamera, lidDepthScale } from './mystery-box-motion.js?v=20261024-9';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
@@ -51,8 +51,8 @@ export async function createMysteryBoxScene(host) {
   host.dataset.renderer = 'texture';
   const loader = new T.TextureLoader();
   const [woodMap, paintMap] = await Promise.all([
-    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261024-8', import.meta.url).href),
-    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261024-8', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261024-9', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261024-9', import.meta.url).href),
   ]);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;
@@ -143,6 +143,14 @@ export async function createMysteryBoxScene(host) {
   const inner = new T.Mesh(new T.PlaneGeometry(5.86, 1.80), new T.MeshBasicMaterial({ color: 0xe6f7ff, transparent: true, opacity: .6, side: T.DoubleSide }));
   inner.rotation.x = -Math.PI / 2; inner.position.set(0, 1.30, 0); caseGroup.add(inner);
   const innerLight = new T.PointLight(0xc8eeff, 0, 9, 2); innerLight.position.set(0, 1.52, .05); caseGroup.add(innerLight);
+  // A broad source along the luminous front edge can cast a faint shadow back
+  // onto the open lid. One small map avoids six point-light shadow passes.
+  const lidLight = new T.SpotLight(0xc8eeff, 0, 8, Math.PI / 3, .8, 2);
+  lidLight.position.set(0, 1.52, .95); lidLight.target.position.set(0, 2.5, -1.3);
+  lidLight.castShadow = true; lidLight.shadow.mapSize.set(mobile ? 256 : 512, mobile ? 256 : 512);
+  lidLight.shadow.intensity = .45; lidLight.shadow.normalBias = .015;
+  lidLight.shadow.bias = -.0002; lidLight.shadow.radius = 3;
+  caseGroup.add(lidLight, lidLight.target);
   const glowMat = new T.ShaderMaterial({
     transparent: true, depthWrite: false, blending: T.AdditiveBlending, side: T.DoubleSide,
     uniforms: { strength: { value: 0 } },
@@ -175,6 +183,51 @@ export async function createMysteryBoxScene(host) {
   const contactTexture = new T.CanvasTexture(contactCanvas);
   const contact = new T.Mesh(new T.PlaneGeometry(8.3,4.4), new T.MeshBasicMaterial({ map: contactTexture, transparent: true, depthWrite: false }));
   contact.rotation.x = -Math.PI/2; contact.position.y = .003; scene.add(contact);
+  // Invisible, alpha-masked copies participate in the existing key-light shadow
+  // passes. The real lid receives their shadows only where the light ray hits it.
+  // There is no permanent rendering loop.
+  const iconShadows = new Map();
+  let latestIconShadow = null;
+  let disposed = false;
+  async function prepareIconShadows(icons) {
+    await Promise.all(icons.map(async ({ type, source }) => {
+      if (iconShadows.has(type)) return;
+      const texture = await loader.loadAsync(source);
+      if (disposed) { texture.dispose(); return; }
+      const material = new T.MeshBasicMaterial({ map: texture, alphaTest: .18,
+        side: T.DoubleSide, colorWrite: false, depthWrite: false });
+      const mesh = new T.Mesh(new T.PlaneGeometry(1, 1), material);
+      mesh.castShadow = true; mesh.visible = false; scene.add(mesh);
+      iconShadows.set(type, { mesh, texture });
+      if (latestIconShadow?.type === type) { positionIconShadow(latestIconShadow); draw(); }
+    }));
+  }
+  function clearIconShadow() {
+    latestIconShadow = null;
+    for (const { mesh } of iconShadows.values()) mesh.visible = false;
+  }
+  function positionIconShadow(shadow) {
+    for (const { mesh } of iconShadows.values()) mesh.visible = false;
+    latestIconShadow = shadow;
+    const { type, pose, target, roll } = shadow;
+    const proxy = iconShadows.get(type);
+    if (!proxy || pose.depth <= .03 || disposed) return;
+    const rect = host.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    // Register the CSS icon's centre with the orthographic scene, on a plane
+    // inside the aperture behind its light. The full SVG retains its alpha mask.
+    const pixels = target.width * pose.scale;
+    const center = new T.Vector3(
+      ((pose.left + pixels / 2 - rect.left) / rect.width) * 2 - 1,
+      1 - ((pose.top + pixels / 2 - rect.top) / rect.height) * 2, 0).unproject(camera);
+    const direction = camera.getWorldDirection(new T.Vector3());
+    center.addScaledVector(direction, (-.25 - center.z) / direction.z);
+    const units = pixels * (camera.right - camera.left) / rect.width;
+    proxy.mesh.position.copy(center);
+    proxy.mesh.scale.set(units, units, 1);
+    proxy.mesh.rotation.x = -roll * Math.PI / 180;
+    proxy.mesh.visible = true;
+  }
   let lastProgress = 0;
   let mostOpen = 0;
   let contextLost = false;
@@ -189,6 +242,7 @@ export async function createMysteryBoxScene(host) {
     mostOpen = t === 0 ? 0 : Math.max(mostOpen, t);
     lid.scale.z = lidDepthScale(mostOpen);
     innerLight.intensity = 17 * Math.pow(ease, .75);
+    lidLight.intensity = 4.5 * Math.pow(ease, .75);
     inner.material.opacity = .65 + ease * .35;
     glowMat.uniforms.strength.value = ease * .95;
     renderer.render(scene, camera);
@@ -273,9 +327,13 @@ export async function createMysteryBoxScene(host) {
     const direction = camera.getWorldDirection(new T.Vector3());
     return { x: direction.x, y: direction.y, z: direction.z };
   }
-  return { draw, resize, aperture, closedBounds, viewDirection, poster, dispose() {
+  return { draw, resize, aperture, closedBounds, viewDirection, poster,
+    prepareIconShadows, positionIconShadow, clearIconShadow, dispose() {
+    disposed = true;
     observer.disconnect();
+    key.shadow.dispose(); lidLight.shadow.dispose();
     scene.traverse((node) => { if (node.isMesh) { node.geometry.dispose(); for (const material of [].concat(node.material)) material.dispose(); } });
+    for (const { texture } of iconShadows.values()) texture.dispose();
     woodMap.dispose(); paintMap.dispose(); floorTexture.dispose(); contactTexture.dispose(); env.dispose(); renderer.dispose(); canvas.remove();
   } };
 }

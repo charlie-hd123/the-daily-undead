@@ -94,15 +94,15 @@ test('the icon starts below the front rim and rises clear of it with visible dep
   assert.equal(raised.opacity, 1);
   assert.equal(raised.rotateZ, 0);
   assert.ok(ink.right - ink.left <= (desktop.mouth.right.x - desktop.mouth.left.x) * .62);
-  assert.equal(Math.abs(raised.rotateX), 0); assert.equal(Math.abs(raised.rotateY), 0);
+  assert.ok(raised.rotateX < 0 && raised.rotateY < 0);
   assert.equal(raised.depth, 1);
 });
 
 
-test('the icon emerges in the chest perspective and faces the player before rolling', () => {
+test('the outer icon frame keeps the chest perspective through emergence, rolling and the chosen hold', () => {
   const flight = createIconFlight(desktop);
   const view = camera.matrixWorldInverse.elements;
-  for (const elapsed of [timing.liftAt]) {
+  for (const elapsed of [timing.liftAt, timing.cycleAt, timing.cycleAt + 1300, timing.settleAt]) {
     const pose = flight(elapsed);
     const x = pose.rotateX * Math.PI / 180, y = pose.rotateY * Math.PI / 180;
     // Columns of the CSS front-plane rotation, including the normal that controls extrusion.
@@ -112,17 +112,18 @@ test('the icon emerges in the chest perspective and faces the player before roll
     const projected = [view[0], -view[1], view[2], -view[4], view[5], -view[6], view[8], -view[9], view[10]];
     css.forEach((value, index) => assert.ok(Math.abs(value - projected[index]) < 1e-10));
   }
-  let previousYaw = Math.abs(flight(timing.liftAt).rotateY);
-  for (let elapsed = timing.liftAt; elapsed <= timing.finishAt; elapsed += 5) {
-    const pose = flight(elapsed);
-    assert.ok(Math.abs(pose.rotateY) <= previousYaw);
-    previousYaw = Math.abs(pose.rotateY);
-    if (elapsed >= timing.cycleAt) {
-      assert.equal(Math.abs(pose.rotateX), 0);
-      assert.equal(Math.abs(pose.rotateY), 0);
-      assert.equal(pose.rotateZ, 0);
-    }
+});
+
+test('the chosen icon receives one brief glow after locking, including the skip destination', () => {
+  const lockedAt = timing.cycleAt + timing.cycleFor;
+  for (const elapsed of [0, timing.cycleAt, lockedAt - 1, lockedAt, lockedAt + 420, timing.settleAt, timing.finishAt]) {
+    assert.equal(boxRewardAt(elapsed, 'word', ['word', 'easter']).glow, 0);
   }
+  const pulse = [70, 140, 210, 280, 350].map(offset => boxRewardAt(lockedAt + offset, 'word', ['word', 'easter']).glow);
+  assert.ok(pulse[0] < pulse[1] && pulse[1] < pulse[2]);
+  assert.ok(pulse[2] > pulse[3] && pulse[3] > pulse[4]);
+  assert.equal(pulse[2], 1);
+  assert.ok(lockedAt + 420 < timing.settleAt, 'the glow clears before the watermark landing');
 });
 
 test('the travelling icon becomes its exact faint corner watermark without residual depth or glow', () => {

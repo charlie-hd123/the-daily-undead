@@ -1,6 +1,6 @@
-import { BOX_SEQUENCE, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261024-8';
+import { BOX_SEQUENCE, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261024-9';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261024-8';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261024-9';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () => {} } = {}) {
@@ -92,7 +92,7 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     if (renderingReady) return renderingReady;
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261024-8')
+      import('./mystery-box-scene.js?v=20261024-9')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -138,6 +138,7 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     if (trigger) { trigger.hidden = false; trigger.removeAttribute('data-auto-focus'); syncTrigger(); }
     timers.forEach(window.clearTimeout); timers = [];
     window.cancelAnimationFrame(frame);
+    visual?.clearIconShadow?.();
     if (reward) {
       const { node, slot, context, style, hidden, inert, source } = reward;
       node.setAttribute('src', source);
@@ -176,18 +177,19 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
       const traveller = document.createElement('div'); traveller.className = 'mb-icon-traveller';
       traveller.dataset.icon = type;
       const object = document.createElement('div'); object.className = 'mb-icon-object';
+      const rolling = document.createElement('div'); rolling.className = 'mb-icon-roll';
       const face = type === puzzleType ? node : node.cloneNode(false);
       face.setAttribute('src', type === puzzleType ? node.getAttribute('src') : iconSource(type));
       for (let layer = 4; layer >= 1; layer--) {
         const side = face.cloneNode(false); side.className = 'mb-icon-side';
-        side.setAttribute('aria-hidden', 'true'); side.style.setProperty('--layer', layer); object.append(side);
+        side.setAttribute('aria-hidden', 'true'); side.style.setProperty('--layer', layer); rolling.append(side);
       }
       if (type === puzzleType) node.replaceWith(slot);
       face.classList.add('mb-icon-face'); face.inert = true; face.setAttribute('aria-hidden', 'true');
-      object.append(face); traveller.append(object); context.append(traveller);
+      rolling.append(face); object.append(rolling); traveller.append(object); context.append(traveller);
       Object.assign(traveller.style, { left: `${target.left - stageRect.left}px`, top: `${target.top - stageRect.top}px`,
         width: `${target.width}px`, height: `${target.height}px`, opacity: '0' });
-      return { type, traveller, object,
+      return { type, traveller, object, rolling,
         flight: createIconFlight({ target, mouth: visual.aperture(), stage: stageRect, viewDirection: visual.viewDirection(), ink: ICON_INK[type] }) };
     });
     reward = { node, slot, context, target, layers, ...original };
@@ -197,22 +199,24 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
   }
   function positionReward(elapsed) {
     const { context, target, layers } = reward;
-    const current = boxRewardAt(elapsed, puzzleType, rewardTypes);
+    const current = boxRewardAt(elapsed, puzzleType, rewardTypes, layers[0].flight(elapsed));
     context.dataset.reward = current.type;
-    for (const { type, traveller, object, flight } of layers) {
+    for (const { type, traveller, object, rolling, flight } of layers) {
       const exchanging = !current.locked && current.fromType !== current.toType;
-      const incoming = exchanging && current.blend >= .5;
-      const visibleType = incoming ? current.toType : current.fromType;
+      const visibleType = current.type;
       const weight = type === visibleType ? 1 : 0;
       const pose = flight(elapsed);
       // Exchange the silhouettes only while edge-on. One visible object avoids
       // a ghosted double outline; predecoded faces never change source in flight.
-      const pitch = pose.rotateX + (exchanging ? current.rollX : 0);
+      const roll = exchanging ? current.rollX : 0;
       traveller.style.transform = `translate3d(${pose.left - target.left}px,${pose.top - target.top}px,0) scale(${pose.scale})`;
       traveller.style.opacity = pose.opacity * weight;
-      object.style.transform = `rotateX(${pitch}deg) rotateY(${pose.rotateY}deg) rotateZ(0deg)`;
+      object.style.transform = `rotateX(${pose.rotateX}deg) rotateY(${pose.rotateY}deg) rotateZ(0deg)`;
+      rolling.style.transform = `rotateX(${roll}deg)`;
+      traveller.style.setProperty('--mb-confirm', weight ? current.glow : 0);
       traveller.style.setProperty('--mb-light', pose.light);
       traveller.style.setProperty('--mb-depth', pose.depth);
+      if (weight) visual.positionIconShadow?.({ type, pose, target, roll });
     }
     const pose = layers[0].flight(elapsed);
     context.style.clipPath = elapsed < BOX_SEQUENCE.settleAt
@@ -222,12 +226,14 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     intro?.setAttribute('aria-hidden', 'true');
     if (settleRequested && copy) copy.hidden = true;
     const lid = lidOpenness(elapsed);
-    if (lid !== progress) { progress = lid; visual.draw(progress); }
+    const lidChanged = lid !== progress;
+    progress = lid;
     if (elapsed >= BOX_SEQUENCE.liftAt) {
       if (!reward && !prepareReward()) { cancel(); return; }
       wrapper.style.height = `${revealHeight(elapsed, layout.closedHeight, layout.puzzleHeight)}px`;
       positionReward(elapsed);
     }
+    if (lidChanged || reward) visual.draw(progress);
     const phase = elapsed >= BOX_SEQUENCE.assembleAt ? 'assembling'
       : elapsed >= BOX_SEQUENCE.settleAt ? 'settling'
       : elapsed >= BOX_SEQUENCE.liftAt + BOX_SEQUENCE.liftFor ? 'reward'
@@ -350,7 +356,11 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
       const image = icon.cloneNode(false); image.setAttribute('src', iconSource(type)); return image.decode();
     }) : [];
     const presentationReady = Promise.all([rendererReady, icon ? icon.decode() : Promise.reject(), ...previews])
-      .then(([scene]) => scene).catch(() => null);
+      .then(([scene]) => {
+        // Shadow preparation is decorative and may never block the real puzzle.
+        void scene?.prepareIconShadows?.(rewardTypes.map(type => ({ type, source: iconSource(type) }))).catch(() => {});
+        return scene;
+      }).catch(() => null);
     if (['lift', 'reward', 'landed'].includes(review)) {
       wrapper.dataset.review = review;
       void presentationReady.then((scene) => {

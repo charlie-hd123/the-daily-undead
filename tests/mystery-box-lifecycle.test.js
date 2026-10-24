@@ -197,25 +197,44 @@ test('two taps on the initial poster wait for assets and then show the chosen ic
   assert.equal(f.panel.inert, false);
 });
 
-test('icons roll forward around a horizontal screen axis and exchange only edge-on', async () => {
+test('failed or stalled decorative shadow textures never delay the reveal or the real puzzle', async () => {
+  for (const shadowPreparation of [() => Promise.reject(new Error('shadow texture unavailable')), () => new Promise(() => {})]) {
+    const f = boxFixture({ shadowPreparation });
+    f.open(); await f.flush(); f.trigger.click();
+    assert.equal(f.frameCount, 1);
+    f.frame(BOX_SEQUENCE.finishAt);
+    assert.equal(f.panel.inert, false);
+    assert.equal(f.controller.isPresenting, false);
+  }
+});
+
+test('icons keep a fixed box angle while an independent inner frame rolls forward', async () => {
   const f = boxFixture(); f.open({ availableTypes: ['word', 'easter', 'blood'] }); await f.flush(); f.trigger.click();
-  const angle = (name) => {
+  const angle = (name, rolling = false) => {
     const visible = f.iconLayers.find(layer => Number(layer.style.opacity) > 0);
-    return Number(visible.children[0].style.transform.match(new RegExp(name + '\\((-?[\\d.]+)deg\\)'))[1]);
+    const frame = rolling ? visible.children[0].children[0] : visible.children[0];
+    return Number(frame.style.transform.match(new RegExp(name + '\\((-?[\\d.]+)deg\\)'))[1]);
   };
+  f.frame(BOX_SEQUENCE.cycleAt);
+  const fixedPitch = angle('rotateX'), fixedYaw = angle('rotateY');
+  assert.ok(fixedPitch < 0 && fixedYaw < 0, 'the perspective matches the box');
+  const frontNormal = (roll) => Math.cos(fixedPitch * Math.PI / 180) * Math.cos(fixedYaw * Math.PI / 180) * Math.cos(roll * Math.PI / 180)
+    - Math.sin(fixedPitch * Math.PI / 180) * Math.sin(roll * Math.PI / 180);
   let previous, exchanges = 0;
   for (let at = BOX_SEQUENCE.cycleAt; at <= BOX_SEQUENCE.cycleAt + BOX_SEQUENCE.cycleFor; at += 5) {
     f.frame(at);
-    assert.equal(Math.abs(angle('rotateY')), 0, 'yaw would tilt the rolling edge diagonally');
+    assert.equal(angle('rotateY'), fixedYaw);
+    assert.equal(angle('rotateX'), fixedPitch);
     assert.equal(Math.abs(angle('rotateZ')), 0);
-    const pitch = angle('rotateX');
+    const pitch = angle('rotateX', true);
     const type = f.iconLayers.find(layer => Number(layer.style.opacity) > 0).dataset.icon;
     if (previous?.type === type) assert.ok(pitch <= previous.pitch + 1e-8, 'every turn continues forward');
     else if (previous) {
-      assert.ok(previous.pitch < -75 && pitch > 75, 'artwork switches at the horizontal edge');
+      assert.ok(frontNormal(previous.pitch) < .15 && frontNormal(pitch) < .15, 'artwork switches at the actual tilted edge');
       exchanges++;
     }
     previous = { type, pitch };
+    assert.ok(frontNormal(pitch) >= -1e-8, 'the visible artwork must face the camera');
   }
   assert.ok(exchanges >= 4, 'the icons roll repeatedly before settling');
   assert.equal(previous.type, 'word');
