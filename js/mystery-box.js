@@ -1,9 +1,9 @@
-import { BOX_SEQUENCE, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261024-17';
+import { BOX_SEQUENCE, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261025-1';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261024-17';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261025-1';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
-export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () => {} } = {}) {
+export function createMysteryBox({ beforeOpen, onOpen = () => {}, onSkip = () => {}, onCancel = () => {} } = {}) {
   const stage = document.querySelector('#initial-mystery-box .mb-scene');
   const trigger = stage?.querySelector('.mb-open-trigger');
   const caption = document.querySelector('#initial-mystery-box .mb-caption');
@@ -56,12 +56,15 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
   trigger?.addEventListener('click', () => {
     if (unavailable || review) return;
     if (activation.requested) {
-      if (!wrapper) { skipPending = true; return; }
+      if (!wrapper) {
+        if (!skipPending) { skipPending = true; onSkip(); }
+        return;
+      }
       if (settleRequested) return;
       settleRequested = true;
       trigger.hidden = true;
       if (copy) copy.hidden = true;
-      onCancel(); skipAudioWait?.(); skipToReward?.();
+      onCancel(); onSkip(); skipAudioWait?.(); skipToReward?.();
       return;
     }
     activation.request(); syncTrigger();
@@ -93,7 +96,7 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onCancel = () 
     if (renderingReady) return renderingReady;
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261024-17')
+      import('./mystery-box-scene.js?v=20261025-1')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {

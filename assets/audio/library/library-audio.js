@@ -1,4 +1,4 @@
-import { settings } from './library-core.js?v=20261024-13';
+import { settings } from './library-core.js?v=20261025-1';
 
 export async function renderVersion(input, options, sampleRate) {
   const config = settings(options), rate = 2 ** (config.pitch / 12);

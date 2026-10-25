@@ -718,7 +718,7 @@
       "id": "map-select",
       "title": "Selection & deselection",
       "group": "Puzzle controls",
-      "trigger": "Puzzle cards, result navigation, map/game selection, back to clues/games, and Blood Ties shuffle/deselect. Other puzzle actions use dedicated cues.",
+      "trigger": "Puzzle selections and deselections, puzzle navigation, and an accepted click to skip the Mystery Box animation.",
       "wav": "map-select-ed526ca1bc.wav",
       "compressed": "map-select-aa4c70ee42.m4a",
       "duration": 0.14,

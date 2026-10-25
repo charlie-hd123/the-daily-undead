@@ -17,7 +17,7 @@ const details = {
   'letter-streak-4': ['Correct streak · 4+', 'Last Words', 'The fourth consecutive correct letter; repeats for longer streaks.', ['Last Words']],
   'letter-wrong': ['Wrong answer', 'Everyday feedback', 'A wrong letter, an incorrect bonus order, or an incorrect Blood Ties trio.', ['Last Words', 'Quest Steps', 'Blood Ties']],
   'quest-clue-reveal': ['Clue reveal', 'New selection · October 24', 'A new Quest Steps clue is revealed.', ['Quest Steps']],
-  'map-select': ['Selection & deselection', 'Puzzle controls', 'Map and puzzle choices, Blood Ties tiles, shuffle and deselect, and puzzle navigation.', ['Controls', 'Last Words', 'Quest Steps', 'Blood Ties']],
+  'map-select': ['Selection & deselection', 'Puzzle controls', 'Map and puzzle choices, Mystery Box skips, Blood Ties tiles, shuffle and deselect, and puzzle navigation.', ['Controls', 'Last Words', 'Quest Steps', 'Blood Ties']],
   'answer-lock': ['Answer lock-in / connection', 'Puzzle feedback', 'Confirming a map, submitting a correct bonus order, or finding a Blood Ties connection.', ['Quest Steps', 'Blood Ties']],
   'puzzle-solved-a': ['Puzzle solved', 'Puzzle success', 'A Last Words solve or a correct Quest Steps map answer.', ['Rewards', 'Last Words', 'Quest Steps']],
   'bonus-step-1': ['Bonus selection · first', 'Quest Steps', 'The first selected bonus step.', ['Quest Steps']],

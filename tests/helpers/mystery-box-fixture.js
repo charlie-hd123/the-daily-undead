@@ -57,7 +57,7 @@ export function boxFixture(options = {}) {
     requestAnimationFrame(fn) { const id = ++sequence; frames.set(id, fn); return id; }, cancelAnimationFrame: (id) => frames.delete(id), scrollTo() {} };
   const context = { ...motion, createDailyBoxHistory, document, window, location: { hostname: 'example.com', search: '' },
     ResizeObserver: options.resize === false ? undefined : class { observe() {} disconnect() {} }, dailyUndeadEntry: options.entry, performance: { now: () => 0 }, WebGL2RenderingContext: options.webgl === false ? undefined : class {},
-    beforeBoxOpen: options.beforeOpen, onBoxOpen: options.onOpen, onBoxCancel: options.onCancel,
+    beforeBoxOpen: options.beforeOpen, onBoxOpen: options.onOpen, onBoxSkip: options.onSkip, onBoxCancel: options.onCancel,
     URL, console: { warn() {} }, loadScene() { loads++; if (options.sceneFails) return Promise.reject(new Error('renderer unavailable'));
       if (options.slow) return new Promise((resolve) => { settleLoader = () => resolve({ createMysteryBoxScene: async () => visual }); });
       return Promise.resolve({ createMysteryBoxScene: async () => visual }); } };
@@ -65,7 +65,7 @@ export function boxFixture(options = {}) {
     .replace(/^import[^\n]+\n/gm, '').replace('export function createMysteryBox', 'function createMysteryBox')
     .replaceAll('import.meta.url', JSON.stringify(new URL('../../js/mystery-box.js', import.meta.url).href))
     .replace(/import\('\.\/mystery-box-scene\.js\?v=[^']+'\)/g, 'loadScene()');
-  vm.runInNewContext(source + '\nglobalThis.controller = createMysteryBox({ beforeOpen: beforeBoxOpen, onOpen: onBoxOpen, onCancel: onBoxCancel });', context);
+  vm.runInNewContext(source + '\nglobalThis.controller = createMysteryBox({ beforeOpen: beforeBoxOpen, onOpen: onBoxOpen, onSkip: onBoxSkip, onCancel: onBoxCancel });', context);
   return { controller: context.controller, panel, stage, trigger, caption, intro, copy, icon, storage, values,
     get iconLayers() { return panel.parentElement?.children.find(node => node.className === 'mb-icon-portal')?.children ?? []; },
     get loads() { return loads; }, get draws() { return draws; }, get disposed() { return disposed; },

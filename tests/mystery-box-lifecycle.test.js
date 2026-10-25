@@ -160,6 +160,33 @@ test('skipping an audio wait shows the final icon without a late sound or duplic
   assert.equal(f.panel.inert, false); assert.equal(f.frameCount, 0);
 });
 
+test('an accepted skip requests one click sound, including queued loading and audio waits', async () => {
+  for (const options of [{}, { slow: true }, { beforeOpen: () => new Promise(() => {}) }]) {
+    const sounds = [];
+    const f = boxFixture({ ...options, onOpen: () => sounds.push('opening'),
+      onSkip: () => sounds.push('selection'), onCancel: () => sounds.push('cancel') });
+    f.open(); await f.flush(); f.trigger.click();
+    assert.equal(sounds.filter(cue => cue === 'selection').length, 0, 'the opening tap is not a skip');
+    f.trigger.click();
+    assert.equal(sounds.at(-1), 'selection', 'click feedback is requested synchronously after stopping the opening');
+    f.trigger.click(); f.ready(); await f.flush();
+    f.controller.cancel();
+    assert.equal(sounds.filter(cue => cue === 'selection').length, 1, 'duplicate taps and cleanup do not replay it');
+  }
+  let clicks = 0;
+  const queued = boxFixture({ onSkip: () => clicks++ });
+  queued.trigger.click(); queued.trigger.click(); queued.trigger.click();
+  assert.equal(clicks, 1, 'an early skip before the wrapper exists is acknowledged once');
+  queued.open(); await queued.flush();
+  assert.equal(clicks, 1);
+  for (const options of [{ reduced: true }, { sceneFails: true }, { webgl: false }]) {
+    const fallback = boxFixture({ ...options, onSkip: () => clicks++ });
+    fallback.open(); await fallback.flush();
+    fallback.loseContext(); fallback.controller.cancel();
+    assert.equal(clicks, 1, 'automatic bypass and fallback are silent');
+  }
+});
+
 test('decoded icon objects exchange edge-on without ghosting and restore the untouched native icon', async () => {
   for (const availableTypes of [['word', 'easter'], ['word', 'easter', 'blood']]) {
     const f = boxFixture(); f.open({ availableTypes }); await f.flush(); f.trigger.click();

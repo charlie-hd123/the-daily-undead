@@ -1,5 +1,5 @@
-import { DEFAULT_SETTINGS, catalog, changed, settings, wavBytes, zipBytes } from './library-core.js?v=20261024-13';
-import { renderVersion } from './library-audio.js?v=20261024-13';
+import { DEFAULT_SETTINGS, catalog, changed, settings, wavBytes, zipBytes } from './library-core.js?v=20261025-1';
+import { renderVersion } from './library-audio.js?v=20261025-1';
 
 const $ = selector => document.querySelector(selector);
 const drafts = new Map(), cards = new Map(), buffers = new Map(), saveTimers = new Map(), rendered = new WeakMap(), uploads = new Map();
