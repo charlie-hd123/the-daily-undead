@@ -25,20 +25,36 @@ Yesterday’s Blood Ties summary lives inside the shared statistics grid. Its so
 
 `js/blood-ties-catalogue.js` contains **only the final 23 October workbook**: 164 categories, 477 distinct answers and 902 eligible memberships from `Blood Ties!A1:U165`, the first worksheet. Definitions, families and difficulty are preserved. The XLSM is read as XML; macros are never run. Imports reject incomplete categories, duplicate IDs, invalid difficulties and formula caches. Whitespace/Unicode and apostrophe-equivalent spellings are canonicalized, so equivalent answers have one visible spelling.
 
-To inspect a new workbook import locally:
+### Adding future categories and new-map content
+
+Add rows to the **first worksheet** of the existing workbook. Each row needs a unique, permanent Connection ID, a name, a precise definition, a family, difficulty 1/2/3, and at least three distinct eligible tiles (up to 16). Keep existing IDs for existing categories; add new IDs for new connections. Use the same spelling for a shared tile in every row. You can also add a new map to existing categories whose definitions it genuinely meets. Column V can contain a research link.
+
+You do not need to write game code or hand-pick boards when adding categories. Give the updated workbook and a future start date to the developer, or run:
 
 ```sh
-python3 scripts/import-blood-ties.py /path/to/workbook.xlsm
+python3 scripts/import-blood-ties.py /path/to/workbook.xlsm --effective-date YYYY-MM-DD
 node scripts/generate-blood-ties.mjs
 ```
 
-Content v2 activates on **23 October 2026 UTC**. It replaces the active catalogue rather than appending to it. `blood-ties-catalogue-v1.js` and `blood-ties-legacy.js` are a historical archive used only before that date, preserving the 22 October official round, account records and yesterday’s answers. No old-only category or answer enters a new board. Today’s official Last Words round is unchanged; the first official Blood Ties round using the final data is 25 October. A future content update needs another version/date boundary rather than editing already assigned boards.
+The importer increments the content version and automatically archives the previous catalogue and compiled pool. It refuses past dates, conflicting historical snapshots, incomplete categories and an uncompiled preceding import. The compiler rebuilds the content registry automatically, checks every category can participate and names uncovered categories if it cannot satisfy the safeguards. It does not quietly weaken fairness or cooldowns. Review ambiguous or version-specific facts before deploying the complete candidate to staging through STAGING.md. Future content changes do not need a database migration.
 
-The seeded offline compiler builds 4,096 reproducible boards covering all 164 categories. The compact pool is tied to the workbook SHA-256 and verified for freshness by tests. This avoids expensive board search inside browser startup/Worker requests. Every board has one difficulty-1, two difficulty-2 and one difficulty-3 group, and at most two groups from the same family. Each has four selected connections, three distinct answers each, and at least two answers that also belong to another selected connection. An exact-cover search rejects boards with multiple complete solutions among the four selected connections. Different orders of solving the same partition do not count as different solutions. Connections outside those four are not part of that uniqueness guarantee.
+### Content history and fairness
+
+Content v2 started on **23 October 2026 UTC**, using the final workbook rather than appending to the older data. The first official round with that workbook was 25 October. `blood-ties-catalogue-v1.js` / `blood-ties-legacy.js`, and `blood-ties-catalogue-v2.js` / `blood-ties-boards-v2.js` / `blood-ties-v2.js` preserve the already issued rounds, puzzle IDs, save restoration and scoring. Never edit those historical snapshots.
+
+Content v3 starts on **26 October 2026 UTC**, with the same 164-category workbook and improved generation. The first official Blood Ties round under these safeguards is **28 October**. Today’s 25 October puzzle remains exactly as issued. `blood-ties-content.js` routes dates to their immutable content snapshots; later workbook imports add further dated versions automatically.
+
+The seeded offline compiler builds 4,096 reproducible boards covering every active category. The compact pool is tied to the workbook SHA-256 and verified for freshness by tests. This avoids expensive board search inside browser startup/Worker requests. Each board has one difficulty-1, two difficulty-2 and one difficulty-3 group, with at most two from the same family, three distinct answers per group and at least two overlapping tiles. New boards must also pass these checks:
+
+- Exactly one complete tile partition across the **whole active catalogue**, using four distinct categories. Alternative category labels for an identical accepted trio and different solve orders do not count as alternative physical partitions.
+- The difficulty-1 category has exactly three eligible tiles visible, providing a clear starting connection.
+- No chosen category has more than five eligible tiles visible. The daily selector softly favours fewer rejected, catalogue-supported trios and fresher category pairings over a 42-day history.
+
+These checks preserve challenging overlaps while removing catalogue-known alternative complete answers. Catalogue memberships still need editorial accuracy: an unrecorded real-world connection cannot be detected automatically. The compiler reports actual ambiguity counts rather than treating two overlapping tiles as a complete difficulty measure.
 
 A board has **12 distinct visible labels**, including after normalization. Shared answers appear once, never as two indistinguishable tiles secretly assigned to different groups. Matches use the selected answer values rather than button position; shuffle/solve order cannot change correctness. Overlap creates deduction, not duplicate-owner guesswork.
 
-Daily selection computes shared history from the fixed v2 UTC epoch, independent of device, browser storage, timezone or play order. Categories cannot recur within the preceding **14 calendar days**, and tiles within **seven calendar days**. The 22 October round also seeds the boundary cooldown. These gaps apply even to just-for-fun days, so the three-day official rotation cannot shorten them. Among eligible boards, selection first favours less-used categories, then category gaps up to 42 days and tile gaps up to 21 days, with a date-seeded tie break. It fails explicitly if strict cooldowns cannot be met. All categories participate across the tested three-year schedule. Both browser and Worker import the same generator, pool and catalogue, all included in API release fingerprints.
+Daily selection computes shared history from fixed UTC content boundaries, independent of device, browser storage, timezone or play order. Categories cannot recur within the preceding **14 calendar days**, and tiles within **seven calendar days**. Every issued day from 22 October seeds the first fairness boundary; later versions retain the complete preceding history. These gaps apply even to just-for-fun days. Among eligible boards, selection first favours less-used categories, then balances category gaps up to 42 days, tile gaps up to 21 days, ambiguity and pair repetition, with a date-seeded tie break. It fails explicitly if strict cooldowns cannot be met. All active categories participate across the tested three-year schedule. Browser and Worker import the same dated generator, pools and catalogues, all included in API release fingerprints.
 
 ## Developer controls and release
 

@@ -4,6 +4,8 @@ import { DatabaseSync } from 'node:sqlite';
 import { readFile, readdir } from 'node:fs/promises';
 import { bloodTiesCatalogue } from '../js/blood-ties-catalogue.js';
 import { bloodTiesCatalogue as historicalCatalogue } from '../js/blood-ties-catalogue-v1.js';
+import { bloodTiesCatalogue as v2Catalogue } from '../js/blood-ties-catalogue-v2.js';
+import { bloodTiesContents } from '../js/blood-ties-content.js';
 import { buildDailyBloodTiesPuzzle, countBloodTiesSolutions, createBloodTiesSession, normalizeBloodTiesSession, replayBloodTiesAttempts } from '../js/blood-ties-core.js';
 import { getOfficialPuzzleType } from '../js/daily-challenge-core.js';
 import { recordVerifiedBloodResult, recordVerifiedWordResult, recordVerifiedMapResult, sanitizeDailyState, getAccount } from '../worker/src/accounts.js';
@@ -65,12 +67,12 @@ test('Blood Ties renders three strike circles, mode warnings and truthful result
   assert.match(renderBloodTiesGroup({ name: '<script>', answers: ['A & B'], definition: '<img>' }, 0), /&lt;script&gt;/);
 });
 
-test('the final first worksheet replaces the active database with 164 connections', () => {
+test('the active first worksheet contains complete categories with distinct IDs', () => {
   assert.equal(bloodTiesCatalogue.worksheet, 'Blood Ties');
-  assert.equal(bloodTiesCatalogue.connections.length, 164);
-  assert.equal(new Set(bloodTiesCatalogue.connections.map((g) => g.id)).size, 164);
-  assert.equal(bloodTiesCatalogue.version, 2);
-  assert.equal(new Set(bloodTiesCatalogue.connections.flatMap(g => g.tiles)).size, 477);
+  assert.ok(bloodTiesCatalogue.connections.length >= 4);
+  assert.equal(new Set(bloodTiesCatalogue.connections.map((g) => g.id)).size, bloodTiesCatalogue.connections.length);
+  assert.ok(bloodTiesCatalogue.version >= 3);
+  assert.ok(new Set(bloodTiesCatalogue.connections.flatMap(g => g.tiles)).size >= 12);
   assert.match(bloodTiesCatalogue.sourceSha256, /^[a-f0-9]{64}$/);
   for (const g of bloodTiesCatalogue.connections) assert.ok(g.tiles.length >= 3);
 });
@@ -84,7 +86,8 @@ test('a full year has deterministic unique solutions, deliberate traps and three
     assert.equal(countBloodTiesSolutions(p.groups.map((g) => ({ tiles: g.eligibleTiles })), p.tiles), 1, date);
     assert.ok(p.redHerrings.length >= 2, date);
     for (const g of p.groups) {
-      const source = (date < '2026-10-23' ? historicalCatalogue : bloodTiesCatalogue).connections.find((c) => c.id === g.id);
+      const catalogue = date < '2026-10-23' ? historicalCatalogue : date < '2026-10-26' ? v2Catalogue : bloodTiesContents.findLast(v => v.catalogue.effectiveDate <= date).catalogue;
+      const source = catalogue.connections.find((c) => c.id === g.id);
       assert.ok(g.answers.every((tile) => source.tiles.includes(tile)));
     }
     for (const previous of history.slice(-3)) {
@@ -373,11 +376,12 @@ test('verified failure credits no points and the staging schedule also verifies 
   assert.equal((await recordVerifiedMapResult(db, req(mapPayload), 'verify-player', { bloodTies: true })).status, 200);
 });
 
-test('new workbook boards use the same secure account, refresh, statistics and leaderboard flows', async (t) => {
-  t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-25T12:00:00Z') });
+test('fair boards use the same secure account, refresh, statistics and leaderboard flows', async (t) => {
+  t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-28T12:00:00Z') });
   const db = await database(); t.after(() => db.sqlite.close());
   db.sqlite.exec("INSERT INTO player_profiles(user_id,username) VALUES ('content-player','ContentPlayer'); INSERT INTO player_saves(user_id,score,total_rounds,current_round,best_round) VALUES ('content-player',500,4,7,9)");
-  const p = buildDailyBloodTiesPuzzle('2026-10-25');
+  const p = buildDailyBloodTiesPuzzle('2026-10-28');
+  assert.equal(p.contentVersion, 3);
   const attempts = [wrongs(p)[0], ...solution(p)];
   const payload = { puzzleDate: p.dateKey, puzzleId: p.key, attempts, rulesVersion: 3, points: 9999, success: false };
   const req = body => new Request('https://test/result', { method: 'POST', body: JSON.stringify(body) });
