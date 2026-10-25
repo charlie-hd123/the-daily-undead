@@ -138,6 +138,55 @@ test('small AAC transfers are primary, with WAV fallback if that format fails', 
   assert.ok(correct[0].endsWith('.m4a')); assert.ok(correct[1].endsWith('.wav'));
 });
 
+test('background preload has four slots, coalesces taps and lets an urgent cue bypass the queue', async () => {
+  let release, active = 0, maximum = 0;
+  const gate = new Promise(resolve => { release = resolve; }), requested = [];
+  const f = fixture({ fetchAudio: async url => {
+    requested.push(String(url)); active++; maximum = Math.max(maximum, active);
+    await gate; active--;
+    return { ok: true, arrayBuffer: async () => new ArrayBuffer(1) };
+  } });
+  const batch = f.audio.prepare();
+  assert.equal(requested.length, 4);
+  assert.ok(requested[0].includes('mystery-box-a-'));
+  assert.ok(requested[1].includes('map-select-'));
+  assert.equal(f.audio.prepare(), batch);
+  f.audio.unlock();
+  assert.equal(requested.length, 4, 'gesture warming reuses the in-flight batch');
+  const urgent = f.audio.play('bonus-step-3');
+  assert.equal(requested.length, 5);
+  assert.ok(requested.at(-1).includes('bonus-step-3-'));
+  release();
+  assert.equal(await urgent, true); await batch;
+  assert.equal(requested.length, 17, 'the later background visit to the urgent cue reuses its buffer');
+  assert.equal(maximum, 5, 'four background transfers plus one actual interaction');
+});
+
+test('muting stops the unstarted background queue and unmuting warms only the remaining cues', async () => {
+  let release;
+  const gate = new Promise(resolve => { release = resolve; });
+  const requested = [];
+  const f = fixture({ fetchAudio: async url => {
+    requested.push(String(url)); await gate;
+    return { ok: true, arrayBuffer: async () => new ArrayBuffer(1) };
+  } });
+  const batch = f.audio.prepare(); f.audio.setEnabled(false); release(); await batch;
+  assert.equal(requested.length, 4);
+  f.audio.setEnabled(true); await f.audio.prepare();
+  assert.equal(requested.length, 17);
+  assert.equal(new Set(requested).size, 17);
+  assert.equal(f.starts.length, 0, 'loading never autoplays a sound');
+});
+
+test('repeated warming of the complete pack does not download or decode again', async () => {
+  let decoded = 0;
+  const f = fixture({ decode: async () => { decoded++; return { duration: 1 }; } });
+  await f.audio.prepare();
+  const complete = f.audio.prepare();
+  for (let i = 0; i < 10; i++) { f.audio.unlock(); assert.equal(f.audio.prepare(), complete); await complete; }
+  assert.equal(f.calls.length, 17); assert.equal(decoded, 17);
+});
+
 test('warmed sounds start synchronously before a slow puzzle render can delay or discard them', async () => {
   const f = fixture(); f.audio.unlock(); await f.audio.prepare();
   const pending = f.audio.play('letter-correct');

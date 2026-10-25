@@ -22,6 +22,18 @@ export default {
     if (separator < 0 || !equal(credentials.slice(0, separator), "charlie") || !equal(credentials.slice(separator + 1), env.STAGING_PASSWORD)) return unauthorized();
     const assetRequest = new Request(request);
     assetRequest.headers.delete("Authorization");
-    return env.ASSETS.fetch(assetRequest);
+    const response = await env.ASSETS.fetch(assetRequest);
+    // Audio filenames contain their content hash, so a changed sound gets a new
+    // URL. Cache only successful audio responses in this browser, after auth;
+    // never cache the app, account data, release identity or an error this way.
+    if (['GET', 'HEAD'].includes(request.method) && response.status === 200
+      && /^\/assets\/audio\/[a-z0-9-]+-[a-f0-9]{10}\.(?:m4a|wav)$/.test(new URL(request.url).pathname)
+      && /^(?:audio\/|application\/octet-stream(?:;|$))/i.test(response.headers.get('Content-Type') || '')) {
+      const cached = new Response(response.body, response);
+      cached.headers.set('Cache-Control', 'private, max-age=31536000, immutable');
+      cached.headers.append('Vary', 'Authorization');
+      return cached;
+    }
+    return response;
   },
 };

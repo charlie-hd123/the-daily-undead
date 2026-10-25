@@ -152,6 +152,8 @@ export function createGameAudio({
   try { enabled = storage?.getItem(SOUND_PREFERENCE_KEY) !== 'false'; } catch { /* session-only preference */ }
   let context, output, unlocked = false, generation = 0;
   let resumeReady = Promise.resolve(false);
+  let preparing, prepared, preloadGeneration = 0;
+  const preloadOrder = [...new Set(['mystery-box-a', 'map-select', 'letter-correct', 'letter-wrong', 'quest-clue-reveal', ...Object.keys(SOUND_CUES)])];
   const buffers = new Map(), decoded = new Map(), retryAfter = new Map(), sources = new Set(), cueGenerations = new Map();
   const supported = typeof AudioContext === 'function' && typeof fetchAudio === 'function';
 
@@ -161,6 +163,7 @@ export function createGameAudio({
       if (context?.state === 'closed') {
         // Decoded AudioBuffers can be reused by the replacement context.
         stopAll(); buffers.clear(); retryAfter.clear();
+        preloadGeneration++; preparing = null;
         context = null; unlocked = false; resumeReady = Promise.resolve(false);
       }
       if (!context) {
@@ -222,7 +225,24 @@ export function createGameAudio({
   }
   function prepare() {
     if (!enabled || !supported) return Promise.resolve([]);
-    return Promise.all([...new Set(['mystery-box-a', 'map-select', 'letter-correct', 'letter-wrong', 'quest-clue-reveal', ...Object.keys(SOUND_CUES)])].map(load));
+    if (!getContext()) return Promise.resolve([]);
+    if (decoded.size === preloadOrder.length) return prepared ||= Promise.resolve(preloadOrder.map(cue => decoded.get(cue)));
+    if (preparing) return preparing;
+    const pending = preloadOrder.filter(cue => !decoded.has(cue) && now() >= (retryAfter.get(cue) || 0));
+    if (!pending.length) return Promise.resolve(preloadOrder.map(cue => decoded.get(cue) || null));
+    const epoch = preloadGeneration;
+    let next = 0;
+    const worker = async () => {
+      while (enabled && epoch === preloadGeneration && next < pending.length) await load(pending[next++]);
+    };
+    // Keep background fetch/decode work from arriving in one large burst on a
+    // phone. ready()/play() load an urgently needed cue directly, without waiting
+    // for a background slot. All requests for the same cue still coalesce.
+    const batch = Promise.all(Array.from({ length: Math.min(4, pending.length) }, worker))
+      .then(() => preloadOrder.map(cue => decoded.get(cue) || null))
+      .finally(() => { if (preparing === batch) preparing = null; });
+    preparing = batch;
+    return batch;
   }
   function unlock() {
     if (!enabled || !supported || isHidden()) return;

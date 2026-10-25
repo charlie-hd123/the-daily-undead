@@ -365,6 +365,34 @@ test("staging gateway protects the app and exposes only release identity", async
   assert.equal((await gateway.fetch(new Request("https://staging.test/", { headers: { Authorization: `Basic ${btoa("charlie:test-secret")}` } }), env)).status, 200);
 });
 
+test('staging caches only authenticated successful content-hashed audio privately', async () => {
+  const audio = '/assets/audio/map-select-012345abcd.m4a';
+  const authorization = `Basic ${btoa('charlie:test-secret')}`;
+  let upstream = 0, status = 200, type = 'audio/mp4';
+  const env = { STAGING_PASSWORD: 'test-secret', ASSETS: { async fetch(request) {
+    upstream++;
+    assert.equal(request.headers.has('Authorization'), false);
+    return new Response(null, { status, headers: { 'Content-Type': type, ETag: 'audio-hash', Vary: 'Accept-Encoding' } });
+  } } };
+  const get = (path, method = 'GET') => gateway.fetch(new Request('https://staging.test' + path, { method, headers: { Authorization: authorization } }), env);
+  for (const method of ['GET', 'HEAD']) {
+    const response = await get(audio, method);
+    assert.equal(response.headers.get('Cache-Control'), 'private, max-age=31536000, immutable');
+    assert.equal(response.headers.get('Vary'), 'Accept-Encoding, Authorization');
+    assert.equal(response.headers.get('ETag'), 'audio-hash');
+  }
+  assert.equal((await get(audio.replace('.m4a', '.wav'))).headers.get('Cache-Control'), 'private, max-age=31536000, immutable');
+  for (const path of ['/','/release.json','/assets/audio/manifest.json','/assets/audio/library/index.html','/assets/audio/mutable.m4a','/api/account']) {
+    assert.equal((await get(path)).headers.get('Cache-Control'), null);
+  }
+  status = 404; assert.equal((await get(audio)).headers.get('Cache-Control'), null);
+  status = 200; type = 'text/html'; assert.equal((await get(audio)).headers.get('Cache-Control'), null, 'SPA error fallback must not become an immutable audio response');
+  const before = upstream;
+  const denied = await gateway.fetch(new Request('https://staging.test' + audio), env);
+  assert.equal(denied.status, 401); assert.equal(denied.headers.get('Cache-Control'), 'no-store');
+  assert.equal(upstream, before, 'cache policy never bypasses the staging password');
+});
+
 test("promotion rejects partial candidates, API mismatches and missing live hotfixes", () => {
   const candidate = { commit: "approved", applicationDigest: "frontend", apiDigest: "backend" };
   const state = { candidate, staged: { ...candidate }, api: { apiDigest: "backend", environment: "staging" }, mainIsAncestor: true };
