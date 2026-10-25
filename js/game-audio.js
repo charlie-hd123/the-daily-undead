@@ -145,17 +145,24 @@ export function createGameAudio({
   fetchAudio = globalThis.fetch?.bind(globalThis),
   now = () => performance.now(),
   isHidden = () => globalThis.document?.hidden,
+  loadTimeoutMs = 6000,
+  retryDelayMs = 1000,
 } = {}) {
   let enabled = true;
   try { enabled = storage?.getItem(SOUND_PREFERENCE_KEY) !== 'false'; } catch { /* session-only preference */ }
   let context, output, unlocked = false, generation = 0;
   let resumeReady = Promise.resolve(false);
-  const buffers = new Map(), sources = new Set(), cueGenerations = new Map();
+  const buffers = new Map(), decoded = new Map(), retryAfter = new Map(), sources = new Set(), cueGenerations = new Map();
   const supported = typeof AudioContext === 'function' && typeof fetchAudio === 'function';
 
   function getContext() {
     if (!supported) return null;
     try {
+      if (context?.state === 'closed') {
+        // Decoded AudioBuffers can be reused by the replacement context.
+        stopAll(); buffers.clear(); retryAfter.clear();
+        context = null; unlocked = false; resumeReady = Promise.resolve(false);
+      }
       if (!context) {
         context = new AudioContext({ latencyHint: 'interactive' });
         output = context.destination;
@@ -174,26 +181,48 @@ export function createGameAudio({
     } catch { return null; }
     return context;
   }
-  function load(cue) {
-    if (buffers.has(cue)) return buffers.get(cue);
-    const loading = (async () => {
-      const audio = getContext();
-      if (!audio) return null;
-      for (const filename of SOUND_CUES[cue].files) {
-        try {
-          const response = await fetchAudio(new URL(`../assets/audio/${filename}`, import.meta.url));
-          if (!response.ok) continue;
+  async function loadFile(audio, filename) {
+    const controller = typeof AbortController === 'function' ? new AbortController() : null;
+    let timer;
+    try {
+      return await Promise.race([
+        (async () => {
+          const response = await fetchAudio(new URL(`../assets/audio/${filename}`, import.meta.url), { signal: controller?.signal });
+          if (!response.ok) throw new Error('Audio unavailable');
           return await audio.decodeAudioData(await response.arrayBuffer());
+        })(),
+        new Promise((_, reject) => {
+          timer = setTimeout(() => { controller?.abort(); reject(new Error('Audio load timed out')); }, loadTimeoutMs);
+        }),
+      ]);
+    } finally { clearTimeout(timer); }
+  }
+  function load(cue) {
+    const audio = getContext();
+    if (!audio) return Promise.resolve(null);
+    if (decoded.has(cue)) return Promise.resolve(decoded.get(cue));
+    if (buffers.has(cue)) return buffers.get(cue);
+    if (now() < (retryAfter.get(cue) || 0)) return Promise.resolve(null);
+    const loading = (async () => {
+      // Much smaller transfers, with the full-quality WAV retained as fallback.
+      const files = [...SOUND_CUES[cue].files].sort((a, b) => Number(b.endsWith('.m4a')) - Number(a.endsWith('.m4a')));
+      for (const filename of files) {
+        try {
+          const buffer = await loadFile(audio, filename);
+          if (audio !== context || audio.state === 'closed') return null;
+          decoded.set(cue, buffer); retryAfter.delete(cue);
+          return buffer;
         } catch { /* Try the alternate format, or continue silently on failure. */ }
       }
+      if (audio === context) retryAfter.set(cue, now() + retryDelayMs);
       return null;
-    })();
+    })().finally(() => { if (buffers.get(cue) === loading) buffers.delete(cue); });
     buffers.set(cue, loading);
     return loading;
   }
   function prepare() {
     if (!enabled || !supported) return Promise.resolve([]);
-    return Promise.all(Object.keys(SOUND_CUES).map(load));
+    return Promise.all([...new Set(['mystery-box-a', 'map-select', 'letter-correct', 'letter-wrong', 'quest-clue-reveal', ...Object.keys(SOUND_CUES)])].map(load));
   }
   function unlock() {
     if (!enabled || !supported || isHidden()) return;
@@ -236,15 +265,16 @@ export function createGameAudio({
     if (persist) try { storage?.setItem(SOUND_PREFERENCE_KEY, String(enabled)); } catch { /* session-only */ }
     if (enabled) unlock();
   }
-  async function play(cue, { delay = 0 } = {}) {
-    if (!SOUND_CUES[cue] || !enabled || !unlocked || isHidden()) return false;
-    const epoch = generation, cueEpoch = cueGenerations.get(cue) || 0;
-    const intendedAt = now() + delay;
-    const [buffer, running] = await Promise.all([load(cue), resumeReady]);
-    if (!buffer || !running || epoch !== generation || cueEpoch !== (cueGenerations.get(cue) || 0) || !enabled || isHidden() || context.state !== 'running') return false;
+  function recover({ online = false } = {}) {
+    if (!enabled || !supported || isHidden()) return;
+    if (online) retryAfter.clear();
+    if (unlocked) unlock(); else void prepare();
+  }
+  function start(cue, buffer, intendedAt, delay) {
     const late = now() - intendedAt;
-    // Never queue feedback to play much later than its actual action on a slow connection.
-    if (late > 180 || late / 1000 >= buffer.duration) return false;
+    // Drop stale network-loaded cues, especially old ticks, instead of bunching
+    // them up. Every accepted cue starts at its attack, never partway through it.
+    if (late > (delay > 0 ? 50 : 180)) return false;
     try {
       if (sources.size >= 24) stopSource(sources.values().next().value);
       const source = context.createBufferSource(), gain = context.createGain();
@@ -254,9 +284,20 @@ export function createGameAudio({
       const entry = { source, gain, cue };
       sources.add(entry);
       source.onended = () => { sources.delete(entry); source.disconnect(); gain.disconnect(); };
-      source.start(context.currentTime + Math.max(0, -late / 1000), Math.max(0, late / 1000));
+      source.start(context.currentTime + Math.max(0, -late / 1000), 0);
       return true;
     } catch { return false; }
+  }
+  async function play(cue, { delay = 0 } = {}) {
+    if (!SOUND_CUES[cue] || !enabled || !unlocked || isHidden()) return false;
+    const epoch = generation, cueEpoch = cueGenerations.get(cue) || 0;
+    const intendedAt = now() + delay;
+    // Schedule warmed feedback before a synchronous puzzle render can block the
+    // main thread. Even an already-resolved await used to delay or discard it.
+    if (decoded.has(cue) && context?.state === 'running') return start(cue, decoded.get(cue), intendedAt, delay);
+    const [buffer, running] = await Promise.all([load(cue), resumeReady]);
+    if (!buffer || !running || epoch !== generation || cueEpoch !== (cueGenerations.get(cue) || 0) || !enabled || isHidden() || context.state !== 'running') return false;
+    return start(cue, buffer, intendedAt, delay);
   }
   function countPoints(duration = 720, { delay = 0, reward: rewardCue } = {}) {
     stopCue('points-tick'); stopCue('points-finish');
@@ -274,7 +315,7 @@ export function createGameAudio({
     for (const other of ['puzzle-solved-a', 'double-points-a']) stopCue(other);
     return play(cue, options);
   }
-  return { supported, get enabled() { return enabled; }, prepare, ready, unlock, play, reward, countPoints, stopCue, stopAll, setEnabled };
+  return { supported, get enabled() { return enabled; }, prepare, ready, unlock, play, reward, countPoints, stopCue, stopAll, setEnabled, recover };
 }
 
 export function initialiseGameAudio(storage, document = globalThis.document, window = globalThis.window, platform = {}) {
@@ -300,8 +341,10 @@ export function initialiseGameAudio(storage, document = globalThis.document, win
     // Start the new click afterwards so that cleanup doesn't swallow it.
     if (cue) queueMicrotask(() => { void audio.play(cue); });
   }, { capture: true, passive: true });
-  document.addEventListener('visibilitychange', () => { if (document.hidden) audio.stopAll(); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) audio.stopAll(); else audio.recover(); });
   window.addEventListener('pagehide', () => audio.stopAll());
+  window.addEventListener('pageshow', () => audio.recover());
+  window.addEventListener('online', () => audio.recover({ online: true }));
   window.addEventListener('storage', (event) => {
     if (event.key === SOUND_PREFERENCE_KEY || event.key === null) {
       let value = true;

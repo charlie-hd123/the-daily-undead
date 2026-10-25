@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { createGameAudio, initialiseGameAudio, letterSound, bloodConnectionSound, SOUND_CUES, SOUND_PREFERENCE_KEY } from '../js/game-audio.js';
 
-function fixture({ muted = false, unavailable = false, fetchAudio, decode } = {}) {
+function fixture({ muted = false, unavailable = false, fetchAudio, decode, loadTimeoutMs } = {}) {
   let time = 0, hidden = false;
   const values = new Map(muted ? [[SOUND_PREFERENCE_KEY, 'false']] : []), starts = [], stopped = [];
   const context = {
@@ -23,6 +23,7 @@ function fixture({ muted = false, unavailable = false, fetchAudio, decode } = {}
     AudioContext: unavailable ? null : class { constructor() { return context; } },
     fetchAudio: fetchAudio || (async url => { calls.push(String(url)); return { ok: true, arrayBuffer: async () => new ArrayBuffer(1) }; }),
     now: () => time, isHidden: () => hidden,
+    ...(loadTimeoutMs === undefined ? {} : { loadTimeoutMs }),
   };
   const audio = createGameAudio(platform);
   return { audio, platform, context, calls, starts, stopped, values, advance: value => { time += value; }, hide: value => { hidden = value; } };
@@ -126,15 +127,112 @@ test('background tabs, unavailable audio, bad assets and stale downloads stay si
   assert.equal(await pending, false);
 });
 
-test('lossless WAV is primary, with AAC fallback if that download fails', async () => {
+test('small AAC transfers are primary, with WAV fallback if that format fails', async () => {
   const requested = [];
   const f = fixture({ fetchAudio: async url => ({ ok: true, arrayBuffer: async () => ({ filename: String(url) }) }),
-    decode: async bytes => { requested.push(bytes.filename); if (bytes.filename.endsWith('.wav')) throw new Error('WAV unavailable'); return { duration: .5 }; } });
+    decode: async bytes => { requested.push(bytes.filename); if (bytes.filename.endsWith('.m4a')) throw new Error('AAC unavailable'); return { duration: .5 }; } });
   f.audio.unlock(); await f.audio.prepare();
   assert.equal(await f.audio.play('letter-correct'), true);
   const correct = requested.filter(name => name.includes('/letter-correct-'));
   assert.equal(correct.length, 2);
-  assert.ok(correct[0].endsWith('.wav')); assert.ok(correct[1].endsWith('.m4a'));
+  assert.ok(correct[0].endsWith('.m4a')); assert.ok(correct[1].endsWith('.wav'));
+});
+
+test('warmed sounds start synchronously before a slow puzzle render can delay or discard them', async () => {
+  const f = fixture(); f.audio.unlock(); await f.audio.prepare();
+  const pending = f.audio.play('letter-correct');
+  assert.equal(f.starts.length, 1, 'source is scheduled within the event handler');
+  f.advance(400); // A synchronous render after play() blocks the next microtask.
+  assert.equal(await pending, true);
+  assert.equal(f.starts[0].offset, 0);
+});
+
+test('a short cold cue keeps its attack rather than being truncated after a brief download wait', async () => {
+  let release;
+  const gate = new Promise(resolve => { release = resolve; });
+  const f = fixture({ fetchAudio: async () => { await gate; return { ok: true, arrayBuffer: async () => new ArrayBuffer(1) }; },
+    decode: async () => ({ duration: .075 }) });
+  f.audio.unlock(); const pending = f.audio.play('points-tick');
+  f.advance(120); release();
+  assert.equal(await pending, true);
+  assert.equal(f.starts.length, 1); assert.equal(f.starts[0].offset, 0);
+});
+
+test('temporary failures retry on a later interaction without hammering the network', async () => {
+  let online = false, requests = 0;
+  const f = fixture({ fetchAudio: async () => { requests++; if (!online) throw new Error('offline'); return { ok: true, arrayBuffer: async () => new ArrayBuffer(1) }; } });
+  f.audio.unlock(); await f.audio.prepare();
+  const failedRequests = requests;
+  online = true;
+  assert.equal(await f.audio.play('letter-correct'), false);
+  assert.equal(requests, failedRequests);
+  f.advance(1001); f.audio.unlock();
+  assert.equal(await f.audio.play('letter-correct'), true);
+  assert.ok(requests > failedRequests);
+});
+
+test('stalled requests time out, abort and allow a later successful retry', async () => {
+  let stalled = true;
+  const signals = [];
+  const f = fixture({ loadTimeoutMs: 10, fetchAudio: async (_url, { signal }) => {
+    signals.push(signal);
+    if (stalled) return new Promise(() => {});
+    return { ok: true, arrayBuffer: async () => new ArrayBuffer(1) };
+  } });
+  f.audio.unlock(); await f.audio.prepare();
+  assert.ok(signals.length > 0 && signals.every(signal => signal.aborted));
+  stalled = false; f.advance(1001);
+  assert.equal(await f.audio.play('map-select'), true);
+});
+
+test('cold count ticks that have missed their slot do not bunch up on a slow connection', async () => {
+  let release;
+  const gate = new Promise(resolve => { release = resolve; });
+  const f = fixture({ fetchAudio: async () => { await gate; return { ok: true, arrayBuffer: async () => new ArrayBuffer(1) }; } });
+  f.audio.unlock(); f.audio.countPoints(720);
+  f.advance(600); release(); await new Promise(resolve => setImmediate(resolve));
+  assert.equal(f.starts.length, 1, 'only the finishing ping is still ahead of its intended time');
+  assert.equal(f.starts[0].at, 10.12);
+});
+
+test('resuming an interrupted context and replacing a closed context both restore playback', async () => {
+  const f = fixture(); f.audio.unlock(); await f.audio.prepare();
+  f.context.state = 'interrupted'; f.audio.unlock();
+  assert.equal(await f.audio.play('letter-correct'), true);
+  const downloads = f.calls.length;
+  f.context.state = 'closed'; f.audio.unlock();
+  assert.equal(await f.audio.play('letter-correct'), true);
+  assert.equal(f.starts.length, 2);
+  assert.equal(f.calls.length, downloads, 'context recovery reuses decoded buffers without another download');
+});
+
+test('returning online retries failed audio immediately and visible-page recovery resumes warmed audio', async () => {
+  let online = false;
+  const f = fixture({ fetchAudio: async () => { if (!online) throw new Error('offline'); return { ok: true, arrayBuffer: async () => new ArrayBuffer(1) }; } });
+  f.audio.unlock(); await f.audio.prepare();
+  online = true; f.audio.recover({ online: true }); await f.audio.prepare();
+  assert.equal(await f.audio.play('map-select'), true);
+  f.context.state = 'suspended'; f.audio.recover();
+  assert.equal(await f.audio.play('letter-correct'), true);
+  f.audio.setEnabled(false); f.audio.recover({ online: true });
+  assert.equal(await f.audio.play('letter-correct'), false);
+});
+
+test('visibility and page restoration recover Safari audio without replaying background cues', async () => {
+  const f = fixture(), handlers = new Map(), windowHandlers = new Map();
+  const document = { hidden: false, querySelector: () => null, addEventListener: (name, fn) => handlers.set(name, fn) };
+  const audio = initialiseGameAudio(f.platform.storage, document, { addEventListener: (name, fn) => windowHandlers.set(name, fn) }, f.platform);
+  await audio.prepare(); audio.unlock(); await audio.play('points-finish', { delay: 720 });
+  document.hidden = true; handlers.get('visibilitychange')();
+  assert.equal(f.stopped.length, 1);
+  f.context.state = 'interrupted'; document.hidden = false; handlers.get('visibilitychange')();
+  assert.equal(await audio.play('letter-correct'), true);
+  assert.equal(f.starts.length, 2, 'the old finishing cue is not replayed');
+  f.context.state = 'closed'; windowHandlers.get('pageshow')();
+  assert.equal(await audio.play('map-select'), true);
+  assert.equal(f.starts.length, 3);
+  audio.setEnabled(false); windowHandlers.get('online')();
+  assert.equal(await audio.play('map-select'), false);
 });
 
 test('puzzle navigation gets one click; dedicated cues, site controls and disabled controls stay silent', async () => {
