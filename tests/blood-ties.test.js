@@ -64,6 +64,21 @@ test('Blood Ties renders three strike circles, mode warnings and truthful result
   assert.match(lost, /Your run ended at <strong>Round 8/);
   assert.equal((lost.match(/· Revealed/g) || []).length, 4);
   assert.doesNotMatch(lost, /Round score/);
+  const discoveryOrder = [p.groups[2], p.groups[0], p.groups[3], p.groups[1]];
+  const namesIn = (markup) => [...markup.matchAll(/<h3>(.*?)<\/h3>/g)].map((match) => match[1]);
+  for (const official of [true, false]) {
+    for (let count = 1; count <= 4; count++) {
+      const session = replayBloodTiesAttempts(p, discoveryOrder.slice(0, count).map((g) => g.answers));
+      assert.deepEqual(namesIn(render(session, official)), discoveryOrder.slice(0, count).map((g) => g.name));
+      assert.deepEqual(namesIn(render(normalizeBloodTiesSession(p, JSON.parse(JSON.stringify(session))), official)), discoveryOrder.slice(0, count).map((g) => g.name));
+    }
+  }
+  const unsolved = p.groups.filter((g) => g !== discoveryOrder[0]);
+  const partialLoss = replayBloodTiesAttempts(p, [discoveryOrder[0].answers, ...[0, 1, 2].map((i) => unsolved.map((g) => g.answers[i]))]);
+  assert.deepEqual(namesIn(render(partialLoss)), [discoveryOrder[0], ...p.groups.filter((g) => g !== discoveryOrder[0])].map((g) => g.name));
+  const legacyWin = replayBloodTiesAttempts(p, discoveryOrder.slice(0, 3).map((g) => g.answers), 2);
+  assert.deepEqual(namesIn(render(legacyWin)), discoveryOrder.map((g) => g.name));
+  assert.equal((render(legacyWin).match(/· Revealed/g) || []).length, 1);
   assert.match(renderBloodTiesGroup({ name: '<script>', answers: ['A & B'], definition: '<img>' }, 0), /&lt;script&gt;/);
 });
 

@@ -14,6 +14,9 @@ export function renderBloodTiesView({ app, puzzle, session, official, developer,
   const tiles = shuffle(remaining, createRng(hashString(`${puzzle.key}:shuffle:${session.shuffleCount}`)));
   const groupRow = renderBloodTiesGroup;
   const solvedGroups = session.solved.map((id) => puzzle.groups.find((g) => g.id === id));
+  const displayedGroups = session.complete
+    ? [...solvedGroups, ...puzzle.groups.filter((g) => !session.solved.includes(g.id))]
+    : solvedGroups;
   const lastAttempt = session.attempts.at(-1);
   const lastCorrect = lastAttempt && puzzle.groups.some((g) => lastAttempt.every((tile) => g.answers.includes(tile)));
   const feedback = session.message && lastAttempt ? lastCorrect ? ' is-correct' : ' is-miss' : '';
@@ -24,15 +27,13 @@ export function renderBloodTiesView({ app, puzzle, session, official, developer,
       ${official ? session.success ? '' : ' Your permanent Score and Solves are safe.' : ' This result did not affect your stats.'}</p>
       ${official && session.success ? `<div class="result-score-total"><span>Round score</span><strong data-count-to="${session.points}">${session.points}</strong></div>` : ''}
       ${official && !session.success ? `<p class="survival-summary">${Math.max(1, session.roundsSurvivedBeforeLoss || 1) === 1 ? 'Your Round remains at <strong>Round 1</strong>.' : `Your run ended at <strong>Round ${session.roundsSurvivedBeforeLoss}</strong>. Your next game starts at <strong>Round 1</strong>.`}</p>` : ''}</div>`
-      : `<img class="puzzle-panel-art" src="./assets/blood-ties-card.svg?v=20261025-6" alt="" width="240" height="240" aria-hidden="true">
+      : `<img class="puzzle-panel-art" src="./assets/blood-ties-card.svg?v=20261025-7" alt="" width="240" height="240" aria-hidden="true">
       ${heading('Blood Ties', 'Select 3 tiles that share a hidden Zombies connection. Find all four, and watch out for overlapping themes.', official ? 'Today’s round' : 'Just for fun', true)}
       ${official ? '' : '<p class="puzzle-mode-note">Playing just for fun. This result will not change your stats.</p>'}
       <div class="word-scoreboard${official ? '' : ' is-single'}" role="group" aria-label="Connection puzzle progress"><div class="blood-strikes"><span>Strikes</span><div class="blood-strike-circles${flashStrikes ? ' is-clearing' : ''}" role="img" aria-label="${session.strikes} of 3 strikes">${[1, 2, 3].map((i) => `<i class="${i <= session.strikes ? 'is-active' : ''}"></i>`).join('')}</div></div>
       ${official ? `<div><span>Potential score</span><strong>${session.potentialPoints}</strong></div>` : ''}</div>
       <div class="blood-progress" role="status" aria-label="${session.solved.length} of 4 connections found"><div class="blood-progress-copy"><strong>${session.solved.length}<span> / 4</span></strong><span>Connections found</span></div><div class="blood-progress-track" aria-hidden="true">${[1, 2, 3, 4].map(i => `<span class="${i <= session.solved.length ? 'is-found' : ''}">${i <= session.solved.length ? '✓' : i}</span>`).join('')}</div></div>`}
-    <div class="blood-solved" aria-label="${session.complete ? 'Today’s connections' : 'Solved connections'}">${session.complete
-      ? puzzle.groups.map((g, i) => groupRow(g, i, !session.solved.includes(g.id) || session.success && session.rulesVersion < 3 && g.id === session.solved.at(-1))).join('')
-      : solvedGroups.map((g) => groupRow(g, puzzle.groups.indexOf(g))).join('')}</div>
+    <div class="blood-solved" aria-label="${session.complete ? 'Today’s connections' : 'Solved connections'}">${displayedGroups.map((g, i) => groupRow(g, i, !session.solved.includes(g.id) || session.success && session.rulesVersion < 3 && g.id === session.solved.at(-1))).join('')}</div>
     ${session.complete ? resultActions : `<div class="blood-grid" role="group" aria-label="Connection tiles">${tiles.map((tile, i) => `<button class="blood-tile${session.selected.includes(tile) ? ' is-selected' : ''}" style="--blood-longest-word:${Math.max(10, ...tile.split(/[\s-]/u).map(word => [...word].length))}" type="button" data-blood-tile="${i}" aria-pressed="${session.selected.includes(tile)}">${html(tile)}</button>`).join('')}</div>
       <p id="blood-status" class="blood-status${feedback}" role="status" aria-live="polite">${html(session.message || 'Find the first connection.')}</p>
       <div class="blood-controls"><button class="button" id="blood-shuffle" type="button">Shuffle</button><button class="button" id="blood-clear" type="button" ${session.selected.length ? '' : 'disabled'}>Deselect</button><button class="button primary" id="blood-submit" type="button" ${session.selected.length === 3 ? '' : 'disabled'}>Submit <span id="blood-selection-count">${session.selected.length}/3</span></button></div>
