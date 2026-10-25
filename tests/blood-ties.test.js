@@ -192,8 +192,8 @@ test('unfinished legacy saves adopt strikes while completed legacy awards retain
   assert.equal(normalizeBloodTiesSession(p, failed).success, false);
 });
 
-test('three-day rotation is staging/local only, and leaves historical assignments intact', () => {
-  assert.deepEqual(Array.from({ length: 6 }, (_, i) => getOfficialPuzzleType(`2026-10-${22 + i}`, { bloodTies: true })), ['blood', 'word', 'easter', 'blood', 'word', 'easter']);
+test('historical three-day rotation is staging/local only and remains intact', () => {
+  assert.deepEqual(Array.from({ length: 4 }, (_, i) => getOfficialPuzzleType(`2026-10-${22 + i}`, { bloodTies: true })), ['blood', 'word', 'easter', 'blood']);
   assert.equal(getOfficialPuzzleType('2026-10-22'), 'easter');
   assert.equal(getOfficialPuzzleType('2026-10-21', { bloodTies: true }), getOfficialPuzzleType('2026-10-21'));
   assert.equal(puzzleOptions({ BLOOD_TIES_DEMO: '1', DEPLOYMENT_ENVIRONMENT: 'production' }).bloodTies, false);
@@ -364,23 +364,23 @@ test('verified failure credits no points and the staging schedule also verifies 
   assert.equal(failed.status, 200); assert.equal(failed.body.progress.score, 500);
   assert.equal(failed.body.progress.currentRound, 1); assert.equal(failed.body.progress.bestRound, 9);
   assert.equal(failed.body.result.bloodMisses, 3);
-  t.mock.timers.setTime(new Date('2026-10-26T12:00:00Z').getTime());
-  const w = buildDailyWordPuzzle('2026-10-26', workerWords);
+  t.mock.timers.setTime(new Date('2026-10-28T12:00:00Z').getTime());
+  const w = buildDailyWordPuzzle('2026-10-28', workerWords);
   const wordPayload = { puzzleDate: w.dateKey, puzzleId: w.key, guesses: [...new Set(w.entry.answer.toUpperCase().replace(/[^A-Z]/g, ''))] };
   assert.equal((await recordVerifiedWordResult(db, req(wordPayload), 'verify-player')).status, 400);
   assert.equal((await recordVerifiedWordResult(db, req(wordPayload), 'verify-player', { bloodTies: true })).status, 200);
-  t.mock.timers.setTime(new Date('2026-10-27T12:00:00Z').getTime());
-  const map = buildDailyPuzzle('2026-10-27', workerMaps);
+  t.mock.timers.setTime(new Date('2026-11-04T12:00:00Z').getTime());
+  const map = buildDailyPuzzle('2026-11-04', workerMaps);
   const mapPayload = { puzzleDate: map.dateKey, puzzleId: map.key, selectedMapId: map.map.id, cluesUsed: 1 };
   assert.equal((await recordVerifiedMapResult(db, req(mapPayload), 'verify-player')).status, 400);
   assert.equal((await recordVerifiedMapResult(db, req(mapPayload), 'verify-player', { bloodTies: true })).status, 200);
 });
 
 test('fair boards use the same secure account, refresh, statistics and leaderboard flows', async (t) => {
-  t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-28T12:00:00Z') });
+  t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-27T12:00:00Z') });
   const db = await database(); t.after(() => db.sqlite.close());
   db.sqlite.exec("INSERT INTO player_profiles(user_id,username) VALUES ('content-player','ContentPlayer'); INSERT INTO player_saves(user_id,score,total_rounds,current_round,best_round) VALUES ('content-player',500,4,7,9)");
-  const p = buildDailyBloodTiesPuzzle('2026-10-28');
+  const p = buildDailyBloodTiesPuzzle('2026-10-27');
   assert.equal(p.contentVersion, 3);
   const attempts = [wrongs(p)[0], ...solution(p)];
   const payload = { puzzleDate: p.dateKey, puzzleId: p.key, attempts, rulesVersion: 3, points: 9999, success: false };
@@ -406,4 +406,40 @@ test('fair boards use the same secure account, refresh, statistics and leaderboa
   const env = { DB: db, DEPLOYMENT_ENVIRONMENT: 'local', BLOOD_TIES_DEMO: '1' };
   assert.equal((await worker.fetch(new Request('https://test/api/attempts', { method: 'POST', body: JSON.stringify(anonymous) }), env)).status, 200);
   assert.equal((await worker.fetch(new Request('https://test/api/attempts', { method: 'POST', body: JSON.stringify({ ...anonymous, rulesVersion: 1 }) }), env)).status, 400);
+});
+
+test('balanced daily assignments verify only the official game and persist rewards once across rollover', async (t) => {
+  t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-26T12:00:00Z') });
+  const db = await database(); t.after(() => db.sqlite.close());
+  db.sqlite.exec("INSERT INTO player_profiles(user_id,username) VALUES ('schedule-player','SchedulePlayer'); INSERT INTO player_saves(user_id,score,total_rounds,current_round,best_round) VALUES ('schedule-player',500,4,7,9)");
+  const seen = new Set();
+  let expectedScore = 500;
+  for (let day = 0; day < 14; day += 1) {
+    const now = new Date(Date.parse('2026-10-26T12:00:00Z') + day * 86400000);
+    t.mock.timers.setTime(now.getTime());
+    const date = now.toISOString().slice(0, 10);
+    const official = getOfficialPuzzleType(date, { bloodTies: true }); seen.add(official);
+    const blood = buildDailyBloodTiesPuzzle(date);
+    const word = buildDailyWordPuzzle(date, workerWords);
+    const map = buildDailyPuzzle(date, workerMaps);
+    const entries = [
+      ['blood', recordVerifiedBloodResult, { puzzleDate: date, puzzleId: blood.key, attempts: solution(blood), rulesVersion: 3 }],
+      ['word', recordVerifiedWordResult, { puzzleDate: date, puzzleId: word.key, guesses: [...new Set(word.entry.answer.toUpperCase().replace(/[^A-Z]/g, ''))] }],
+      ['easter', recordVerifiedMapResult, { puzzleDate: date, puzzleId: map.key, selectedMapId: map.map.id, cluesUsed: 1 }],
+    ];
+    for (const [type, save, body] of entries) {
+      const send = () => save(db, new Request('https://test/result', { method: 'POST', body: JSON.stringify(body) }), 'schedule-player', { bloodTies: true });
+      const result = await send();
+      assert.equal(result.status, type === official ? 200 : 400, `${date} ${type}`);
+      if (type !== official) continue;
+      expectedScore += type === 'easter' ? 50 : 100;
+      assert.equal(result.body.progress.score, expectedScore, date);
+      assert.equal((await send()).body.progress.score, expectedScore, 'refresh cannot award twice');
+      const board = await readLeaderboards(db, date);
+      assert.equal(board.today.elite.find((player) => player.username === 'SchedulePlayer').points, type === 'easter' ? 50 : 100);
+    }
+    assert.equal(db.sqlite.prepare('SELECT puzzle_type FROM player_daily_results WHERE user_id=? AND puzzle_date=?').get('schedule-player', date).puzzle_type, official);
+  }
+  assert.equal(seen.size, 3);
+  assert.equal(db.sqlite.prepare("SELECT COUNT(*) n FROM player_daily_results WHERE user_id='schedule-player'").get().n, 14);
 });

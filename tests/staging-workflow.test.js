@@ -202,6 +202,27 @@ test("staging is a complete database-backed service through production routes", 
   db.sqlite.close();
 });
 
+test("fixtures follow the balanced schedule across rollover without changing real account saves", async (t) => {
+  const db = await database(); t.after(() => db.sqlite.close());
+  const env = { ...stagingEnv(db), BLOOD_TIES_DEMO: '1' };
+  db.sqlite.exec("INSERT INTO player_profiles (user_id,username,account_id) VALUES ('real-schedule-account','KeepSchedule','acct_keep_schedule'); INSERT INTO player_saves (user_id,score,current_round,best_round,revision) VALUES ('real-schedule-account',1234,9,12,7); INSERT INTO player_daily_saves (user_id,puzzle_date,state_json) VALUES ('real-schedule-account','2026-10-25','{\"officialType\":\"blood\",\"marker\":\"keep\"}')");
+  const seen = new Set();
+  for (let day = 0; day < 7; day += 1) {
+    const date = new Date(Date.parse('2026-10-26T00:00:00Z') + day * 86400000).toISOString().slice(0, 10);
+    await ensureStagingFixtures(env, date);
+    const official = getOfficialPuzzleType(date, { bloodTies: true }); seen.add(official);
+    const rows = db.sqlite.prepare("SELECT puzzle_type FROM player_daily_results WHERE user_id LIKE 'stage_demo_%' AND puzzle_date=?").all(date);
+    assert.equal(rows.length, 8);
+    assert.ok(rows.every((row) => row.puzzle_type === official), date);
+    const before = db.sqlite.prepare('SELECT COUNT(*) n FROM player_daily_results').get().n;
+    await ensureStagingFixtures({ ...env, DB: { ...db } }, date);
+    assert.equal(db.sqlite.prepare('SELECT COUNT(*) n FROM player_daily_results').get().n, before);
+  }
+  assert.equal(seen.size, 3);
+  assert.deepEqual({ ...db.sqlite.prepare("SELECT score,current_round,best_round,revision FROM player_saves WHERE user_id='real-schedule-account'").get() }, { score: 1234, current_round: 9, best_round: 12, revision: 7 });
+  assert.equal(db.sqlite.prepare("SELECT state_json FROM player_daily_saves WHERE user_id='real-schedule-account'").get().state_json, '{"officialType":"blood","marker":"keep"}');
+});
+
 test("production and accidental production-auth configuration cannot enable staging fixtures", async () => {
   let touched = false;
   const DB = { prepare() { touched = true; throw new Error("must not write"); } };

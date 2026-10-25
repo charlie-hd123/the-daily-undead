@@ -2,7 +2,7 @@
 
 Blood Ties is the third game in the shared Daily Undead application. It is enabled only on local development hosts and the normal staging host. `BLOOD_TIES_DEMO=1` additionally enables its Worker routes in local/staging environments. Production ignores that flag and retains the existing two-game schedule. No production deployment or data migration is part of this demo.
 
-The staging rotation starts on **22 October 2026 UTC**: Blood Ties, Last Words, Quest Steps, then repeats every three days. Earlier assignments are unchanged. After the official round, either remaining game is available just for fun. Just-for-fun games never award Score, Solves or Round progression. Date previews use the existing isolated browser storage and disable account uploads.
+The staging rotation started on **22 October 2026 UTC**: Blood Ties, Last Words, Quest Steps. From **26 October 2026 UTC**, the shared daily selector uses a balanced random schedule: no consecutive game repeats, every rolling five-day window includes all three games, and selection favours games played less in the preceding 14 days. Everyone receives the same game and puzzle for each UTC date, including after refresh or switching devices. The date-seeded v1 schedule includes preceding assignments at its boundary; its rules/seed remain fixed to preserve issued days. Assignments through 25 October are unchanged. After the official round, either remaining game is available just for fun. Just-for-fun games never award Score, Solves or Round progression. Date previews use the existing isolated browser storage and disable account uploads.
 
 ## Rules
 
@@ -42,7 +42,7 @@ The importer increments the content version and automatically archives the previ
 
 Content v2 started on **23 October 2026 UTC**, using the final workbook rather than appending to the older data. The first official round with that workbook was 25 October. `blood-ties-catalogue-v1.js` / `blood-ties-legacy.js`, and `blood-ties-catalogue-v2.js` / `blood-ties-boards-v2.js` / `blood-ties-v2.js` preserve the already issued rounds, puzzle IDs, save restoration and scoring. Never edit those historical snapshots.
 
-Content v3 starts on **26 October 2026 UTC**, with the same 164-category workbook and improved generation. The first official Blood Ties round under these safeguards is **28 October**. Today’s 25 October puzzle remains exactly as issued. `blood-ties-content.js` routes dates to their immutable content snapshots; later workbook imports add further dated versions automatically.
+Content v3 starts on **26 October 2026 UTC**, with the same 164-category workbook and improved generation. Under the balanced daily schedule, the first official Blood Ties round with these safeguards is **27 October**. Today’s 25 October puzzle remains exactly as issued. `blood-ties-content.js` routes dates to their immutable content snapshots; later workbook imports add further dated versions automatically.
 
 The seeded offline compiler builds 4,096 reproducible boards covering every active category. The compact pool is tied to the workbook SHA-256 and verified for freshness by tests. This avoids expensive board search inside browser startup/Worker requests. Each board has one difficulty-1, two difficulty-2 and one difficulty-3 group, with at most two from the same family, three distinct answers per group and at least two overlapping tiles. New boards must also pass these checks:
 

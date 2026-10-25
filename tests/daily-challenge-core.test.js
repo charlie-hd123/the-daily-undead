@@ -4,9 +4,62 @@ import {
   getOfficialPuzzleType,
   getOtherPuzzleType,
   isPuzzleSessionComplete,
+  BALANCED_PUZZLE_LAUNCH_DATE,
   MULTI_PUZZLE_LAUNCH_DATE,
   OFFICIAL_PUZZLE_TYPES,
 } from "../js/daily-challenge-core.js";
+
+const dateAfter = (dateKey, days) => new Date(Date.parse(`${dateKey}T00:00:00Z`) + days * 86400000).toISOString().slice(0, 10);
+const stagingType = (dateKey) => getOfficialPuzzleType(dateKey, { bloodTies: true });
+
+test("balanced staging assignments preserve history and freeze the issued v1 schedule", () => {
+  assert.equal(BALANCED_PUZZLE_LAUNCH_DATE, "2026-10-26");
+  assert.deepEqual(Array.from({ length: 4 }, (_, i) => stagingType(dateAfter("2026-10-22", i))), ["blood", "word", "easter", "blood"]);
+  assert.deepEqual(Array.from({ length: 14 }, (_, i) => stagingType(dateAfter(BALANCED_PUZZLE_LAUNCH_DATE, i))), [
+    "easter", "blood", "word", "blood", "easter", "word", "easter",
+    "blood", "word", "easter", "word", "easter", "blood", "word",
+  ]);
+  for (let i = 0; i < 365; i += 1) {
+    const date = dateAfter("2025-10-22", i);
+    assert.equal(stagingType(date), getOfficialPuzzleType(date), date);
+  }
+});
+
+test("ten years have no consecutive repeats, no missing game in five days, and an even mix", () => {
+  const start = dateAfter(BALANCED_PUZZLE_LAUNCH_DATE, -4);
+  const counts = { word: 0, easter: 0, blood: 0 };
+  const transitions = new Set();
+  const history = [];
+  for (let i = 0; i < 3657; i += 1) {
+    const date = dateAfter(start, i);
+    const type = stagingType(date);
+    assert.ok(Object.hasOwn(counts, type), date);
+    if (i) {
+      assert.notEqual(type, history.at(-1), date);
+      transitions.add(`${history.at(-1)}:${type}`);
+    }
+    history.push(type);
+    if (i >= 4) assert.equal(new Set(history.slice(-5)).size, 3, date);
+    if (i >= 4) counts[type] += 1;
+    // Production's existing two-game schedule is unaffected on every date.
+    assert.equal(getOfficialPuzzleType(date), (Date.parse(`${date}T00:00:00Z`) - Date.parse("2026-10-13T00:00:00Z")) / 86400000 % 2 === 0 ? "word" : "easter", date);
+  }
+  assert.equal(transitions.size, 6, "all six transitions occur instead of a fixed cycle");
+  for (const count of Object.values(counts)) assert.ok(count / 3653 > 0.31 && count / 3653 < 0.36, JSON.stringify(counts));
+});
+
+test("fresh browser/API instances agree regardless of clock or date query order", async (t) => {
+  const deviceA = await import("../js/daily-challenge-core.js?device-a");
+  const deviceB = await import("../js/daily-challenge-core.js?device-b");
+  t.mock.timers.enable({ apis: ["Date"], now: new Date("2035-12-31T23:59:59Z") });
+  const dates = ["2030-02-28", "2026-10-26", "2028-02-29", "2026-10-25", "2027-01-01"];
+  const assignments = dates.map((date) => deviceA.getOfficialPuzzleType(date, { bloodTies: true }));
+  t.mock.timers.setTime(new Date("2026-10-25T00:00:00Z").getTime());
+  for (let i = dates.length - 1; i >= 0; i -= 1) {
+    assert.equal(deviceB.getOfficialPuzzleType(dates[i], { bloodTies: true }), assignments[i], dates[i]);
+    assert.equal(stagingType(dates[i]), assignments[i], dates[i]);
+  }
+});
 
 test("the official puzzle alternates on consecutive UTC dates", () => {
   assert.equal(MULTI_PUZZLE_LAUNCH_DATE, "2026-10-13");
