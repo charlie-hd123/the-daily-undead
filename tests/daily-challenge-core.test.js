@@ -39,6 +39,7 @@ test('live schedule is stable across instances, balanced, and respects the actua
   const counts = { blood: 0, word: 0, easter: 0 };
   const history = Array.from({ length: 4 }, (_, i) => getOfficialPuzzleType(dateAfter('2026-10-22', i), options));
   const expected = [];
+  const launchAssignments = ['blood', 'easter', 'blood', 'word', 'blood', 'word', 'easter', 'blood', 'easter', 'blood', 'word', 'easter', 'word', 'blood'];
   for (let i = 0; i < 3653; i++) {
     const date = dateAfter('2026-10-26', i);
     const type = getOfficialPuzzleType(date, options);
@@ -49,6 +50,7 @@ test('live schedule is stable across instances, balanced, and respects the actua
     if (i < 14) expected.push(type);
   }
   for (const count of Object.values(counts)) assert.ok(count / 3653 > .31 && count / 3653 < .36);
+  assert.deepEqual(expected, launchAssignments, 'production-v1 assignments are immutable after launch');
   for (let i = 13; i >= 0; i--) assert.equal(fresh.getOfficialPuzzleType(dateAfter('2026-10-26', i), options), expected[i]);
 });
 
