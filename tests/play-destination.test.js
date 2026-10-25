@@ -1,38 +1,53 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { rememberPlayDestination, restorePlayDestination } from '../js/play-destination.js';
-const day = { officialType: 'word', officialCompleted: true, sessions: { word: {}, easter: {}, blood: {} } };
-function memory() { const m = new Map(); return { getItem: (k) => m.get(k) ?? null, setItem: (k, v) => m.set(k, v) }; }
-test('all three just-for-fun destinations restore only after the official puzzle is complete', () => {
-  for (const type of ['word', 'easter', 'blood']) {
-    const s = memory(), state = { ...day, officialType: type === 'word' ? 'easter' : 'word' };
-    rememberPlayDestination(s, '2026-10-19', { type, mode: 'for_fun' });
-    assert.deepEqual(restorePlayDestination(s, '2026-10-19', state), { type, mode: 'for_fun' });
-    assert.equal(restorePlayDestination(s, '2026-10-19', { ...state, officialCompleted: false }), null);
-    assert.equal(restorePlayDestination(s, '2026-10-20', state), null);
-  }
-});
-test('hub and official result destinations survive refresh without unlocking another puzzle', () => {
-  const s = memory(); rememberPlayDestination(s, '2026-10-19', { screen: 'hub' });
-  assert.deepEqual(restorePlayDestination(s, '2026-10-19', day), { screen: 'hub' });
-  rememberPlayDestination(s, '2026-10-19', { type: 'word', mode: 'official' });
-  assert.deepEqual(restorePlayDestination(s, '2026-10-19', day), { type: 'word', mode: 'official' });
-  assert.equal(restorePlayDestination(s, '2026-10-19', { ...day, officialType: 'easter' }), null);
-  rememberPlayDestination(s, '2026-10-22', { type: 'blood', mode: 'official' });
-  assert.deepEqual(restorePlayDestination(s, '2026-10-22', { ...day, officialType: 'blood' }), { type: 'blood', mode: 'official' });
-});
-test('corrupt, missing-session and unavailable destination storage safely uses official entry', () => {
-  const s = memory(); rememberPlayDestination(s, '2026-10-19', { type: 'easter', mode: 'for_fun' });
-  assert.equal(restorePlayDestination(s, '2026-10-19', { ...day, sessions: {} }), null);
-  s.setItem('the-daily-undead:play-destination:2026-10-19', '{'); assert.equal(restorePlayDestination(s, '2026-10-19', day), null);
-  const denied = { getItem() { throw Error('denied'); }, setItem() { throw Error('denied'); } };
-  assert.doesNotThrow(() => rememberPlayDestination(denied, 'date', {})); assert.equal(restorePlayDestination(denied, 'date', day), null);
-});
 
-test('unfinished fun saves from before this release resume without a navigation marker', () => {
-  const s = memory();
-  assert.deepEqual(restorePlayDestination(s, '2026-10-19', { ...day, sessions: { easter: { phase: 'clues', cluesRevealed: 2 } } }), { type: 'easter', mode: 'for_fun' });
-  assert.deepEqual(restorePlayDestination(s, '2026-10-19', { officialType: 'easter', officialCompleted: true, sessions: { word: { guesses: ['Q'], complete: false } } }), { type: 'word', mode: 'for_fun' });
-  assert.equal(restorePlayDestination(s, '2026-10-19', { ...day, sessions: { easter: { phase: 'clues', cluesRevealed: 1 } } }), null);
-  assert.equal(restorePlayDestination(s, '2026-10-19', { ...day, sessions: { easter: { phase: 'result', isCorrect: false } } }), null);
+const date = '2026-10-25';
+function memory() {
+  const values = new Map();
+  return { getItem: (key) => values.get(key) ?? null, setItem: (key, value) => values.set(key, value) };
+}
+
+for (const officialType of ['word', 'easter', 'blood']) {
+  test(`${officialType}: completed official results take priority over every previous screen`, () => {
+    const extraTypes = ['word', 'easter', 'blood'].filter((type) => type !== officialType);
+    for (const success of [true, false]) {
+      const day = {
+        dateKey: date, officialType, officialCompleted: true,
+        sessions: {
+          [officialType]: { complete: true, success },
+          ...Object.fromEntries(extraTypes.map((type) => [type, { complete: false, guesses: ['Q'], attempts: [['a', 'b', 'c']], cluesRevealed: 2 }])),
+        },
+      };
+      const before = structuredClone(day);
+      for (const destination of [{ screen: 'hub' }, ...extraTypes.map((type) => ({ type, mode: 'for_fun' })), { type: officialType, mode: 'official' }]) {
+        const storage = memory();
+        rememberPlayDestination(storage, date, destination);
+        assert.deepEqual(restorePlayDestination(storage, date, day), { type: officialType, mode: 'official' });
+        assert.deepEqual(day, before, 'refresh must retain every official and just-for-fun save');
+      }
+    }
+  });
+
+  test(`${officialType}: unfinished official play resumes without altering its saved state`, () => {
+    const day = { dateKey: date, officialType, officialCompleted: false, sessions: { [officialType]: { guesses: ['F'], phase: 'result', bonusComplete: false } } };
+    const before = structuredClone(day), storage = memory();
+    rememberPlayDestination(storage, date, { screen: 'hub' });
+    assert.deepEqual(restorePlayDestination(storage, date, day), { type: officialType, mode: 'official' });
+    assert.deepEqual(day, before);
+  });
+}
+
+test('missing, corrupt and unavailable navigation storage cannot change official entry', () => {
+  const day = { dateKey: date, officialType: 'word', officialCompleted: true, sessions: { word: { complete: true }, blood: { attempts: [['a', 'b', 'c']] } } };
+  const storage = memory();
+  for (const value of [null, '{', JSON.stringify({ screen: 'hub' })]) {
+    if (value !== null) storage.setItem(`the-daily-undead:play-destination:${date}`, value);
+    assert.deepEqual(restorePlayDestination(storage, date, day), { type: 'word', mode: 'official' });
+  }
+  const denied = { getItem() { throw Error('denied'); }, setItem() { throw Error('denied'); } };
+  assert.doesNotThrow(() => rememberPlayDestination(denied, date, {}));
+  assert.deepEqual(restorePlayDestination(denied, date, day), { type: 'word', mode: 'official' });
+  assert.equal(restorePlayDestination(storage, '2026-10-26', day), null);
+  assert.equal(restorePlayDestination(storage, date, { officialType: 'invalid' }), null);
 });
