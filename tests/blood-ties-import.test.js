@@ -69,4 +69,20 @@ with zipfile.ZipFile(sys.argv[2],'w') as z:
     const {bloodTiesBoards:pool}=await import(pathToFileURL(root+'/js/blood-ties-boards.js'));
     assert.equal(new Set(pool.boards.flatMap(board=>board.map(g=>g[0]))).size,Number(count));
   `,root,before,effectiveDate,JSON.stringify(buildDailyBloodTiesPuzzle(before)),String(bloodTiesCatalogue.version+1),String(bloodTiesCatalogue.connections.length+1)]);
+  // Once that date has arrived, changing the seed/content must never silently
+  // rewrite the existing daily assignments, even via the compiler directly.
+  const compiled = await readFile(path.join(root,'js/blood-ties-boards.js'),'utf8');
+  const current = path.join(root,'js/blood-ties-catalogue.js');
+  await writeFile(current,(await readFile(current,'utf8')).replace(/"sourceSha256": "[a-f0-9]+"/,'"sourceSha256": "'+'f'.repeat(64)+'"'));
+  const guarded = spawnSync(process.execPath,['--input-type=module','-e',`
+    import {pathToFileURL} from 'node:url';
+    const [script,root,effective]=process.argv.slice(1);
+    const RealDate=Date;
+    globalThis.Date=class extends RealDate { constructor(...args) { super(...(args.length?args:[effective+'T12:00:00Z'])); } };
+    process.argv=[process.execPath,script,'--root',root];
+    await import(pathToFileURL(script));
+  `,fileURLToPath(new URL('../scripts/generate-blood-ties.mjs',import.meta.url)),root,effectiveDate],{encoding:'utf8'});
+  assert.notEqual(guarded.status,0);
+  assert.match(guarded.stderr,/Refusing to change already issued/);
+  assert.equal(await readFile(path.join(root,'js/blood-ties-boards.js'),'utf8'),compiled);
 });

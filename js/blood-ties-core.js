@@ -35,7 +35,7 @@ function prepareContents() {
       const redHerrings = groups.flatMap(owner => owner.answers.filter(t => groups.some(g => g.id !== owner.id && g.tiles.includes(t))));
       return { groups, tiles, redHerrings, signature, pairs: pairs(groups), ambiguity: boards.ambiguity[index] };
     });
-    return { version: catalogue.version, effectiveDate: catalogue.effectiveDate, pool };
+    return { version: catalogue.version, effectiveDate: catalogue.effectiveDate, fairnessVersion: boards.fairnessVersion, pool };
   });
   // Include every actually issued day at the boundary, including the original
   // 22 October round. Workbook IDs are stable; historical renamed IDs use names.
@@ -66,6 +66,10 @@ export function buildDailyBloodTiesPuzzle(dateKey) {
     const olderTiles = new Set(history.slice(-21, -BLOOD_TIES_TILE_COOLDOWN).flatMap(p => p.tiles));
     const recentPairs = new Map();
     history.slice(-42).forEach(p => p.pairs.forEach(pair => recentPairs.set(pair, (recentPairs.get(pair) || 0) + 1)));
+    // Keep a mix of gentle days and small deduction puzzles, instead of always
+    // spending the easiest boards first. This is a preference, never a fallback
+    // that relaxes fairness, coverage or either cooldown.
+    const gentleDay = hashString(`${date}:blood-ties:gentle:v1`) % 5 === 0;
     let best, bestRank;
     for (const candidate of content.pool) {
       if (candidate.groups.some(g => recentCategories.has(g.id)) || candidate.tiles.some(t => recentTiles.has(t))) continue;
@@ -74,7 +78,8 @@ export function buildDailyBloodTiesPuzzle(dateKey) {
       const repeats = candidate.groups.reduce((n, g) => n + (categoryUsage.get(g.id) || 0), 0);
       const recent = candidate.groups.filter(g => olderCategories.has(g.id)).length * 12 + candidate.tiles.filter(t => olderTiles.has(t)).length;
       const pairRepeats = candidate.pairs.reduce((n,pair) => n + (recentPairs.get(pair) || 0), 0);
-      const rank = [repeats, recent + pairRepeats * 4 + candidate.ambiguity * 2, hashString(`${index}:blood-ties:v${content.version}:${candidate.signature}`)];
+      const pacing = content.fairnessVersion >= 2 && !gentleDay && candidate.redHerrings.length === 0 ? 12 : 0;
+      const rank = [repeats, recent + pairRepeats * 4 + candidate.ambiguity * 2 + pacing, hashString(`${index}:blood-ties:v${content.version}:${candidate.signature}`)];
       if (!bestRank || rank[0] < bestRank[0] || rank[0] === bestRank[0] && (rank[1] < bestRank[1] || rank[1] === bestRank[1] && rank[2] < bestRank[2])) { best = candidate; bestRank = rank; }
     }
     if (!best) throw new Error('No Blood Ties board satisfies the category and tile cooldowns.');

@@ -84,7 +84,7 @@ test('a full year has deterministic unique solutions, deliberate traps and three
     const p = buildDailyBloodTiesPuzzle(date);
     assert.equal(p.tiles.length, 12); assert.equal(new Set(p.tiles).size, 12);
     assert.equal(countBloodTiesSolutions(p.groups.map((g) => ({ tiles: g.eligibleTiles })), p.tiles), 1, date);
-    assert.ok(p.redHerrings.length >= 2, date);
+    assert.ok(p.contentVersion >= 3 ? p.redHerrings.length <= 2 : p.redHerrings.length >= 2, date);
     for (const g of p.groups) {
       const catalogue = date < '2026-10-23' ? historicalCatalogue : date < '2026-10-26' ? v2Catalogue : bloodTiesContents.findLast(v => v.catalogue.effectiveDate <= date).catalogue;
       const source = catalogue.connections.find((c) => c.id === g.id);

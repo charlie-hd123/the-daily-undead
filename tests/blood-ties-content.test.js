@@ -8,7 +8,7 @@ import { bloodTiesBoards } from '../js/blood-ties-boards.js';
 import { buildDailyBloodTiesPuzzle, countBloodTiesSolutions, replayBloodTiesAttempts, normalizeBloodTiesSession } from '../js/blood-ties-core.js';
 import { buildDailyBloodTiesPuzzle as historicalPuzzle } from '../js/blood-ties-legacy.js';
 import { isApiFile } from '../scripts/lib/release-tools.mjs';
-import { createBloodTiesFairnessChecker } from '../js/blood-ties-fairness.js';
+import { BLOOD_TIES_FAIRNESS_VERSION, createBloodTiesFairnessChecker, passesBloodTiesFairness } from '../js/blood-ties-fairness.js';
 
 test('compiled pool is reproducible and every workbook category participates in unique boards', () => {
   execFileSync(process.execPath, ['scripts/generate-blood-ties.mjs', '--check']);
@@ -16,6 +16,7 @@ test('compiled pool is reproducible and every workbook category participates in 
   const seen = new Set();
   const inspect = createBloodTiesFairnessChecker(catalogue.connections);
   assert.equal(bloodTiesBoards.sourceSha256, catalogue.sourceSha256);
+  assert.equal(bloodTiesBoards.fairnessVersion, BLOOD_TIES_FAIRNESS_VERSION);
   assert.equal(bloodTiesBoards.boards.length, 4096);
   for (const [index,board] of bloodTiesBoards.boards.entries()) {
     const groups = board.map(([id, ...indices]) => {
@@ -32,7 +33,11 @@ test('compiled pool is reproducible and every workbook category participates in 
     const fairness = inspect(groups);
     assert.equal(fairness.alternative, false, `board ${index}`);
     assert.equal(fairness.easyClear, true, `board ${index}`);
-    assert.ok(fairness.maxVisible <= 5, `board ${index}`);
+    assert.ok(fairness.maxVisible <= 4, `board ${index}`);
+    assert.equal(fairness.similarPairs.length, 0, `board ${index}`);
+    assert.ok(fairness.redHerringCount <= 2, `board ${index}`);
+    assert.ok(fairness.rejectedTrios <= 6, `board ${index}`);
+    assert.equal(passesBloodTiesFairness(fairness), true, `board ${index}`);
     assert.equal(bloodTiesBoards.ambiguity[index], fairness.rejectedTrios);
   }
   assert.equal(seen.size, catalogue.connections.length);
@@ -50,7 +55,7 @@ test('three years preserve 14-day category and 7-day tile gaps, traps, difficult
     const date = new Date(start + i * 86400000).toISOString().slice(0, 10);
     const p = buildDailyBloodTiesPuzzle(date);
     assert.equal(p.contentVersion, catalogue.version);
-    assert.ok(p.redHerrings.length >= 2);
+    assert.ok(p.redHerrings.length <= 2);
     for (const previous of history.slice(-14)) assert.ok(p.groups.every(g => !previous.groups.some(h => h.id === g.id)), date);
     for (const previous of history.slice(-7)) assert.ok(p.tiles.every(t => !previous.tiles.includes(t)), date);
     for (const g of p.groups) {

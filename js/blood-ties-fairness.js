@@ -1,5 +1,17 @@
 // Compiler/editorial checks. Runtime requests consume the compiled pool instead.
-export const BLOOD_TIES_FAIRNESS_VERSION = 1;
+export const BLOOD_TIES_FAIRNESS_VERSION = 2;
+
+// A narrow category nested inside a broad one makes correct knowledge feel
+// wrong. Avoid pairing categories sharing at least half of the smaller list.
+export function bloodTiesCategoriesTooSimilar(a, b) {
+  const shared = a.tiles.filter(tile => b.tiles.includes(tile)).length;
+  return shared >= 2 && shared * 2 >= Math.min(a.tiles.length, b.tiles.length);
+}
+
+export function passesBloodTiesFairness(fairness) {
+  return !fairness.alternative && fairness.easyClear && fairness.maxVisible <= 4
+    && fairness.redHerringCount <= 2 && fairness.rejectedTrios <= 6 && !fairness.similarPairs.length;
+}
 
 export function trioMasks(indices) {
   const masks = [];
@@ -52,9 +64,13 @@ export function createBloodTiesFairnessChecker(connections) {
     const counts = groups.map(g => (visible.get(g.id) || []).length);
     return {
       alternative: alternative(0, []),
-      maxVisible: Math.max(...counts),
+      // Include unchosen categories: players can spot those connections too.
+      maxVisible: Math.max(...[...visible.values()].map(indices => indices.length)),
+      maxChosenVisible: Math.max(...counts),
       easyClear: groups.filter(g => g.difficulty === 1).every(g => visible.get(g.id)?.length === 3),
       rejectedTrios: [...labels.keys()].filter(mask => !intended.has(mask)).length,
+      redHerringCount: tiles.filter(tile => groups.some(g => !g.answers.includes(tile) && g.tiles.includes(tile))).length,
+      similarPairs: groups.flatMap((g,i) => groups.slice(i+1).filter(h => bloodTiesCategoriesTooSimilar(g,h)).map(h => [g.id,h.id])),
     };
   };
 }
