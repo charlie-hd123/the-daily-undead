@@ -7,10 +7,50 @@ import {
   BALANCED_PUZZLE_LAUNCH_DATE,
   MULTI_PUZZLE_LAUNCH_DATE,
   OFFICIAL_PUZZLE_TYPES,
+  browserPuzzleOptions,
+  PRODUCTION_THREE_PUZZLE_LAUNCH_DATE,
 } from "../js/daily-challenge-core.js";
+import { buildDailyWordPuzzle } from '../js/word-puzzle-core.js';
+import { workerWords } from '../worker/src/generated-word-catalog.js';
+import { puzzleOptions } from '../worker/src/puzzle-environment.js';
 
 const dateAfter = (dateKey, days) => new Date(Date.parse(`${dateKey}T00:00:00Z`) + days * 86400000).toISOString().slice(0, 10);
 const stagingType = (dateKey) => getOfficialPuzzleType(dateKey, { bloodTies: true });
+
+test('live keeps Fire Works and all issued days, then starts Blood Ties on 26 October', () => {
+  const options = browserPuzzleOptions('production');
+  assert.deepEqual(options, puzzleOptions({ DEPLOYMENT_ENVIRONMENT: 'production' }));
+  assert.equal(PRODUCTION_THREE_PUZZLE_LAUNCH_DATE, '2026-10-26');
+  for (let i = 0; i < 365; i++) {
+    const date = dateAfter('2025-10-26', i);
+    assert.equal(getOfficialPuzzleType(date, options), getOfficialPuzzleType(date), date);
+  }
+  assert.equal(getOfficialPuzzleType('2026-10-25', options), 'word');
+  const today = buildDailyWordPuzzle('2026-10-25', workerWords);
+  assert.equal(today.entry.answer, 'Fire Works');
+  assert.equal(today.key, '2026-10-25:word:lw-0445:KO');
+  assert.equal(getOfficialPuzzleType('2026-10-26', options), 'blood');
+  assert.deepEqual(browserPuzzleOptions('staging'), { bloodTies: true, production: false });
+});
+
+test('live schedule is stable across instances, balanced, and respects the actual launch history', async () => {
+  const options = browserPuzzleOptions();
+  const fresh = await import('../js/daily-challenge-core.js?production-schedule');
+  const counts = { blood: 0, word: 0, easter: 0 };
+  const history = Array.from({ length: 4 }, (_, i) => getOfficialPuzzleType(dateAfter('2026-10-22', i), options));
+  const expected = [];
+  for (let i = 0; i < 3653; i++) {
+    const date = dateAfter('2026-10-26', i);
+    const type = getOfficialPuzzleType(date, options);
+    assert.notEqual(type, history.at(-1), date);
+    history.push(type);
+    assert.equal(new Set(history.slice(-5)).size, 3, date);
+    counts[type]++;
+    if (i < 14) expected.push(type);
+  }
+  for (const count of Object.values(counts)) assert.ok(count / 3653 > .31 && count / 3653 < .36);
+  for (let i = 13; i >= 0; i--) assert.equal(fresh.getOfficialPuzzleType(dateAfter('2026-10-26', i), options), expected[i]);
+});
 
 test("balanced staging assignments preserve history and freeze the issued v1 schedule", () => {
   assert.equal(BALANCED_PUZZLE_LAUNCH_DATE, "2026-10-26");

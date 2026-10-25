@@ -12,6 +12,7 @@ const ALTERNATION_EPOCH_DAY = Math.floor(Date.parse(`${ALTERNATION_EPOCH}T00:00:
 
 export const THREE_PUZZLE_LAUNCH_DATE = "2026-10-22";
 export const BALANCED_PUZZLE_LAUNCH_DATE = "2026-10-26";
+export const PRODUCTION_THREE_PUZZLE_LAUNCH_DATE = "2026-10-26";
 const DAY_MS = 86400000;
 const BALANCED_EPOCH = Date.parse(`${BALANCED_PUZZLE_LAUNCH_DATE}T00:00:00Z`);
 const PUZZLE_TYPES = Object.freeze(["blood", "word", "easter"]);
@@ -34,11 +35,17 @@ const balancedHistory = Array.from({ length: HISTORY_DAYS }, (_, index) => {
   const dateKey = new Date(BALANCED_EPOCH + (index - HISTORY_DAYS) * DAY_MS).toISOString().slice(0, 10);
   return historicalPuzzleType(dateKey, true);
 });
+// Live starts from its actual two-game history. Keep this separate from the
+// already-issued staging v1 schedule; its first overdue game is Blood Ties.
+const productionHistory = Array.from({ length: HISTORY_DAYS }, (_, index) => {
+  const dateKey = new Date(BALANCED_EPOCH + (index - HISTORY_DAYS) * DAY_MS).toISOString().slice(0, 10);
+  return historicalPuzzleType(dateKey, false);
+});
 
-function balancedPuzzleType(dateKey) {
+function balancedPuzzleType(dateKey, history = balancedHistory, version = 'v1') {
   const target = HISTORY_DAYS + Math.floor((Date.parse(`${dateKey}T00:00:00Z`) - BALANCED_EPOCH) / DAY_MS);
-  while (balancedHistory.length <= target) {
-    const recent = balancedHistory.slice(-HISTORY_DAYS);
+  while (history.length <= target) {
+    const recent = history.slice(-HISTORY_DAYS);
     const yesterday = recent.at(-1);
     // At most one game can be absent from the last four valid days. It must
     // appear today so every rolling five-day window contains all three games.
@@ -47,24 +54,33 @@ function balancedPuzzleType(dateKey) {
     const counts = PUZZLE_TYPES.map((type) => recent.filter((played) => played === type).length);
     const maximum = Math.max(...counts);
     const weights = candidates.map((type) => (maximum - counts[PUZZLE_TYPES.indexOf(type)] + 1) ** 2);
-    const scheduledDate = new Date(BALANCED_EPOCH + (balancedHistory.length - HISTORY_DAYS) * DAY_MS).toISOString().slice(0, 10);
+    const scheduledDate = new Date(BALANCED_EPOCH + (history.length - HISTORY_DAYS) * DAY_MS).toISOString().slice(0, 10);
     // Keep this version/seed and historical rules fixed after release. A future
     // rule change needs a new dated boundary, preserving already issued puzzles.
-    let draw = createRng(hashString(`daily-puzzle-schedule:v1:${scheduledDate}`))() * weights.reduce((sum, weight) => sum + weight, 0);
+    let draw = createRng(hashString(`daily-puzzle-schedule:${version}:${scheduledDate}`))() * weights.reduce((sum, weight) => sum + weight, 0);
     let selected = candidates.at(-1);
     for (let index = 0; index < candidates.length; index += 1) {
       draw -= weights[index];
       if (draw < 0) { selected = candidates[index]; break; }
     }
-    balancedHistory.push(overdue || selected);
+    history.push(overdue || selected);
   }
-  return balancedHistory[target];
+  return history[target];
 }
 
-export function getOfficialPuzzleType(dateKey, { bloodTies = false } = {}) {
+export function getOfficialPuzzleType(dateKey, { bloodTies = false, production = false } = {}) {
   if (!isValidDateKey(dateKey)) throw new Error("A valid UTC date is required.");
+  if (production) {
+    return bloodTies && dateKey >= PRODUCTION_THREE_PUZZLE_LAUNCH_DATE
+      ? balancedPuzzleType(dateKey, productionHistory, 'production-v1')
+      : historicalPuzzleType(dateKey, false);
+  }
   if (bloodTies && dateKey >= BALANCED_PUZZLE_LAUNCH_DATE) return balancedPuzzleType(dateKey);
   return historicalPuzzleType(dateKey, bloodTies);
+}
+
+export function browserPuzzleOptions(environment) {
+  return { bloodTies: true, production: !['local', 'staging'].includes(environment) };
 }
 
 export function getOtherPuzzleType(type) {

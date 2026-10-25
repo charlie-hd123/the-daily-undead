@@ -766,7 +766,7 @@ export async function saveAccount(db, request, userId) {
       db
         .prepare(
           `INSERT INTO player_daily_saves (user_id, puzzle_date, state_json)
-          VALUES (?, ?, ?)
+          SELECT ?, ?, ? WHERE changes() > 0
           ON CONFLICT (user_id, puzzle_date) DO UPDATE SET
             state_json = excluded.state_json,
             updated_at = CURRENT_TIMESTAMP`,

@@ -296,6 +296,12 @@ test("real account routes save profiles, verify puzzle rewards, reject stale sav
   assert.equal(saved.progress.solves, 1);
   await request("/api/account/save", "PUT", { puzzleDate: today, baseRevision: account.progress.revision, progress: account.progress }, 409);
   assert.equal((await request(`/api/account?date=${today}`)).progress.score, 100);
+  const dailyState = { dayStateVersion: 1, dateKey: today, officialType: type, sessions: {} };
+  const current = await request(`/api/account?date=${today}`);
+  await request('/api/account/save', 'PUT', { puzzleDate: today, baseRevision: current.progress.revision, progress: current.progress, dailyState });
+  const beforeConflict = await request(`/api/account?date=${today}`);
+  await request('/api/account/save', 'PUT', { puzzleDate: today, baseRevision: current.progress.revision, progress: current.progress, dailyState: { ...dailyState, officialType: type === 'word' ? 'easter' : 'word' } }, 409);
+  assert.deepEqual((await request(`/api/account?date=${today}`)).dailyState, beforeConflict.dailyState, 'rejected stale saves must not overwrite the current puzzle state');
   // Deletion must authenticate, validate confirmation, cascade all player data,
   // preserve other players, and reject even the original unexpired token.
   const deletionEnv = { DB: db, SUPABASE_ISSUER: issuer, SUPABASE_SECRET_KEY: "test-secret", DEPLOYMENT_ENVIRONMENT: "staging" };

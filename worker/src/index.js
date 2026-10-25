@@ -235,7 +235,7 @@ async function handleAttempt(request, env) {
   const playerHash = await hashPlayerId(payload.playerId);
   const puzzleType = payload.puzzleType || 'easter';
   if (puzzleType === 'blood') {
-    if (!puzzleOptions(env).bloodTies) return errorResponse(request, env, 'Blood Ties is available only in the staging demo.', 400);
+    if (!puzzleOptions(env).bloodTies) return errorResponse(request, env, 'Blood Ties is unavailable in this environment.', 400);
     const puzzle = buildDailyBloodTiesPuzzle(todayDateKey);
     let result;
     try { result = replayBloodTiesAttempts(puzzle, payload.attempts, payload.rulesVersion ?? 1); }
@@ -385,7 +385,9 @@ export default {
           apiDigest: env.RELEASE_API_DIGEST || null,
           configurationDigest: env.RELEASE_CONFIG_DIGEST || null,
           fixturesEnabled: fixturesEnabled(env),
-          bloodTiesDemo: puzzleOptions(env).bloodTies,
+          bloodTiesDemo: puzzleOptions(env).bloodTies && env.DEPLOYMENT_ENVIRONMENT !== 'production',
+          bloodTiesEnabled: puzzleOptions(env).bloodTies,
+          puzzleSchedule: puzzleOptions(env).production ? 'production-v1' : 'v1',
           accountsConfigured: Boolean(env.CLERK_ISSUER || env.SUPABASE_ISSUER),
           accountProviders: {
             clerk: Boolean(env.CLERK_ISSUER),

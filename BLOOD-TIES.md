@@ -1,6 +1,6 @@
-# Blood Ties staging demo
+# Blood Ties
 
-Blood Ties is the third game in the shared Daily Undead application. It is enabled only on local development hosts and the normal staging host. `BLOOD_TIES_DEMO=1` additionally enables its Worker routes in local/staging environments. Production ignores that flag and retains the existing two-game schedule. No production deployment or data migration is part of this demo.
+Blood Ties is the third game in the shared Daily Undead application. It is available in production and on local/staging hosts. Production uses the separate production-v1 daily schedule: every issued assignment through 25 October 2026 stays unchanged, including Last Words / Fire Works on 25 October; Blood Ties is the official round on 26 October, followed by balanced random three-game selection seeded from actual live history. `BLOOD_TIES_DEMO=1` still controls Worker availability in local/staging. Production never enables fixture activity or date-preview controls.
 
 The staging rotation started on **22 October 2026 UTC**: Blood Ties, Last Words, Quest Steps. From **26 October 2026 UTC**, the shared daily selector uses a balanced random schedule: no consecutive game repeats, every rolling five-day window includes all three games, and selection favours games played less in the preceding 14 days. Everyone receives the same game and puzzle for each UTC date, including after refresh or switching devices. The date-seeded v1 schedule includes preceding assignments at its boundary; its rules/seed remain fixed to preserve issued days. Assignments through 25 October are unchanged. After the official round, either remaining game is available just for fun. Just-for-fun games never award Score, Solves or Round progression. Date previews use the existing isolated browser storage and disable account uploads.
 
@@ -19,7 +19,7 @@ Blood Ties uses the existing neutral cards, cyan selection/success, red strike f
 
 Rules version 3 requires all four connections and stores/replays the complete submission history to reconstruct strikes and potential points on refresh. Unfinished legacy saves adopt these rules. Completed version 1/2 saves and already awarded server results retain their original outcomes and scores; pre-update clients remain server-verified under their original rules for historical content only. New content rejects attempts to downgrade the rules. Leaderboard miss counts record all incorrect submissions, so a strike reset cannot turn an imperfect solve into a Perfect Solve.
 
-Yesterday’s Blood Ties summary lives inside the shared statistics grid. Its solve rate stays alongside a compact **View connections** button, which opens a keyboard-accessible answer dialog without expanding the footer. The local/staging marketing pack follows the three-game schedule and can generate a Blood Ties image and copy. Production keeps its existing two-game schedule.
+Yesterday’s Blood Ties summary lives inside the shared statistics grid. Its solve rate stays alongside a compact **View connections** button, which opens a keyboard-accessible answer dialog without expanding the footer. The local/staging marketing pack follows the three-game schedule and can generate a Blood Ties image and copy. Production marketing follows production-v1, preserving live history before the 26 October activation.
 
 ## Database and generator
 

@@ -2,11 +2,11 @@ import {
   buildDailyPuzzle,
   getAnswerDisplayTitle,
   getUtcDateKey,
-} from "./game-core.js?v=20261025-7";
-import { getOfficialPuzzleType } from "./daily-challenge-core.js?v=20261025-7";
-import { buildDailyWordPuzzle } from "./word-puzzle-core.js?v=20261025-7";
-import { buildDailyBloodTiesPuzzle } from './blood-ties-core.js?v=20261025-7';
-import { fetchCommunityStats } from "./community-stats.js?v=20261025-7";
+} from "./game-core.js?v=20261025-8";
+import { getOfficialPuzzleType, browserPuzzleOptions } from "./daily-challenge-core.js?v=20261025-8";
+import { buildDailyWordPuzzle } from "./word-puzzle-core.js?v=20261025-8";
+import { buildDailyBloodTiesPuzzle } from './blood-ties-core.js?v=20261025-8';
+import { fetchCommunityStats } from "./community-stats.js?v=20261025-8";
 import {
   buildMarketingCopy,
   buildWordMarketingCopy,
@@ -15,9 +15,9 @@ import {
   getDailyPostNumber,
   getPreviousDateKey,
   isAppleMobileDevice,
-} from "./marketing-core.js?v=20261025-7";
+} from "./marketing-core.js?v=20261025-8";
 
-import { drawMarketingImage } from "./marketing-art.js?v=20261025-7";
+import { drawMarketingImage } from "./marketing-art.js?v=20261025-8";
 
 const pack = document.querySelector("#marketing-pack");
 const packDate = document.querySelector("#pack-date");
@@ -179,9 +179,9 @@ async function initialise() {
     ]);
     const dateKey = getUtcDateKey(now);
     const yesterdayDateKey = getPreviousDateKey(dateKey);
-    const bloodTies = ['local', 'staging'].includes(document.querySelector('meta[name="daily-undead-environment"]')?.content);
-    const puzzleType = getOfficialPuzzleType(dateKey, { bloodTies });
-    const yesterdayPuzzleType = getOfficialPuzzleType(yesterdayDateKey, { bloodTies });
+    const scheduleOptions = browserPuzzleOptions(document.querySelector('meta[name="daily-undead-environment"]')?.content);
+    const puzzleType = getOfficialPuzzleType(dateKey, scheduleOptions);
+    const yesterdayPuzzleType = getOfficialPuzzleType(yesterdayDateKey, scheduleOptions);
     const yesterdayPuzzleName = { word: 'Last Words', easter: 'Quest Steps', blood: 'Blood Ties' }[yesterdayPuzzleType];
     const postNumber = getDailyPostNumber(dateKey);
     const puzzle = buildDailyPuzzle(dateKey, maps);

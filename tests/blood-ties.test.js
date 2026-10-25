@@ -211,7 +211,7 @@ test('historical three-day rotation is staging/local only and remains intact', (
   assert.deepEqual(Array.from({ length: 4 }, (_, i) => getOfficialPuzzleType(`2026-10-${22 + i}`, { bloodTies: true })), ['blood', 'word', 'easter', 'blood']);
   assert.equal(getOfficialPuzzleType('2026-10-22'), 'easter');
   assert.equal(getOfficialPuzzleType('2026-10-21', { bloodTies: true }), getOfficialPuzzleType('2026-10-21'));
-  assert.equal(puzzleOptions({ BLOOD_TIES_DEMO: '1', DEPLOYMENT_ENVIRONMENT: 'production' }).bloodTies, false);
+  assert.deepEqual(puzzleOptions({ DEPLOYMENT_ENVIRONMENT: 'production' }), { bloodTies: true, production: true });
   assert.equal(puzzleOptions({ BLOOD_TIES_DEMO: '1', DEPLOYMENT_ENVIRONMENT: 'staging' }).bloodTies, true);
 });
 
@@ -423,7 +423,7 @@ test('fair boards use the same secure account, refresh, statistics and leaderboa
   assert.equal((await worker.fetch(new Request('https://test/api/attempts', { method: 'POST', body: JSON.stringify({ ...anonymous, rulesVersion: 1 }) }), env)).status, 400);
 });
 
-test('balanced daily assignments verify only the official game and persist rewards once across rollover', async (t) => {
+for (const production of [false, true]) test(`balanced ${production ? 'production' : 'staging'} assignments verify only the official game and persist rewards once across rollover`, async (t) => {
   t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-26T12:00:00Z') });
   const db = await database(); t.after(() => db.sqlite.close());
   db.sqlite.exec("INSERT INTO player_profiles(user_id,username) VALUES ('schedule-player','SchedulePlayer'); INSERT INTO player_saves(user_id,score,total_rounds,current_round,best_round) VALUES ('schedule-player',500,4,7,9)");
@@ -433,7 +433,7 @@ test('balanced daily assignments verify only the official game and persist rewar
     const now = new Date(Date.parse('2026-10-26T12:00:00Z') + day * 86400000);
     t.mock.timers.setTime(now.getTime());
     const date = now.toISOString().slice(0, 10);
-    const official = getOfficialPuzzleType(date, { bloodTies: true }); seen.add(official);
+    const official = getOfficialPuzzleType(date, { bloodTies: true, production }); seen.add(official);
     const blood = buildDailyBloodTiesPuzzle(date);
     const word = buildDailyWordPuzzle(date, workerWords);
     const map = buildDailyPuzzle(date, workerMaps);
@@ -443,7 +443,7 @@ test('balanced daily assignments verify only the official game and persist rewar
       ['easter', recordVerifiedMapResult, { puzzleDate: date, puzzleId: map.key, selectedMapId: map.map.id, cluesUsed: 1 }],
     ];
     for (const [type, save, body] of entries) {
-      const send = () => save(db, new Request('https://test/result', { method: 'POST', body: JSON.stringify(body) }), 'schedule-player', { bloodTies: true });
+      const send = () => save(db, new Request('https://test/result', { method: 'POST', body: JSON.stringify(body) }), 'schedule-player', { bloodTies: true, production });
       const result = await send();
       assert.equal(result.status, type === official ? 200 : 400, `${date} ${type}`);
       if (type !== official) continue;
