@@ -1,3 +1,3 @@
-import './player-entry.js?v=20261026-18';
+import './player-entry.js?v=20261026-19';
 
 export const browserStorage = globalThis.dailyUndeadEntry.storage;
