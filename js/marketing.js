@@ -2,11 +2,11 @@ import {
   buildDailyPuzzle,
   getAnswerDisplayTitle,
   getUtcDateKey,
-} from "./game-core.js?v=20261026-11";
-import { getOfficialPuzzleType, browserPuzzleOptions } from "./daily-challenge-core.js?v=20261026-11";
-import { buildDailyWordPuzzle } from "./word-puzzle-core.js?v=20261026-11";
-import { buildDailyBloodTiesPuzzle } from './blood-ties-core.js?v=20261026-11';
-import { fetchCommunityStats } from "./community-stats.js?v=20261026-11";
+} from "./game-core.js?v=20261026-12";
+import { getOfficialPuzzleType, browserPuzzleOptions } from "./daily-challenge-core.js?v=20261026-12";
+import { buildDailyWordPuzzle } from "./word-puzzle-core.js?v=20261026-12";
+import { buildDailyBloodTiesPuzzle } from './blood-ties-core.js?v=20261026-12';
+import { fetchCommunityStats } from "./community-stats.js?v=20261026-12";
 import {
   buildMarketingCopy,
   buildWordMarketingCopy,
@@ -15,9 +15,9 @@ import {
   getDailyPostNumber,
   getPreviousDateKey,
   isAppleMobileDevice,
-} from "./marketing-core.js?v=20261026-11";
+} from "./marketing-core.js?v=20261026-12";
 
-import { drawMarketingImage } from "./marketing-art.js?v=20261026-11";
+import { drawMarketingImage } from "./marketing-art.js?v=20261026-12";
 
 const pack = document.querySelector("#marketing-pack");
 const packDate = document.querySelector("#pack-date");
