@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261026-8";
+import { browserStorage } from "./browser-storage.js?v=20261026-9";
 const playerIdStorageKey = "the-daily-undead:community-player-id";
 const submittedPuzzleStoragePrefix = "the-daily-undead:community-submitted:";
 
