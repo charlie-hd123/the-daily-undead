@@ -86,7 +86,10 @@ function makePlayer(
   name.type = "button";
   name.className = "leaderboard-player-name";
   name.dataset.viewProfile = username;
-  name.textContent = username;
+  const nameText = documentObject.createElement("span");
+  nameText.className = "leaderboard-player-name-text";
+  nameText.textContent = username;
+  name.append(nameText);
   identity.append(avatarButton, name);
   player.append(identity);
 
