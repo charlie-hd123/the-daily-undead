@@ -1,7 +1,7 @@
-import { browserStorage } from "./browser-storage.js?v=20261027-4";
-import { buildDailyBloodTiesPuzzle, createBloodTiesSession, normalizeBloodTiesSession, replayBloodTiesAttempts } from './blood-ties-core.js?v=20261027-4';
-import { renderBloodTiesGroup, renderBloodTiesView } from './blood-ties-view.js?v=20261027-4';
-import { rememberPlayDestination, restorePlayDestination } from "./play-destination.js?v=20261027-4";
+import { browserStorage } from "./browser-storage.js?v=20261027-5";
+import { buildDailyBloodTiesPuzzle, createBloodTiesSession, normalizeBloodTiesSession, replayBloodTiesAttempts } from './blood-ties-core.js?v=20261027-5';
+import { renderBloodTiesGroup, renderBloodTiesView } from './blood-ties-view.js?v=20261027-5';
+import { rememberPlayDestination, restorePlayDestination } from "./play-destination.js?v=20261027-5";
 import {
   buildDailyPuzzle,
   calculateBonusPoints,
@@ -16,20 +16,20 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261027-4";
+} from "./game-core.js?v=20261027-5";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
   shouldHandleWordShortcut,
-} from "./word-puzzle-core.js?v=20261027-4";
+} from "./word-puzzle-core.js?v=20261027-5";
 import {
   getOfficialPuzzleType as selectOfficialPuzzleType,
   browserPuzzleOptions,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261027-4";
+} from "./daily-challenge-core.js?v=20261027-5";
 import {
   canUseRequestedPreviewDate,
   getProgressionUpdateVisibility,
@@ -38,29 +38,29 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261027-4";
+} from "./progression.js?v=20261027-5";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261027-4";
+} from "./account.js?v=20261027-5";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261027-4";
+} from "./community-stats.js?v=20261027-5";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261027-4";
-import { fetchWithTimeout } from "./network.js?v=20261027-4";
-import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261027-4";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261027-4";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261027-4";
-import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261027-4";
-import { createMysteryBox } from "./mystery-box.js?v=20261027-4";
-import { initialiseGameAudio, letterSound, bloodConnectionSound } from "./game-audio.js?v=20261027-4";
+} from "./leaderboards.js?v=20261027-5";
+import { fetchWithTimeout } from "./network.js?v=20261027-5";
+import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261027-5";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261027-5";
+import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261027-5";
+import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261027-5";
+import { createMysteryBox } from "./mystery-box.js?v=20261027-5";
+import { initialiseGameAudio, letterSound, bloodConnectionSound } from "./game-audio.js?v=20261027-5";
 
 const gameAudio = initialiseGameAudio(browserStorage);
 const mysteryBox = createMysteryBox({
@@ -242,19 +242,19 @@ const puzzleTypes = {
     name: "Quest Steps",
     kicker: "Easter egg puzzle",
     description: "Can you identify the Zombies map from its Easter egg steps?",
-    image: "./assets/quest-steps-card.svg?v=20261027-4",
+    image: "./assets/quest-steps-card.svg?v=20261027-5",
   },
   word: {
     name: "Last Words",
     kicker: "Letter puzzle",
     description: "Can you identify the Zombies word or phrase by revealing its letters?",
-    image: "./assets/dead-letters-card.svg?v=20261027-4",
+    image: "./assets/dead-letters-card.svg?v=20261027-5",
   },
 };
 if (bloodTiesEnabled) puzzleTypes.blood = {
   name: 'Blood Ties', kicker: 'Connection puzzle',
   description: 'Can you uncover the hidden Zombies connections?',
-  image: './assets/blood-ties-card.svg?v=20261027-4',
+  image: './assets/blood-ties-card.svg?v=20261027-5',
 };
 
 function escapeHtml(value) {
@@ -660,18 +660,78 @@ function initialiseProfileScrollbars() {
     const picker = track.previousElementSibling;
     const thumb = track.firstElementChild;
     if (!picker || !thumb) return;
+    let drag = null;
 
-    const update = () => {
+    const geometry = () => {
       const trackWidth = track.clientWidth;
       const maxScroll = Math.max(0, picker.scrollWidth - picker.clientWidth);
       const thumbWidth = maxScroll
-        ? Math.max(36, trackWidth * (picker.clientWidth / picker.scrollWidth))
+        ? Math.min(trackWidth, Math.max(36, trackWidth * (picker.clientWidth / picker.scrollWidth)))
         : trackWidth;
       const maxOffset = Math.max(0, trackWidth - thumbWidth);
+      return { maxScroll, thumbWidth, maxOffset };
+    };
+
+    const update = () => {
+      const { maxScroll, thumbWidth, maxOffset } = geometry();
       const offset = maxScroll ? (picker.scrollLeft / maxScroll) * maxOffset : 0;
       thumb.style.width = `${thumbWidth}px`;
       thumb.style.transform = `translateX(${offset}px)`;
+      track.setAttribute("aria-valuenow", String(Math.round(maxScroll ? picker.scrollLeft / maxScroll * 100 : 0)));
+      track.setAttribute("aria-disabled", String(!maxScroll));
+      track.tabIndex = maxScroll ? 0 : -1;
     };
+
+    const moveThumb = (clientX) => {
+      const { maxScroll, maxOffset } = geometry();
+      const offset = clientX - track.getBoundingClientRect().left - drag.grabOffset;
+      picker.scrollLeft = maxOffset ? Math.max(0, Math.min(1, offset / maxOffset)) * maxScroll : 0;
+      update();
+    };
+    track.addEventListener("pointerdown", (event) => {
+      if (drag || !event.isPrimary || event.button !== 0 || !geometry().maxScroll) return;
+      event.preventDefault();
+      track.focus({ preventScroll: true });
+      drag = {
+        pointerId: event.pointerId,
+        grabOffset: event.target === thumb ? event.clientX - thumb.getBoundingClientRect().left : geometry().thumbWidth / 2,
+        snapType: picker.style.scrollSnapType,
+      };
+      picker.style.scrollSnapType = "none";
+      track.classList.add("is-dragging");
+      track.setPointerCapture(event.pointerId);
+      moveThumb(event.clientX);
+    });
+    track.addEventListener("pointermove", (event) => {
+      if (drag?.pointerId === event.pointerId) moveThumb(event.clientX);
+    });
+    const endDrag = (event) => {
+      if (drag?.pointerId !== event.pointerId) return;
+      picker.style.scrollSnapType = drag.snapType;
+      drag = null;
+      track.classList.remove("is-dragging");
+      if (track.hasPointerCapture(event.pointerId)) track.releasePointerCapture(event.pointerId);
+      update();
+    };
+    track.addEventListener("pointerup", endDrag);
+    track.addEventListener("pointercancel", endDrag);
+    track.addEventListener("lostpointercapture", endDrag);
+    track.addEventListener("keydown", (event) => {
+      if (drag || !geometry().maxScroll) return;
+      const step = (picker.firstElementChild?.getBoundingClientRect().width || 40) + (parseFloat(getComputedStyle(picker).columnGap) || 0);
+      const positions = {
+        ArrowLeft: picker.scrollLeft - step,
+        ArrowRight: picker.scrollLeft + step,
+        PageUp: picker.scrollLeft - picker.clientWidth,
+        PageDown: picker.scrollLeft + picker.clientWidth,
+        Home: 0,
+        End: geometry().maxScroll,
+      };
+      if (!(event.key in positions)) return;
+      event.preventDefault();
+      picker.scrollLeft = Math.max(0, Math.min(geometry().maxScroll, positions[event.key]));
+      update();
+    });
 
     picker.addEventListener("scroll", update, { passive: true });
     new ResizeObserver(update).observe(picker);
