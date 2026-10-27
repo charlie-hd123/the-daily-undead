@@ -51,10 +51,11 @@ export function formatDiscordDate(dateKey) {
 
 function previousPuzzleLines(yesterdayAnswer, yesterdayPuzzleName, solved, platform) {
   const answerLines = yesterdayPuzzleName === 'Blood Ties'
-    ? ['Yesterday’s connections: 🧟', ...yesterdayAnswer.trim().split('\n')]
+    ? []
     : [`Yesterday’s answer: ${yesterdayAnswer.trim()} 🧟`];
   const names = platform === 'reddit' ? 'u/____, u/____, u/____' : '@____, @____, @____';
-  return [...answerLines, `Yesterday’s solve rate: ${solved} 🔎`, `First correct here: ${names} 👏`];
+  const solveLabel = yesterdayPuzzleName === 'Blood Ties' ? 'Yesterday’s Blood Ties solve rate' : 'Yesterday’s solve rate';
+  return [...answerLines, `${solveLabel}: ${solved} 🔎`, `First correct here: ${names} 👏`];
 }
 
 function solveRate(value) {

@@ -160,15 +160,16 @@ test("Apple mobile devices are detected for the Photos save flow", () => {
   assert.equal(isAppleMobileDevice({ userAgent: "Mozilla/5.0 (Macintosh)", platform: "MacIntel", maxTouchPoints: 0 }), false);
 });
 
-test('the previous Blood Ties board is labelled as connections for every post type', () => {
+test('the previous Blood Ties recap keeps only its solve rate and shout-outs for every post type', () => {
   const input = { dateKey: '2026-10-23', yesterdayAnswer: 'Revive perks: Quick Revive, Tombstone Soda, Dying Wish\nPack-a-Punch: Wall Power, Crate Power, Bullet Boost', yesterdayPuzzleName: 'Blood Ties', solvePercentage: 70 };
   const copies = [buildMarketingCopy({ ...input, clue: 'A clue' }), buildWordMarketingCopy({ ...input, answer: 'Mystery Box', initialLetters: ['M'], category: 'Object' }), buildBloodMarketingCopy(input)];
   copies.forEach(copy => {
     for (const text of [copy.redditBody, copy.discordBody]) {
-      assert.match(text, /Yesterday’s connections: 🧟\nRevive perks:/);
-      assert.doesNotMatch(text, /Yesterday’s answer:/);
-      assert.match(text, /70%/);
+      assert.match(text, /Yesterday’s Blood Ties solve rate: 70% 🔎/);
+      assert.doesNotMatch(text, /Yesterday’s connections:|Yesterday’s answer:|Revive perks|Quick Revive|Pack-a-Punch|Bullet Boost/);
     }
+    assert.match(copy.redditBody, /First correct here: u\/____, u\/____, u\/____ 👏/);
+    assert.match(copy.discordBody, /First correct here: @____, @____, @____ 👏/);
   });
 });
 
