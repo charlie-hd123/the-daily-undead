@@ -1,5 +1,5 @@
-import * as T from './vendor/mystery-box-three.js?v=20261027-1';
-import { BOX_FRAME, fitBoxCamera, lidDepthScale, iconShadowNeedsUpdate } from './mystery-box-motion.js?v=20261027-1';
+import * as T from './vendor/mystery-box-three.js?v=20261027-3';
+import { BOX_FRAME, fitBoxCamera, lidDepthScale, iconShadowNeedsUpdate } from './mystery-box-motion.js?v=20261027-3';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
@@ -53,8 +53,8 @@ export async function createMysteryBoxScene(host) {
   host.dataset.renderer = 'texture';
   const loader = new T.TextureLoader();
   const [woodMap, paintMap] = await Promise.all([
-    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261027-1', import.meta.url).href),
-    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261027-1', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261027-3', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261027-3', import.meta.url).href),
   ]);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;
@@ -214,21 +214,8 @@ export async function createMysteryBoxScene(host) {
   async function prepareIconShadows(icons) {
     await Promise.all(icons.map(async ({ type, source }) => {
       if (iconShadows.has(type)) return;
-      const sourceTexture = await loader.loadAsync(source);
-      if (disposed) { sourceTexture.dispose(); return; }
-      let texture;
-      try {
-        // Upload pixels rather than an SVG image: Chrome can otherwise lose its
-        // alpha silhouette. Rasterize once per icon, then reuse the GPU texture.
-        const shadowCanvas = document.createElement('canvas');
-        shadowCanvas.width = shadowCanvas.height = 256;
-        const shadowContext = shadowCanvas.getContext('2d');
-        if (!shadowContext) throw new Error('Icon shadow canvas unavailable');
-        shadowContext.drawImage(sourceTexture.image, 0, 0, 256, 256);
-        texture = new T.CanvasTexture(shadowCanvas);
-      } finally {
-        sourceTexture.dispose();
-      }
+      const texture = await loader.loadAsync(source);
+      if (disposed) { texture.dispose(); return; }
       const material = new T.MeshBasicMaterial({ map: texture, alphaTest: .18,
         side: T.DoubleSide, colorWrite: false, depthWrite: false });
       const mesh = new T.Mesh(new T.PlaneGeometry(1, 1), material);
