@@ -1,5 +1,5 @@
-import * as T from './vendor/mystery-box-three.js?v=20261028-4';
-import { BOX_FRAME, fitBoxCamera, lidDepthScale, iconShadowNeedsUpdate } from './mystery-box-motion.js?v=20261028-4';
+import * as T from './vendor/mystery-box-three.js?v=20261028-5';
+import { BOX_FRAME, fitBoxCamera, lidDepthScale, iconShadowNeedsUpdate } from './mystery-box-motion.js?v=20261028-5';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
@@ -53,8 +53,8 @@ export async function createMysteryBoxScene(host) {
   host.dataset.renderer = 'texture';
   const loader = new T.TextureLoader();
   const [woodMap, paintMap] = await Promise.all([
-    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261028-4', import.meta.url).href),
-    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261028-4', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261028-5', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261028-5', import.meta.url).href),
   ]);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;
@@ -393,7 +393,7 @@ export async function createMysteryBoxScene(host) {
   }
   function aperture() {
     return { left: project(-2.89, 1.65, 1.08), right: project(2.89, 1.65, 1.08),
-      center: project(0, 1.65, .25) };
+      center: project(0, 1.65, 0) };
   }
   function viewDirection() {
     const direction = camera.getWorldDirection(new T.Vector3());

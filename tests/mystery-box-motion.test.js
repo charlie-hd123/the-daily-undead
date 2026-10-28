@@ -112,7 +112,7 @@ test('floating icon size stays proportional to the projected box across desktop 
           const point = new Vector3(x, y, z).project(fitted);
           return { x: stage.left + (point.x + 1) * width / 2, y: stage.top + (1 - point.y) * height / 2 };
         };
-        const mouth = { left: project(-2.89, 1.65, 1.08), right: project(2.89, 1.65, 1.08), center: project(0, 1.65, .25) };
+        const mouth = { left: project(-2.89, 1.65, 1.08), right: project(2.89, 1.65, 1.08), center: project(0, 1.65, 0) };
         const target = { left: stage.left + width - 100, top: stage.top + 14, width: 88, height: 88 };
         const pose = createIconFlight({ target, mouth, stage, viewDirection, ink })(elapsed);
         ratios.push(ink.width * target.width * pose.scale / (mouth.right.x - mouth.left.x));
