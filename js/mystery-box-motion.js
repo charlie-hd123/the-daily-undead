@@ -95,7 +95,7 @@ export function createIconFlight({ target, mouth, stage, viewDirection, ink = IC
   const clearance = openingWidth * .04;
   const availableHeight = Math.max(0, Math.min(mouth.left.y, mouth.right.y) - stage.top - clearance - 24);
   // Optical scales balance visible width and height across the three compact silhouettes.
-  const peakInkWidth = Math.min(openingWidth * .30, (stage.width - 40) / widestIcon, availableHeight / tallestIcon);
+  const peakInkWidth = Math.min(openingWidth * .33, (stage.width - 40) / widestIcon, availableHeight / tallestIcon);
   const peakSize = peakInkWidth * ink.visualScale / ink.width;
   const peakScale = peakSize / target.width;
   const startScale = peakScale * .62;
