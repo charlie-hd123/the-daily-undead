@@ -1,6 +1,6 @@
-import { BOX_SEQUENCE, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261027-7';
+import { BOX_SEQUENCE, ICON_INK, boxRewardAt, createIconFlight, createBoxActivation, revealHeight, lidOpenness } from './mystery-box-motion.js?v=20261028-1';
 
-import { createDailyBoxHistory } from './mystery-box-history.js?v=20261027-7';
+import { createDailyBoxHistory } from './mystery-box-history.js?v=20261028-1';
 
 // Presentation only. The real puzzle stays in the DOM and remains playable.
 export function createMysteryBox({ beforeOpen, onOpen = () => {}, onSkip = () => {}, onCancel = () => {} } = {}) {
@@ -96,7 +96,7 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onSkip = () =>
     if (renderingReady) return renderingReady;
     renderingReady = Promise.all([
       document.fonts.load('900 40px "Barlow Condensed"').then(() => document.fonts.check('900 40px "Barlow Condensed"')).catch(() => false),
-      import('./mystery-box-scene.js?v=20261027-7')
+      import('./mystery-box-scene.js?v=20261028-1')
         .then(({ createMysteryBoxScene }) => createMysteryBoxScene(stage)),
     ])
       .then(([fontReady, scene]) => {
@@ -206,11 +206,15 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onSkip = () =>
     const current = boxRewardAt(elapsed, puzzleType, rewardTypes, layers[0].flight(elapsed));
     let shadowChanged = false;
     context.dataset.reward = current.type;
+    let activePose;
     for (const { type, traveller, object, rolling, flight } of layers) {
       const exchanging = !current.locked && current.fromType !== current.toType;
       const visibleType = current.type;
       const weight = type === visibleType ? 1 : 0;
+      traveller.hidden = !weight;
+      if (!weight) { traveller.style.opacity = '0'; continue; }
       const pose = flight(elapsed);
+      activePose = pose;
       // Exchange the silhouettes only while edge-on. One visible object avoids
       // a ghosted double outline; predecoded faces never change source in flight.
       const roll = exchanging ? current.rollX : 0;
@@ -223,7 +227,7 @@ export function createMysteryBox({ beforeOpen, onOpen = () => {}, onSkip = () =>
       traveller.style.setProperty('--mb-depth', pose.depth);
       if (weight) shadowChanged = visual.positionIconShadow?.({ type, pose, target, stage: stageRect, roll, elapsed, openness: progress }) || false;
     }
-    const pose = layers[0].flight(elapsed);
+    const pose = activePose;
     context.style.clipPath = elapsed < BOX_SEQUENCE.settleAt
       ? `polygon(0 0,100% 0,100% ${pose.clipRight}px,0 ${pose.clipLeft}px)` : 'none';
     return shadowChanged;

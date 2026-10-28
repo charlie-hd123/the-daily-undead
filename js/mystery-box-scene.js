@@ -1,5 +1,5 @@
-import * as T from './vendor/mystery-box-three.js?v=20261027-7';
-import { BOX_FRAME, fitBoxCamera, lidDepthScale, iconShadowNeedsUpdate } from './mystery-box-motion.js?v=20261027-7';
+import * as T from './vendor/mystery-box-three.js?v=20261028-1';
+import { BOX_FRAME, fitBoxCamera, lidDepthScale, iconShadowNeedsUpdate } from './mystery-box-motion.js?v=20261028-1';
 
 // One small, demand-rendered scene. No game data or puzzle content enters WebGL.
 export async function createMysteryBoxScene(host) {
@@ -53,8 +53,8 @@ export async function createMysteryBoxScene(host) {
   host.dataset.renderer = 'texture';
   const loader = new T.TextureLoader();
   const [woodMap, paintMap] = await Promise.all([
-    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261027-7', import.meta.url).href),
-    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261027-7', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/aged-oak.webp?v=20261028-1', import.meta.url).href),
+    loader.loadAsync(new URL('../assets/mystery-box/painted-question.png?v=20261028-1', import.meta.url).href),
   ]);
   woodMap.colorSpace = T.SRGBColorSpace;
   woodMap.wrapS = woodMap.wrapT = T.RepeatWrapping;
@@ -162,6 +162,35 @@ export async function createMysteryBoxScene(host) {
   });
   const glow = new T.Mesh(new T.PlaneGeometry(6.5, 3.2), glowMat); glow.position.set(0, 3.03, -.12); glow.rotation.y = .4; caseGroup.add(glow);
 
+  // The boards and hardware do not move relative to their body/lid. Batch each
+  // material once so every shadow update does not redraw hundreds of parts.
+  const originalGeometries = new Set();
+  for (const group of [caseGroup, lid]) {
+    const batches = new Map();
+    for (const mesh of [...group.children]) {
+      if (!mesh.isMesh || !mesh.visible || !mesh.material.isMeshStandardMaterial || mesh.material.transparent) continue;
+      const key = `${mesh.material.uuid}:${mesh.castShadow}:${mesh.receiveShadow}`;
+      if (!batches.has(key)) batches.set(key, []);
+      batches.get(key).push(mesh);
+    }
+    for (const meshes of batches.values()) {
+      if (meshes.length < 2) continue;
+      const parts = meshes.map(mesh => {
+        mesh.updateMatrix();
+        const part = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone();
+        return part.applyMatrix4(mesh.matrix);
+      });
+      const geometry = T.mergeGeometries(parts, false);
+      for (const part of parts) part.dispose();
+      if (!geometry) continue;
+      const merged = new T.Mesh(geometry, meshes[0].material);
+      merged.castShadow = meshes[0].castShadow; merged.receiveShadow = meshes[0].receiveShadow;
+      for (const mesh of meshes) { originalGeometries.add(mesh.geometry); group.remove(mesh); }
+      group.add(merged);
+    }
+  }
+  for (const geometry of originalGeometries) geometry.dispose();
+
   // A softly lit floor gives the contact and directional shadows a visible
   // surface. It shares the prop's perspective and fades to transparent at its edge.
   const floorCanvas = document.createElement('canvas'); floorCanvas.width = floorCanvas.height = 256;
@@ -216,6 +245,8 @@ export async function createMysteryBoxScene(host) {
       if (iconShadows.has(type)) return;
       const texture = await loader.loadAsync(source);
       if (disposed) { texture.dispose(); return; }
+      // Upload while preparing the box, rather than on an icon's first spin frame.
+      renderer.initTexture(texture);
       const material = new T.MeshBasicMaterial({ map: texture, alphaTest: .18,
         side: T.DoubleSide, colorWrite: false, depthWrite: false });
       const mesh = new T.Mesh(new T.PlaneGeometry(1, 1), material);

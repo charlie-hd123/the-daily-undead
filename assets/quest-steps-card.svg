@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-labelledby="title">
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-labelledby="title">
   <title id="title">Quest Steps treasure map with three connected X marks</title>
   <path fill="#183d62" stroke="#67e8ff" stroke-linejoin="round" stroke-width="6" d="m36 88 56-15 56 15 56-15v86l-56 15-56-15-56 15z"/>
   <path fill="none" stroke="#67e8ff" stroke-width="6" opacity=".35" d="M92 73v86m56-71v86"/>

@@ -98,6 +98,30 @@ test('the icon starts below the front rim and rises clear of it with visible dep
   assert.equal(raised.depth, 1);
 });
 
+test('floating icon size stays proportional to the projected box across desktop and phone widths', () => {
+  for (const ink of Object.values(ICON_INK)) {
+    for (const elapsed of [timing.liftAt, timing.cycleAt, 1450, 3200, timing.settleAt]) {
+      const ratios = [];
+      for (const [width, height] of [[343, 250], [620, 310], [800, 320], [1056, 480], [1500, 480], [797, 200]]) {
+        const stage = { left: 20, top: 150, width, height };
+        const frame = fitBoxCamera(width, height, width <= 600);
+        const fitted = camera.clone();
+        fitted.left = -frame.halfWidth; fitted.right = frame.halfWidth;
+        fitted.top = frame.halfHeight; fitted.bottom = -frame.halfHeight; fitted.updateProjectionMatrix();
+        const project = (x, y, z) => {
+          const point = new Vector3(x, y, z).project(fitted);
+          return { x: stage.left + (point.x + 1) * width / 2, y: stage.top + (1 - point.y) * height / 2 };
+        };
+        const mouth = { left: project(-2.89, 1.65, 1.08), right: project(2.89, 1.65, 1.08), center: project(0, 1.65, .25) };
+        const target = { left: stage.left + width - 100, top: stage.top + 14, width: 88, height: 88 };
+        const pose = createIconFlight({ target, mouth, stage, viewDirection, ink })(elapsed);
+        ratios.push(ink.width * target.width * pose.scale / (mouth.right.x - mouth.left.x));
+      }
+      assert.ok(Math.max(...ratios) - Math.min(...ratios) < 1e-10, `icon/box ratio changed at ${elapsed}ms`);
+    }
+  }
+});
+
 
 test('the outer icon frame keeps the chest perspective through emergence, rolling and the chosen hold', () => {
   const flight = createIconFlight(desktop);
@@ -288,9 +312,9 @@ test('every 60Hz motion frame keeps the correct shadow icon and bounds shadow la
         if (iconShadowNeedsUpdate(rendered, next)) rendered = next;
         assert.equal(rendered.type, next.type, `wrong shadow at ${elapsed}ms`);
         if (next.depth > .03) {
-          assert.ok(Math.abs(rendered.roll - next.roll) < 6, `turn lag at ${elapsed}ms`);
-          assert.ok(Math.abs(rendered.left - next.left) < .75, `horizontal lag at ${elapsed}ms`);
-          assert.ok(Math.abs(rendered.top - next.top) < .75, `vertical lag at ${elapsed}ms`);
+          assert.ok(Math.abs(rendered.roll - next.roll) < .26, `turn lag at ${elapsed}ms`);
+          assert.ok(Math.abs(rendered.left - next.left) < .26, `horizontal lag at ${elapsed}ms`);
+          assert.ok(Math.abs(rendered.top - next.top) < .26, `vertical lag at ${elapsed}ms`);
         }
       }
       assert.equal(rendered.type, finalType);

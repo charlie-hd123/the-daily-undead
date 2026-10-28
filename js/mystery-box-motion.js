@@ -36,8 +36,8 @@ const mix = (a, b, amount) => a + (b - a) * amount;
 const smooth = (value) => value < .5 ? 4 * value ** 3 : 1 - (-2 * value + 2) ** 3 / 2;
 const smoother = (value) => value ** 3 * (value * (value * 6 - 15) + 10);
 
-// Keep gentle shadow motion economical, but never defer a new icon, a visibly
-// different turn, or a movement large enough to separate it from its caster.
+// Follow visible motion on the same frame as the icon; cache subpixel changes
+// and stationary holds instead of throttling slow turns to a separate cadence.
 export function iconShadowNeedsUpdate(previous, next) {
   if (!previous) return true;
   const movement = Math.max(Math.abs(next.left - previous.left), Math.abs(next.top - previous.top),
@@ -45,8 +45,7 @@ export function iconShadowNeedsUpdate(previous, next) {
   const turn = Math.abs(next.roll - previous.roll);
   const visibilityChanged = (next.depth > .03) !== (previous.depth > .03);
   if (next.type !== previous.type || visibilityChanged || next.elapsed < previous.elapsed) return true;
-  if (movement < .25 && turn < .25) return false;
-  return movement >= .75 || turn >= 6 || next.elapsed - previous.elapsed >= 1000 / 24;
+  return movement >= .25 || turn >= .25;
 }
 
 export function lidOpenness(elapsed) {
@@ -93,14 +92,15 @@ export function createIconFlight({ target, mouth, stage, viewDirection, ink = IC
   const lipY = (x) => mix(mouth.left.y, mouth.right.y,
     (x - mouth.left.x) / (mouth.right.x - mouth.left.x));
   const openingWidth = Math.abs(mouth.right.x - mouth.left.x);
-  const availableHeight = Math.max(30, Math.min(mouth.left.y, mouth.right.y) - stage.top - 40);
+  const clearance = openingWidth * .04;
+  const availableHeight = Math.max(0, Math.min(mouth.left.y, mouth.right.y) - stage.top - clearance - 24);
   // Optical scales balance visible width and height across the three compact silhouettes.
-  const peakInkWidth = .65 * Math.min(168, (stage.width - 40) / widestIcon, openingWidth * .62, availableHeight / tallestIcon);
+  const peakInkWidth = Math.min(openingWidth * .26, (stage.width - 40) / widestIcon, availableHeight / tallestIcon);
   const peakSize = peakInkWidth * ink.visualScale / ink.width;
   const peakScale = peakSize / target.width;
   const startScale = peakScale * .62;
   const startTop = Math.max(mouth.left.y, mouth.right.y) + target.height * startScale;
-  const peakTop = Math.min(mouth.left.y, mouth.right.y) - 16
+  const peakTop = Math.min(mouth.left.y, mouth.right.y) - clearance
     - (ink.top + ink.height) * target.height * peakScale;
 
   return (elapsed) => {

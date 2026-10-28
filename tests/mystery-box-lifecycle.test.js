@@ -198,6 +198,7 @@ test('decoded icon objects exchange edge-on without ghosting and restore the unt
       assert.ok(weights.every(weight => Number.isFinite(weight) && weight >= 0 && weight <= 1));
       assert.ok(Math.abs(weights.reduce((sum, weight) => sum + weight, 0) - 1) < 1e-9);
       assert.equal(weights.filter(weight => weight > 0).length, 1, 'one crisp silhouette at every frame');
+      assert.equal(f.iconLayers.filter(layer => !layer.hidden).length, 1, 'inactive SVG stacks must not paint');
       const visible = f.iconLayers.find(layer => Number(layer.style.opacity) > 0);
       shown.add(visible.dataset.icon);
       assert.equal(f.icon.getAttribute('src'), './assets/dead-letters-card.svg');
