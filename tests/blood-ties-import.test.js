@@ -76,7 +76,7 @@ with zipfile.ZipFile(sys.argv[2],'w') as z:
     assert.equal(build(effective).contentVersion,Number(version));
     const {bloodTiesBoards:pool}=await import(pathToFileURL(root+'/js/blood-ties-boards.js'));
     assert.equal(new Set(pool.boards.flatMap(board=>board.map(g=>g[0]))).size,Number(count));
-  `,root,before,effectiveDate,JSON.stringify(buildDailyBloodTiesPuzzle(before)),String(bloodTiesCatalogue.version+1),String(bloodTiesCatalogue.connections.filter(g => g.discovery.method !== 'specialist').length+1)]);
+  `,root,before,effectiveDate,JSON.stringify(buildDailyBloodTiesPuzzle(before)),String(bloodTiesCatalogue.version+1),String(bloodTiesCatalogue.connections.length+1)]);
   // Once that date has arrived, changing the seed/content must never silently
   // rewrite the existing daily assignments, even via the compiler directly.
   const compiled = await readFile(path.join(root,'js/blood-ties-boards.js'),'utf8');

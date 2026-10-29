@@ -9,12 +9,12 @@ import { buildDailyBloodTiesPuzzle, countBloodTiesSolutions, replayBloodTiesAtte
 import { buildDailyBloodTiesPuzzle as historicalPuzzle } from '../js/blood-ties-legacy.js';
 import { isApiFile } from '../scripts/lib/release-tools.mjs';
 import { BLOOD_TIES_FAIRNESS_VERSION, createBloodTiesFairnessChecker, passesBloodTiesFairness } from '../js/blood-ties-fairness.js';
-import { BLOOD_TIES_DISCOVERY_VERSION, inspectBloodTiesDiscovery, passesBloodTiesDiscovery } from '../js/blood-ties-discovery.js';
+import { BLOOD_TIES_DISCOVERY_VERSION, inspectBloodTiesDiscovery, passesBloodTiesDiscovery, resolveBloodTiesTrioDiscovery } from '../js/blood-ties-discovery.js';
 
-test('compiled pool is reproducible and every regular category participates in discoverable unique boards', () => {
+test('compiled pool is reproducible and every category and tile participates in discoverable unique boards', () => {
   execFileSync(process.execPath, ['scripts/generate-blood-ties.mjs', '--check']);
   const source = new Map(catalogue.connections.map(g => [g.id, g]));
-  const seen = new Set();
+  const seen = new Set(), seenTiles = new Set(), seenMemberships = new Set();
   const inspect = createBloodTiesFairnessChecker(catalogue.connections);
   assert.equal(bloodTiesBoards.sourceSha256, catalogue.sourceSha256);
   assert.equal(bloodTiesBoards.fairnessVersion, BLOOD_TIES_FAIRNESS_VERSION);
@@ -24,15 +24,18 @@ test('compiled pool is reproducible and every regular category participates in d
     const groups = board.map(([id, ...indices]) => {
       const g = source.get(id); seen.add(id);
       assert.ok(indices.every(i => Number.isInteger(i) && g.tiles[i]));
-      return { ...g, answers: indices.map(i => g.tiles[i]) };
+      return resolveBloodTiesTrioDiscovery({ ...g, answers: indices.map(i => g.tiles[i]) });
     });
     const tiles = groups.flatMap(g => g.answers);
+    tiles.forEach(tile => seenTiles.add(tile));
+    groups.forEach(g => g.answers.forEach(tile => seenMemberships.add(JSON.stringify([g.id,tile]))));
     // Shared membership never creates indistinguishable buttons with secret owners.
     assert.equal(new Set(tiles.map(t => t.normalize('NFKC').toLowerCase().replaceAll('’', "'"))).size, 12);
     assert.equal(countBloodTiesSolutions(groups, tiles), 1);
     const discovery = inspectBloodTiesDiscovery(groups);
     assert.equal(passesBloodTiesDiscovery(discovery), true, `board ${index}`);
     assert.equal(discovery.finishes.length, 6);
+    assert.ok(discovery.specialistGroups <= 1);
     assert.equal(bloodTiesBoards.opening[index], discovery.isolatedGroups);
     const fairness = inspect(groups);
     assert.equal(fairness.alternative, false, `board ${index}`);
@@ -43,10 +46,12 @@ test('compiled pool is reproducible and every regular category participates in d
     assert.equal(passesBloodTiesFairness({ ...fairness, easyClear: true }), true, `board ${index}`);
     assert.equal(bloodTiesBoards.ambiguity[index], fairness.rejectedTrios);
   }
-  assert.deepEqual([...seen].sort(), catalogue.connections.filter(g => g.discovery.method !== 'specialist').map(g => g.id).sort());
+  assert.deepEqual([...seen].sort(), catalogue.connections.map(g => g.id).sort());
+  assert.deepEqual([...seenTiles].sort(), [...new Set(catalogue.connections.flatMap(g => g.tiles))].sort());
+  assert.deepEqual([...seenMemberships].sort(), catalogue.connections.flatMap(g => g.tiles.map(tile => JSON.stringify([g.id,tile]))).sort());
 });
 
-test('three years preserve 14-day category and 7-day tile gaps, discoverable finishes and regular coverage', () => {
+test('three years preserve 14-day category and 7-day tile gaps, discoverable finishes and full category coverage', () => {
   const history = [], seen = new Set();
   const start = Date.parse(`${catalogue.effectiveDate}T00:00:00Z`);
   for (let date = Math.max(Date.parse('2026-10-22T00:00:00Z'), start - 14 * 86400000); date < start; date += 86400000) {
@@ -68,7 +73,7 @@ test('three years preserve 14-day category and 7-day tile gaps, discoverable fin
     }
     history.push(p);
   }
-  assert.equal(seen.size, catalogue.connections.filter(g => g.discovery.method !== 'specialist').length);
+  assert.equal(seen.size, catalogue.connections.length);
   const expected = JSON.stringify(buildDailyBloodTiesPuzzle('2026-10-25'));
   buildDailyBloodTiesPuzzle('2026-12-25').groups[0].answers.reverse();
   assert.equal(JSON.stringify(buildDailyBloodTiesPuzzle('2026-10-25')), expected);

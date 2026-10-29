@@ -1,7 +1,7 @@
 import { createRng, hashString, isValidDateKey, shuffle } from './game-core.js';
 import { bloodTiesContents } from './blood-ties-content.js';
 import { buildDailyBloodTiesPuzzle as buildV2BloodTiesPuzzle } from './blood-ties-v2.js';
-import { BLOOD_TIES_DISCOVERY_VERSION } from './blood-ties-discovery.js';
+import { BLOOD_TIES_DISCOVERY_VERSION, resolveBloodTiesTrioDiscovery } from './blood-ties-discovery.js';
 export { countBloodTiesSolutions } from './blood-ties-legacy.js';
 
 export const BLOOD_TIES_LAUNCH_DATE = '2026-10-22';
@@ -31,7 +31,8 @@ function prepareContents() {
     const pool = boards.boards.map((board,index) => {
       const groups = board.map(([id, ...indices]) => {
         const group = connections.get(id);
-        return { ...group, answers: indices.map(i => group.tiles[i]) };
+        const selected = { ...group, answers: indices.map(i => group.tiles[i]) };
+        return boards.discoveryVersion ? resolveBloodTiesTrioDiscovery(selected) : selected;
       });
       const tiles = groups.flatMap(g => g.answers);
       const signature = groups.map(g => `${g.id}:${trioKey(g.answers)}`).sort().join('|');
