@@ -18,18 +18,18 @@ test('future workbook additions archive issued content, compile automatically an
   const oldBoards = await readFile(path.join(root,'js/blood-ties-boards.js'),'utf8');
   const fixture = path.join(root,'rows.json'), workbook = path.join(root,'new-content.xlsm');
   // The owner's old sheet has no classifications yet: preserve reviewed IDs.
-  const rows = [...bloodTiesCatalogue.connections.map(({discovery,...g}) => g), {id:'future-example',name:'Future example maps',definition:'Three new maps in the next content release.',family:'Maps',difficulty:1,tiles:['Future Map A','Future Map B','Future Map C'],discovery:{method:'name',theme:'Future maps',words:['future map']}}];
+  const rows = [...bloodTiesCatalogue.connections.map(({discovery,...g}) => g), {id:'future-example',name:'Future example equipment',definition:'Three new items in the next content release.',family:'Gameplay',difficulty:1,tiles:['Future Item A','Future Item B','Future Item C'],discovery:{method:'name',theme:'Future equipment',words:['future item'],pairing:'equipment'}}];
   await writeFile(fixture,JSON.stringify(rows));
   // A tiny standards-based first-worksheet fixture, with no Excel dependencies.
   const makeWorkbook = () => execFileSync('python3',['-c',`
 import json, sys, zipfile
 from xml.sax.saxutils import escape
 rows=json.load(open(sys.argv[1]))
-values=[['Connection ID','Name','Definition','Family','Difficulty','Eligible tile 01']+['']*15+['Research link','Discovery','Name theme','Clue words','Common link']]
-values += [[g['id'],g['name'],g['definition'],g['family'],str(g['difficulty']),*(g['tiles']+['']*(16-len(g['tiles']))),g.get('researchLink',''),g.get('discovery',{}).get('method',''),g.get('discovery',{}).get('theme',''),' | '.join(g.get('discovery',{}).get('words',[])),g.get('discovery',{}).get('reasoning','')] for g in rows]
+values=[['Connection ID','Name','Definition','Family','Difficulty','Eligible tile 01']+['']*15+['Research link','Discovery','Name theme','Clue words','Common link','Pair type']]
+values += [[g['id'],g['name'],g['definition'],g['family'],str(g['difficulty']),*(g['tiles']+['']*(16-len(g['tiles']))),g.get('researchLink',''),g.get('discovery',{}).get('method',''),g.get('discovery',{}).get('theme',''),' | '.join(g.get('discovery',{}).get('words',[])),g.get('discovery',{}).get('reasoning',''),g.get('discovery',{}).get('pairing','')] for g in rows]
 xml='<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>'
 for i,row in enumerate(values,1):
- xml += '<row r="'+str(i)+'">'+''.join('<c r="'+chr(65+j)+str(i)+'" t="inlineStr"><is><t>'+escape(v)+'</t></is></c>' for j,v in enumerate(row))+'</row>'
+ xml += '<row r="'+str(i)+'">'+''.join('<c r="'+(chr(64+j//26) if j>=26 else '')+chr(65+j%26)+str(i)+'" t="inlineStr"><is><t>'+escape(v)+'</t></is></c>' for j,v in enumerate(row))+'</row>'
 xml += '</sheetData></worksheet>'
 with zipfile.ZipFile(sys.argv[2],'w') as z:
  z.writestr('xl/workbook.xml','<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Blood Ties" sheetId="1" r:id="rId1"/></sheets></workbook>')
@@ -66,6 +66,9 @@ with zipfile.ZipFile(sys.argv[2],'w') as z:
   const importedCatalogue = JSON.parse((await readFile(path.join(root,'js/blood-ties-catalogue.js'),'utf8')).split(' = ')[1].trim().replace(/;$/,''));
   assert.deepEqual(importedCatalogue.connections[0].discovery,bloodTiesCatalogue.connections[0].discovery);
   assert.equal(importedCatalogue.connections.find(g => g.id === '0045').discovery.reasoning,'function');
+  assert.equal(importedCatalogue.connections.find(g => g.id === '0045').discovery.pairing,'effects');
+  assert.equal(importedCatalogue.connections.find(g => g.id === '0075').discovery.pairing,'mixed');
+  assert.equal(importedCatalogue.connections.find(g => g.id === 'future-example').discovery.pairing,'equipment');
   execFileSync(process.execPath,[fileURLToPath(new URL('../scripts/generate-blood-ties.mjs',import.meta.url)),'--root',root]);
   const before = new Date(Date.parse(`${effectiveDate}T00:00:00Z`)-86400000).toISOString().slice(0,10);
   execFileSync(process.execPath,['--input-type=module','-e',`

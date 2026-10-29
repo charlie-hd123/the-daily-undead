@@ -1,10 +1,25 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { bloodTiesCatalogue as catalogue } from '../js/blood-ties-catalogue.js';
-import { bloodTiesClueTiles, inspectBloodTiesDiscovery, passesBloodTiesDiscovery, resolveBloodTiesTrioDiscovery } from '../js/blood-ties-discovery.js';
+import { bloodTiesClueTiles, hasBloodTiesCategoryPairs, inspectBloodTiesDiscovery, passesBloodTiesDiscovery, resolveBloodTiesTrioDiscovery } from '../js/blood-ties-discovery.js';
 import { createBloodTiesFairnessChecker } from '../js/blood-ties-fairness.js';
 
 const groups = rows => rows.map(([id,...answers]) => ({ ...catalogue.connections.find(g => g.id === id), answers }));
+test('two category pairs use player-visible types without mistaking 3+1 or four-of-a-kind for 2+2', () => {
+  const families = values => values.map(family => ({ family }));
+  assert.equal(hasBloodTiesCategoryPairs(families(['Weapons','Wonder Weapons','Maps','Maps'])), true);
+  assert.equal(hasBloodTiesCategoryPairs(families(['GobbleGums','Elixirs','Enemies','Enemies'])), true);
+  const gameplay = pairing => ({family:'Gameplay',discovery:{pairing}});
+  assert.equal(hasBloodTiesCategoryPairs([...families(['Maps','Maps']),gameplay('effects'),gameplay('equipment')]), false);
+  assert.equal(hasBloodTiesCategoryPairs([...families(['Maps','Maps']),gameplay('effects'),gameplay('effects')]), true);
+  assert.equal(hasBloodTiesCategoryPairs([...families(['Maps','Maps']),gameplay('mixed'),gameplay('mixed')]), false);
+  assert.equal(hasBloodTiesCategoryPairs(families(['Maps','Maps','Gameplay','Gameplay'])), false);
+  for (const values of [
+    ['Weapons','Wonder Weapons','Weapons','Maps'],
+    ['Weapons','Wonder Weapons','Weapons','Wonder Weapons'],
+    ['Maps','Maps','Enemies','Perks'],
+  ]) assert.equal(hasBloodTiesCategoryPairs(families(values)), false);
+});
 test('both approved name-led examples have discoverable finishes and unique full solutions', () => {
   for (const example of [
     [['0036','Staff of Lightning','Lightning Bow','D.I.E. Electrobolt'],['0037','Staff of Ice',"Winter's Howl",'D.I.E. Cryo-Emitter'],['0024','Mule Kick','Vulture Aid','Victorious Tortoise'],['0094','Speed Cola','Tombstone Soda',"Widow's Wine"]],

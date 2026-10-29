@@ -1,5 +1,5 @@
 // Editorial guidance, compiled into boards ahead of time. No AI runs in the game.
-export const BLOOD_TIES_DISCOVERY_VERSION = 2;
+export const BLOOD_TIES_DISCOVERY_VERSION = 3;
 export const BLOOD_TIES_DISCOVERY_METHODS = ['name', 'familiar', 'specialist'];
 export const BLOOD_TIES_REASONING_TYPES = ['function', 'trait', 'weapon-class'];
 
@@ -7,6 +7,7 @@ const normal = value => value.normalize('NFKC').toLowerCase().replaceAll('’', 
 export function validateBloodTiesDiscovery(group) {
   const d = group.discovery;
   if (!d || !BLOOD_TIES_DISCOVERY_METHODS.includes(d.method)) throw new Error(`Category ${group.id} needs a discovery classification: name, familiar or specialist.`);
+  if (d.pairing && !['effects', 'equipment', 'mixed'].includes(d.pairing)) throw new Error(`Category ${group.id} needs a pair type: effects, equipment or mixed.`);
   if (d.reasoning && (!BLOOD_TIES_REASONING_TYPES.includes(d.reasoning) || d.method === 'specialist')) throw new Error(`Category ${group.id} needs a non-specialist reasoning type: function, trait or weapon-class.`);
   if (d.method === 'name' && (!d.theme?.trim() || !Array.isArray(d.words) || !d.words.length || d.words.some(w => typeof w !== 'string' || !w.trim()))) {
     throw new Error(`Category ${group.id} needs a name theme and clue words.`);
@@ -45,6 +46,19 @@ function misleadingTraitName(group, other) {
 }
 export const isBloodTiesLiteralGroup = group => group.discovery.method === 'name'
   && group.discovery.words.some(word => group.answers.every(tile => normal(tile).includes(normal(word))));
+// Use the types a player sees, including merged weapon/consumable families.
+// Four related groups and a three-plus-one opening are not two separate pairs.
+export function hasBloodTiesCategoryPairs(groups) {
+  const counts = new Map();
+  // "Gameplay" is a workbook filing label, not a recognisable item type.
+  // Mixed-item categories remain available on variation days.
+  if (groups.some(group => group.family === 'Gameplay' && (!group.discovery?.pairing || group.discovery.pairing === 'mixed'))) return false;
+  groups.forEach(group => {
+    const type = group.discovery?.pairing || kind(group);
+    counts.set(type, (counts.get(type) || 0) + 1);
+  });
+  return counts.size === 2 && [...counts.values()].every(count => count === 2);
+}
 export function inspectBloodTiesDiscovery(groups) {
   groups.forEach(validateBloodTiesDiscovery);
   const nameGroups = groups.filter(g => g.discovery.method === 'name');

@@ -12,7 +12,7 @@ const root = rootArg < 0 ? fileURLToPath(new URL('../', import.meta.url)) : path
 const { bloodTiesCatalogue: catalogue } = await import(pathToFileURL(path.join(root, 'js/blood-ties-catalogue.js')));
 if (!Number.isInteger(catalogue.version) || catalogue.version < 3) throw new Error('Archive issued content and import a new version before generating boards.');
 const inspect = createBloodTiesFairnessChecker(catalogue.connections);
-const discovery = catalogue.generationPolicy === 'discovery-v2';
+const discovery = catalogue.generationPolicy === `discovery-v${BLOOD_TIES_DISCOVERY_VERSION}`;
 if (catalogue.generationPolicy && !discovery) throw new Error('Unsupported Blood Ties generation policy.');
 if (discovery) catalogue.connections.forEach(validateBloodTiesDiscovery);
 const categories = catalogue.connections;
@@ -21,7 +21,7 @@ const anchors = categories.filter(g => g.discovery?.method === 'name' || g.disco
 const poolSize = discovery ? 16384 : 4096;
 const clues = new Map(names.map(g => [g.id, bloodTiesClueTiles(g)]));
 if (discovery && names.some(g => clues.get(g.id).length < 3)) throw new Error('Every name theme needs at least three eligible clue tiles. Review its clue words.');
-const random = createRng(hashString(`blood-ties:v${catalogue.version}:fairness${BLOOD_TIES_FAIRNESS_VERSION}:${catalogue.sourceSha256}${discovery ? ':discovery2' : ''}`));
+const random = createRng(hashString(`blood-ties:v${catalogue.version}:fairness${BLOOD_TIES_FAIRNESS_VERSION}:${catalogue.sourceSha256}${discovery ? `:discovery${BLOOD_TIES_DISCOVERY_VERSION}` : ''}`));
 const byDifficulty = [1, 2, 3].map(d => catalogue.connections.filter(g => g.difficulty === d));
 if (!discovery && (byDifficulty[0].length < 1 || byDifficulty[1].length < 2 || byDifficulty[2].length < 1)) throw new Error('Blood Ties needs categories at every difficulty, including two at difficulty 2.');
 const pool = [], ambiguity = [], opening = [], seen = new Set(), coverage = new Map(), tileCoverage = new Set(), membershipCoverage = new Set();

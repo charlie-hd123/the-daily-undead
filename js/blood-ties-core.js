@@ -1,7 +1,7 @@
 import { createRng, hashString, isValidDateKey, shuffle } from './game-core.js';
 import { bloodTiesContents } from './blood-ties-content.js';
 import { buildDailyBloodTiesPuzzle as buildV2BloodTiesPuzzle } from './blood-ties-v2.js';
-import { BLOOD_TIES_DISCOVERY_VERSION, isBloodTiesLiteralGroup, resolveBloodTiesTrioDiscovery } from './blood-ties-discovery.js';
+import { BLOOD_TIES_DISCOVERY_VERSION, hasBloodTiesCategoryPairs, isBloodTiesLiteralGroup, resolveBloodTiesTrioDiscovery } from './blood-ties-discovery.js';
 export { countBloodTiesSolutions } from './blood-ties-legacy.js';
 
 export const BLOOD_TIES_LAUNCH_DATE = '2026-10-22';
@@ -26,7 +26,7 @@ function prepareContents() {
       || !isValidDateKey(catalogue.effectiveDate) || catalogue.version < 3
       || (i === 0 ? catalogue.effectiveDate !== firstFairDate : catalogue.effectiveDate <= bloodTiesContents[i-1].catalogue.effectiveDate)) throw new Error('Blood Ties content history or board pool does not match its workbook.');
     if ((catalogue.generationPolicy || '') !== (boards.discoveryVersion ? `discovery-v${boards.discoveryVersion}` : '')
-      || boards.discoveryVersion && ![1,BLOOD_TIES_DISCOVERY_VERSION].includes(boards.discoveryVersion)
+      || boards.discoveryVersion && ![1,2,BLOOD_TIES_DISCOVERY_VERSION].includes(boards.discoveryVersion)
       || boards.discoveryVersion && boards.opening?.length !== boards.boards.length) throw new Error('Blood Ties discovery policy does not match the compiled pool.');
     const connections = new Map(catalogue.connections.map(g => [g.id, g]));
     const pool = boards.boards.map((board,index) => {
@@ -38,7 +38,7 @@ function prepareContents() {
       const tiles = groups.flatMap(g => g.answers);
       const signature = groups.map(g => `${g.id}:${trioKey(g.answers)}`).sort().join('|');
       const redHerrings = groups.flatMap(owner => owner.answers.filter(t => groups.some(g => g.id !== owner.id && g.tiles.includes(t))));
-      return { groups, tiles, redHerrings, signature, pairs: pairs(groups), ambiguity: boards.ambiguity[index], ...(boards.discoveryVersion ? { opening: boards.opening[index], nameGroups: groups.filter(g => g.discovery.method === 'name').length, literalGroups: groups.filter(isBloodTiesLiteralGroup).length } : {}) };
+      return { groups, tiles, redHerrings, signature, pairs: pairs(groups), ambiguity: boards.ambiguity[index], ...(boards.discoveryVersion ? { categoryPairs: hasBloodTiesCategoryPairs(groups), opening: boards.opening[index], nameGroups: groups.filter(g => g.discovery.method === 'name').length, literalGroups: groups.filter(isBloodTiesLiteralGroup).length } : {}) };
     });
     return { version: catalogue.version, effectiveDate: catalogue.effectiveDate, fairnessVersion: boards.fairnessVersion, discoveryVersion: boards.discoveryVersion, pool };
   });
@@ -86,9 +86,11 @@ export function buildDailyBloodTiesPuzzle(dateKey) {
       const pacing = content.discoveryVersion
         ? candidate.opening * 3 + (!gentleDay && candidate.redHerrings.length === 0 ? 4 : 0)
         : content.fairnessVersion >= 2 && !gentleDay && candidate.redHerrings.length === 0 ? 12 : 0;
-      // V2 prefers an opening with related items on most days. V1's archived
-      // name-theme budget and historical rankings remain unchanged.
-      const rank = content.discoveryVersion >= 2 ? [gentleDay || candidate.opening <= 1 ? 0 : 1, repeats,
+      // V3 prefers two related pairs on ordinary days; variation days retain
+      // the broader pool so rare families and every category can still appear.
+      // Earlier policies retain their original rankings.
+      const openingPreference = gentleDay || (content.discoveryVersion >= 3 ? candidate.categoryPairs : candidate.opening <= 1) ? 0 : 1;
+      const rank = content.discoveryVersion >= 2 ? [openingPreference, repeats,
         recent + pairRepeats * 4 + candidate.ambiguity * 2 + candidate.opening * 14
           + Math.abs(candidate.redHerrings.length - (gentleDay ? 0 : 1)) * 30 + candidate.literalGroups * 6,
         hashString(`${index}:blood-ties:v${content.version}:${candidate.signature}`)]

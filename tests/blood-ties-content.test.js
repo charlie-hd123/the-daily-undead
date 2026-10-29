@@ -9,7 +9,7 @@ import { buildDailyBloodTiesPuzzle, countBloodTiesSolutions, replayBloodTiesAtte
 import { buildDailyBloodTiesPuzzle as historicalPuzzle } from '../js/blood-ties-legacy.js';
 import { isApiFile } from '../scripts/lib/release-tools.mjs';
 import { BLOOD_TIES_FAIRNESS_VERSION, createBloodTiesFairnessChecker, passesBloodTiesFairness } from '../js/blood-ties-fairness.js';
-import { BLOOD_TIES_DISCOVERY_VERSION, inspectBloodTiesDiscovery, passesBloodTiesDiscovery, resolveBloodTiesTrioDiscovery } from '../js/blood-ties-discovery.js';
+import { BLOOD_TIES_DISCOVERY_VERSION, hasBloodTiesCategoryPairs, inspectBloodTiesDiscovery, passesBloodTiesDiscovery, resolveBloodTiesTrioDiscovery } from '../js/blood-ties-discovery.js';
 
 test('compiled pool is reproducible and every category and tile participates in discoverable unique boards', () => {
   execFileSync(process.execPath, ['scripts/generate-blood-ties.mjs', '--check']);
@@ -55,7 +55,7 @@ test('compiled pool is reproducible and every category and tile participates in 
 
 test('three years preserve 14-day category and 7-day tile gaps, discoverable finishes and full category coverage', () => {
   const history = [], seen = new Set();
-  let relatedOpenings = 0, overlappingDays = 0;
+  let relatedOpenings = 0, overlappingDays = 0, pairedDays = 0;
   const start = Date.parse(`${catalogue.effectiveDate}T00:00:00Z`);
   for (let date = Math.max(Date.parse('2026-10-22T00:00:00Z'), start - 14 * 86400000); date < start; date += 86400000) {
     const p = buildDailyBloodTiesPuzzle(new Date(date).toISOString().slice(0,10));
@@ -70,6 +70,7 @@ test('three years preserve 14-day category and 7-day tile gaps, discoverable fin
     const discovery = inspectBloodTiesDiscovery(p.groups.map(g => ({ ...g, tiles:g.eligibleTiles })));
     assert.equal(passesBloodTiesDiscovery(discovery), true, date);
     if (discovery.isolatedGroups <= 1) relatedOpenings++;
+    if (hasBloodTiesCategoryPairs(p.groups)) pairedDays++;
     if (p.redHerrings.length > 0) overlappingDays++;
     for (const previous of history.slice(-14)) assert.ok(p.groups.every(g => !previous.groups.some(h => h.id === g.id)), date);
     for (const previous of history.slice(-7)) assert.ok(p.tiles.every(t => !previous.tiles.includes(t)), date);
@@ -80,6 +81,8 @@ test('three years preserve 14-day category and 7-day tile gaps, discoverable fin
     history.push(p);
   }
   assert.equal(seen.size, catalogue.connections.length);
+  assert.ok(pairedDays > 1096 * .65, 'Two related category pairs should be the usual opening.');
+  assert.ok(pairedDays < 1096 * .95, 'Other structures must remain playable for variety and category coverage.');
   assert.ok(relatedOpenings > 1096 * .65, 'Most openings must require more than sorting distinct object types.');
   assert.ok(overlappingDays > 1096 * .5, 'Most days should offer a plausible competing membership, without forcing two overlaps.');
   const expected = JSON.stringify(buildDailyBloodTiesPuzzle('2026-10-25'));
