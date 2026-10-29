@@ -17,15 +17,16 @@ test('future workbook additions archive issued content, compile automatically an
   const oldSource = await readFile(path.join(root,'js/blood-ties-catalogue.js'),'utf8');
   const oldBoards = await readFile(path.join(root,'js/blood-ties-boards.js'),'utf8');
   const fixture = path.join(root,'rows.json'), workbook = path.join(root,'new-content.xlsm');
-  const rows = [...bloodTiesCatalogue.connections, {id:'future-example',name:'Future example maps',definition:'Three new maps in the next content release.',family:'Maps',difficulty:1,tiles:['Future Map A','Future Map B','Future Map C']}];
+  // The owner's old sheet has no classifications yet: preserve reviewed IDs.
+  const rows = [...bloodTiesCatalogue.connections.map(({discovery,...g}) => g), {id:'future-example',name:'Future example maps',definition:'Three new maps in the next content release.',family:'Maps',difficulty:1,tiles:['Future Map A','Future Map B','Future Map C'],discovery:{method:'name',theme:'Future maps',words:['future map']}}];
   await writeFile(fixture,JSON.stringify(rows));
   // A tiny standards-based first-worksheet fixture, with no Excel dependencies.
   const makeWorkbook = () => execFileSync('python3',['-c',`
 import json, sys, zipfile
 from xml.sax.saxutils import escape
 rows=json.load(open(sys.argv[1]))
-values=[['Connection ID','Name','Definition','Family','Difficulty','Eligible tile 01']]
-values += [[g['id'],g['name'],g['definition'],g['family'],str(g['difficulty']),*g['tiles']] for g in rows]
+values=[['Connection ID','Name','Definition','Family','Difficulty','Eligible tile 01']+['']*15+['Research link','Discovery','Name theme','Clue words']]
+values += [[g['id'],g['name'],g['definition'],g['family'],str(g['difficulty']),*(g['tiles']+['']*(16-len(g['tiles']))),g.get('researchLink',''),g.get('discovery',{}).get('method',''),g.get('discovery',{}).get('theme',''),' | '.join(g.get('discovery',{}).get('words',[]))] for g in rows]
 xml='<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>'
 for i,row in enumerate(values,1):
  xml += '<row r="'+str(i)+'">'+''.join('<c r="'+chr(65+j)+str(i)+'" t="inlineStr"><is><t>'+escape(v)+'</t></is></c>' for j,v in enumerate(row))+'</row>'
@@ -47,6 +48,11 @@ with zipfile.ZipFile(sys.argv[2],'w') as z:
   assert.equal(await readFile(archive,'utf8'),'do not overwrite');
   assert.equal(await readFile(path.join(root,'js/blood-ties-catalogue.js'),'utf8'),oldSource);
   await rm(archive);
+  // Unclassified additions cannot silently become supposedly approachable.
+  await writeFile(fixture,JSON.stringify(rows.map(g => g.id === 'future-example' ? {...g,discovery:undefined} : g)));
+  makeWorkbook();
+  assert.match(runImport(effectiveDate).stderr,/needs a Discovery classification/);
+  assert.equal(await readFile(path.join(root,'js/blood-ties-catalogue.js'),'utf8'),oldSource);
   // Incomplete new categories fail before any history or current content writes.
   await writeFile(fixture,JSON.stringify([...rows,{id:'incomplete',name:'Incomplete',definition:'Missing tiles',family:'Maps',difficulty:1,tiles:['Only one']} ]));
   makeWorkbook();
@@ -57,6 +63,8 @@ with zipfile.ZipFile(sys.argv[2],'w') as z:
   assert.equal(imported.status,0,imported.stderr);
   assert.equal(await readFile(archive,'utf8'),oldSource);
   assert.equal(await readFile(path.join(root,`js/blood-ties-boards-v${bloodTiesCatalogue.version}.js`),'utf8'),oldBoards);
+  const importedCatalogue = JSON.parse((await readFile(path.join(root,'js/blood-ties-catalogue.js'),'utf8')).split(' = ')[1].trim().replace(/;$/,''));
+  assert.deepEqual(importedCatalogue.connections[0].discovery,bloodTiesCatalogue.connections[0].discovery);
   execFileSync(process.execPath,[fileURLToPath(new URL('../scripts/generate-blood-ties.mjs',import.meta.url)),'--root',root]);
   const before = new Date(Date.parse(`${effectiveDate}T00:00:00Z`)-86400000).toISOString().slice(0,10);
   execFileSync(process.execPath,['--input-type=module','-e',`
@@ -68,7 +76,7 @@ with zipfile.ZipFile(sys.argv[2],'w') as z:
     assert.equal(build(effective).contentVersion,Number(version));
     const {bloodTiesBoards:pool}=await import(pathToFileURL(root+'/js/blood-ties-boards.js'));
     assert.equal(new Set(pool.boards.flatMap(board=>board.map(g=>g[0]))).size,Number(count));
-  `,root,before,effectiveDate,JSON.stringify(buildDailyBloodTiesPuzzle(before)),String(bloodTiesCatalogue.version+1),String(bloodTiesCatalogue.connections.length+1)]);
+  `,root,before,effectiveDate,JSON.stringify(buildDailyBloodTiesPuzzle(before)),String(bloodTiesCatalogue.version+1),String(bloodTiesCatalogue.connections.filter(g => g.discovery.method !== 'specialist').length+1)]);
   // Once that date has arrived, changing the seed/content must never silently
   // rewrite the existing daily assignments, even via the compiler directly.
   const compiled = await readFile(path.join(root,'js/blood-ties-boards.js'),'utf8');

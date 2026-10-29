@@ -32,6 +32,7 @@ def read_export(filename):
 js = args.root / "js"
 output = js / "blood-ties-catalogue.js"
 previous = read_export(output)
+previous_connections = {g["id"]: g for g in previous["connections"]}
 previous_boards = read_export(js / "blood-ties-boards.js")
 if args.effective_date <= previous["effectiveDate"]:
     parser.error("Choose an effective date after the current content version.")
@@ -81,10 +82,29 @@ with zipfile.ZipFile(source) as book:
         ids.add(row["A"])
         difficulty = float(row["E"])
         assert difficulty in (1, 2, 3), f"Invalid difficulty for {row['A']}"
-        connections.append(dict(id=row["A"], name=row["B"], definition=row["C"], family=row["D"], difficulty=int(difficulty), tiles=tiles, researchLink=row.get("V", "")))
+        group = dict(id=row["A"], name=row["B"], definition=row["C"], family=row["D"], difficulty=int(difficulty), tiles=tiles, researchLink=row.get("V", ""))
+        if previous.get("generationPolicy") == "discovery-v1":
+            method = row.get("W", "").lower()
+            old = previous_connections.get(row["A"], {})
+            if method:
+                assert method in ("name", "familiar", "specialist"), f"Connection {row['A']}: Discovery (W) must be name, familiar or specialist"
+                group["discovery"] = dict(method=method)
+                if method == "name":
+                    words = list(dict.fromkeys(w.strip() for w in row.get("Y", "").split("|") if w.strip()))
+                    assert row.get("X") and words, f"Connection {row['A']}: name clues need Name theme (X) and Clue words (Y), separated by |"
+                    group["discovery"].update(theme=row["X"], words=words)
+            elif old.get("name") == group["name"] and old.get("definition") == group["definition"] and old.get("discovery"):
+                # Existing unclassified copies remain usable until the reviewed
+                # classifications have been copied back to the owner's workbook.
+                group["discovery"] = old["discovery"]
+            else:
+                raise AssertionError(f"Connection {row['A']} needs a Discovery classification in W. New or renamed categories cannot silently enter the regular pool.")
+        connections.append(group)
 
 assert connections, "The first worksheet has no complete connection rows"
 catalogue = dict(version=previous["version"] + 1, effectiveDate=args.effective_date, source=source.name, sourceSha256=hashlib.sha256(source.read_bytes()).hexdigest(), worksheet=first.attrib["name"], connections=connections)
+if previous.get("generationPolicy"):
+    catalogue["generationPolicy"] = previous["generationPolicy"]
 # Validate every archive destination before writing anything. Historical content
 # is never rewritten, including when importing a corrected copy of a workbook.
 archives = [(js / f"blood-ties-{kind}-v{previous['version']}.js", (js / f"blood-ties-{kind}.js").read_text()) for kind in ["catalogue", "boards"]]

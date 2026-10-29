@@ -1,6 +1,7 @@
 import { createRng, hashString, isValidDateKey, shuffle } from './game-core.js';
 import { bloodTiesContents } from './blood-ties-content.js';
 import { buildDailyBloodTiesPuzzle as buildV2BloodTiesPuzzle } from './blood-ties-v2.js';
+import { BLOOD_TIES_DISCOVERY_VERSION } from './blood-ties-discovery.js';
 export { countBloodTiesSolutions } from './blood-ties-legacy.js';
 
 export const BLOOD_TIES_LAUNCH_DATE = '2026-10-22';
@@ -24,6 +25,8 @@ function prepareContents() {
     if (boards.sourceSha256 !== catalogue.sourceSha256 || boards.version !== catalogue.version || boards.effectiveDate !== catalogue.effectiveDate
       || !isValidDateKey(catalogue.effectiveDate) || catalogue.version < 3
       || (i === 0 ? catalogue.effectiveDate !== firstFairDate : catalogue.effectiveDate <= bloodTiesContents[i-1].catalogue.effectiveDate)) throw new Error('Blood Ties content history or board pool does not match its workbook.');
+    if ((catalogue.generationPolicy === 'discovery-v1') !== (boards.discoveryVersion === BLOOD_TIES_DISCOVERY_VERSION)
+      || boards.discoveryVersion && boards.opening?.length !== boards.boards.length) throw new Error('Blood Ties discovery policy does not match the compiled pool.');
     const connections = new Map(catalogue.connections.map(g => [g.id, g]));
     const pool = boards.boards.map((board,index) => {
       const groups = board.map(([id, ...indices]) => {
@@ -33,9 +36,9 @@ function prepareContents() {
       const tiles = groups.flatMap(g => g.answers);
       const signature = groups.map(g => `${g.id}:${trioKey(g.answers)}`).sort().join('|');
       const redHerrings = groups.flatMap(owner => owner.answers.filter(t => groups.some(g => g.id !== owner.id && g.tiles.includes(t))));
-      return { groups, tiles, redHerrings, signature, pairs: pairs(groups), ambiguity: boards.ambiguity[index] };
+      return { groups, tiles, redHerrings, signature, pairs: pairs(groups), ambiguity: boards.ambiguity[index], ...(boards.discoveryVersion ? { opening: boards.opening[index], nameGroups: groups.filter(g => g.discovery.method === 'name').length } : {}) };
     });
-    return { version: catalogue.version, effectiveDate: catalogue.effectiveDate, fairnessVersion: boards.fairnessVersion, pool };
+    return { version: catalogue.version, effectiveDate: catalogue.effectiveDate, fairnessVersion: boards.fairnessVersion, discoveryVersion: boards.discoveryVersion, pool };
   });
   // Include every actually issued day at the boundary, including the original
   // 22 October round. Workbook IDs are stable; historical renamed IDs use names.
@@ -78,9 +81,17 @@ export function buildDailyBloodTiesPuzzle(dateKey) {
       const repeats = candidate.groups.reduce((n, g) => n + (categoryUsage.get(g.id) || 0), 0);
       const recent = candidate.groups.filter(g => olderCategories.has(g.id)).length * 12 + candidate.tiles.filter(t => olderTiles.has(t)).length;
       const pairRepeats = candidate.pairs.reduce((n,pair) => n + (recentPairs.get(pair) || 0), 0);
-      const pacing = content.fairnessVersion >= 2 && !gentleDay && candidate.redHerrings.length === 0 ? 12 : 0;
-      const rank = [repeats, recent + pairRepeats * 4 + candidate.ambiguity * 2 + pacing, hashString(`${index}:blood-ties:v${content.version}:${candidate.signature}`)];
-      if (!bestRank || rank[0] < bestRank[0] || rank[0] === bestRank[0] && (rank[1] < bestRank[1] || rank[1] === bestRank[1] && rank[2] < bestRank[2])) { best = candidate; bestRank = rank; }
+      const pacing = content.discoveryVersion
+        ? candidate.opening * 3 + (!gentleDay && candidate.redHerrings.length === 0 ? 4 : 0)
+        : content.fairnessVersion >= 2 && !gentleDay && candidate.redHerrings.length === 0 ? 12 : 0;
+      // Budget scarce name themes across the full cooldown, rather than using
+      // three or four on early days and exhausting every approachable board.
+      const rank = [content.discoveryVersion ? candidate.nameGroups - 1 : 0,
+        content.discoveryVersion ? candidate.opening : 0,
+        repeats, recent + pairRepeats * 4 + candidate.ambiguity * 2 + pacing,
+        hashString(`${index}:blood-ties:v${content.version}:${candidate.signature}`)];
+      const difference = bestRank ? rank.findIndex((value,i) => value !== bestRank[i]) : -1;
+      if (!bestRank || difference >= 0 && rank[difference] < bestRank[difference]) { best = candidate; bestRank = rank; }
     }
     if (!best) throw new Error('No Blood Ties board satisfies the category and tile cooldowns.');
     days.push({ ...best, version: content.version });

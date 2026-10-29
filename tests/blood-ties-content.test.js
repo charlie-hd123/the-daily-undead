@@ -9,15 +9,17 @@ import { buildDailyBloodTiesPuzzle, countBloodTiesSolutions, replayBloodTiesAtte
 import { buildDailyBloodTiesPuzzle as historicalPuzzle } from '../js/blood-ties-legacy.js';
 import { isApiFile } from '../scripts/lib/release-tools.mjs';
 import { BLOOD_TIES_FAIRNESS_VERSION, createBloodTiesFairnessChecker, passesBloodTiesFairness } from '../js/blood-ties-fairness.js';
+import { BLOOD_TIES_DISCOVERY_VERSION, inspectBloodTiesDiscovery, passesBloodTiesDiscovery } from '../js/blood-ties-discovery.js';
 
-test('compiled pool is reproducible and every workbook category participates in unique boards', () => {
+test('compiled pool is reproducible and every regular category participates in discoverable unique boards', () => {
   execFileSync(process.execPath, ['scripts/generate-blood-ties.mjs', '--check']);
   const source = new Map(catalogue.connections.map(g => [g.id, g]));
   const seen = new Set();
   const inspect = createBloodTiesFairnessChecker(catalogue.connections);
   assert.equal(bloodTiesBoards.sourceSha256, catalogue.sourceSha256);
   assert.equal(bloodTiesBoards.fairnessVersion, BLOOD_TIES_FAIRNESS_VERSION);
-  assert.equal(bloodTiesBoards.boards.length, 4096);
+  assert.equal(bloodTiesBoards.discoveryVersion, BLOOD_TIES_DISCOVERY_VERSION);
+  assert.equal(bloodTiesBoards.boards.length, 16384);
   for (const [index,board] of bloodTiesBoards.boards.entries()) {
     const groups = board.map(([id, ...indices]) => {
       const g = source.get(id); seen.add(id);
@@ -28,22 +30,23 @@ test('compiled pool is reproducible and every workbook category participates in 
     // Shared membership never creates indistinguishable buttons with secret owners.
     assert.equal(new Set(tiles.map(t => t.normalize('NFKC').toLowerCase().replaceAll('’', "'"))).size, 12);
     assert.equal(countBloodTiesSolutions(groups, tiles), 1);
-    assert.deepEqual(groups.map(g => g.difficulty).sort(), [1, 2, 2, 3]);
-    assert.ok(groups.every(g => groups.filter(other => other.family === g.family).length <= 2));
+    const discovery = inspectBloodTiesDiscovery(groups);
+    assert.equal(passesBloodTiesDiscovery(discovery), true, `board ${index}`);
+    assert.equal(discovery.finishes.length, 6);
+    assert.equal(bloodTiesBoards.opening[index], discovery.isolatedGroups);
     const fairness = inspect(groups);
     assert.equal(fairness.alternative, false, `board ${index}`);
-    assert.equal(fairness.easyClear, true, `board ${index}`);
     assert.ok(fairness.maxVisible <= 4, `board ${index}`);
     assert.equal(fairness.similarPairs.length, 0, `board ${index}`);
     assert.ok(fairness.redHerringCount <= 2, `board ${index}`);
     assert.ok(fairness.rejectedTrios <= 6, `board ${index}`);
-    assert.equal(passesBloodTiesFairness(fairness), true, `board ${index}`);
+    assert.equal(passesBloodTiesFairness({ ...fairness, easyClear: true }), true, `board ${index}`);
     assert.equal(bloodTiesBoards.ambiguity[index], fairness.rejectedTrios);
   }
-  assert.equal(seen.size, catalogue.connections.length);
+  assert.deepEqual([...seen].sort(), catalogue.connections.filter(g => g.discovery.method !== 'specialist').map(g => g.id).sort());
 });
 
-test('three years preserve 14-day category and 7-day tile gaps, traps, difficulty and full coverage', () => {
+test('three years preserve 14-day category and 7-day tile gaps, discoverable finishes and regular coverage', () => {
   const history = [], seen = new Set();
   const start = Date.parse(`${catalogue.effectiveDate}T00:00:00Z`);
   for (let date = Math.max(Date.parse('2026-10-22T00:00:00Z'), start - 14 * 86400000); date < start; date += 86400000) {
@@ -56,6 +59,7 @@ test('three years preserve 14-day category and 7-day tile gaps, traps, difficult
     const p = buildDailyBloodTiesPuzzle(date);
     assert.equal(p.contentVersion, catalogue.version);
     assert.ok(p.redHerrings.length <= 2);
+    assert.equal(passesBloodTiesDiscovery(inspectBloodTiesDiscovery(p.groups.map(g => ({ ...g, tiles:g.eligibleTiles })))), true, date);
     for (const previous of history.slice(-14)) assert.ok(p.groups.every(g => !previous.groups.some(h => h.id === g.id)), date);
     for (const previous of history.slice(-7)) assert.ok(p.tiles.every(t => !previous.tiles.includes(t)), date);
     for (const g of p.groups) {
@@ -64,7 +68,7 @@ test('three years preserve 14-day category and 7-day tile gaps, traps, difficult
     }
     history.push(p);
   }
-  assert.equal(seen.size, catalogue.connections.length);
+  assert.equal(seen.size, catalogue.connections.filter(g => g.discovery.method !== 'specialist').length);
   const expected = JSON.stringify(buildDailyBloodTiesPuzzle('2026-10-25'));
   buildDailyBloodTiesPuzzle('2026-12-25').groups[0].answers.reverse();
   assert.equal(JSON.stringify(buildDailyBloodTiesPuzzle('2026-10-25')), expected);
@@ -88,7 +92,7 @@ test('content boundary preserves history and new puzzles cannot downgrade scorin
 });
 
 test('all shared content dependencies participate in the API release fingerprint', () => {
-  for (const name of ['blood-ties-core', 'blood-ties-boards', 'blood-ties-catalogue', 'blood-ties-catalogue-v1', 'blood-ties-legacy', 'blood-ties-content', 'blood-ties-fairness', 'blood-ties-v2', 'blood-ties-catalogue-v2', 'blood-ties-boards-v2']) {
+  for (const name of ['blood-ties-core', 'blood-ties-boards', 'blood-ties-catalogue', 'blood-ties-catalogue-v1', 'blood-ties-legacy', 'blood-ties-content', 'blood-ties-fairness', 'blood-ties-discovery', 'blood-ties-v2', 'blood-ties-catalogue-v2', 'blood-ties-boards-v2', 'blood-ties-catalogue-v3', 'blood-ties-boards-v3']) {
     assert.equal(isApiFile(`js/${name}.js`), true);
   }
 });
