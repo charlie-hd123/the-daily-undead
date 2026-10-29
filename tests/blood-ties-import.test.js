@@ -25,8 +25,8 @@ test('future workbook additions archive issued content, compile automatically an
 import json, sys, zipfile
 from xml.sax.saxutils import escape
 rows=json.load(open(sys.argv[1]))
-values=[['Connection ID','Name','Definition','Family','Difficulty','Eligible tile 01']+['']*15+['Research link','Discovery','Name theme','Clue words']]
-values += [[g['id'],g['name'],g['definition'],g['family'],str(g['difficulty']),*(g['tiles']+['']*(16-len(g['tiles']))),g.get('researchLink',''),g.get('discovery',{}).get('method',''),g.get('discovery',{}).get('theme',''),' | '.join(g.get('discovery',{}).get('words',[]))] for g in rows]
+values=[['Connection ID','Name','Definition','Family','Difficulty','Eligible tile 01']+['']*15+['Research link','Discovery','Name theme','Clue words','Common link']]
+values += [[g['id'],g['name'],g['definition'],g['family'],str(g['difficulty']),*(g['tiles']+['']*(16-len(g['tiles']))),g.get('researchLink',''),g.get('discovery',{}).get('method',''),g.get('discovery',{}).get('theme',''),' | '.join(g.get('discovery',{}).get('words',[])),g.get('discovery',{}).get('reasoning','')] for g in rows]
 xml='<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>'
 for i,row in enumerate(values,1):
  xml += '<row r="'+str(i)+'">'+''.join('<c r="'+chr(65+j)+str(i)+'" t="inlineStr"><is><t>'+escape(v)+'</t></is></c>' for j,v in enumerate(row))+'</row>'
@@ -65,6 +65,7 @@ with zipfile.ZipFile(sys.argv[2],'w') as z:
   assert.equal(await readFile(path.join(root,`js/blood-ties-boards-v${bloodTiesCatalogue.version}.js`),'utf8'),oldBoards);
   const importedCatalogue = JSON.parse((await readFile(path.join(root,'js/blood-ties-catalogue.js'),'utf8')).split(' = ')[1].trim().replace(/;$/,''));
   assert.deepEqual(importedCatalogue.connections[0].discovery,bloodTiesCatalogue.connections[0].discovery);
+  assert.equal(importedCatalogue.connections.find(g => g.id === '0045').discovery.reasoning,'function');
   execFileSync(process.execPath,[fileURLToPath(new URL('../scripts/generate-blood-ties.mjs',import.meta.url)),'--root',root]);
   const before = new Date(Date.parse(`${effectiveDate}T00:00:00Z`)-86400000).toISOString().slice(0,10);
   execFileSync(process.execPath,['--input-type=module','-e',`

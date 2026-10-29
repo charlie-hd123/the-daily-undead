@@ -25,12 +25,33 @@ test('the photographed enemy finish is excluded by its pairing, not by pretendin
 });
 
 test('specialist categories remain playable with a discoverable partner, without stacking specialist knowledge', () => {
-  const board = groups([['0163','Spider','Disciple','Mangler'],['0124','Vermin','Deathspinner','Web Mother'],['0001','Nacht der Untoten','Verrückt','Der Riese'],['0020','Juggernog','Quick Revive','Speed Cola']]);
+  const board = groups([['0163','Spider','Disciple','Mangler'],['0024','Mule Kick','Vulture Aid','Victorious Tortoise'],['0001','Nacht der Untoten','Verrückt','Der Riese'],['0094','Speed Cola','Tombstone Soda',"Widow's Wine"]]);
   assert.equal(passesBloodTiesDiscovery(inspectBloodTiesDiscovery(board)), true);
   assert.equal(createBloodTiesFairnessChecker(catalogue.connections)(board).alternative, false);
   board[2] = groups([['0118','Mob of the Dead','Gorod Krovi','Classified']])[0];
   assert.equal(inspectBloodTiesDiscovery(board).specialistGroups, 2);
   assert.equal(passesBloodTiesDiscovery(inspectBloodTiesDiscovery(board)), false);
+});
+
+test('related effects can make an opening puzzle without any obscure final-pair distinction', () => {
+  const board = groups([['0045','In Plain Sight','Aether Shroud','Zombie Blood'],['0046','Phoenix Up','Healing Aura','Near Death Experience'],['0047','Max Ammo','Cache Back','Alchemical Antithesis'],['0133','Fire Sale','Bonfire Sale','Shopping Free']]).map(resolveBloodTiesTrioDiscovery);
+  const review = inspectBloodTiesDiscovery(board);
+  assert.equal(review.isolatedGroups, 0);
+  assert.equal(review.approachableGroups, 4);
+  assert.equal(passesBloodTiesDiscovery(review), true);
+  assert.equal(createBloodTiesFairnessChecker(catalogue.connections)(board).alternative, false);
+});
+
+test('specialist splits need exactly three visible matches in their clearer partner', () => {
+  const board = groups([['0163','Spider','Disciple','Mangler'],['0124','Vermin','Deathspinner','Web Mother'],['0098','Stock Option','Profit Sharing','Extra Credit'],['0158','Burned Out','Blaze Phase','Wild Fire']]);
+  assert.equal(passesBloodTiesDiscovery(inspectBloodTiesDiscovery(board)), false);
+});
+
+test('multiple spelling giveaways and literal trait-name contradictions are rejected', () => {
+  const prefixes = groups([['0031','Staff of Fire','Staff of Ice','Staff of Wind'],['0032','Fire Bow','Lightning Bow','Wolf Bow'],['0098','Stock Option','Profit Sharing','Extra Credit'],['0158','Burned Out','Blaze Phase','Wild Fire']]);
+  assert.equal(passesBloodTiesDiscovery(inspectBloodTiesDiscovery(prefixes)), false);
+  const lighthouse = groups([['0155','Call of the Dead','Tag der Toten','Totenreich'],['0146','Eidskallen Lighthouse','Mars','Zarya Cosmodrome'],['0098','Stock Option','Profit Sharing','Extra Credit'],['0158','Burned Out','Blaze Phase','Wild Fire']]);
+  assert.equal(passesBloodTiesDiscovery(inspectBloodTiesDiscovery(lighthouse)), false);
 });
 
 test('familiar facts of the same object type and identical visible themes cannot be the final pair', () => {

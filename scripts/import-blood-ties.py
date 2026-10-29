@@ -83,7 +83,7 @@ with zipfile.ZipFile(source) as book:
         difficulty = float(row["E"])
         assert difficulty in (1, 2, 3), f"Invalid difficulty for {row['A']}"
         group = dict(id=row["A"], name=row["B"], definition=row["C"], family=row["D"], difficulty=int(difficulty), tiles=tiles, researchLink=row.get("V", ""))
-        if previous.get("generationPolicy") == "discovery-v1":
+        if previous.get("generationPolicy") in ("discovery-v1", "discovery-v2"):
             method = row.get("W", "").lower()
             old = previous_connections.get(row["A"], {})
             if method:
@@ -96,9 +96,17 @@ with zipfile.ZipFile(source) as book:
             elif old.get("name") == group["name"] and old.get("definition") == group["definition"] and old.get("discovery"):
                 # Existing unclassified copies remain usable until the reviewed
                 # classifications have been copied back to the owner's workbook.
-                group["discovery"] = old["discovery"]
+                group["discovery"] = dict(old["discovery"])
             else:
                 raise AssertionError(f"Connection {row['A']} needs a Discovery classification in W. New or renamed categories cannot silently enter the regular pool.")
+            reasoning = row.get("Z", "").lower()
+            if reasoning == "none":
+                group["discovery"].pop("reasoning", None)
+            elif reasoning:
+                assert reasoning in ("function", "trait", "weapon-class") and group["discovery"]["method"] != "specialist", f"Connection {row['A']}: Common link (Z) must be function, trait, weapon-class or none; specialist categories cannot use it"
+                group["discovery"]["reasoning"] = reasoning
+            elif old.get("name") == group["name"] and old.get("definition") == group["definition"] and group["discovery"]["method"] == old.get("discovery", {}).get("method") and old.get("discovery", {}).get("reasoning"):
+                group["discovery"].setdefault("reasoning", old["discovery"]["reasoning"])
         connections.append(group)
 
 assert connections, "The first worksheet has no complete connection rows"

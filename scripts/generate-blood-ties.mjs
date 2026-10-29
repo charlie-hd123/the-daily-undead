@@ -12,15 +12,16 @@ const root = rootArg < 0 ? fileURLToPath(new URL('../', import.meta.url)) : path
 const { bloodTiesCatalogue: catalogue } = await import(pathToFileURL(path.join(root, 'js/blood-ties-catalogue.js')));
 if (!Number.isInteger(catalogue.version) || catalogue.version < 3) throw new Error('Archive issued content and import a new version before generating boards.');
 const inspect = createBloodTiesFairnessChecker(catalogue.connections);
-const discovery = catalogue.generationPolicy === 'discovery-v1';
+const discovery = catalogue.generationPolicy === 'discovery-v2';
 if (catalogue.generationPolicy && !discovery) throw new Error('Unsupported Blood Ties generation policy.');
 if (discovery) catalogue.connections.forEach(validateBloodTiesDiscovery);
 const categories = catalogue.connections;
 const names = categories.filter(g => g.discovery?.method === 'name');
+const anchors = categories.filter(g => g.discovery?.method === 'name' || g.discovery?.reasoning);
 const poolSize = discovery ? 16384 : 4096;
 const clues = new Map(names.map(g => [g.id, bloodTiesClueTiles(g)]));
 if (discovery && names.some(g => clues.get(g.id).length < 3)) throw new Error('Every name theme needs at least three eligible clue tiles. Review its clue words.');
-const random = createRng(hashString(`blood-ties:v${catalogue.version}:fairness${BLOOD_TIES_FAIRNESS_VERSION}:${catalogue.sourceSha256}${discovery ? ':discovery1' : ''}`));
+const random = createRng(hashString(`blood-ties:v${catalogue.version}:fairness${BLOOD_TIES_FAIRNESS_VERSION}:${catalogue.sourceSha256}${discovery ? ':discovery2' : ''}`));
 const byDifficulty = [1, 2, 3].map(d => catalogue.connections.filter(g => g.difficulty === d));
 if (!discovery && (byDifficulty[0].length < 1 || byDifficulty[1].length < 2 || byDifficulty[2].length < 1)) throw new Error('Blood Ties needs categories at every difficulty, including two at difficulty 2.');
 const pool = [], ambiguity = [], opening = [], seen = new Set(), coverage = new Map(), tileCoverage = new Set(), membershipCoverage = new Set();
@@ -33,7 +34,7 @@ for (let attempt = 0; attempt < 4000000 && pool.length < poolSize; attempt++) {
   // Draw two different medium categories without shuffling the whole workbook.
   const first = Math.floor(random() * byDifficulty[1].length);
   const second = Math.floor(random() * (byDifficulty[1].length - 1));
-  const selected = discovery ? [pick(names), ...shuffle(categories, random).slice(0, 3)]
+  const selected = discovery ? [pick(anchors), ...shuffle(categories, random).slice(0, 3)]
     : [pick(byDifficulty[0]), byDifficulty[1][first], byDifficulty[1][second + (second >= first ? 1 : 0)], pick(byDifficulty[2])];
   if (new Set(selected.map(g => g.id)).size !== 4) continue;
   if (discovery && selected.filter(g => g.discovery.method === 'specialist').length > 1) continue;
@@ -42,7 +43,7 @@ for (let attempt = 0; attempt < 4000000 && pool.length < poolSize; attempt++) {
   if (selected.some((g,i) => selected.slice(i+1).some(h => similarPairs.has(pairKey(g,h))))) continue;
   const used = new Set();
   const groups = shuffle(selected, random).map(g => {
-    const eligible = discovery && g.id === selected[0].id ? clues.get(g.id) : g.tiles;
+    const eligible = discovery && g.id === selected[0].id && g.discovery.method === 'name' ? clues.get(g.id) : g.tiles;
     const answers = shuffle(eligible.filter(t => !used.has(t)), random).slice(0, 3);
     answers.forEach(t => used.add(t));
     const group = { ...g, answers };
@@ -53,7 +54,7 @@ for (let attempt = 0; attempt < 4000000 && pool.length < poolSize; attempt++) {
   const traps = groups.flatMap(owner => owner.answers.filter(t => groups.some(g => g.id !== owner.id && g.tiles.includes(t))));
   // Discovery boards allow more zero-overlap draws. Difficulty need not come
   // from a misleading membership. Historical pools keep their exact quotas.
-  if (traps.length > 2 || traps.length === 0 && overlapCounts[0] >= (discovery ? poolSize / 2 : 256) || traps.length === 2 && overlapCounts[2] >= (discovery ? poolSize / 8 : 512)
+  if (traps.length > 2 || traps.length === 0 && overlapCounts[0] >= (discovery ? poolSize / 4 : 256) || traps.length === 2 && overlapCounts[2] >= (discovery ? poolSize / 4 : 512)
     || countBloodTiesSolutions(groups, tiles) !== 1) continue;
   // Protect the opening group and avoid large combination traps before the
   // broader catalogue search. Alternative labels on the SAME trio are fine.

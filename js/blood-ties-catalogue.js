@@ -175,7 +175,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "trait"
       }
     },
     {
@@ -297,7 +298,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "trait"
       }
     },
     {
@@ -499,7 +501,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "function"
       }
     },
     {
@@ -516,7 +519,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "function"
       }
     },
     {
@@ -533,7 +537,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "function"
       }
     },
     {
@@ -554,7 +559,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "function"
       }
     },
     {
@@ -570,7 +576,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "function"
       }
     },
     {
@@ -588,7 +595,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "function"
       }
     },
     {
@@ -668,7 +676,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "weapon-class"
       }
     },
     {
@@ -714,7 +723,8 @@ export const bloodTiesCatalogue = {
         "words": [
           "lightning",
           "electro"
-        ]
+        ],
+        "reasoning": "function"
       }
     },
     {
@@ -866,7 +876,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "trait"
       }
     },
     {
@@ -885,7 +896,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "function"
       }
     },
     {
@@ -902,7 +914,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "function"
       }
     },
     {
@@ -921,7 +934,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "function"
       }
     },
     {
@@ -944,7 +958,8 @@ export const bloodTiesCatalogue = {
         "words": [
           "ammo",
           "cache"
-        ]
+        ],
+        "reasoning": "function"
       }
     },
     {
@@ -1174,7 +1189,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "trait"
       }
     },
     {
@@ -1195,7 +1211,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "trait"
       }
     },
     {
@@ -1230,7 +1247,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "trait"
       }
     },
     {
@@ -1656,7 +1674,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "weapon-class"
       }
     },
     {
@@ -1743,7 +1762,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "weapon-class"
       }
     },
     {
@@ -1762,7 +1782,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "weapon-class"
       }
     },
     {
@@ -1801,7 +1822,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "weapon-class"
       }
     },
     {
@@ -1995,7 +2017,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "trait"
       }
     },
     {
@@ -2039,7 +2062,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "trait"
       }
     },
     {
@@ -2055,7 +2079,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "trait"
       }
     },
     {
@@ -2129,7 +2154,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "trait"
       }
     },
     {
@@ -2145,7 +2171,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "trait"
       }
     },
     {
@@ -2178,7 +2205,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "trait"
       }
     },
     {
@@ -2195,7 +2223,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "trait"
       }
     },
     {
@@ -2337,7 +2366,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "trait"
       }
     },
     {
@@ -2357,7 +2387,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "trait"
       }
     },
     {
@@ -2404,7 +2435,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "trait"
       }
     },
     {
@@ -2525,7 +2557,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "function"
       }
     },
     {
@@ -2544,7 +2577,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "function"
       }
     },
     {
@@ -2600,7 +2634,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "function"
       }
     },
     {
@@ -2972,7 +3007,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "trait"
       }
     },
     {
@@ -2988,7 +3024,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "trait"
       }
     },
     {
@@ -3004,7 +3041,8 @@ export const bloodTiesCatalogue = {
       ],
       "researchLink": "",
       "discovery": {
-        "method": "familiar"
+        "method": "familiar",
+        "reasoning": "trait"
       }
     },
     {
@@ -3161,5 +3199,5 @@ export const bloodTiesCatalogue = {
       }
     }
   ],
-  "generationPolicy": "discovery-v1"
+  "generationPolicy": "discovery-v2"
 };
