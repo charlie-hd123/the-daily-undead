@@ -55,7 +55,8 @@ export function inspectBloodTiesDiscovery(groups) {
     const partner = specialist === g ? h : g;
     const sameTheme = g.discovery.method === 'name' && h.discovery.method === 'name'
       && normal(g.discovery.theme) === normal(h.discovery.theme);
-    const specialistSplit = !specialist || !sameKind || (approachable(partner)
+    const crossMembership = g.answers.some(tile => h.tiles.includes(tile)) || h.answers.some(tile => g.tiles.includes(tile));
+    const specialistSplit = !specialist || !sameKind && !crossMembership || (approachable(partner)
       && [...g.answers,...h.answers].filter(tile => partner.tiles.includes(tile)).length === 3);
     return { groups: [g.id,h.id], discoverable: !sameTheme && !misleadingTraitName(g,h) && !misleadingTraitName(h,g) && specialistSplit
       && (!sameKind || approachable(g) || approachable(h)) };

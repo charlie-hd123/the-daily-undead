@@ -45,6 +45,9 @@ test('related effects can make an opening puzzle without any obscure final-pair 
 test('specialist splits need exactly three visible matches in their clearer partner', () => {
   const board = groups([['0163','Spider','Disciple','Mangler'],['0124','Vermin','Deathspinner','Web Mother'],['0098','Stock Option','Profit Sharing','Extra Credit'],['0158','Burned Out','Blaze Phase','Wild Fire']]);
   assert.equal(passesBloodTiesDiscovery(inspectBloodTiesDiscovery(board)), false);
+  // Workbook families differ, but Hell's Retriever still straddles both groups.
+  const crossFamily = groups([['0077','Monkey Bomb',"Hell's Retriever","Li'l Arnie"],['0038','Time Bomb','Paralyzer','Sliquifier'],['0091','KN-44','M8A7','Sheiva'],['0158','Wild Fire','Burned Out','Blaze Phase']]);
+  assert.equal(passesBloodTiesDiscovery(inspectBloodTiesDiscovery(crossFamily)), false);
 });
 
 test('multiple spelling giveaways and literal trait-name contradictions are rejected', () => {
