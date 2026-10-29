@@ -50,9 +50,11 @@ export const isBloodTiesLiteralGroup = group => group.discovery.method === 'name
 // Four related groups and a three-plus-one opening are not two separate pairs.
 export function hasBloodTiesCategoryPairs(groups) {
   const counts = new Map();
-  // "Gameplay" is a workbook filing label, not a recognisable item type.
+  // Lore mixes organisations, gods and locations; Gameplay also needs a
+  // reviewed subtype. These filing labels alone cannot promise a visible pair.
   // Mixed-item categories remain available on variation days.
-  if (groups.some(group => group.family === 'Gameplay' && (!group.discovery?.pairing || group.discovery.pairing === 'mixed'))) return false;
+  if (groups.some(group => group.family === 'Lore'
+    || group.family === 'Gameplay' && (!group.discovery?.pairing || group.discovery.pairing === 'mixed'))) return false;
   groups.forEach(group => {
     const type = group.discovery?.pairing || kind(group);
     counts.set(type, (counts.get(type) || 0) + 1);

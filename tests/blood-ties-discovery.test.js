@@ -14,6 +14,7 @@ test('two category pairs use player-visible types without mistaking 3+1 or four-
   assert.equal(hasBloodTiesCategoryPairs([...families(['Maps','Maps']),gameplay('effects'),gameplay('effects')]), true);
   assert.equal(hasBloodTiesCategoryPairs([...families(['Maps','Maps']),gameplay('mixed'),gameplay('mixed')]), false);
   assert.equal(hasBloodTiesCategoryPairs(families(['Maps','Maps','Gameplay','Gameplay'])), false);
+  assert.equal(hasBloodTiesCategoryPairs(families(['Maps','Maps','Lore','Lore'])), false);
   for (const values of [
     ['Weapons','Wonder Weapons','Weapons','Maps'],
     ['Weapons','Wonder Weapons','Weapons','Wonder Weapons'],
