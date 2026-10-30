@@ -143,7 +143,7 @@ function sanitizeWordState(value, puzzleDate) {
   };
 }
 
-export function sanitizeDailyState(value, puzzleDate) {
+export function sanitizeDailyState(value, puzzleDate, options = {}) {
   if (value?.dayStateVersion !== 1) return sanitizeEasterState(value, puzzleDate);
   if (value.dateKey !== puzzleDate) return null;
   const officialType = ['word', 'easter', 'blood'].includes(value.officialType)
@@ -168,7 +168,7 @@ export function sanitizeDailyState(value, puzzleDate) {
     progressionApplied: Boolean(value.progressionApplied),
     lastCompleted: null,
     sessions: { easter, word, blood: value.sessions?.blood && puzzleDate <= getUtcDateKey()
-      ? normalizeBloodTiesSession(buildDailyBloodTiesPuzzle(puzzleDate), value.sessions.blood) : null },
+      ? normalizeBloodTiesSession(buildDailyBloodTiesPuzzle(puzzleDate, options), value.sessions.blood) : null },
   };
 }
 
@@ -309,7 +309,7 @@ export async function recordVerifiedBloodResult(db, request, userId, options = {
   if (!options.bloodTies || body.puzzleDate !== today || getOfficialPuzzleType(today, options) !== 'blood') {
     return { status: 400, body: { error: 'Only today’s official Blood Ties result can be saved.' } };
   }
-  const puzzle = buildDailyBloodTiesPuzzle(today);
+  const puzzle = buildDailyBloodTiesPuzzle(today, options);
   if (body.puzzleId !== puzzle.key || !Array.isArray(body.attempts)) return { status: 400, body: { error: 'The submitted Blood Ties puzzle is invalid.' } };
   let result;
   // Missing versions come only from pre-update clients/saves. Both rule sets
@@ -517,7 +517,7 @@ export async function registerAccount(
   db,
   request,
   userId,
-  { accountId = userId, identity = null } = {},
+  { accountId = userId, identity = null, ...options } = {},
 ) {
   const body = await readJsonBody(request);
   const username = normalizeUsername(body.username);
@@ -536,7 +536,7 @@ export async function registerAccount(
 
   const progress = sanitizeProgress(body.progress);
   const puzzleDate = isValidDateKey(body.puzzleDate) ? body.puzzleDate : null;
-  const dailyState = puzzleDate ? sanitizeDailyState(body.dailyState, puzzleDate) : null;
+  const dailyState = puzzleDate ? sanitizeDailyState(body.dailyState, puzzleDate, options) : null;
   const importedAt = body.importLocalProgress ? new Date().toISOString() : null;
 
   const statements = [
@@ -729,14 +729,14 @@ export async function getPublicProfile(db, username) {
   };
 }
 
-export async function saveAccount(db, request, userId) {
+export async function saveAccount(db, request, userId, options = {}) {
   const body = await readJsonBody(request);
   const progress = sanitizeProgress(body.progress);
   const baseRevision = Number.isInteger(body.baseRevision) && body.baseRevision > 0
     ? body.baseRevision
     : null;
   const puzzleDate = isValidDateKey(body.puzzleDate) ? body.puzzleDate : null;
-  const dailyState = puzzleDate ? sanitizeDailyState(body.dailyState, puzzleDate) : null;
+  const dailyState = puzzleDate ? sanitizeDailyState(body.dailyState, puzzleDate, options) : null;
   const profile = await db
     .prepare("SELECT user_id FROM player_profiles WHERE user_id = ?")
     .bind(userId)

@@ -8,7 +8,7 @@ import { bloodTiesCatalogue as v2Catalogue } from '../js/blood-ties-catalogue-v2
 import { bloodTiesContents } from '../js/blood-ties-content.js';
 import { buildDailyBloodTiesPuzzle, countBloodTiesSolutions, createBloodTiesSession, normalizeBloodTiesSession, replayBloodTiesAttempts } from '../js/blood-ties-core.js';
 import { getOfficialPuzzleType } from '../js/daily-challenge-core.js';
-import { recordVerifiedBloodResult, recordVerifiedWordResult, recordVerifiedMapResult, sanitizeDailyState, getAccount } from '../worker/src/accounts.js';
+import { recordVerifiedBloodResult, recordVerifiedWordResult, recordVerifiedMapResult, sanitizeDailyState, getAccount, saveAccount } from '../worker/src/accounts.js';
 import { buildDailyWordPuzzle } from '../js/word-puzzle-core.js';
 import { buildDailyPuzzle } from '../js/game-core.js';
 import { workerWords } from '../worker/src/generated-word-catalog.js';
@@ -277,6 +277,32 @@ test('tapered server scoring rejects the old scale, awards the minimum once and 
   assert.equal(db.sqlite.prepare("SELECT COUNT(*) n FROM puzzle_attempts WHERE puzzle_type='blood'").get().n,1);
 });
 
+test('production account saves preserve the issued 30 October Blood Ties transcript and original scoring', async t => {
+  t.mock.timers.enable({apis:['Date'],now:new Date('2026-10-30T12:00:00Z')});
+  const db = await database(); t.after(() => db.sqlite.close());
+  db.sqlite.exec("INSERT INTO player_profiles(user_id,username) VALUES ('live-boundary','LiveBoundary'); INSERT INTO player_saves(user_id,score,total_rounds,current_round,best_round) VALUES ('live-boundary',500,4,7,9)");
+  const p = buildDailyBloodTiesPuzzle('2026-10-30',{production:true});
+  const sessions = [replayBloodTiesAttempts(p,[wrongs(p)[0],p.groups[0].answers]),replayBloodTiesAttempts(p,[wrongs(p)[0],...solution(p)])];
+  for (const session of sessions) {
+    const dailyState = {dayStateVersion:1,dateKey:p.dateKey,officialType:getOfficialPuzzleType(p.dateKey,{production:true,bloodTies:true}),sessions:{blood:session}};
+    const sanitized = sanitizeDailyState(dailyState,p.dateKey,{production:true});
+    assert.equal(sanitized.sessions.blood.key,p.key);
+    assert.equal(sanitized.sessions.blood.potentialPoints,90);
+    const response = await saveAccount(db,new Request('https://test/save',{method:'PUT',body:JSON.stringify({puzzleDate:p.dateKey,dailyState})}),'live-boundary',{production:true});
+    assert.equal(response.status,200);
+    const restored = (await getAccount(db,'live-boundary',p.dateKey)).body.dailyState.sessions.blood;
+    assert.equal(restored.key,p.key);
+    assert.equal(restored.complete,session.complete);
+    assert.equal(restored.potentialPoints,90);
+    assert.equal(restored.points,session.complete ? 90 : 0);
+    assert.equal(restored.rulesVersion,3);
+    assert.deepEqual(restored.attempts,session.attempts);
+  }
+  const row = db.sqlite.prepare("SELECT score,total_rounds FROM player_saves WHERE user_id='live-boundary'").get();
+  assert.equal(row.score,500);
+  assert.equal(row.total_rounds,4);
+});
+
 test('historical three-day rotation is staging/local only and remains intact', () => {
   assert.deepEqual(Array.from({ length: 4 }, (_, i) => getOfficialPuzzleType(`2026-10-${22 + i}`, { bloodTies: true })), ['blood', 'word', 'easter', 'blood']);
   assert.equal(getOfficialPuzzleType('2026-10-22'), 'easter');
@@ -504,7 +530,7 @@ for (const production of [false, true]) test(`balanced ${production ? 'productio
     t.mock.timers.setTime(now.getTime());
     const date = now.toISOString().slice(0, 10);
     const official = getOfficialPuzzleType(date, { bloodTies: true, production }); seen.add(official);
-    const blood = buildDailyBloodTiesPuzzle(date);
+    const blood = buildDailyBloodTiesPuzzle(date, { production });
     const word = buildDailyWordPuzzle(date, workerWords);
     const map = buildDailyPuzzle(date, workerMaps);
     const entries = [

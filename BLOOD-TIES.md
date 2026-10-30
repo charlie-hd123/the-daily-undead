@@ -27,6 +27,9 @@ Yesterday’s Blood Ties summary lives inside the shared statistics grid. Its so
 
 ### Softer paired trial: content v5, 31 October 2026
 
+Production activates this policy at **00:00 UTC on 31 October 2026**. It never issued staging's content v4 on 30 October, so production keeps v3 for every live date through 30 October; staging/local retain their v4 trial for that date. The shared generator uses isolated history caches selected by the existing production/staging options. Each environment seeds future cooldowns from its actual previous boards. Browser play, yesterday's connections, marketing images, anonymous result verification and account save/result replay all use the same environment selection. No production player data or old puzzle identities are migrated. The approved 2 November preview board remains identical across both histories.
+
+
 Content v4 catalogue/boards are archived byte-for-byte. Every issued date through 30 October, its key, unfinished progress and original scoring are preserved. Content v5 starts on 31 October with discovery policy v4 and scoring rules v4. The normal staging preview controls can exercise future dates without account uploads; 2 November remains the first official Blood Ties day using this revision.
 
 The two-pair preference, all categories/answers and every final-six safeguard remain. Daily selection gives a third recognisable connection priority on roughly a quarter of dates, when eligible paired boards exist; elsewhere it uses a smaller clarity preference among similarly used boards. Overlap is targeted on fewer dates, and the compiler permits up to half the pool to have no selected-category overlap, rather than a quarter. These are preferences rather than exclusions or relaxed cooldowns.

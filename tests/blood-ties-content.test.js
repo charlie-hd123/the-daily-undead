@@ -53,18 +53,18 @@ test('compiled pool is reproducible and every category and tile participates in 
   assert.deepEqual([...seenMemberships].sort(), catalogue.connections.flatMap(g => g.tiles.map(tile => JSON.stringify([g.id,tile]))).sort());
 });
 
-test('three years preserve 14-day category and 7-day tile gaps, discoverable finishes and full category coverage', () => {
+for (const production of [false,true]) test(`three ${production ? 'production' : 'staging'} years preserve cooldowns, discoverable finishes and full category coverage`, () => {
   const history = [], seen = new Set();
   let relatedOpenings = 0, overlappingDays = 0, pairedDays = 0, clearerDays = 0;
   const start = Date.parse(`${catalogue.effectiveDate}T00:00:00Z`);
   for (let date = Math.max(Date.parse('2026-10-22T00:00:00Z'), start - 14 * 86400000); date < start; date += 86400000) {
-    const p = buildDailyBloodTiesPuzzle(new Date(date).toISOString().slice(0,10));
+    const p = buildDailyBloodTiesPuzzle(new Date(date).toISOString().slice(0,10), { production });
     if (p.dateKey === '2026-10-22') p.groups.forEach(g => { g.id = catalogue.connections.find(c => c.name === g.name)?.id || `historical:${g.id}`; });
     history.push(p);
   }
   for (let i = 0; i < 1096; i++) {
     const date = new Date(start + i * 86400000).toISOString().slice(0, 10);
-    const p = buildDailyBloodTiesPuzzle(date);
+    const p = buildDailyBloodTiesPuzzle(date, { production });
     assert.equal(p.contentVersion, catalogue.version);
     assert.ok(p.redHerrings.length <= 2);
     const discovery = inspectBloodTiesDiscovery(p.groups.map(g => ({ ...g, tiles:g.eligibleTiles })));
@@ -91,6 +91,29 @@ test('three years preserve 14-day category and 7-day tile gaps, discoverable fin
   const expected = JSON.stringify(buildDailyBloodTiesPuzzle('2026-10-25'));
   buildDailyBloodTiesPuzzle('2026-12-25').groups[0].answers.reverse();
   assert.equal(JSON.stringify(buildDailyBloodTiesPuzzle('2026-10-25')), expected);
+});
+
+test('production preserves every issued live board through 30 October and starts the approved policy on the 31st', () => {
+  const issued = JSON.parse(readFileSync(new URL('./fixtures/blood-ties-production-issued.json', import.meta.url)));
+  for (const [date,hash] of Object.entries(issued)) {
+    const p = buildDailyBloodTiesPuzzle(date, {production:true});
+    assert.equal(createHash('sha256').update(JSON.stringify(p)).digest('hex'),hash,date);
+  }
+  const live = buildDailyBloodTiesPuzzle('2026-10-30',{production:true});
+  const staging = buildDailyBloodTiesPuzzle('2026-10-30');
+  assert.equal(live.contentVersion,3);
+  assert.equal(staging.contentVersion,4);
+  const saved = normalizeBloodTiesSession(live, replayBloodTiesAttempts(live,[live.groups[0].answers]));
+  assert.equal(saved.solved.length,1);
+  assert.equal(saved.potentialPoints,100);
+  for (const production of [false,true]) {
+    const next = buildDailyBloodTiesPuzzle('2026-10-31',{production});
+    assert.equal(next.contentVersion,5);
+    assert.equal(replayBloodTiesAttempts(next).rulesVersion,4);
+    assert.throws(() => replayBloodTiesAttempts(next,[],3),/current rules/);
+  }
+  buildDailyBloodTiesPuzzle('2028-10-30');
+  assert.deepEqual(buildDailyBloodTiesPuzzle('2026-10-30',{production:true}),live,'Staging requests cannot contaminate production history.');
 });
 
 test('content boundary preserves history and new puzzles cannot downgrade scoring or skip the last trio', () => {

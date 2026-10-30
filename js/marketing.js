@@ -2,11 +2,11 @@ import {
   buildDailyPuzzle,
   getAnswerDisplayTitle,
   getUtcDateKey,
-} from "./game-core.js?v=20261030-1";
-import { getOfficialPuzzleType, browserPuzzleOptions } from "./daily-challenge-core.js?v=20261030-1";
-import { buildDailyWordPuzzle } from "./word-puzzle-core.js?v=20261030-1";
-import { buildDailyBloodTiesPuzzle } from './blood-ties-core.js?v=20261030-1';
-import { fetchCommunityStats } from "./community-stats.js?v=20261030-1";
+} from "./game-core.js?v=20261030-2";
+import { getOfficialPuzzleType, browserPuzzleOptions } from "./daily-challenge-core.js?v=20261030-2";
+import { buildDailyWordPuzzle } from "./word-puzzle-core.js?v=20261030-2";
+import { buildDailyBloodTiesPuzzle } from './blood-ties-core.js?v=20261030-2';
+import { fetchCommunityStats } from "./community-stats.js?v=20261030-2";
 import {
   buildMarketingCopy,
   buildWordMarketingCopy,
@@ -15,9 +15,9 @@ import {
   getDailyPostNumber,
   getPreviousDateKey,
   isAppleMobileDevice,
-} from "./marketing-core.js?v=20261030-1";
+} from "./marketing-core.js?v=20261030-2";
 
-import { drawMarketingImage } from "./marketing-art.js?v=20261030-1";
+import { drawMarketingImage } from "./marketing-art.js?v=20261030-2";
 
 const pack = document.querySelector("#marketing-pack");
 const packDate = document.querySelector("#pack-date");
@@ -187,7 +187,7 @@ async function initialise() {
     const puzzle = buildDailyPuzzle(dateKey, maps);
     const wordPuzzle = buildDailyWordPuzzle(dateKey, wordEntries);
     const yesterdayAnswer = yesterdayPuzzleType === 'blood'
-      ? buildDailyBloodTiesPuzzle(yesterdayDateKey).groups.map((g) => `${g.name}: ${g.answers.join(', ')}`).join('\n')
+      ? buildDailyBloodTiesPuzzle(yesterdayDateKey, scheduleOptions).groups.map((g) => `${g.name}: ${g.answers.join(', ')}`).join('\n')
       : yesterdayPuzzleType === "word"
       ? buildDailyWordPuzzle(yesterdayDateKey, wordEntries).entry.answer
       : getAnswerDisplayTitle(
@@ -232,7 +232,7 @@ async function initialise() {
         solvePercentage,
       });
     const imagePuzzle = puzzleType === 'blood'
-      ? buildDailyBloodTiesPuzzle(dateKey)
+      ? buildDailyBloodTiesPuzzle(dateKey, scheduleOptions)
       : puzzleType === 'word'
       ? { answer: wordPuzzle.entry.answer, initialLetters: wordPuzzle.initialLetters, category: wordPuzzle.entry.category }
       : { clue };

@@ -236,7 +236,7 @@ async function handleAttempt(request, env) {
   const puzzleType = payload.puzzleType || 'easter';
   if (puzzleType === 'blood') {
     if (!puzzleOptions(env).bloodTies) return errorResponse(request, env, 'Blood Ties is unavailable in this environment.', 400);
-    const puzzle = buildDailyBloodTiesPuzzle(todayDateKey);
+    const puzzle = buildDailyBloodTiesPuzzle(todayDateKey, puzzleOptions(env));
     let result;
     try { result = replayBloodTiesAttempts(puzzle, payload.attempts, payload.rulesVersion ?? 1); }
     catch { return errorResponse(request, env, 'Invalid Blood Ties attempts.', 400); }
@@ -310,6 +310,7 @@ async function handleAccountRequest(request, env, url, context) {
     } else {
       const accountId = createAccountId();
       result = await registerAccount(env.DB, request, accountId, {
+        ...puzzleOptions(env),
         accountId,
         identity: verifiedIdentity,
       });
@@ -321,7 +322,7 @@ async function handleAccountRequest(request, env, url, context) {
   } else if (url.pathname === "/api/account/profile" && request.method === "PUT") {
     result = await updateSocialProfile(env.DB, request, identity.userId);
   } else if (url.pathname === "/api/account/save" && request.method === "PUT") {
-    result = await saveAccount(env.DB, request, identity.userId);
+    result = await saveAccount(env.DB, request, identity.userId, puzzleOptions(env));
   } else if (url.pathname === "/api/account/results/map" && request.method === "POST") {
     result = await recordVerifiedMapResult(env.DB, request, identity.userId, puzzleOptions(env));
   } else if (url.pathname === "/api/account/results/bonus" && request.method === "POST") {

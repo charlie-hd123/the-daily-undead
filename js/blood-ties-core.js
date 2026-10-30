@@ -13,8 +13,9 @@ export const BLOOD_TIES_TILE_COOLDOWN = 7;
 const firstFairDate = '2026-10-26';
 const epoch = Date.parse(`${firstFairDate}T00:00:00Z`) / 86400000;
 const trioKey = (tiles) => [...tiles].sort().join('\u001f');
-const days = [];
-const categoryUsage = new Map();
+// Production never issued the 30 October staging-only trial. Separate history
+// caches preserve both environments and seed future cooldowns from actual boards.
+const schedules = new Map();
 let contents;
 let seedHistory;
 const pairs = groups => groups.flatMap((g,i) => groups.slice(i+1).map(h => [g.id,h.id].sort().join(':')));
@@ -50,16 +51,21 @@ function prepareContents() {
     const groups = old.groups.map(g => ({ ...g, id: bloodTiesContents[0].catalogue.connections.find(c => c.name === g.name)?.id || `historical:${g.id}` }));
     const previous = { ...old, groups, pairs: pairs(groups) };
     seedHistory.push(previous);
-    groups.forEach(g => categoryUsage.set(g.id, (categoryUsage.get(g.id) || 0) + 1));
   }
   return contents;
 }
 
-export function buildDailyBloodTiesPuzzle(dateKey) {
+export function buildDailyBloodTiesPuzzle(dateKey, { production = false } = {}) {
   if (!isValidDateKey(dateKey)) throw new Error('A valid UTC date is required.');
   // Keep already played dates, saved results and yesterday's answers immutable.
   if (dateKey < firstFairDate) return buildV2BloodTiesPuzzle(dateKey);
-  const versions = prepareContents();
+  const versions = prepareContents().filter(v => !production || v.version !== 4);
+  if (!schedules.has(Boolean(production))) {
+    const categoryUsage = new Map();
+    seedHistory.forEach(p => p.groups.forEach(g => categoryUsage.set(g.id, (categoryUsage.get(g.id) || 0) + 1)));
+    schedules.set(Boolean(production), { days: [], categoryUsage });
+  }
+  const { days, categoryUsage } = schedules.get(Boolean(production));
   const day = Math.floor(Date.parse(`${dateKey}T00:00:00Z`) / 86400000) - epoch;
   for (let index = days.length; index <= day; index++) {
     const date = new Date((epoch + index) * 86400000).toISOString().slice(0,10);
