@@ -1,7 +1,7 @@
 // Workbook categories with reviewed discovery classifications; update the workbook after staging play-testing.
 export const bloodTiesCatalogue = {
-  "version": 4,
-  "effectiveDate": "2026-10-30",
+  "version": 5,
+  "effectiveDate": "2026-10-31",
   "source": "1-Blood-Ties-Updated-23-Oct-2026.xlsm",
   "sourceSha256": "977e67636bc3867a259b4881b2e91cb9c295bff8a32662e7f59ba828e682f105",
   "worksheet": "Blood Ties",
@@ -3226,5 +3226,5 @@ export const bloodTiesCatalogue = {
       }
     }
   ],
-  "generationPolicy": "discovery-v3"
+  "generationPolicy": "discovery-v4"
 };

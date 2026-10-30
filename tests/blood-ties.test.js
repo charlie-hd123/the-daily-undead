@@ -207,6 +207,76 @@ test('unfinished legacy saves adopt strikes while completed legacy awards retain
   assert.equal(normalizeBloodTiesSession(p, failed).success, false);
 });
 
+test('dated tapered scoring awards 100 through 10 across all survivable mistake counts', () => {
+  const p = buildDailyBloodTiesPuzzle('2026-11-02');
+  assert.equal(createBloodTiesSession(p).rulesVersion, 4);
+  for (const [misses, points] of [100,80,60,40,30,20,10].entries()) {
+    let included = 0;
+    const attempts = interruptedSolution(p).filter(attempt => p.groups.some(g => g.answers === attempt) || included++ < misses);
+    const result = replayBloodTiesAttempts(p, attempts);
+    assert.equal(result.success, true);
+    assert.equal(result.misses, misses);
+    assert.equal(result.points, points);
+    assert.equal(result.strikes, 0);
+    assert.equal(result.solved.length, 4);
+    const restored = normalizeBloodTiesSession(p, { ...result, points:999, potentialPoints:999, misses:0 });
+    assert.equal(restored.points, points);
+    assert.equal(restored.potentialPoints, points);
+  }
+  const attempts = interruptedSolution(p);
+  for (const [count,strikes,points] of [[2,2,60],[3,0,60],[5,2,30],[6,0,30],[8,2,10],[9,0,10]]) {
+    const result = normalizeBloodTiesSession(p, { key:p.key, attempts:attempts.slice(0,count), rulesVersion:4, complete:false, points:999 });
+    assert.equal(result.strikes, strikes);
+    assert.equal(result.potentialPoints, points);
+    assert.equal(result.points, 0);
+  }
+  const failedAttempts = [...attempts.slice(0,6), ...[0,1,2].map(i => [p.groups[2].answers[0],p.groups[2].answers[1],p.groups[3].answers[i]])];
+  const failed = replayBloodTiesAttempts(p, failedAttempts);
+  assert.equal(failed.misses, 7);
+  assert.equal(failed.strikes, 3);
+  assert.equal(failed.success, false);
+  assert.equal(failed.points, 0);
+  assert.throws(() => replayBloodTiesAttempts(p, [wrongs(p)[0],[...wrongs(p)[0]].reverse()]), /Invalid/);
+  for (const oldRules of [1,2,3]) assert.throws(() => replayBloodTiesAttempts(p, solution(p), oldRules), /current rules/);
+  const old = buildDailyBloodTiesPuzzle('2026-10-30');
+  const oldSession = replayBloodTiesAttempts(old, [wrongs(old)[0],...solution(old)], 3);
+  assert.equal(oldSession.points, 90);
+  assert.equal(normalizeBloodTiesSession(old, oldSession).points, 90);
+  assert.equal(normalizeBloodTiesSession(old, { ...oldSession, attempts:oldSession.attempts.slice(0,2),complete:false }).potentialPoints, 90);
+  assert.throws(() => replayBloodTiesAttempts(old, solution(old), 4), /current rules/);
+});
+
+test('tapered server scoring rejects the old scale, awards the minimum once and keeps failed runs at zero', async t => {
+  t.mock.timers.enable({ apis:['Date'], now:new Date('2026-11-02T12:00:00Z') });
+  const db = await database(); t.after(() => db.sqlite.close());
+  db.sqlite.exec("INSERT INTO player_profiles(user_id,username) VALUES ('taper-win','TaperWin'),('taper-fail','TaperFail'); INSERT INTO player_saves(user_id,score,total_rounds,current_round,best_round) VALUES ('taper-win',500,4,7,9),('taper-fail',500,4,7,9)");
+  const p = buildDailyBloodTiesPuzzle('2026-11-02'), attempts = interruptedSolution(p);
+  const send = (user,values) => recordVerifiedBloodResult(db, new Request('https://test/result',{method:'POST',body:JSON.stringify({puzzleDate:p.dateKey,puzzleId:p.key,rulesVersion:4,...values})}),user,{bloodTies:true});
+  assert.equal((await send('taper-win',{attempts,rulesVersion:3})).status,400);
+  assert.equal((await send('taper-win',{attempts:attempts.slice(0,9),points:100,success:true})).status,400);
+  const won = await send('taper-win',{attempts,points:100,misses:0,potentialPoints:100});
+  assert.equal(won.status,200);
+  assert.equal(won.body.result.pointsEarned,10);
+  assert.equal(won.body.result.bloodMisses,6);
+  assert.equal(won.body.progress.score,510);
+  assert.equal(won.body.progress.solves,5);
+  assert.equal((await send('taper-win',{attempts:solution(p)})).body.progress.score,510);
+  const board = await readLeaderboards(db,p.dateKey);
+  assert.equal(board.today.elite.find(e => e.username === 'TaperWin').points,10);
+  const failure = [...attempts.slice(0,6), ...[0,1,2].map(i => [p.groups[2].answers[0],p.groups[2].answers[1],p.groups[3].answers[i]])];
+  const lost = await send('taper-fail',{attempts:failure,points:10,success:true});
+  assert.equal(lost.body.result.pointsEarned,0);
+  assert.equal(lost.body.progress.score,500);
+  assert.equal(lost.body.progress.solves,4);
+  assert.equal(lost.body.progress.currentRound,1);
+  const body = {playerId:'07ce720f-48dd-470e-90d9-85650ff1edeb',puzzleDate:p.dateKey,puzzleType:'blood',puzzleId:p.key,mapId:'blood-ties',mapName:'Connections',attempts,rulesVersion:4,isCorrect:true};
+  const anon = values => worker.fetch(new Request('https://test/api/attempts',{method:'POST',body:JSON.stringify(values)}),{DB:db,DEPLOYMENT_ENVIRONMENT:'local',BLOOD_TIES_DEMO:'1'});
+  assert.equal((await anon({...body,rulesVersion:3})).status,400);
+  assert.equal((await anon(body)).status,200);
+  assert.equal((await anon(body)).status,200);
+  assert.equal(db.sqlite.prepare("SELECT COUNT(*) n FROM puzzle_attempts WHERE puzzle_type='blood'").get().n,1);
+});
+
 test('historical three-day rotation is staging/local only and remains intact', () => {
   assert.deepEqual(Array.from({ length: 4 }, (_, i) => getOfficialPuzzleType(`2026-10-${22 + i}`, { bloodTies: true })), ['blood', 'word', 'easter', 'blood']);
   assert.equal(getOfficialPuzzleType('2026-10-22'), 'easter');
@@ -438,7 +508,7 @@ for (const production of [false, true]) test(`balanced ${production ? 'productio
     const word = buildDailyWordPuzzle(date, workerWords);
     const map = buildDailyPuzzle(date, workerMaps);
     const entries = [
-      ['blood', recordVerifiedBloodResult, { puzzleDate: date, puzzleId: blood.key, attempts: solution(blood), rulesVersion: 3 }],
+      ['blood', recordVerifiedBloodResult, { puzzleDate: date, puzzleId: blood.key, attempts: solution(blood), rulesVersion: createBloodTiesSession(blood).rulesVersion }],
       ['word', recordVerifiedWordResult, { puzzleDate: date, puzzleId: word.key, guesses: [...new Set(word.entry.answer.toUpperCase().replace(/[^A-Z]/g, ''))] }],
       ['easter', recordVerifiedMapResult, { puzzleDate: date, puzzleId: map.key, selectedMapId: map.map.id, cluesUsed: 1 }],
     ];

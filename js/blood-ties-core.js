@@ -1,11 +1,11 @@
 import { createRng, hashString, isValidDateKey, shuffle } from './game-core.js';
 import { bloodTiesContents } from './blood-ties-content.js';
 import { buildDailyBloodTiesPuzzle as buildV2BloodTiesPuzzle } from './blood-ties-v2.js';
-import { BLOOD_TIES_DISCOVERY_VERSION, hasBloodTiesCategoryPairs, isBloodTiesLiteralGroup, resolveBloodTiesTrioDiscovery } from './blood-ties-discovery.js';
+import { BLOOD_TIES_DISCOVERY_VERSION, countBloodTiesApproachableGroups, hasBloodTiesCategoryPairs, isBloodTiesLiteralGroup, resolveBloodTiesTrioDiscovery } from './blood-ties-discovery.js';
 export { countBloodTiesSolutions } from './blood-ties-legacy.js';
 
 export const BLOOD_TIES_LAUNCH_DATE = '2026-10-22';
-export const BLOOD_TIES_RULES_VERSION = 3;
+export const BLOOD_TIES_RULES_VERSION = 4;
 export const BLOOD_TIES_MAX_STRIKES = 3;
 export const BLOOD_TIES_CONTENT_DATE = bloodTiesContents.at(-1).catalogue.effectiveDate;
 export const BLOOD_TIES_CATEGORY_COOLDOWN = 14;
@@ -26,7 +26,7 @@ function prepareContents() {
       || !isValidDateKey(catalogue.effectiveDate) || catalogue.version < 3
       || (i === 0 ? catalogue.effectiveDate !== firstFairDate : catalogue.effectiveDate <= bloodTiesContents[i-1].catalogue.effectiveDate)) throw new Error('Blood Ties content history or board pool does not match its workbook.');
     if ((catalogue.generationPolicy || '') !== (boards.discoveryVersion ? `discovery-v${boards.discoveryVersion}` : '')
-      || boards.discoveryVersion && ![1,2,BLOOD_TIES_DISCOVERY_VERSION].includes(boards.discoveryVersion)
+      || boards.discoveryVersion && ![1,2,3,BLOOD_TIES_DISCOVERY_VERSION].includes(boards.discoveryVersion)
       || boards.discoveryVersion && boards.opening?.length !== boards.boards.length) throw new Error('Blood Ties discovery policy does not match the compiled pool.');
     const connections = new Map(catalogue.connections.map(g => [g.id, g]));
     const pool = boards.boards.map((board,index) => {
@@ -38,7 +38,7 @@ function prepareContents() {
       const tiles = groups.flatMap(g => g.answers);
       const signature = groups.map(g => `${g.id}:${trioKey(g.answers)}`).sort().join('|');
       const redHerrings = groups.flatMap(owner => owner.answers.filter(t => groups.some(g => g.id !== owner.id && g.tiles.includes(t))));
-      return { groups, tiles, redHerrings, signature, pairs: pairs(groups), ambiguity: boards.ambiguity[index], ...(boards.discoveryVersion ? { categoryPairs: hasBloodTiesCategoryPairs(groups), opening: boards.opening[index], nameGroups: groups.filter(g => g.discovery.method === 'name').length, literalGroups: groups.filter(isBloodTiesLiteralGroup).length } : {}) };
+      return { groups, tiles, redHerrings, signature, pairs: pairs(groups), ambiguity: boards.ambiguity[index], ...(boards.discoveryVersion ? { approachableGroups: countBloodTiesApproachableGroups(groups), categoryPairs: hasBloodTiesCategoryPairs(groups), opening: boards.opening[index], nameGroups: groups.filter(g => g.discovery.method === 'name').length, literalGroups: groups.filter(isBloodTiesLiteralGroup).length } : {}) };
     });
     return { version: catalogue.version, effectiveDate: catalogue.effectiveDate, fairnessVersion: boards.fairnessVersion, discoveryVersion: boards.discoveryVersion, pool };
   });
@@ -75,6 +75,12 @@ export function buildDailyBloodTiesPuzzle(dateKey) {
     // spending the easiest boards first. This is a preference, never a fallback
     // that relaxes fairness, coverage or either cooldown.
     const gentleDay = hashString(`${date}:blood-ties:gentle:v1`) % 5 === 0;
+    // Occasionally prioritise a third recognisable connection; otherwise keep
+    // coverage first, with a smaller clarity preference among equally used boards.
+    const clearerDay = content.discoveryVersion >= 4 && hashString(`${date}:blood-ties:clearer:v4`) % 4 === 0;
+    const overlapTarget = content.discoveryVersion >= 4
+      ? Number(!gentleDay && hashString(`${date}:blood-ties:overlap:v4`) % 2 === 0)
+      : gentleDay ? 0 : 1;
     let best, bestRank;
     for (const candidate of content.pool) {
       if (candidate.groups.some(g => recentCategories.has(g.id)) || candidate.tiles.some(t => recentTiles.has(t))) continue;
@@ -90,9 +96,10 @@ export function buildDailyBloodTiesPuzzle(dateKey) {
       // the broader pool so rare families and every category can still appear.
       // Earlier policies retain their original rankings.
       const openingPreference = gentleDay || (content.discoveryVersion >= 3 ? candidate.categoryPairs : candidate.opening <= 1) ? 0 : 1;
-      const rank = content.discoveryVersion >= 2 ? [openingPreference, repeats,
+      const rank = content.discoveryVersion >= 2 ? [openingPreference, clearerDay && candidate.approachableGroups < 3 ? 1 : 0, repeats,
         recent + pairRepeats * 4 + candidate.ambiguity * 2 + candidate.opening * 14
-          + Math.abs(candidate.redHerrings.length - (gentleDay ? 0 : 1)) * 30 + candidate.literalGroups * 6,
+          + Math.abs(candidate.redHerrings.length - overlapTarget) * (content.discoveryVersion >= 4 ? 48 : 30)
+          + (content.discoveryVersion >= 4 ? Math.max(0, 3 - candidate.approachableGroups) * 36 : 0) + candidate.literalGroups * 6,
         hashString(`${index}:blood-ties:v${content.version}:${candidate.signature}`)]
         : [content.discoveryVersion ? candidate.nameGroups - 1 : 0,
         content.discoveryVersion ? candidate.opening : 0,
@@ -111,19 +118,24 @@ export function buildDailyBloodTiesPuzzle(dateKey) {
   return { dateKey, key, contentVersion: selected.version, groups, tiles: shuffle(selected.tiles, createRng(hashString(`${key}:display`))), redHerrings: [...selected.redHerrings] };
 }
 
-export function createBloodTiesSession(puzzle, rulesVersion = BLOOD_TIES_RULES_VERSION) {
-  if (![1, 2, BLOOD_TIES_RULES_VERSION].includes(rulesVersion)) throw new Error('Invalid Blood Ties rules version.');
-  if (puzzle.contentVersion >= 2 && rulesVersion !== BLOOD_TIES_RULES_VERSION) throw new Error('New Blood Ties puzzles require the current rules.');
+// Scoring is tied to dated content, so old boards, saves and awards never change.
+export const bloodTiesRulesVersion = puzzle => puzzle.contentVersion >= 5 ? 4 : 3;
+
+export function createBloodTiesSession(puzzle, rulesVersion = bloodTiesRulesVersion(puzzle)) {
+  if (![1, 2, 3, BLOOD_TIES_RULES_VERSION].includes(rulesVersion)) throw new Error('Invalid Blood Ties rules version.');
+  const currentRules = bloodTiesRulesVersion(puzzle);
+  if (rulesVersion > currentRules || puzzle.contentVersion >= 2 && rulesVersion !== currentRules) throw new Error('Blood Ties puzzles require the current rules for their content version.');
   return { key: puzzle.key, rulesVersion, attempts: [], selected: [], solved: [], misses: 0, strikes: 0, potentialPoints: 100, complete: false, success: null, points: 0, message: '', shuffleCount: 0 };
 }
 
 export function calculateBloodTiesPoints(misses, rulesVersion = BLOOD_TIES_RULES_VERSION) {
   if (!Number.isInteger(misses) || misses < 0) return 0;
-  return rulesVersion === 1 ? [100, 70, 40][misses] ?? 0 : Math.max(0, 100 - 10 * misses);
+  if (rulesVersion === 1) return [100, 70, 40][misses] ?? 0;
+  return rulesVersion >= 4 ? [100, 80, 60, 40, 30, 20][misses] ?? 10 : Math.max(0, 100 - 10 * misses);
 }
 
 // Shared replay is authoritative for browser restores, account saves and scoring.
-export function replayBloodTiesAttempts(puzzle, attempts = [], rulesVersion = BLOOD_TIES_RULES_VERSION) {
+export function replayBloodTiesAttempts(puzzle, attempts = [], rulesVersion = bloodTiesRulesVersion(puzzle)) {
   const session = createBloodTiesSession(puzzle, rulesVersion);
   // Two misses can precede each of the first three solves; the last trio is submitted too.
   if (!Array.isArray(attempts) || attempts.length > (rulesVersion === 1 ? 5 : rulesVersion === 2 ? 9 : 10)) throw new Error('Invalid Blood Ties attempt history.');
@@ -163,10 +175,10 @@ export function replayBloodTiesAttempts(puzzle, attempts = [], rulesVersion = BL
 export function normalizeBloodTiesSession(puzzle, value) {
   if (!value || value.key !== puzzle.key) return null;
   try {
-    // Completed pre-update saves retain their verified old result. Unfinished
-    // saves adopt the new rules by replaying their original submission history.
-    if (value.rulesVersion !== undefined && ![1, 2, BLOOD_TIES_RULES_VERSION].includes(value.rulesVersion)) return null;
-    const rulesVersion = value.complete ? value.rulesVersion ?? 1 : BLOOD_TIES_RULES_VERSION;
+    // Completed saves retain their verified rules. Unfinished saves replay under
+    // the rules for their dated board, preserving issued puzzles and scores.
+    if (value.rulesVersion !== undefined && ![1, 2, 3, BLOOD_TIES_RULES_VERSION].includes(value.rulesVersion)) return null;
+    const rulesVersion = value.complete ? value.rulesVersion ?? 1 : bloodTiesRulesVersion(puzzle);
     const replay = replayBloodTiesAttempts(puzzle, value.attempts, rulesVersion);
     const remaining = puzzle.groups.filter((g) => !replay.solved.includes(g.id)).flatMap((g) => g.answers);
     return { ...replay, selected: Array.isArray(value.selected) ? [...new Set(value.selected)].filter((t) => remaining.includes(t)).slice(0, 3) : [],

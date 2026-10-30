@@ -3,7 +3,7 @@ import { buildDailyWordPuzzle, calculateWordPoints } from "../../js/word-puzzle-
 import { getOfficialPuzzleType } from "../../js/daily-challenge-core.js";
 import { workerMaps } from "./generated-map-catalog.js";
 import { workerWords } from "./generated-word-catalog.js";
-import { buildDailyBloodTiesPuzzle, calculateBloodTiesPoints } from '../../js/blood-ties-core.js';
+import { bloodTiesRulesVersion, buildDailyBloodTiesPuzzle, calculateBloodTiesPoints } from '../../js/blood-ties-core.js';
 
 const fixtureVersion = 2;
 const ready = new WeakMap();
@@ -57,7 +57,7 @@ export function fixtureStatements(db, today) {
       const misses = index % 4;
       const clues = index % 3 + 1;
       const bonusCorrect = index % 2 === 0;
-      const mapPoints = official === 'blood' ? calculateBloodTiesPoints(index % 3) : official === "word" ? calculateWordPoints(misses) : [0, 50, 20, 10][clues];
+      const mapPoints = official === 'blood' ? calculateBloodTiesPoints(index % 3, bloodTiesRulesVersion(blood)) : official === "word" ? calculateWordPoints(misses) : [0, 50, 20, 10][clues];
       const bonusPoints = official === "easter" && bonusCorrect ? mapPoints : 0;
       statement(`INSERT INTO player_daily_results (user_id, puzzle_date, puzzle_id, selected_map_id, clues_used, map_correct,
         map_points, bonus_status, bonus_points, points_earned, completed_at, score_awarded, progression_applied, puzzle_type, word_misses, blood_misses)

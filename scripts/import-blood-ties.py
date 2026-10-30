@@ -83,7 +83,7 @@ with zipfile.ZipFile(source) as book:
         difficulty = float(row["E"])
         assert difficulty in (1, 2, 3), f"Invalid difficulty for {row['A']}"
         group = dict(id=row["A"], name=row["B"], definition=row["C"], family=row["D"], difficulty=int(difficulty), tiles=tiles, researchLink=row.get("V", ""))
-        if previous.get("generationPolicy") in ("discovery-v1", "discovery-v2", "discovery-v3"):
+        if previous.get("generationPolicy") in ("discovery-v1", "discovery-v2", "discovery-v3", "discovery-v4"):
             method = row.get("W", "").lower()
             old = previous_connections.get(row["A"], {})
             if method:
@@ -113,7 +113,7 @@ with zipfile.ZipFile(source) as book:
                 group["discovery"]["pairing"] = pairing
             elif old.get("name") == group["name"] and old.get("definition") == group["definition"] and old.get("discovery", {}).get("pairing"):
                 group["discovery"].setdefault("pairing", old["discovery"]["pairing"])
-            elif group["family"] == "Gameplay" and previous.get("generationPolicy") == "discovery-v3":
+            elif group["family"] == "Gameplay" and previous.get("generationPolicy") in ("discovery-v3", "discovery-v4"):
                 raise AssertionError(f"Connection {row['A']} needs a Pair type classification in AA; Gameplay alone is not a visible item type.")
         connections.append(group)
 

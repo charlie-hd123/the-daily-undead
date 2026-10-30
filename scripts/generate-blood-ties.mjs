@@ -54,7 +54,7 @@ for (let attempt = 0; attempt < 4000000 && pool.length < poolSize; attempt++) {
   const traps = groups.flatMap(owner => owner.answers.filter(t => groups.some(g => g.id !== owner.id && g.tiles.includes(t))));
   // Discovery boards allow more zero-overlap draws. Difficulty need not come
   // from a misleading membership. Historical pools keep their exact quotas.
-  if (traps.length > 2 || traps.length === 0 && overlapCounts[0] >= (discovery ? poolSize / 4 : 256) || traps.length === 2 && overlapCounts[2] >= (discovery ? poolSize / 4 : 512)
+  if (traps.length > 2 || traps.length === 0 && overlapCounts[0] >= (discovery ? poolSize / 2 : 256) || traps.length === 2 && overlapCounts[2] >= (discovery ? poolSize / 4 : 512)
     || countBloodTiesSolutions(groups, tiles) !== 1) continue;
   // Protect the opening group and avoid large combination traps before the
   // broader catalogue search. Alternative labels on the SAME trio are fine.

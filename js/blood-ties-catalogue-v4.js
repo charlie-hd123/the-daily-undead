@@ -1,0 +1,3230 @@
+// Workbook categories with reviewed discovery classifications; update the workbook after staging play-testing.
+export const bloodTiesCatalogue = {
+  "version": 4,
+  "effectiveDate": "2026-10-30",
+  "source": "1-Blood-Ties-Updated-23-Oct-2026.xlsm",
+  "sourceSha256": "977e67636bc3867a259b4881b2e91cb9c295bff8a32662e7f59ba828e682f105",
+  "worksheet": "Blood Ties",
+  "connections": [
+    {
+      "id": "0001",
+      "name": "Maps introduced in World at War",
+      "definition": "Zombies maps first released in World at War, including its map packs.",
+      "family": "Maps",
+      "difficulty": 1,
+      "tiles": [
+        "Nacht der Untoten",
+        "Verrückt",
+        "Shi No Numa",
+        "Der Riese"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0002",
+      "name": "Maps introduced in Black Ops 1",
+      "definition": "Zombies maps first released in Black Ops 1, including its map packs.",
+      "family": "Maps",
+      "difficulty": 1,
+      "tiles": [
+        "Kino der Toten",
+        "Five",
+        "Ascension",
+        "Call of the Dead",
+        "Shangri-La",
+        "Moon"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0003",
+      "name": "Maps introduced in Black Ops 2",
+      "definition": "Zombies maps first released in Black Ops 2, excluding Green Run's separate Survival variants.",
+      "family": "Maps",
+      "difficulty": 1,
+      "tiles": [
+        "TranZit",
+        "Nuketown Zombies",
+        "Die Rise",
+        "Mob of the Dead",
+        "Buried",
+        "Origins"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0004",
+      "name": "Maps introduced in Black Ops 3",
+      "definition": "Maps first released under these names in Black Ops 3, including DLC. Zombies Chronicles remasters are excluded.",
+      "family": "Maps",
+      "difficulty": 1,
+      "tiles": [
+        "Shadows of Evil",
+        "The Giant",
+        "Der Eisendrache",
+        "Zetsubou No Shima",
+        "Gorod Krovi",
+        "Revelations"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0005",
+      "name": "Maps introduced in Black Ops 4",
+      "definition": "Maps first released under these names in Black Ops 4, including DLC.",
+      "family": "Maps",
+      "difficulty": 1,
+      "tiles": [
+        "Voyage of Despair",
+        "IX",
+        "Blood of the Dead",
+        "Classified",
+        "Dead of the Night",
+        "Ancient Evil",
+        "Alpha Omega",
+        "Tag der Toten"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0006",
+      "name": "Maps introduced in Black Ops Cold War",
+      "definition": "Round-based Zombies maps first released in Black Ops Cold War.",
+      "family": "Maps",
+      "difficulty": 1,
+      "tiles": [
+        "Die Maschine",
+        "Firebase Z",
+        "Mauer der Toten",
+        "Forsaken"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0007",
+      "name": "Maps introduced in Black Ops 6",
+      "definition": "Round-based Zombies maps first released in Black Ops 6, including post-launch maps.",
+      "family": "Maps",
+      "difficulty": 1,
+      "tiles": [
+        "Liberty Falls",
+        "Terminus",
+        "Citadelle des Morts",
+        "The Tomb",
+        "Shattered Veil",
+        "Reckoning"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0008",
+      "name": "Zombies Chronicles remasters",
+      "definition": "The eight maps remastered for Black Ops 3's Zombies Chronicles expansion.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Nacht der Untoten",
+        "Verrückt",
+        "Shi No Numa",
+        "Kino der Toten",
+        "Ascension",
+        "Shangri-La",
+        "Moon",
+        "Origins"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0009",
+      "name": "Snowy maps",
+      "definition": "Maps with snow-covered outdoor areas. Changing weather, as in Origins, also counts.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Call of the Dead",
+        "Origins",
+        "The Giant",
+        "Der Eisendrache",
+        "Tag der Toten",
+        "Die Maschine",
+        "Totenreich"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "trait"
+      }
+    },
+    {
+      "id": "0010",
+      "name": "Maps with rideable lifts",
+      "definition": "Maps where players can ride a lift or elevator between levels, including quest-only lifts.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Five",
+        "Classified",
+        "Die Rise",
+        "Zetsubou No Shima",
+        "Reckoning",
+        "Terminus"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0011",
+      "name": "Maps with teleporters",
+      "definition": "Maps with fixed, usable teleporters or travel portals. Cutscene-only travel and consumable teleportation are excluded.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Der Riese",
+        "The Giant",
+        "Kino der Toten",
+        "Five",
+        "Classified",
+        "Moon",
+        "Der Eisendrache",
+        "Revelations",
+        "Reckoning",
+        "Astra Malorum"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0012",
+      "name": "Maps with linkable teleporters",
+      "definition": "Maps where linking a teleporter is part of unlocking Pack-a-Punch.",
+      "family": "Maps",
+      "difficulty": 3,
+      "tiles": [
+        "Der Riese",
+        "The Giant",
+        "Kino der Toten"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0013",
+      "name": "Maps with buildable shields",
+      "definition": "Maps where players can collect parts and assemble a shield.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "TranZit",
+        "Mob of the Dead",
+        "Origins",
+        "Shadows of Evil",
+        "Der Eisendrache",
+        "Zetsubou No Shima",
+        "Gorod Krovi",
+        "Revelations",
+        "Voyage of Despair",
+        "IX",
+        "Blood of the Dead",
+        "Classified",
+        "Dead of the Night",
+        "Ancient Evil",
+        "Alpha Omega",
+        "Tag der Toten"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0014",
+      "name": "Maps with celebrity guest crews",
+      "definition": "Maps with a playable guest crew portrayed by an ensemble of celebrity actors.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Call of the Dead",
+        "Mob of the Dead",
+        "Shadows of Evil",
+        "Dead of the Night"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0015",
+      "name": "Maps set on islands",
+      "definition": "Maps whose main playable setting is an island.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Mob of the Dead",
+        "Blood of the Dead",
+        "Zetsubou No Shima",
+        "Terminus",
+        "Totenreich"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "trait"
+      }
+    },
+    {
+      "id": "0016",
+      "name": "Maps with playable Ultimis",
+      "definition": "Maps where you can play as the Ultimis quartet in at least one official version.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Nacht der Untoten",
+        "Verrückt",
+        "Shi No Numa",
+        "Der Riese",
+        "Kino der Toten",
+        "Ascension",
+        "Shangri-La",
+        "Moon",
+        "Classified",
+        "Alpha Omega"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0017",
+      "name": "Maps with playable Primis",
+      "definition": "Maps where you can play as the Primis quartet.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Origins",
+        "The Giant",
+        "Der Eisendrache",
+        "Zetsubou No Shima",
+        "Gorod Krovi",
+        "Revelations",
+        "Blood of the Dead",
+        "Alpha Omega"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0018",
+      "name": "Maps with Panzersoldaten",
+      "definition": "Maps where you fight the armoured Panzersoldat enemy.",
+      "family": "Maps",
+      "difficulty": 3,
+      "tiles": [
+        "Origins",
+        "Der Eisendrache",
+        "Revelations"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0019",
+      "name": "Maps with Manglers",
+      "definition": "Maps where Manglers appear as enemies during gameplay.",
+      "family": "Maps",
+      "difficulty": 3,
+      "tiles": [
+        "Gorod Krovi",
+        "Firebase Z",
+        "Mauer der Toten",
+        "Liberty Falls",
+        "Terminus",
+        "Shattered Veil",
+        "Reckoning"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0020",
+      "name": "The original four perks",
+      "definition": "The four Perk-a-Colas introduced in Verrückt.",
+      "family": "Perks",
+      "difficulty": 1,
+      "tiles": [
+        "Juggernog",
+        "Quick Revive",
+        "Speed Cola",
+        "Double Tap Root Beer"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0021",
+      "name": "Perks introduced in Black Ops 1",
+      "definition": "Perk-a-Colas that first appeared in Black Ops 1.",
+      "family": "Perks",
+      "difficulty": 2,
+      "tiles": [
+        "Stamin-Up",
+        "PhD Flopper",
+        "Deadshot Daiquiri",
+        "Mule Kick"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0022",
+      "name": "Perks introduced in Black Ops 2",
+      "definition": "Perk-a-Colas that first appeared in Black Ops 2.",
+      "family": "Perks",
+      "difficulty": 2,
+      "tiles": [
+        "Tombstone Soda",
+        "Who's Who",
+        "Electric Cherry",
+        "Vulture Aid"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0023",
+      "name": "Perks introduced in Black Ops 4",
+      "definition": "Perk names first introduced in Black Ops 4, including renamed versions of older perks.",
+      "family": "Perks",
+      "difficulty": 2,
+      "tiles": [
+        "Dying Wish",
+        "Death Perception",
+        "Stone Cold Stronghold",
+        "Victorious Tortoise",
+        "Winter's Wail",
+        "Bandolier Bandit",
+        "Blood Wolf Bite",
+        "Blaze Phase",
+        "Zombshell",
+        "Timeslip",
+        "Ethereal Razor",
+        "Secret Sauce",
+        "Electric Burst",
+        "Deadshot Dealer",
+        "PhD Slider"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0024",
+      "name": "Perks with animal references",
+      "definition": "Perks whose name or icon references an animal. Widow's Wine counts through its spider icon.",
+      "family": "Perks",
+      "difficulty": 3,
+      "tiles": [
+        "Mule Kick",
+        "Vulture Aid",
+        "Widow's Wine",
+        "Blood Wolf Bite",
+        "Victorious Tortoise"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "Animals",
+        "words": [
+          "mule",
+          "vulture",
+          "widow",
+          "wolf",
+          "tortoise"
+        ]
+      }
+    },
+    {
+      "id": "0025",
+      "name": "Perks that give you another chance",
+      "definition": "Perks that help you revive, recover from being downed, or survive an otherwise fatal hit.",
+      "family": "Perks",
+      "difficulty": 3,
+      "tiles": [
+        "Quick Revive",
+        "Tombstone Soda",
+        "Who's Who",
+        "Dying Wish"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "function"
+      }
+    },
+    {
+      "id": "0026",
+      "name": "Perk-granting GobbleGums",
+      "definition": "GobbleGums that award perks directly, through a power-up, or alongside a perk purchase.",
+      "family": "GobbleGums",
+      "difficulty": 2,
+      "tiles": [
+        "Perkaholic",
+        "Soda Fountain",
+        "On the House",
+        "Reign Drops"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "function"
+      }
+    },
+    {
+      "id": "0027",
+      "name": "Mystery Box GobbleGums",
+      "definition": "GobbleGums that change the Mystery Box's price, weapon result, or upgrade level.",
+      "family": "GobbleGums",
+      "difficulty": 2,
+      "tiles": [
+        "Immolation Liquidation",
+        "Respin Cycle",
+        "Crate Power",
+        "Wonderbar!"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "function"
+      }
+    },
+    {
+      "id": "0028",
+      "name": "Power-up GobbleGums",
+      "definition": "GobbleGums that grant power-ups or change their drops or duration.",
+      "family": "GobbleGums",
+      "difficulty": 2,
+      "tiles": [
+        "Immolation Liquidation",
+        "Cache Back",
+        "On the House",
+        "Reign Drops",
+        "Who's Keeping Score?",
+        "Licensed Contractor",
+        "Power Vacuum",
+        "Temporal Gift"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "function"
+      }
+    },
+    {
+      "id": "0029",
+      "name": "Ammo-restoring GobbleGums",
+      "definition": "GobbleGums that refill ammunition directly or through a Max Ammo power-up.",
+      "family": "GobbleGums",
+      "difficulty": 2,
+      "tiles": [
+        "Cache Back",
+        "Alchemical Antithesis",
+        "Reign Drops"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "function"
+      }
+    },
+    {
+      "id": "0030",
+      "name": "Pack-a-Punch GobbleGums",
+      "definition": "GobbleGums that Pack-a-Punch weapons or apply an alternate ammo effect.",
+      "family": "GobbleGums",
+      "difficulty": 3,
+      "tiles": [
+        "Wall Power",
+        "Crate Power",
+        "Bullet Boost",
+        "Ephemeral Enhancement",
+        "Fully Packed"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "function"
+      }
+    },
+    {
+      "id": "0031",
+      "name": "Origins elemental staffs",
+      "definition": "The four elemental staffs that players can build in Origins.",
+      "family": "Wonder Weapons",
+      "difficulty": 1,
+      "tiles": [
+        "Staff of Fire",
+        "Staff of Ice",
+        "Staff of Lightning",
+        "Staff of Wind"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "Staffs",
+        "words": [
+          "staff"
+        ]
+      }
+    },
+    {
+      "id": "0032",
+      "name": "Der Eisendrache bows",
+      "definition": "The four elemental upgrades of the Wrath of the Ancients.",
+      "family": "Wonder Weapons",
+      "difficulty": 2,
+      "tiles": [
+        "Fire Bow",
+        "Lightning Bow",
+        "Wolf Bow",
+        "Void Bow"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "Bows",
+        "words": [
+          "bow"
+        ]
+      }
+    },
+    {
+      "id": "0033",
+      "name": "Ancient Evil God Hands",
+      "definition": "The four God Hand Wonder Weapons in Ancient Evil.",
+      "family": "Wonder Weapons",
+      "difficulty": 2,
+      "tiles": [
+        "Hand of Charon",
+        "Hand of Gaia",
+        "Hand of Hemera",
+        "Hand of Ouranos"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "God Hands",
+        "words": [
+          "hand of"
+        ]
+      }
+    },
+    {
+      "id": "0034",
+      "name": "Citadelle des Morts swords",
+      "definition": "The four elemental upgrades of the Bastard Sword.",
+      "family": "Wonder Weapons",
+      "difficulty": 2,
+      "tiles": [
+        "Caliburn",
+        "Durendal",
+        "Balmung",
+        "Solais"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "weapon-class"
+      }
+    },
+    {
+      "id": "0035",
+      "name": "D.I.E. elemental upgrades",
+      "definition": "The four elemental modifications of the D.I.E. Shockwave in Die Maschine.",
+      "family": "Wonder Weapons",
+      "difficulty": 2,
+      "tiles": [
+        "D.I.E. Electrobolt",
+        "D.I.E. Cryo-Emitter",
+        "D.I.E. Nova 5",
+        "D.I.E. Thermophasic"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "D.I.E. upgrades",
+        "words": [
+          "D.I.E."
+        ]
+      }
+    },
+    {
+      "id": "0036",
+      "name": "Electrical Wonder Weapons",
+      "definition": "Wonder Weapons or named variants that attack with electricity.",
+      "family": "Wonder Weapons",
+      "difficulty": 3,
+      "tiles": [
+        "Wunderwaffe DG-2",
+        "Staff of Lightning",
+        "Lightning Bow",
+        "D.I.E. Electrobolt",
+        "Durendal",
+        "Ragnarok DG-4",
+        "Ragnarok DG-5"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "Electricity",
+        "words": [
+          "lightning",
+          "electro"
+        ],
+        "reasoning": "function"
+      }
+    },
+    {
+      "id": "0037",
+      "name": "Freezing Wonder Weapons",
+      "definition": "Wonder Weapons or named variants that can freeze zombies.",
+      "family": "Wonder Weapons",
+      "difficulty": 3,
+      "tiles": [
+        "Staff of Ice",
+        "Winter's Howl",
+        "D.I.E. Cryo-Emitter"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "Freezing",
+        "words": [
+          "ice",
+          "winter",
+          "cryo"
+        ]
+      }
+    },
+    {
+      "id": "0038",
+      "name": "Wonder Weapons introduced in Black Ops 2",
+      "definition": "Wonder Weapons first introduced in Black Ops 2, including tactical Wonder Weapons.",
+      "family": "Wonder Weapons",
+      "difficulty": 3,
+      "tiles": [
+        "Sliquifier",
+        "Paralyzer",
+        "Blundergat",
+        "Ray Gun Mark II",
+        "Thrustodyne Aeronautics Model 23",
+        "Staff of Fire",
+        "Staff of Ice",
+        "Staff of Lightning",
+        "Staff of Wind",
+        "Hell's Retriever",
+        "Time Bomb"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0039",
+      "name": "Wonder Weapons in Black Ops 6",
+      "definition": "Wonder Weapons available in Black Ops 6 Zombies, including returning weapons.",
+      "family": "Wonder Weapons",
+      "difficulty": 3,
+      "tiles": [
+        "Ray Gun",
+        "Beamsmasher",
+        "Thrustodyne Aeronautics Model 23",
+        "Caliburn",
+        "Durendal",
+        "Balmung",
+        "Solais",
+        "Staff of Ice",
+        "Ray Gun Mark II",
+        "Gorgofex"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0040",
+      "name": "Black Ops 6 enemy types",
+      "definition": "Distinct enemy types encountered in Black Ops 6 Zombies, apart from ordinary zombies.",
+      "family": "Enemies",
+      "difficulty": 2,
+      "tiles": [
+        "Vermin",
+        "Parasite",
+        "Mangler",
+        "Abomination",
+        "Amalgam",
+        "Doppelghast",
+        "Mimic",
+        "Elder Disciple",
+        "Toxic Zombie",
+        "Kommando Klaus",
+        "Uber Klaus"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0041",
+      "name": "Black Ops 3 enemy types",
+      "definition": "Distinct enemy types encountered in Black Ops 3's original Zombies maps, apart from ordinary zombies.",
+      "family": "Enemies",
+      "difficulty": 2,
+      "tiles": [
+        "Margwa",
+        "Parasite",
+        "Panzersoldat",
+        "Thrasher",
+        "Valkyrie Drone",
+        "Mangler",
+        "Corrupted Keeper",
+        "Fury",
+        "Spider",
+        "Insanity Elemental"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0042",
+      "name": "Enemies that pull you towards them",
+      "definition": "Enemies with an attack that grabs a player and pulls them closer.",
+      "family": "Enemies",
+      "difficulty": 3,
+      "tiles": [
+        "Panzersoldat",
+        "Mimic",
+        "Amalgam"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0043",
+      "name": "Flying or hovering enemies",
+      "definition": "Enemy types that fly or hover during gameplay.",
+      "family": "Enemies",
+      "difficulty": 2,
+      "tiles": [
+        "Parasite",
+        "Valkyrie Drone",
+        "Tempest",
+        "Disciple",
+        "Elder Disciple",
+        "O.S.C.A.R.",
+        "Ghost"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "trait"
+      }
+    },
+    {
+      "id": "0044",
+      "name": "Zombie-distraction devices",
+      "definition": "Throwable devices that lure zombies away or draw them into a vortex.",
+      "family": "Gameplay",
+      "difficulty": 2,
+      "tiles": [
+        "Monkey Bomb",
+        "Li'l Arnie",
+        "Homunculus",
+        "Decoy Grenade",
+        "Gersh Device",
+        "LT53 Kazimir"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "function",
+        "pairing": "equipment"
+      }
+    },
+    {
+      "id": "0045",
+      "name": "Effects that hide you from zombies",
+      "definition": "Abilities or power-ups that temporarily make zombies ignore you.",
+      "family": "Gameplay",
+      "difficulty": 3,
+      "tiles": [
+        "In Plain Sight",
+        "Idle Eyes",
+        "Aether Shroud",
+        "Zombie Blood"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "function",
+        "pairing": "effects"
+      }
+    },
+    {
+      "id": "0046",
+      "name": "Effects that revive teammates",
+      "definition": "Items and abilities that directly revive downed teammates. Nowhere But There! uses its Black Ops 6 effect.",
+      "family": "Gameplay",
+      "difficulty": 3,
+      "tiles": [
+        "Phoenix Up",
+        "Healing Aura",
+        "Nowhere But There!",
+        "Near Death Experience",
+        "Join the Party",
+        "Maxis Drone"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "function",
+        "pairing": "effects"
+      }
+    },
+    {
+      "id": "0047",
+      "name": "Ways to refill ammunition",
+      "definition": "Power-ups, consumables, and map utilities that replenish weapon ammunition.",
+      "family": "Gameplay",
+      "difficulty": 3,
+      "tiles": [
+        "Max Ammo",
+        "Ammo Cache",
+        "Cache Back",
+        "Alchemical Antithesis",
+        "Reign Drops"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "Ammunition",
+        "words": [
+          "ammo",
+          "cache"
+        ],
+        "reasoning": "function",
+        "pairing": "effects"
+      }
+    },
+    {
+      "id": "0048",
+      "name": "Victis",
+      "definition": "The four survivors who make up the Victis crew.",
+      "family": "Characters",
+      "difficulty": 1,
+      "tiles": [
+        "Misty",
+        "Marlton Johnson",
+        "Samuel Stuhlinger",
+        "Russman"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0049",
+      "name": "Primis",
+      "definition": "The younger, alternate-universe versions of Dempsey, Nikolai, Takeo, and Richtofen.",
+      "family": "Characters",
+      "difficulty": 1,
+      "tiles": [
+        "Primis Dempsey",
+        "Primis Nikolai",
+        "Primis Takeo",
+        "Primis Richtofen"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "Primis",
+        "words": [
+          "Primis"
+        ]
+      }
+    },
+    {
+      "id": "0050",
+      "name": "Ultimis",
+      "definition": "The original versions of Dempsey, Nikolai, Takeo, and Richtofen.",
+      "family": "Characters",
+      "difficulty": 1,
+      "tiles": [
+        "Ultimis Dempsey",
+        "Ultimis Nikolai",
+        "Ultimis Takeo",
+        "Ultimis Richtofen"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "Ultimis",
+        "words": [
+          "Ultimis"
+        ]
+      }
+    },
+    {
+      "id": "0051",
+      "name": "The Chaos crew",
+      "definition": "The four protagonists of Voyage of Despair, IX, and Ancient Evil.",
+      "family": "Characters",
+      "difficulty": 1,
+      "tiles": [
+        "Scarlett Rhodes",
+        "Diego Necalli",
+        "Bruno Delacroix",
+        "Stanton Shaw"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0052",
+      "name": "Mob of the Dead prisoners",
+      "definition": "The four playable prisoners in the original Mob of the Dead.",
+      "family": "Characters",
+      "difficulty": 1,
+      "tiles": [
+        "Albert Arlington",
+        "Billy Handsome",
+        "Finn O'Leary",
+        "Sal DeLuca"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0053",
+      "name": "Shadows of Evil crew",
+      "definition": "The four playable residents of Morg City in Shadows of Evil.",
+      "family": "Characters",
+      "difficulty": 1,
+      "tiles": [
+        "Nero Blackstone",
+        "Jessica Rose",
+        "Jack Vincent",
+        "Floyd Campbell"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0054",
+      "name": "Dead of the Night crew",
+      "definition": "The four playable characters defending Alistair Rhodes's mansion.",
+      "family": "Characters",
+      "difficulty": 2,
+      "tiles": [
+        "Gideon Jones",
+        "Christina Fowler",
+        "Jonathan Warwick",
+        "Godfrey"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0055",
+      "name": "Five's playable characters",
+      "definition": "The four historical figures playable in the original Five.",
+      "family": "Characters",
+      "difficulty": 1,
+      "tiles": [
+        "John F. Kennedy",
+        "Richard Nixon",
+        "Robert McNamara",
+        "Fidel Castro"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0056",
+      "name": "Call of the Dead survivors",
+      "definition": "The four actors playable in Call of the Dead. George Romero is an enemy, rather than a survivor.",
+      "family": "Characters",
+      "difficulty": 1,
+      "tiles": [
+        "Sarah Michelle Gellar",
+        "Robert Englund",
+        "Danny Trejo",
+        "Michael Rooker"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0057",
+      "name": "Requiem's senior staff",
+      "definition": "Requiem's operations chief and its three senior department heads in Cold War.",
+      "family": "Characters",
+      "difficulty": 2,
+      "tiles": [
+        "Grigori Weaver",
+        "Mackenzie Carver",
+        "Elizabeth Grey",
+        "Oskar Strauss"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0058",
+      "name": "Omega Group members",
+      "definition": "Named military or scientific personnel who served in Omega Group.",
+      "family": "Characters",
+      "difficulty": 2,
+      "tiles": [
+        "Lev Kravchenko",
+        "William Peck",
+        "Aleksandra Valentina",
+        "Sergei Ravenov"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0059",
+      "name": "Group 935 scientists",
+      "definition": "Named scientists employed by Group 935 in the Aether story.",
+      "family": "Characters",
+      "difficulty": 3,
+      "tiles": [
+        "Ludvig Maxis",
+        "Edward Richtofen",
+        "Doctor Groph",
+        "Doctor Schuster"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0060",
+      "name": "Celebrities playing themselves",
+      "definition": "Real entertainers appearing as themselves in Call of the Dead, including George Romero.",
+      "family": "Characters",
+      "difficulty": 2,
+      "tiles": [
+        "Sarah Michelle Gellar",
+        "Robert Englund",
+        "Danny Trejo",
+        "Michael Rooker",
+        "George Romero"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "trait"
+      }
+    },
+    {
+      "id": "0061",
+      "name": "Playable female characters",
+      "definition": "Named female characters playable in Treyarch Zombies, including playable Operators.",
+      "family": "Characters",
+      "difficulty": 1,
+      "tiles": [
+        "Misty",
+        "Sarah Michelle Gellar",
+        "Jessica Rose",
+        "Scarlett Rhodes",
+        "Christina Fowler",
+        "Samantha Maxis",
+        "Elizabeth Grey",
+        "Maya Aguinaldo"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "trait"
+      }
+    },
+    {
+      "id": "0062",
+      "name": "Humans turned into boss enemies",
+      "definition": "Human characters who become major enemy encounters. Tiles use their human names.",
+      "family": "Characters",
+      "difficulty": 3,
+      "tiles": [
+        "George Romero",
+        "Cornelius Pernell",
+        "Aleksandra Valentina",
+        "Nathan Aguinaldo"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0063",
+      "name": "Robots and computers that help you",
+      "definition": "Named robots or computer intelligences that assist players with transport, combat, or quests.",
+      "family": "Characters",
+      "difficulty": 2,
+      "tiles": [
+        "T.E.D.D.",
+        "Klaus",
+        "Rushmore",
+        "S.O.P.H.I.A.",
+        "Maxis Drone"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "trait"
+      }
+    },
+    {
+      "id": "0064",
+      "name": "Songs sung by Elena Siegman",
+      "definition": "Zombies Easter egg songs featuring Elena Siegman on lead vocals, including collaborations.",
+      "family": "Music",
+      "difficulty": 2,
+      "tiles": [
+        "Lullaby of a Deadman",
+        "The One",
+        "Beauty of Annihilation",
+        "115",
+        "Abracadavre",
+        "Pareidolia",
+        "Coming Home",
+        "Archangel",
+        "Dead Again",
+        "The Gift",
+        "Shockwave",
+        "Mystery",
+        "Turn to Ashes",
+        "All We Are"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0065",
+      "name": "Avenged Sevenfold songs",
+      "definition": "Avenged Sevenfold songs featured in Zombies, including opening-cutscene music.",
+      "family": "Music",
+      "difficulty": 2,
+      "tiles": [
+        "Not Ready to Die",
+        "Nightmare",
+        "Shepherd of Fire",
+        "Mad Hatter",
+        "Magic"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0066",
+      "name": "World at War's hidden songs",
+      "definition": "The three hidden vocal songs in World at War's original Zombies maps.",
+      "family": "Music",
+      "difficulty": 2,
+      "tiles": [
+        "Lullaby of a Deadman",
+        "The One",
+        "Beauty of Annihilation"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0067",
+      "name": "Black Ops 1's hidden songs",
+      "definition": "Songs activated as musical Easter eggs in Black Ops 1's original Zombies maps.",
+      "family": "Music",
+      "difficulty": 2,
+      "tiles": [
+        "115",
+        "Won't Back Down",
+        "Abracadavre",
+        "Not Ready to Die",
+        "Pareidolia",
+        "Coming Home",
+        "Nightmare"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0068",
+      "name": "Songs from Black Ops 2 Zombies",
+      "definition": "Songs featured as musical Easter eggs or opening-cutscene music in Black Ops 2 Zombies.",
+      "family": "Music",
+      "difficulty": 2,
+      "tiles": [
+        "Carrion",
+        "We All Fall Down",
+        "Rusty Cage",
+        "Where Are We Going?",
+        "Always Running",
+        "Archangel",
+        "Shepherd of Fire"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0069",
+      "name": "Songs from Black Ops 3 Zombies",
+      "definition": "Songs featured as hidden music or opening-cutscene music in Black Ops 3's original maps.",
+      "family": "Music",
+      "difficulty": 2,
+      "tiles": [
+        "Snakeskin Boots",
+        "Cold Hard Cash",
+        "Dead Again",
+        "Dead Flowers",
+        "Dead Ended",
+        "The Gift"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0070",
+      "name": "Songs with Dead in the title",
+      "definition": "Zombies song titles containing Dead or Deadman.",
+      "family": "Music",
+      "difficulty": 2,
+      "tiles": [
+        "Lullaby of a Deadman",
+        "Dead Again",
+        "Dead Flowers",
+        "Dead Ended"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "Dead in the name",
+        "words": [
+          "dead"
+        ]
+      }
+    },
+    {
+      "id": "0071",
+      "name": "Aether research organisations",
+      "definition": "Research organisations from the original Aether storyline.",
+      "family": "Lore",
+      "difficulty": 2,
+      "tiles": [
+        "Group 935",
+        "Ascension Group",
+        "Broken Arrow",
+        "Division 9"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0072",
+      "name": "Dark Aether research groups",
+      "definition": "Organisations and research projects investigating the Dark Aether.",
+      "family": "Lore",
+      "difficulty": 2,
+      "tiles": [
+        "Requiem",
+        "Omega Group",
+        "Projekt Endstation",
+        "Project Janus"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0073",
+      "name": "Black Ops 4 perk gods",
+      "definition": "The four gods represented by perk statues in Black Ops 4's Chaos maps.",
+      "family": "Lore",
+      "difficulty": 2,
+      "tiles": [
+        "Danu",
+        "Ra",
+        "Zeus",
+        "Odin"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "God names",
+        "words": [
+          "Danu",
+          "Ra",
+          "Zeus",
+          "Odin"
+        ]
+      }
+    },
+    {
+      "id": "0074",
+      "name": "Origins giant robots",
+      "definition": "The three named giant robots that traverse Origins. The destroyed unnamed robot is excluded.",
+      "family": "Lore",
+      "difficulty": 2,
+      "tiles": [
+        "Freya",
+        "Odin",
+        "Thor"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "God names",
+        "words": [
+          "Freya",
+          "Odin",
+          "Thor"
+        ]
+      }
+    },
+    {
+      "id": "0075",
+      "name": "Items used for combat and travel",
+      "definition": "Items that can kill zombies and also move players by launching, teleporting, or lifting them.",
+      "family": "Gameplay",
+      "difficulty": 3,
+      "tiles": [
+        "Gersh Device",
+        "Trample Steam",
+        "Paralyzer"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist",
+        "pairing": "mixed"
+      }
+    },
+    {
+      "id": "0076",
+      "name": "Buildables powered by a Turbine",
+      "definition": "Buildable devices that need a separate Turbine to operate in Black Ops 2.",
+      "family": "Gameplay",
+      "difficulty": 3,
+      "tiles": [
+        "Turret",
+        "Electric Trap",
+        "Subsurface Resonator"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist",
+        "pairing": "equipment"
+      }
+    },
+    {
+      "id": "0077",
+      "name": "Throwables with hidden upgrades",
+      "definition": "Throwable weapons with a map-specific side quest that upgrades them.",
+      "family": "Gameplay",
+      "difficulty": 2,
+      "tiles": [
+        "Monkey Bomb",
+        "Li'l Arnie",
+        "Hell's Retriever"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist",
+        "pairing": "equipment"
+      }
+    },
+    {
+      "id": "0078",
+      "name": "Hidden-song activators",
+      "definition": "Objects that players interact with or shoot to activate a hidden Zombies song.",
+      "family": "Gameplay",
+      "difficulty": 2,
+      "tiles": [
+        "Teddy Bear",
+        "Meteor Fragment",
+        "Vodka Bottle",
+        "Mister Peeks Headphones",
+        "Telephone",
+        "Toilet",
+        "Coin",
+        "Toy Monkey",
+        "Radio",
+        "Medallion"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist",
+        "pairing": "equipment"
+      }
+    },
+    {
+      "id": "0079",
+      "name": "Wonder Weapons introduced in Black Ops 1",
+      "definition": "Wonder Weapons first introduced in Black Ops 1, including tactical Wonder Weapons.",
+      "family": "Wonder Weapons",
+      "difficulty": 2,
+      "tiles": [
+        "Thundergun",
+        "Winter's Howl",
+        "V-R11",
+        "Scavenger",
+        "31-79 JGb215",
+        "Wave Gun",
+        "Gersh Device",
+        "Matryoshka Dolls",
+        "Quantum Entanglement Device"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0080",
+      "name": "Wonder Weapons introduced in Black Ops 3",
+      "definition": "Wonder Weapons and specialist weapons that first appeared in Black Ops 3.",
+      "family": "Wonder Weapons",
+      "difficulty": 2,
+      "tiles": [
+        "Apothicon Servant",
+        "Wrath of the Ancients",
+        "KT-4",
+        "GKZ-45 Mk3",
+        "Skull of Nan Sapwe",
+        "Ragnarok DG-4",
+        "Apothicon Sword",
+        "Gauntlet of Siegfried",
+        "Li'l Arnie"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0081",
+      "name": "Wonder Weapons introduced in Black Ops 4",
+      "definition": "Wonder Weapons that first appeared in Black Ops 4, including new variants of older weapons.",
+      "family": "Wonder Weapons",
+      "difficulty": 2,
+      "tiles": [
+        "Kraken",
+        "Death of Orion",
+        "Alistair's Folly",
+        "Savage Impaler",
+        "Tundragun",
+        "Wunderwaffe DG-Scharfschütze"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0082",
+      "name": "Cold War's new Wonder Weapons",
+      "definition": "The four main Wonder Weapon families introduced across Cold War's round-based maps.",
+      "family": "Wonder Weapons",
+      "difficulty": 2,
+      "tiles": [
+        "D.I.E. Shockwave",
+        "RAI K-84",
+        "CRBR-S",
+        "Chrysalax"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0083",
+      "name": "Items that create black holes",
+      "definition": "Weapons or devices that create a damaging singularity which pulls in zombies.",
+      "family": "Gameplay",
+      "difficulty": 3,
+      "tiles": [
+        "Gersh Device",
+        "LT53 Kazimir",
+        "Apothicon Servant",
+        "GKZ-45 Mk3"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist",
+        "pairing": "mixed"
+      }
+    },
+    {
+      "id": "0084",
+      "name": "Weapons that revive teammates",
+      "definition": "Weapons that can revive downed allies, sometimes after an upgrade or through a secondary ability.",
+      "family": "Weapons",
+      "difficulty": 3,
+      "tiles": [
+        "Ballistic Knife",
+        "Sekhmet's Vigor",
+        "Scepter of Ra",
+        "Ragnarok DG-5"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0085",
+      "name": "Melee Wonder Weapons",
+      "definition": "Wonder Weapons with a dedicated melee form, including named elemental swords.",
+      "family": "Wonder Weapons",
+      "difficulty": 2,
+      "tiles": [
+        "Chrysalax Savager",
+        "Apothicon Sword",
+        "Caliburn",
+        "Durendal",
+        "Balmung",
+        "Solais",
+        "Jotunn Star"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "weapon-class"
+      }
+    },
+    {
+      "id": "0086",
+      "name": "Chaos Specialist Weapons",
+      "definition": "The four Specialist Weapons selectable in Black Ops 4's Chaos maps.",
+      "family": "Weapons",
+      "difficulty": 2,
+      "tiles": [
+        "Chakrams of Vengeance",
+        "Hammer of Valhalla",
+        "Scepter of Ra",
+        "Viper and Dragon"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0087",
+      "name": "Aether Specialist Weapons",
+      "definition": "The four Specialist Weapons selectable in Black Ops 4's Aether maps.",
+      "family": "Weapons",
+      "difficulty": 2,
+      "tiles": [
+        "Hellfire",
+        "Overkill",
+        "Path of Sorrows",
+        "Ragnarok DG-5"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0088",
+      "name": "Pack-a-Punch grants dual wield",
+      "definition": "Weapons that change from single to dual wield through Pack-a-Punch itself, without an Akimbo attachment.",
+      "family": "Weapons",
+      "difficulty": 3,
+      "tiles": [
+        "M1911",
+        "HS10",
+        "PM63",
+        "MR6",
+        "Bloodhound",
+        "Welling"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0089",
+      "name": "Handguns with explosive Pack-a-Punch upgrades",
+      "definition": "Handguns that gain grenade-style explosive shots after Pack-a-Punch.",
+      "family": "Weapons",
+      "difficulty": 2,
+      "tiles": [
+        "M1911",
+        "MR6",
+        "Bloodhound",
+        "Welling",
+        "GS45"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0090",
+      "name": "Classic wall-buy melee weapons",
+      "definition": "Melee upgrades bought directly from a wall in classic Treyarch Zombies.",
+      "family": "Weapons",
+      "difficulty": 1,
+      "tiles": [
+        "Bowie Knife",
+        "Sickle",
+        "Galvaknuckles"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "weapon-class"
+      }
+    },
+    {
+      "id": "0091",
+      "name": "BO3 assault rifles",
+      "definition": "Conventional assault rifles available in BO3 Zombies's original weapon pool.",
+      "family": "Weapons",
+      "difficulty": 2,
+      "tiles": [
+        "KN-44",
+        "ICR-1",
+        "HVK-30",
+        "Man-O-War",
+        "M8A7",
+        "Sheiva"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "weapon-class"
+      }
+    },
+    {
+      "id": "0092",
+      "name": "The Blundergat family",
+      "definition": "The Blundergat and its Acidgat, Magmagat, and Sundergat conversions.",
+      "family": "Wonder Weapons",
+      "difficulty": 2,
+      "tiles": [
+        "Blundergat",
+        "Acidgat",
+        "Magmagat",
+        "Sundergat"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "Blundergat names",
+        "words": [
+          "gat"
+        ]
+      }
+    },
+    {
+      "id": "0093",
+      "name": "Classic starting handguns",
+      "definition": "Default starting handguns from World at War through Black Ops 4, excluding optional loadout choices and quest rewards.",
+      "family": "Weapons",
+      "difficulty": 2,
+      "tiles": [
+        "M1911",
+        "Mauser C96",
+        "Bloodhound",
+        "MR6",
+        "Welling"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "weapon-class"
+      }
+    },
+    {
+      "id": "0094",
+      "name": "Perk names containing drinks",
+      "definition": "Perk names containing the name of a drink, such as cola, wine, or macchiato.",
+      "family": "Perks",
+      "difficulty": 2,
+      "tiles": [
+        "Speed Cola",
+        "Double Tap Root Beer",
+        "Deadshot Daiquiri",
+        "Tombstone Soda",
+        "Widow's Wine",
+        "Melee Macchiato",
+        "Wisp Tea"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "Drinks",
+        "words": [
+          "cola",
+          "root beer",
+          "daiquiri",
+          "soda",
+          "wine",
+          "macchiato",
+          "tea"
+        ]
+      }
+    },
+    {
+      "id": "0095",
+      "name": "BO3 Classic GobbleGums",
+      "definition": "GobbleGums classified as Classic in BO3, where they are reusable rather than limited Mega stock.",
+      "family": "GobbleGums",
+      "difficulty": 2,
+      "tiles": [
+        "Always Done Swiftly",
+        "Arms Grace",
+        "Coagulant",
+        "In Plain Sight",
+        "Stock Option",
+        "Sword Flay",
+        "Anywhere But Here!",
+        "Alchemical Antithesis"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0096",
+      "name": "BO3 Ultra-Rare Mega GobbleGums",
+      "definition": "GobbleGums explicitly classified Ultra-Rare Mega in BO3.",
+      "family": "GobbleGums",
+      "difficulty": 3,
+      "tiles": [
+        "Perkaholic",
+        "Killing Time",
+        "Head Drama",
+        "Secret Shopper",
+        "Shopping Free",
+        "Near Death Experience",
+        "Reign Drops"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0097",
+      "name": "Black Ops 3 Whimsical GobbleGums",
+      "definition": "The four cosmetic Whimsical GobbleGums in Black Ops 3.",
+      "family": "GobbleGums",
+      "difficulty": 2,
+      "tiles": [
+        "Newtonian Negation",
+        "Eye Candy",
+        "Tone Death",
+        "Projectile Vomiting"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0098",
+      "name": "GobbleGum names about money",
+      "definition": "GobbleGum names containing a financial term or payment method.",
+      "family": "GobbleGums",
+      "difficulty": 2,
+      "tiles": [
+        "Stock Option",
+        "Profit Sharing",
+        "Extra Credit",
+        "Gift Card"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "Money",
+        "words": [
+          "stock",
+          "profit",
+          "credit",
+          "gift"
+        ]
+      }
+    },
+    {
+      "id": "0099",
+      "name": "Elixirs that revive other players",
+      "definition": "BO4 Elixirs whose direct effect revives a downed teammate; Join the Party also respawns spectators. Teleportation alone is excluded.",
+      "family": "Elixirs",
+      "difficulty": 3,
+      "tiles": [
+        "Phoenix Up",
+        "Near Death Experience",
+        "Join the Party"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0100",
+      "name": "Maps with playable Victis",
+      "definition": "Maps where Misty, Marlton, Samuel, and Russman are the playable crew.",
+      "family": "Maps",
+      "difficulty": 1,
+      "tiles": [
+        "TranZit",
+        "Die Rise",
+        "Buried",
+        "Tag der Toten"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0101",
+      "name": "Chaos story maps",
+      "definition": "The four Black Ops 4 maps in the Chaos storyline.",
+      "family": "Maps",
+      "difficulty": 1,
+      "tiles": [
+        "Voyage of Despair",
+        "IX",
+        "Dead of the Night",
+        "Ancient Evil"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0102",
+      "name": "Maps containing Nacht der Untoten",
+      "definition": "Maps that include Nacht's bunker or a recognisable recreation of part of it.",
+      "family": "Maps",
+      "difficulty": 3,
+      "tiles": [
+        "TranZit",
+        "Revelations",
+        "Die Maschine"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0103",
+      "name": "Maps with swimming",
+      "definition": "Maps where players can enter deep water and actively swim.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Zetsubou No Shima",
+        "Voyage of Despair",
+        "Terminus"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "trait"
+      }
+    },
+    {
+      "id": "0104",
+      "name": "Maps with ziplines or ascenders",
+      "definition": "Maps with usable ziplines or powered ascenders. Gondolas and enclosed cable cars are excluded.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Shi No Numa",
+        "Call of the Dead",
+        "Zetsubou No Shima",
+        "Tag der Toten",
+        "Mauer der Toten",
+        "Forsaken",
+        "Liberty Falls",
+        "Terminus",
+        "Shattered Veil",
+        "Ashes of the Damned",
+        "Ashwood",
+        "Totenreich"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0105",
+      "name": "Maps with low gravity",
+      "definition": "Maps with playable areas where low or zero gravity changes your jumps.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Moon",
+        "Der Eisendrache",
+        "Revelations",
+        "Reckoning",
+        "Astra Malorum",
+        "Mars"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "trait"
+      }
+    },
+    {
+      "id": "0106",
+      "name": "Maps with land vehicles",
+      "definition": "Round-based maps where players can travel aboard a bus, tank, or truck.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "TranZit",
+        "Origins",
+        "Ashes of the Damned"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "trait"
+      }
+    },
+    {
+      "id": "0107",
+      "name": "Maps with special player transformations",
+      "definition": "Maps with a unique alternate player form: Afterlife, Beast, or Spider Bait.",
+      "family": "Maps",
+      "difficulty": 3,
+      "tiles": [
+        "Mob of the Dead",
+        "Shadows of Evil",
+        "Zetsubou No Shima"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0108",
+      "name": "Maps with four Wonder Weapon variants",
+      "definition": "Maps where one Wonder Weapon family has four distinct upgrade paths or variants.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Origins",
+        "Der Eisendrache",
+        "Ancient Evil",
+        "Alpha Omega",
+        "Die Maschine",
+        "Citadelle des Morts"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0109",
+      "name": "Maps with buildable Wonder Weapons",
+      "definition": "Maps where a main Wonder Weapon can be assembled from collected parts.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "TranZit",
+        "Die Rise",
+        "Origins",
+        "Shadows of Evil",
+        "Zetsubou No Shima",
+        "Terminus",
+        "Liberty Falls",
+        "The Tomb",
+        "Totenreich"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0110",
+      "name": "Maps at real US landmarks",
+      "definition": "Maps set at Alcatraz or the Pentagon.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Five",
+        "Classified",
+        "Mob of the Dead",
+        "Blood of the Dead"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "trait"
+      }
+    },
+    {
+      "id": "0111",
+      "name": "Maps set in Russia",
+      "definition": "Maps set in territory that is part of modern-day Russia.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Call of the Dead",
+        "Gorod Krovi",
+        "Tag der Toten"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "trait"
+      }
+    },
+    {
+      "id": "0112",
+      "name": "Maps that introduced a Black Ops 2 perk",
+      "definition": "The maps that debuted Tombstone Soda, Who's Who, Electric Cherry, or Vulture Aid.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "TranZit",
+        "Die Rise",
+        "Mob of the Dead",
+        "Buried"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0113",
+      "name": "Maps with soul-fed creature heads",
+      "definition": "Maps where feeding zombies to fixed dog or dragon heads unlocks equipment.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Mob of the Dead",
+        "Blood of the Dead",
+        "Der Eisendrache"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "trait"
+      }
+    },
+    {
+      "id": "0114",
+      "name": "Maps with rocket launches",
+      "definition": "Maps with a rocket launch during gameplay or the main quest.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Ascension",
+        "Moon",
+        "Der Eisendrache",
+        "Ashes of the Damned"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "trait"
+      }
+    },
+    {
+      "id": "0115",
+      "name": "Maps with player-triggered time travel",
+      "definition": "Maps where gameplay or a quest lets players travel to another point in time.",
+      "family": "Maps",
+      "difficulty": 3,
+      "tiles": [
+        "Shangri-La",
+        "Buried",
+        "Der Eisendrache",
+        "Paradox Junction"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0116",
+      "name": "Maps with teddy-bear song activators",
+      "definition": "Maps where interacting with three teddy bears activates a hidden song.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Moon",
+        "TranZit",
+        "Die Rise",
+        "Buried",
+        "Der Eisendrache",
+        "Revelations"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0117",
+      "name": "Maps with Element 115 song stones",
+      "definition": "Maps where interacting with three Element 115 stones activates a hidden song.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Kino der Toten",
+        "Call of the Dead",
+        "Shangri-La",
+        "Origins"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0118",
+      "name": "Maps with bottle-activated songs",
+      "definition": "Maps where interacting with three bottles activates a hidden song.",
+      "family": "Maps",
+      "difficulty": 3,
+      "tiles": [
+        "Mob of the Dead",
+        "Gorod Krovi",
+        "Classified"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0119",
+      "name": "Maps with Fire Pit traps",
+      "definition": "Maps featuring the Fire Pit flamethrower trap. Ordinary lava, handheld weapons and other fire-trap designs are excluded.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Kino der Toten",
+        "Ascension",
+        "Dead of the Night"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0120",
+      "name": "Maps with moving Pack-a-Punch",
+      "definition": "Maps where Pack-a-Punch changes position during a match, including machines carried by elevators or vehicles.",
+      "family": "Maps",
+      "difficulty": 3,
+      "tiles": [
+        "Call of the Dead",
+        "Die Rise",
+        "Der Eisendrache",
+        "Voyage of Despair",
+        "Blood of the Dead",
+        "Tag der Toten",
+        "Ashes of the Damned",
+        "Terminus",
+        "The Tomb"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0121",
+      "name": "Maps with zombie dance Easter eggs",
+      "definition": "Maps with a hidden side quest featuring a zombie dance or nightclub scene.",
+      "family": "Maps",
+      "difficulty": 3,
+      "tiles": [
+        "Die Maschine",
+        "Firebase Z",
+        "Mauer der Toten",
+        "Liberty Falls"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0122",
+      "name": "Enemies that steal from you",
+      "definition": "Enemies that steal weapons, perks, points, or power-ups.",
+      "family": "Enemies",
+      "difficulty": 2,
+      "tiles": [
+        "Pentagon Thief",
+        "Space Monkey",
+        "Zombie Monkey",
+        "Astronaut Zombie",
+        "Ghost"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "trait"
+      }
+    },
+    {
+      "id": "0123",
+      "name": "Enemies with explosive deaths",
+      "definition": "Enemies that can release a harmful explosion or gas burst when killed.",
+      "family": "Enemies",
+      "difficulty": 2,
+      "tiles": [
+        "Napalm Zombie",
+        "Nova 6 Crawler",
+        "Plaguehound",
+        "Tormentor",
+        "Doppelghast",
+        "Toxic Zombie",
+        "Rad-Hound"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "trait"
+      }
+    },
+    {
+      "id": "0124",
+      "name": "Insect-like or spider-like enemies",
+      "definition": "Enemy types with a recognisably insect-like or spider-like body.",
+      "family": "Enemies",
+      "difficulty": 2,
+      "tiles": [
+        "Spider",
+        "Parasite",
+        "Vermin",
+        "Deathspinner",
+        "Web Mother"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "Bugs and spiders",
+        "words": [
+          "spider",
+          "parasite",
+          "vermin",
+          "spinner",
+          "web"
+        ]
+      }
+    },
+    {
+      "id": "0125",
+      "name": "Enemies with ranged attacks",
+      "definition": "Enemies that can attack from a distance using fired or thrown projectiles.",
+      "family": "Enemies",
+      "difficulty": 2,
+      "tiles": [
+        "Mangler",
+        "Panzersoldat",
+        "Krasny Soldat",
+        "Valkyrie Drone",
+        "Stoker",
+        "Gladiator",
+        "O.S.C.A.R.",
+        "Uber Klaus"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "trait"
+      }
+    },
+    {
+      "id": "0126",
+      "name": "Enemies that change into other enemies",
+      "definition": "Enemies that can evolve or split into another named enemy type during gameplay.",
+      "family": "Enemies",
+      "difficulty": 3,
+      "tiles": [
+        "Megaton",
+        "Vermin",
+        "Doppelghast"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0127",
+      "name": "Special-round enemies",
+      "definition": "Enemies featured in dedicated rounds that reward Max Ammo when cleared.",
+      "family": "Enemies",
+      "difficulty": 2,
+      "tiles": [
+        "Hellhound",
+        "Space Monkey",
+        "Pentagon Thief",
+        "Jumping Jack",
+        "Spider",
+        "Parasite",
+        "Valkyrie Drone",
+        "Plaguehound",
+        "Vermin",
+        "Kommando Klaus",
+        "Rad-Hound",
+        "Necropincer"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0128",
+      "name": "Enemy types introduced in Black Ops 1",
+      "definition": "Distinct enemy types that first appeared in Black Ops 1 Zombies.",
+      "family": "Enemies",
+      "difficulty": 2,
+      "tiles": [
+        "Nova 6 Crawler",
+        "Pentagon Thief",
+        "Space Monkey",
+        "Napalm Zombie",
+        "Shrieker Zombie",
+        "Zombie Monkey",
+        "Astronaut Zombie",
+        "Phasing Zombie"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0129",
+      "name": "Enemy types introduced in Black Ops 2",
+      "definition": "Distinct enemy types that first appeared in Black Ops 2 Zombies.",
+      "family": "Enemies",
+      "difficulty": 2,
+      "tiles": [
+        "Avogadro",
+        "Denizen",
+        "Jumping Jack",
+        "Brutus",
+        "Ghost",
+        "Panzersoldat"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0130",
+      "name": "Chaos enemy types",
+      "definition": "Distinct enemy types encountered in Black Ops 4's Chaos maps.",
+      "family": "Enemies",
+      "difficulty": 2,
+      "tiles": [
+        "Stoker",
+        "Blightfather",
+        "Gegenees",
+        "Werewolf",
+        "Nosferatu",
+        "Catalyst Zombie",
+        "Tiger",
+        "Gladiator"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0131",
+      "name": "Timed power-ups",
+      "definition": "Power-ups that grant a temporary buff or weapon in at least one Zombies game.",
+      "family": "Gameplay",
+      "difficulty": 1,
+      "tiles": [
+        "Double Points",
+        "Insta-Kill",
+        "Fire Sale",
+        "Bonfire Sale",
+        "Death Machine",
+        "Zombie Blood"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "function",
+        "pairing": "effects"
+      }
+    },
+    {
+      "id": "0132",
+      "name": "Instant-effect power-ups",
+      "definition": "Power-ups that immediately award points, refill a resource, repair barriers, or kill enemies.",
+      "family": "Gameplay",
+      "difficulty": 1,
+      "tiles": [
+        "Max Ammo",
+        "Nuke",
+        "Carpenter",
+        "Bonus Points",
+        "Full Power",
+        "Max Armor"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "function",
+        "pairing": "effects"
+      }
+    },
+    {
+      "id": "0133",
+      "name": "Effects that reduce purchase prices",
+      "definition": "Power-ups or consumables that make purchases cheaper or free.",
+      "family": "Gameplay",
+      "difficulty": 3,
+      "tiles": [
+        "Fire Sale",
+        "Bonfire Sale",
+        "Shopping Free",
+        "Wall to Wall Clearance"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "Discounts",
+        "words": [
+          "sale",
+          "shopping",
+          "clearance"
+        ],
+        "pairing": "effects"
+      }
+    },
+    {
+      "id": "0134",
+      "name": "Effects triggered by a melee hit",
+      "definition": "Perks or consumables that damage, stun, or freeze nearby zombies when they hit you.",
+      "family": "Gameplay",
+      "difficulty": 3,
+      "tiles": [
+        "Widow's Wine",
+        "Winter's Wail",
+        "Burned Out"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist",
+        "pairing": "effects"
+      }
+    },
+    {
+      "id": "0135",
+      "name": "Effects that turn zombies into allies",
+      "definition": "Ammo effects or consumables that turn hostile zombies into temporary allies.",
+      "family": "Gameplay",
+      "difficulty": 3,
+      "tiles": [
+        "Turned",
+        "Brain Rot",
+        "CTRL-Z",
+        "Turncoat"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "function",
+        "pairing": "effects"
+      }
+    },
+    {
+      "id": "0136",
+      "name": "Cold War Field Upgrades",
+      "definition": "The Field Upgrades available in Cold War Zombies, including post-launch additions.",
+      "family": "Gameplay",
+      "difficulty": 2,
+      "tiles": [
+        "Frost Blast",
+        "Energy Mine",
+        "Aether Shroud",
+        "Healing Aura",
+        "Ring of Fire",
+        "Frenzied Guard",
+        "Toxic Growth",
+        "Tesla Storm"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "pairing": "effects"
+      }
+    },
+    {
+      "id": "0137",
+      "name": "Black Ops 3 alternate ammo effects",
+      "definition": "The five alternate ammo effects obtained by Pack-a-Punching an upgraded weapon in Black Ops 3.",
+      "family": "Gameplay",
+      "difficulty": 2,
+      "tiles": [
+        "Blast Furnace",
+        "Dead Wire",
+        "Turned",
+        "Thunder Wall",
+        "Fire Works"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "pairing": "effects"
+      }
+    },
+    {
+      "id": "0138",
+      "name": "Original Jet Gun components",
+      "definition": "The four component types used to construct the BO2 TranZit Jet Gun.",
+      "family": "Quests",
+      "difficulty": 2,
+      "tiles": [
+        "Jet Engine",
+        "Handbrake",
+        "Wires",
+        "Pressure Gauge"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "Machine parts",
+        "words": [
+          "engine",
+          "brake",
+          "wire",
+          "gauge"
+        ]
+      }
+    },
+    {
+      "id": "0139",
+      "name": "Liberty Falls Jet Gun parts",
+      "definition": "The three components used to build the Jet Gun in Liberty Falls.",
+      "family": "Quests",
+      "difficulty": 2,
+      "tiles": [
+        "Water Pressure Gauge",
+        "Handbrake",
+        "Electrical Wires"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "Machine parts",
+        "words": [
+          "engine",
+          "brake",
+          "wire",
+          "gauge"
+        ]
+      }
+    },
+    {
+      "id": "0140",
+      "name": "TranZit buildables",
+      "definition": "Devices or equipment assembled from parts in the original TranZit.",
+      "family": "Gameplay",
+      "difficulty": 2,
+      "tiles": [
+        "Turbine",
+        "Zombie Shield",
+        "Turret",
+        "Electric Trap",
+        "Thrustodyne Aeronautics Model 23",
+        "NAV Table"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "pairing": "equipment"
+      }
+    },
+    {
+      "id": "0141",
+      "name": "Buried buildables",
+      "definition": "The four portable buildable devices available in Buried.",
+      "family": "Gameplay",
+      "difficulty": 2,
+      "tiles": [
+        "Turbine",
+        "Trample Steam",
+        "Head Chopper",
+        "Subsurface Resonator"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "pairing": "equipment"
+      }
+    },
+    {
+      "id": "0142",
+      "name": "Ways past the four-perk limit",
+      "definition": "Items and GobbleGums that grant extra perk slots or bypass the four-perk limit in classic Zombies.",
+      "family": "Gameplay",
+      "difficulty": 3,
+      "tiles": [
+        "Unquenchable",
+        "Soda Fountain",
+        "Perkaholic",
+        "On the House",
+        "Reign Drops",
+        "Empty Perk Bottle"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist",
+        "pairing": "effects"
+      }
+    },
+    {
+      "id": "0143",
+      "name": "Ways to recover lost weapons",
+      "definition": "Effects that can restore weapons lost through downing or bleeding out. Mule Kick refers to Cold War's tier-V recovery effect.",
+      "family": "Gameplay",
+      "difficulty": 3,
+      "tiles": [
+        "Arms Grace",
+        "Tombstone Soda",
+        "Mule Kick"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist",
+        "pairing": "effects"
+      }
+    },
+    {
+      "id": "0144",
+      "name": "Ways to revive your own body",
+      "definition": "Mechanics that let you control a separate form to revive your downed body. Tombstone Soda uses its Cold War effect.",
+      "family": "Gameplay",
+      "difficulty": 3,
+      "tiles": [
+        "Afterlife",
+        "Who's Who",
+        "Tombstone Soda"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist",
+        "pairing": "effects"
+      }
+    },
+    {
+      "id": "0145",
+      "name": "Maps introduced in Black Ops 7",
+      "definition": "The six full story maps first released in Black Ops 7. Separate Survival maps are excluded.",
+      "family": "Maps",
+      "difficulty": 1,
+      "tiles": [
+        "Ashes of the Damned",
+        "Astra Malorum",
+        "Paradox Junction",
+        "Totenreich",
+        "Kowakujō",
+        "Rex Infernus"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0146",
+      "name": "Black Ops 7 Survival maps",
+      "definition": "The smaller arenas released as separate Survival maps in Black Ops 7, rather than Starting Room restrictions.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Vandorn Farm",
+        "Exit 115",
+        "Zarya Cosmodrome",
+        "Mars",
+        "Ashwood",
+        "Nuked",
+        "Eidskallen Lighthouse",
+        "Tenshu"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0147",
+      "name": "Black Ops 7's story crew",
+      "definition": "The eight dedicated story characters in Black Ops 7, including its versions of the original quartet.",
+      "family": "Characters",
+      "difficulty": 1,
+      "tiles": [
+        "Grigori Weaver",
+        "Elizabeth Grey",
+        "Mackenzie Carver",
+        "Maya Aguinaldo",
+        "Tank Dempsey",
+        "Nikolai Belinski",
+        "Takeo Masaki",
+        "Edward Richtofen"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0148",
+      "name": "Wonder Weapons introduced in Black Ops 7",
+      "definition": "Wonder Weapon families that first appeared in Black Ops 7.",
+      "family": "Wonder Weapons",
+      "difficulty": 2,
+      "tiles": [
+        "Necrofluid Gauntlet",
+        "LGM-1",
+        "Jotunn Star",
+        "Nekomancer",
+        "Warden's Blight"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0149",
+      "name": "Enemy types introduced in Black Ops 7",
+      "definition": "Distinct special, elite, or named enemy types that first appeared in Black Ops 7.",
+      "family": "Enemies",
+      "difficulty": 2,
+      "tiles": [
+        "Ravager",
+        "Zursa",
+        "O.S.C.A.R.",
+        "Rad-Hound",
+        "Necropincer",
+        "Oni",
+        "Scorched Zombie",
+        "Deathspinner",
+        "Web Mother"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0150",
+      "name": "Black Ops 7 Ammo Mods",
+      "definition": "Ammo Mods available in Black Ops 7 Zombies, including post-launch returns.",
+      "family": "Gameplay",
+      "difficulty": 2,
+      "tiles": [
+        "Fire Works",
+        "Brain Rot",
+        "Napalm Burst",
+        "Shadow Rift",
+        "Dead Wire",
+        "Cryo Freeze",
+        "Light Mend",
+        "Shatter Blast"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "pairing": "effects"
+      }
+    },
+    {
+      "id": "0151",
+      "name": "Black Ops 7 Field Upgrades",
+      "definition": "Field Upgrades available in Black Ops 7 Zombies, including post-launch additions.",
+      "family": "Gameplay",
+      "difficulty": 2,
+      "tiles": [
+        "Toxic Growth",
+        "Dark Flare",
+        "Healing Aura",
+        "Frenzied Guard",
+        "Energy Mine",
+        "Aether Shroud",
+        "Tesla Storm",
+        "Frost Blast",
+        "Mister Peeks",
+        "Wild Fire"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "pairing": "effects"
+      }
+    },
+    {
+      "id": "0152",
+      "name": "Ashes of the Damned locations",
+      "definition": "Named major areas within the full Ashes of the Damned map. A location can also have its own separate Survival version.",
+      "family": "Lore",
+      "difficulty": 2,
+      "tiles": [
+        "Janus Towers Plaza",
+        "Vandorn Farm",
+        "Blackwater Lake",
+        "Ashwood",
+        "Exit 115",
+        "Zarya Cosmodrome"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0153",
+      "name": "Black Ops 7's hidden songs",
+      "definition": "The main hidden vocal songs in Black Ops 7's six full story maps.",
+      "family": "Music",
+      "difficulty": 2,
+      "tiles": [
+        "Turn to Ashes",
+        "Magic",
+        "Come Back Down",
+        "No One There",
+        "Evencry",
+        "All We Are"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0154",
+      "name": "Nuketown-based maps",
+      "definition": "Zombies maps built around Nuketown's recognisable test-site layout.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Nuketown Zombies",
+        "Alpha Omega",
+        "Paradox Junction"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "trait"
+      }
+    },
+    {
+      "id": "0155",
+      "name": "Maps with lighthouses",
+      "definition": "Full Zombies maps with a prominent lighthouse in the playable area.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "Call of the Dead",
+        "Tag der Toten",
+        "Totenreich"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "trait"
+      }
+    },
+    {
+      "id": "0156",
+      "name": "Maps with lava",
+      "definition": "Maps with environmental lava that can damage players, including the separate Town Survival map.",
+      "family": "Maps",
+      "difficulty": 2,
+      "tiles": [
+        "TranZit",
+        "Town",
+        "Kowakujō"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar",
+        "reasoning": "trait"
+      }
+    },
+    {
+      "id": "0157",
+      "name": "Effects that summon companions",
+      "definition": "Perks, GobbleGums, or Field Upgrades that summon a friendly companion as a base effect.",
+      "family": "Gameplay",
+      "difficulty": 3,
+      "tiles": [
+        "Blood Wolf Bite",
+        "Wisp Tea",
+        "Hellping Hound",
+        "Mister Peeks"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist",
+        "pairing": "effects"
+      }
+    },
+    {
+      "id": "0158",
+      "name": "Effects that burn nearby zombies",
+      "definition": "Perk, Elixir, GobbleGum or Field Upgrade effects that set nearby zombies alight.",
+      "family": "Gameplay",
+      "difficulty": 3,
+      "tiles": [
+        "Burned Out",
+        "Blaze Phase",
+        "Wild Fire"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "name",
+        "theme": "Fire",
+        "words": [
+          "burn",
+          "blaze",
+          "fire"
+        ],
+        "pairing": "effects"
+      }
+    },
+    {
+      "id": "0159",
+      "name": "Effects triggered by reloading",
+      "definition": "Perks or GobbleGums that damage nearby enemies when you reload. Elemental Pop uses its upgraded or augmented effect.",
+      "family": "Gameplay",
+      "difficulty": 3,
+      "tiles": [
+        "Electric Cherry",
+        "Electric Burst",
+        "Elemental Pop",
+        "Explosive Flourish"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist",
+        "pairing": "effects"
+      }
+    },
+    {
+      "id": "0160",
+      "name": "Weapons with returning projectiles",
+      "definition": "Weapons whose projectiles can return to the user, either automatically or when recalled.",
+      "family": "Weapons",
+      "difficulty": 3,
+      "tiles": [
+        "Hell's Retriever",
+        "Chakrams of Vengeance",
+        "Necrofluid Gauntlet"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0161",
+      "name": "Creature-based Wonder Weapons",
+      "definition": "Wonder Weapons that are creatures or use a creature's body as the weapon.",
+      "family": "Wonder Weapons",
+      "difficulty": 3,
+      "tiles": [
+        "Apothicon Servant",
+        "Death of Orion",
+        "Nekomancer"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0162",
+      "name": "GobbleGums introduced in Black Ops 7",
+      "definition": "GobbleGum names that first appeared in Black Ops 7, including post-launch additions.",
+      "family": "GobbleGums",
+      "difficulty": 2,
+      "tiles": [
+        "Requipment",
+        "Round Off",
+        "Armor Gettin'",
+        "Gift Card",
+        "Turncoat",
+        "Hellping Hound",
+        "Fully Packed"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "familiar"
+      }
+    },
+    {
+      "id": "0163",
+      "name": "Enemies you can become",
+      "definition": "Enemy types that players can directly control through Spider Bait or an Injection.",
+      "family": "Enemies",
+      "difficulty": 3,
+      "tiles": [
+        "Spider",
+        "Mangler",
+        "Disciple"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist"
+      }
+    },
+    {
+      "id": "0164",
+      "name": "Black Ops 7 Cursed Relics",
+      "definition": "Collectible Relics that modify matches in Black Ops 7's Cursed mode.",
+      "family": "Gameplay",
+      "difficulty": 3,
+      "tiles": [
+        "Teddy Bear",
+        "Focusing Stone",
+        "Spider Fang",
+        "Seed",
+        "Golden Spork",
+        "Samantha's Drawing",
+        "Vril Sphere",
+        "Dragon Wings",
+        "Lawyer's Pen",
+        "Blood Vials",
+        "Summoning Key",
+        "Mangler Helmet",
+        "Power Switch",
+        "Dancing Arnie",
+        "Gramophone",
+        "Film Reel"
+      ],
+      "researchLink": "",
+      "discovery": {
+        "method": "specialist",
+        "pairing": "equipment"
+      }
+    }
+  ],
+  "generationPolicy": "discovery-v3"
+};

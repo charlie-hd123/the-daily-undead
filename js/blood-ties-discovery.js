@@ -1,5 +1,5 @@
 // Editorial guidance, compiled into boards ahead of time. No AI runs in the game.
-export const BLOOD_TIES_DISCOVERY_VERSION = 3;
+export const BLOOD_TIES_DISCOVERY_VERSION = 4;
 export const BLOOD_TIES_DISCOVERY_METHODS = ['name', 'familiar', 'specialist'];
 export const BLOOD_TIES_REASONING_TYPES = ['function', 'trait', 'weapon-class'];
 
@@ -35,6 +35,7 @@ export function resolveBloodTiesTrioDiscovery(group) {
 const kind = group => ['Weapons', 'Wonder Weapons'].includes(group.family) ? 'Weapons'
   : ['GobbleGums', 'Elixirs'].includes(group.family) ? 'Consumables' : group.family;
 const approachable = group => group.discovery.method === 'name' || Boolean(group.discovery.reasoning);
+export const countBloodTiesApproachableGroups = groups => groups.filter(approachable).length;
 const words = text => normal(text).match(/[a-z]+/g)?.map(word => word.replace(/s$/, '')) || [];
 const generic = new Set(['map','with','that','have','enemy','enemie','type','weapon','wonder','introduced','black','zombie','playable','character']);
 function misleadingTraitName(group, other) {
@@ -80,7 +81,7 @@ export function inspectBloodTiesDiscovery(groups) {
   return {
     specialistGroups: groups.filter(g => g.discovery.method === 'specialist').length,
     nameGroups: nameGroups.length,
-    approachableGroups: groups.filter(approachable).length,
+    approachableGroups: countBloodTiesApproachableGroups(groups),
     literalGroups: groups.filter(isBloodTiesLiteralGroup).length,
     clueTiles: nameGroups.every(g => g.answers.every(t => bloodTiesClueTiles(g).includes(t))),
     finishes,

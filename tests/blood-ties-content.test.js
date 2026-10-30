@@ -55,7 +55,7 @@ test('compiled pool is reproducible and every category and tile participates in 
 
 test('three years preserve 14-day category and 7-day tile gaps, discoverable finishes and full category coverage', () => {
   const history = [], seen = new Set();
-  let relatedOpenings = 0, overlappingDays = 0, pairedDays = 0;
+  let relatedOpenings = 0, overlappingDays = 0, pairedDays = 0, clearerDays = 0;
   const start = Date.parse(`${catalogue.effectiveDate}T00:00:00Z`);
   for (let date = Math.max(Date.parse('2026-10-22T00:00:00Z'), start - 14 * 86400000); date < start; date += 86400000) {
     const p = buildDailyBloodTiesPuzzle(new Date(date).toISOString().slice(0,10));
@@ -70,6 +70,7 @@ test('three years preserve 14-day category and 7-day tile gaps, discoverable fin
     const discovery = inspectBloodTiesDiscovery(p.groups.map(g => ({ ...g, tiles:g.eligibleTiles })));
     assert.equal(passesBloodTiesDiscovery(discovery), true, date);
     if (discovery.isolatedGroups <= 1) relatedOpenings++;
+    if (discovery.approachableGroups >= 3) clearerDays++;
     if (hasBloodTiesCategoryPairs(p.groups)) pairedDays++;
     if (p.redHerrings.length > 0) overlappingDays++;
     for (const previous of history.slice(-14)) assert.ok(p.groups.every(g => !previous.groups.some(h => h.id === g.id)), date);
@@ -85,6 +86,8 @@ test('three years preserve 14-day category and 7-day tile gaps, discoverable fin
   assert.ok(pairedDays < 1096 * .95, 'Other structures must remain playable for variety and category coverage.');
   assert.ok(relatedOpenings > 1096 * .65, 'Most openings must require more than sorting distinct object types.');
   assert.ok(overlappingDays > 1096 * .5, 'Most days should offer a plausible competing membership, without forcing two overlaps.');
+  assert.ok(overlappingDays < 1096 * .7, 'The easier trial must offer more clean splits than the previous overlap-heavy schedule.');
+  assert.ok(clearerDays > 1096 * .2 && clearerDays < 1096 * .5, 'A meaningful minority of days should offer a third recognisable connection without making it mandatory.');
   const expected = JSON.stringify(buildDailyBloodTiesPuzzle('2026-10-25'));
   buildDailyBloodTiesPuzzle('2026-12-25').groups[0].answers.reverse();
   assert.equal(JSON.stringify(buildDailyBloodTiesPuzzle('2026-10-25')), expected);
@@ -108,7 +111,7 @@ test('content boundary preserves history and new puzzles cannot downgrade scorin
 });
 
 test('all shared content dependencies participate in the API release fingerprint', () => {
-  for (const name of ['blood-ties-core', 'blood-ties-boards', 'blood-ties-catalogue', 'blood-ties-catalogue-v1', 'blood-ties-legacy', 'blood-ties-content', 'blood-ties-fairness', 'blood-ties-discovery', 'blood-ties-v2', 'blood-ties-catalogue-v2', 'blood-ties-boards-v2', 'blood-ties-catalogue-v3', 'blood-ties-boards-v3']) {
+  for (const name of ['blood-ties-core', 'blood-ties-boards', 'blood-ties-catalogue', 'blood-ties-catalogue-v1', 'blood-ties-legacy', 'blood-ties-content', 'blood-ties-fairness', 'blood-ties-discovery', 'blood-ties-v2', 'blood-ties-catalogue-v2', 'blood-ties-boards-v2', 'blood-ties-catalogue-v3', 'blood-ties-boards-v3', 'blood-ties-catalogue-v4', 'blood-ties-boards-v4']) {
     assert.equal(isApiFile(`js/${name}.js`), true);
   }
 });
