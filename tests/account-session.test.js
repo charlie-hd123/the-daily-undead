@@ -11,6 +11,7 @@ import {
   pendingProgressBelongsTo,
   pendingMatchesCloud,
   pendingCoveredByCloud,
+  recommendedAccountSave,
   readPendingProgress,
   readRememberedAccount,
   rememberAccount,
@@ -97,6 +98,19 @@ test('cloud progress automatically covers an older prefix, regardless of stale l
   assert.equal(pendingCoveredByCloud(queuedDay(wordDay([])),{dailyState:wrongDay}),false);
   const wrongPuzzle=wordDay(['E']);wrongPuzzle.sessions.word.key='another-word';
   assert.equal(pendingCoveredByCloud(queuedDay(wordDay(['E'])),{dailyState:wrongPuzzle}),false);
+});
+
+test('save recommendations require strictly inclusive puzzle progress, never a larger round or score', () => {
+  const pending=queuedDay(wordDay(['E','G']));
+  const cloud={progress:{currentRound:50,score:9000},dailyState:wordDay(['E'])};
+  assert.equal(recommendedAccountSave(pending,cloud),'device');
+  pending.snapshot.dailyState=wordDay(['E']);cloud.dailyState=wordDay(['E','G']);
+  assert.equal(recommendedAccountSave(pending,cloud),'cloud');
+  pending.snapshot.dailyState=wordDay(['E','S']);
+  assert.equal(recommendedAccountSave(pending,cloud),null,'different histories cannot be ranked safely');
+  pending.snapshot.dailyState=wordDay(['E','G']);
+  assert.equal(recommendedAccountSave(pending,cloud),null,'identical actions need no recommendation');
+  assert.equal(recommendedAccountSave(pending,{dailyState:null}),null,'missing evidence cannot justify a highlighted choice');
 });
 
 test('new just-for-fun actions and independent Blood Ties transcripts still require a choice', () => {

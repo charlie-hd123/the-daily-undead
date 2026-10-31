@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261031-3";
+import { browserStorage } from "./browser-storage.js?v=20261031-5";
 import {
   accountMemoryStorageKey,
   archivePendingProgress,
@@ -10,11 +10,12 @@ import {
   readRememberedAccount,
   pendingMatchesCloud,
   pendingCoveredByCloud,
+  recommendedAccountSave,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261031-3";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261031-3";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261031-3";
+} from "./account-session.js?v=20261031-5";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261031-5";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261031-5";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -746,7 +747,7 @@ export async function initialiseAccount({
   try {
     clerk = await withTimeout(
       supabaseConfigured
-        ? import("./supabase-auth.js?v=20261031-3").then(({ loadSupabaseAuth }) => (
+        ? import("./supabase-auth.js?v=20261031-5").then(({ loadSupabaseAuth }) => (
           loadSupabaseAuth(documentObject)
         ))
         : loadClerk(publishableKey),
@@ -810,6 +811,15 @@ export async function initialiseAccount({
     openDialog(accountSignOutDialog);
   };
   const waitForConflictChoice = (pending, cloud) => new Promise((resolve) => {
+    const recommended = recommendedAccountSave(pending, cloud);
+    for (const [choice, button, label] of [
+      ['device', conflictDeviceButton, 'Use this device'],
+      ['cloud', conflictCloudButton, 'Use cloud save'],
+    ]) {
+      if (!button) continue;
+      button.classList.toggle('primary', recommended === choice);
+      button.textContent = recommended === choice ? `${label} (recommended)` : label;
+    }
     const deviceSummary = documentObject.querySelector('[data-conflict-device-summary]');
     const cloudSummary = documentObject.querySelector('[data-conflict-cloud-summary]');
     const accountSummary = documentObject.querySelector('[data-conflict-account-summary]');
@@ -835,6 +845,9 @@ export async function initialiseAccount({
     conflictCloudButton?.addEventListener('click', chooseCloud);
     conflictDialog?.addEventListener('cancel', (event) => event.preventDefault(), { once: true });
     openDialog(conflictDialog);
+    const focusTarget = recommended === 'device' ? conflictDeviceButton
+      : recommended === 'cloud' ? conflictCloudButton : conflictDialog?.querySelector('h2');
+    focusTarget?.focus({ preventScroll: true });
   });
 
   sessionLoginButton?.addEventListener("click", beginSignIn);

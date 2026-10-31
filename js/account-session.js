@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261031-3";
+import { browserStorage } from "./browser-storage.js?v=20261031-5";
 export const accountMemoryStorageKey = "the-daily-undead:account-memory";
 const pendingProgressStoragePrefix = "the-daily-undead:account-pending:";
 
@@ -197,6 +197,19 @@ export function pendingCoveredByCloud(pending, account) {
     return ['easter', 'word', 'blood'].every((type) => sessionCoveredByCloud(local.sessions?.[type], cloud?.sessions?.[type]));
   }
   return sessionCoveredByCloud(local, cloud);
+}
+
+export function recommendedAccountSave(pending, account) {
+  const local = pending?.snapshot?.dailyState;
+  const cloud = account?.dailyState;
+  if (!local || !cloud) return null;
+  const cloudCoversLocal = pendingCoveredByCloud(pending, account);
+  const localCoversCloud = pendingCoveredByCloud({
+    puzzleDate: pending.puzzleDate,
+    snapshot: { dailyState: cloud },
+  }, { dailyState: local });
+  if (cloudCoversLocal === localCoversCloud) return null;
+  return cloudCoversLocal ? 'cloud' : 'device';
 }
 
 export function describeAccountSave(date, snapshot) {
