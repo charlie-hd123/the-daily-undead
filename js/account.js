@@ -1,18 +1,19 @@
-import { browserStorage } from "./browser-storage.js?v=20261031-1";
+import { browserStorage } from "./browser-storage.js?v=20261031-2";
 import {
   accountMemoryStorageKey,
   archivePendingProgress,
   clearPendingProgress,
   createAccountMutationQueue,
+  describeAccountSave,
   forgetRememberedAccount,
   readPendingProgress,
   readRememberedAccount,
   pendingMatchesCloud,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261031-1";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261031-1";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261031-1";
+} from "./account-session.js?v=20261031-2";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261031-2";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261031-2";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -743,7 +744,7 @@ export async function initialiseAccount({
   try {
     clerk = await withTimeout(
       supabaseConfigured
-        ? import("./supabase-auth.js?v=20261031-1").then(({ loadSupabaseAuth }) => (
+        ? import("./supabase-auth.js?v=20261031-2").then(({ loadSupabaseAuth }) => (
           loadSupabaseAuth(documentObject)
         ))
         : loadClerk(publishableKey),
@@ -807,16 +808,10 @@ export async function initialiseAccount({
     openDialog(accountSignOutDialog);
   };
   const waitForConflictChoice = (pending, cloud) => new Promise((resolve) => {
-    const describe = (date, snapshot) => {
-      const progress = snapshot?.progress || {};
-      const state = snapshot?.dailyState;
-      const complete = state?.officialCompleted || state?.phase === 'result';
-      return `${date}: ${complete ? 'daily puzzle complete' : 'puzzle in progress'}. Score ${Number(progress.score || 0).toLocaleString('en-GB')}; ${Number(progress.solves || 0)} solves.`;
-    };
     const deviceSummary = documentObject.querySelector('[data-conflict-device-summary]');
     const cloudSummary = documentObject.querySelector('[data-conflict-cloud-summary]');
-    if (deviceSummary) deviceSummary.textContent = describe(pending.puzzleDate, pending.snapshot);
-    if (cloudSummary) cloudSummary.textContent = describe(pending.puzzleDate, cloud);
+    if (deviceSummary) deviceSummary.textContent = describeAccountSave(pending.puzzleDate, pending.snapshot);
+    if (cloudSummary) cloudSummary.textContent = describeAccountSave(pending.puzzleDate, cloud);
     const feedback = documentObject.querySelector('[data-conflict-feedback]');
     if (feedback) feedback.textContent = '';
     const choose = (choice) => {

@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261031-1";
+import { browserStorage } from "./browser-storage.js?v=20261031-2";
 export const accountMemoryStorageKey = "the-daily-undead:account-memory";
 const pendingProgressStoragePrefix = "the-daily-undead:account-pending:";
 
@@ -151,6 +151,31 @@ export function pendingMatchesCloud(pending, account) {
   if (!pending?.snapshot?.dailyState || !account?.dailyState) return false;
   return JSON.stringify(puzzleActions(pending.snapshot.dailyState))
     === JSON.stringify(puzzleActions(account.dailyState));
+}
+
+export function describeAccountSave(date, snapshot) {
+  const progress = snapshot?.progress || {};
+  const day = snapshot?.dailyState;
+  const type = day?.dayStateVersion === 1 ? day.officialType : 'easter';
+  const session = day?.dayStateVersion === 1 ? day.sessions?.[type] : day;
+  let detail = 'Puzzle not started.';
+  if (type === 'word' && session) {
+    detail = `Letters tried: ${session.guesses?.join(', ') || 'none'}.`;
+  } else if (type === 'blood' && session) {
+    detail = `${session.solved?.length || 0}/4 connections; ${session.attempts?.length || 0} attempts.`;
+    if (session.selected?.length) detail += ` Selected: ${session.selected.join(', ')}.`;
+    else if (session.attempts?.length) detail += ` Last trio: ${session.attempts.at(-1).join(', ')}.`;
+  } else if (type === 'easter' && session) {
+    detail = `${session.cluesRevealed || 1}/3 clues; ${session.phase === 'result'
+      ? session.isCorrect ? 'correct map' : 'incorrect map' : 'map not submitted'}.`;
+    if (session.bonusComplete || session.bonusFailed) detail += ` Bonus ${session.bonusComplete ? 'correct' : 'incorrect'}.`;
+  }
+  const complete = day?.officialCompleted || isLegacyComplete(day);
+  return `${date} · Round ${Math.max(1, Number(progress.currentRound || 1))} · Score ${Number(progress.score || 0).toLocaleString('en-GB')} · ${Number(progress.solves || 0)} solves. ${complete ? 'Daily puzzle complete. ' : ''}${detail}`;
+}
+
+function isLegacyComplete(state) {
+  return state?.phase === 'result' && (state.isCorrect === false || state.bonusComplete || state.bonusFailed);
 }
 
 export function archivePendingProgress(storage, pending) {

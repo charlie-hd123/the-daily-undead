@@ -6,6 +6,7 @@ import {
   archivePendingProgress,
   clearPendingProgress,
   createAccountMutationQueue,
+  describeAccountSave,
   forgetRememberedAccount,
   pendingProgressBelongsTo,
   pendingMatchesCloud,
@@ -72,6 +73,14 @@ test('choosing cloud can retain the rejected device snapshot as an account-isola
   assert.equal(archivePendingProgress(storage, pending), true);
   assert.deepEqual(JSON.parse(storage.getItem('the-daily-undead:account-pending:user_alpha:recovery:2026-10-30')), pending);
   assert.equal(storage.getItem('the-daily-undead:account-pending:user_beta:recovery:2026-10-30'), null);
+});
+
+test('save summaries distinguish different puzzle actions even when the account totals match', () => {
+  const make = (guesses) => ({progress:{score:160,solves:2,currentRound:1},dailyState:{dayStateVersion:1,officialType:'word',sessions:{word:{guesses}}}});
+  const device=describeAccountSave('2026-10-31',make(['G']));
+  const cloud=describeAccountSave('2026-10-31',make(['E']));
+  assert.match(device,/Letters tried: G/); assert.match(cloud,/Letters tried: E/);
+  assert.notEqual(device,cloud); assert.match(cloud,/Round 1 · Score 160 · 2 solves/);
 });
 
 test("remembered accounts retain only an app-owned account id and cloud revision", () => {
