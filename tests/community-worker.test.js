@@ -215,7 +215,7 @@ test("public profile lookups exclude profiles hidden from leaderboards", async (
   assert.match(query, /leaderboard_visible = 1/);
 });
 
-test("ordinary account saves cannot overwrite server-owned Score or Solves", async () => {
+test("ordinary account saves cannot overwrite server-owned Score, Solves or Round", async () => {
   const statements = [];
   const db = {
     prepare(sql) {
@@ -249,6 +249,7 @@ test("ordinary account saves cannot overwrite server-owned Score or Solves", asy
   assert.equal(response.status, 200);
   assert.doesNotMatch(statements[0].sql, /score\s*=/);
   assert.doesNotMatch(statements[0].sql, /total_rounds\s*=/);
+  assert.doesNotMatch(statements[0].sql, /\b(?:current_round|best_round|last_played_date)\s*=/);
 });
 
 test("signed-in Round reconstruction repairs a retrospectively protected date", async () => {
@@ -258,7 +259,7 @@ test("signed-in Round reconstruction repairs a retrospectively protected date", 
       return {
         bind(...bindings) {
           if (sql.startsWith("UPDATE player_saves")) {
-            return { run: async () => { updated = bindings; } };
+            return { run: async () => { updated = bindings; return { meta: { changes: 1 } }; } };
           }
           if (sql.startsWith("SELECT * FROM player_saves")) {
             return { first: async () => ({
@@ -289,7 +290,7 @@ test("signed-in Round reconstruction repairs a retrospectively protected date", 
     round_anchor_value: 38,
   }, "2026-09-30");
 
-  assert.deepEqual(updated, [39, 40, '2026-09-29', "user_1"]);
+  assert.deepEqual(updated, [39, 40, '2026-09-29', "user_1", 1]);
   assert.equal(result.current_round, 39);
   assert.equal(result.best_round, 40);
 });

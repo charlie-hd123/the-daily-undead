@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261031-2";
+import { browserStorage } from "./browser-storage.js?v=20261031-3";
 export const accountMemoryStorageKey = "the-daily-undead:account-memory";
 const pendingProgressStoragePrefix = "the-daily-undead:account-pending:";
 
@@ -153,8 +153,53 @@ export function pendingMatchesCloud(pending, account) {
     === JSON.stringify(puzzleActions(account.dailyState));
 }
 
+const sameActions = (left, right) => JSON.stringify(left) === JSON.stringify(right);
+const isPrefix = (older, newer) => Array.isArray(older) && Array.isArray(newer)
+  && older.length <= newer.length && older.every((action, index) => sameActions(action, newer[index]));
+
+function sessionCoveredByCloud(local, cloud) {
+  if (!local) return true;
+  if (!cloud) return local.puzzleKey
+    ? local.phase === 'clues' && (local.cluesRevealed || 1) === 1
+      && !local.selectedGameId && !local.selectedMapId && !local.bonusOrder?.length
+    : !local.complete && !(local.guesses?.length || local.attempts?.length || local.selected?.length);
+  if (local.puzzleKey) {
+    if (local.puzzleKey !== cloud.puzzleKey) return false;
+    const phases = ['clues', 'game', 'map', 'result'];
+    if (phases.indexOf(local.phase) > phases.indexOf(cloud.phase)) return false;
+    if ((local.cluesRevealed || 1) > (cloud.cluesRevealed || 1)) return false;
+    for (const key of ['selectedGameId', 'selectedMapId', 'lockedClues']) {
+      if (local[key] != null && local[key] !== cloud[key]) return false;
+    }
+    if (local.phase === 'result' && local.isCorrect !== cloud.isCorrect) return false;
+    if (local.bonusComplete && !cloud.bonusComplete || local.bonusFailed && !cloud.bonusFailed) return false;
+    return !local.bonusOrder?.length || sameActions(local.bonusOrder, cloud.bonusOrder);
+  }
+  if (local.key !== cloud.key || local.complete && !cloud.complete) return false;
+  if (Array.isArray(local.attempts)) {
+    if ((local.rulesVersion ?? 1) !== (cloud.rulesVersion ?? 1)) return false;
+    // Different transcripts/active selections remain an explicit choice. Never
+    // combine guesses or strikes from independent attempts.
+    return isPrefix(local.attempts, cloud.attempts || [])
+      && (!local.selected?.length || sameActions(local.selected, cloud.selected));
+  }
+  return isPrefix(local.guesses || [], cloud.guesses || []);
+}
+
+export function pendingCoveredByCloud(pending, account) {
+  const local = pending?.snapshot?.dailyState;
+  const cloud = account?.dailyState;
+  if (!local) return false;
+  if (local.dayStateVersion === 1) {
+    if (local.dateKey !== pending.puzzleDate) return false;
+    if (cloud && (cloud.dayStateVersion !== 1 || local.dateKey !== cloud.dateKey
+      || local.officialType !== cloud.officialType)) return false;
+    return ['easter', 'word', 'blood'].every((type) => sessionCoveredByCloud(local.sessions?.[type], cloud?.sessions?.[type]));
+  }
+  return sessionCoveredByCloud(local, cloud);
+}
+
 export function describeAccountSave(date, snapshot) {
-  const progress = snapshot?.progress || {};
   const day = snapshot?.dailyState;
   const type = day?.dayStateVersion === 1 ? day.officialType : 'easter';
   const session = day?.dayStateVersion === 1 ? day.sessions?.[type] : day;
@@ -171,7 +216,7 @@ export function describeAccountSave(date, snapshot) {
     if (session.bonusComplete || session.bonusFailed) detail += ` Bonus ${session.bonusComplete ? 'correct' : 'incorrect'}.`;
   }
   const complete = day?.officialCompleted || isLegacyComplete(day);
-  return `${date} · Round ${Math.max(1, Number(progress.currentRound || 1))} · Score ${Number(progress.score || 0).toLocaleString('en-GB')} · ${Number(progress.solves || 0)} solves. ${complete ? 'Daily puzzle complete. ' : ''}${detail}`;
+  return `${date} · ${complete ? 'Daily puzzle complete. ' : ''}${detail}`;
 }
 
 function isLegacyComplete(state) {

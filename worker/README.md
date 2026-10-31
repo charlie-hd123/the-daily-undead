@@ -35,6 +35,20 @@ All `/api/account` routes require a Clerk bearer token. The Worker verifies the 
 
 Account saves may include the last cloud revision seen by the browser. D1 increments the revision on every successful save and rejects stale revisions with `409`, preventing pending progress from one device from silently replacing newer progress saved on another device. A player can explicitly resolve that conflict in the browser before retrying.
 
+Save choices affect puzzle state only. Ordinary saves cannot write Score, Solves,
+Round, Highest Round or the participation date. Round and Highest Round are
+reconstructed immediately from the account's baseline, verified results and
+protected-date calendar; successful result responses include that reconstruction.
+New-account baselines precede their first puzzle, whereas imported baselines
+already include their anchor day's play. Reconstruction uses revision checks so
+an older read cannot overwrite a result received concurrently.
+
+The browser automatically loads a newer cloud puzzle when it contains every
+queued local action. It compares all puzzle sessions, including just-for-fun
+play, and retains a recovery copy. Different guess histories, Blood Ties attempts,
+active selections or bonus arrangements remain an explicit choice. Account
+totals are shown once in the dialog rather than presented as selectable saves.
+
 ## What counts and what is stored
 
 A Quest Steps play is recorded when the player confirms a map. A Last Words play is recorded when its answer is solved or its fifth miss is made. Visiting or refreshing does not create a new attempt, and the bonus order does not create a second Quest Steps attempt.

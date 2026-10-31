@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261031-2";
+import { browserStorage } from "./browser-storage.js?v=20261031-3";
 import {
   accountMemoryStorageKey,
   archivePendingProgress,
@@ -9,11 +9,12 @@ import {
   readPendingProgress,
   readRememberedAccount,
   pendingMatchesCloud,
+  pendingCoveredByCloud,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261031-2";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261031-2";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261031-2";
+} from "./account-session.js?v=20261031-3";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261031-3";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261031-3";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -607,6 +608,7 @@ export async function initialiseAccount({
   puzzleDate,
   getLocalSnapshot,
   applyRemoteAccount,
+  applyRemoteProgress = () => {},
   readOnlyProgress = false,
   documentObject = document,
 }) {
@@ -744,7 +746,7 @@ export async function initialiseAccount({
   try {
     clerk = await withTimeout(
       supabaseConfigured
-        ? import("./supabase-auth.js?v=20261031-2").then(({ loadSupabaseAuth }) => (
+        ? import("./supabase-auth.js?v=20261031-3").then(({ loadSupabaseAuth }) => (
           loadSupabaseAuth(documentObject)
         ))
         : loadClerk(publishableKey),
@@ -810,6 +812,9 @@ export async function initialiseAccount({
   const waitForConflictChoice = (pending, cloud) => new Promise((resolve) => {
     const deviceSummary = documentObject.querySelector('[data-conflict-device-summary]');
     const cloudSummary = documentObject.querySelector('[data-conflict-cloud-summary]');
+    const accountSummary = documentObject.querySelector('[data-conflict-account-summary]');
+    const progress = cloud?.progress || {};
+    if (accountSummary) accountSummary.textContent = `Round ${Math.max(1, Number(progress.currentRound || 1))} · Highest Round ${Number(progress.bestRound || 1)} · Score ${Number(progress.score || 0).toLocaleString('en-GB')} · ${Number(progress.solves || 0)} solves`;
     if (deviceSummary) deviceSummary.textContent = describeAccountSave(pending.puzzleDate, pending.snapshot);
     if (cloudSummary) cloudSummary.textContent = describeAccountSave(pending.puzzleDate, cloud);
     const feedback = documentObject.querySelector('[data-conflict-feedback]');
@@ -1039,11 +1044,12 @@ export async function initialiseAccount({
       pendingProgress.revision != null && pendingProgress.revision === cloudRevision;
     let useDeviceProgress = revisionsMatch;
     const alreadySynced = pendingMatchesCloud(pendingProgress, pendingCloud);
-    if (!revisionsMatch && !alreadySynced) {
+    const cloudCoversPending = alreadySynced || !revisionsMatch && pendingCoveredByCloud(pendingProgress, pendingCloud);
+    if (!revisionsMatch && !cloudCoversPending) {
       useDeviceProgress = await waitForConflictChoice(pendingProgress, pendingCloud) === "device";
     }
 
-    if (useDeviceProgress && !alreadySynced) {
+    if (useDeviceProgress && !cloudCoversPending) {
       try {
         const saveResult = await requestJson(clerk, apiUrl, "/api/account/save", {
           method: "PUT",
@@ -1073,6 +1079,7 @@ export async function initialiseAccount({
         });
       }
     } else {
+      if (!alreadySynced) archivePendingProgress(browserStorage, pendingProgress);
       clearPendingProgress(browserStorage, userId);
       pendingProgress = null;
     }
@@ -1393,6 +1400,7 @@ export async function initialiseAccount({
         if (deletingAccount) return;
         rememberAccount(browserStorage, { userId, revision: currentRevision });
         if (JSON.stringify(getLocalSnapshot()) === JSON.stringify(snapshot)) {
+          applyRemoteProgress(saveResult.progress);
           clearPendingProgress(browserStorage, userId);
         } else {
           // New input arrived during the request. Acknowledge only what was sent.
@@ -1433,6 +1441,7 @@ export async function initialiseAccount({
         currentRevision = Math.max(currentRevision, Number(result.progress?.revision || 0));
         if (deletingAccount) return null;
         rememberAccount(browserStorage, { userId, revision: currentRevision });
+        applyRemoteProgress(result.progress);
         scheduleSave();
         return result;
       } catch {

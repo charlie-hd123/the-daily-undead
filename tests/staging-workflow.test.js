@@ -19,7 +19,8 @@ import { workerMaps } from "../worker/src/generated-map-catalog.js";
 import { workerWords } from "../worker/src/generated-word-catalog.js";
 import { deleteAccount, isAccountRevoked, retryAuthDeletions } from "../worker/src/account-deletion.js";
 import { retryAuthProfileSync, syncAuthProfile } from "../worker/src/auth-profile-sync.js";
-import { getAccount, saveAccount, recordVerifiedMapResult, recordVerifiedWordResult, recordVerifiedBloodResult } from '../worker/src/accounts.js';
+import { getAccount, getPublicProfile, registerAccount, reconstructRound, saveAccount, recordVerifiedMapResult, recordVerifiedWordResult, recordVerifiedBloodResult } from '../worker/src/accounts.js';
+import { readLeaderboards } from '../worker/src/leaderboards.js';
 import { buildDailyBloodTiesPuzzle } from '../js/blood-ties-core.js';
 import { prepareMissedDayProgress } from '../js/progression.js';
 
@@ -543,4 +544,89 @@ test('recovery verifies map bonuses, Blood Ties attempts and failures, and leave
       assert.equal((await getAccount(db,'recovery-case',next.toISOString().slice(0,10),date,options)).body.progress.score,500,'imported result already contributes to the opening total');
     } finally { db.sqlite.close(); }
   }
+});
+
+const accountRequest = (body) => new Request('https://test.invalid/api/account/save', {method:'PUT',body:JSON.stringify(body)});
+
+test('choosing a local Round 4 puzzle never changes a verified Round 50, its achievements or leaderboard', async (t) => {
+  const db=await database(); t.after(()=>db.sqlite.close());
+  t.mock.timers.enable({apis:['Date'],now:new Date('2026-10-31T12:00:00Z')});
+  db.sqlite.exec("INSERT INTO player_profiles(user_id,username) VALUES ('protected-run','ProtectedRun'); INSERT INTO player_saves(user_id,current_round,best_round,score,total_rounds,last_played_date,round_anchor_date,round_anchor_value) VALUES ('protected-run',50,60,7000,80,'2026-10-30','2026-10-30',50)");
+  const puzzle=buildDailyWordPuzzle('2026-10-31',workerWords);
+  const day={dayStateVersion:1,dateKey:'2026-10-31',officialType:'word',sessions:{word:{key:puzzle.key,guesses:['G']}}};
+  for(const localRound of [4,999]) {
+    const before=db.sqlite.prepare("SELECT revision FROM player_saves WHERE user_id='protected-run'").get();
+    const saved=await saveAccount(db,accountRequest({puzzleDate:'2026-10-31',baseRevision:before.revision,progress:{currentRound:localRound,bestRound:999,score:1,solves:1,lastPlayedDate:'2026-10-31'},dailyState:day}),'protected-run',{production:true,bloodTies:true});
+    assert.equal(saved.status,200);
+    assert.equal(saved.body.progress.currentRound,50);assert.equal(saved.body.progress.bestRound,60);
+    assert.equal(saved.body.progress.score,7000);assert.equal(saved.body.progress.solves,80);assert.equal(saved.body.progress.lastPlayedDate,'2026-10-30');
+    assert.deepEqual(JSON.parse(db.sqlite.prepare("SELECT state_json FROM player_daily_saves WHERE user_id='protected-run'").get().state_json).sessions.word.guesses,['G'],'the selected puzzle progress still saves');
+    const viewed=await getPublicProfile(db,'ProtectedRun');
+    assert.equal(viewed.body.stats.currentRound,50);assert.equal(viewed.body.stats.bestRound,60);
+    const leaderboard=await readLeaderboards(db,'2026-10-31');
+    assert.equal(leaderboard.allTime[0].score,7000);assert.equal(leaderboard.allTime[0].bestRound,60);
+  }
+  const wrong=[...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].filter(l=>!puzzle.entry.answer.toUpperCase().includes(l)).slice(0,5);
+  const failed=await recordVerifiedWordResult(db,accountRequest({puzzleDate:'2026-10-31',puzzleId:puzzle.key,guesses:wrong}),'protected-run',{production:true,bloodTies:true});
+  assert.equal(failed.body.progress.currentRound,1,'a verified failure still ends the run');
+  const after=await saveAccount(db,accountRequest({baseRevision:failed.body.progress.revision,progress:{currentRound:50,bestRound:999}}),'protected-run');
+  assert.equal(after.body.progress.currentRound,1);assert.equal(after.body.progress.bestRound,60,'an old successful-looking snapshot cannot undo a verified failure');
+});
+
+test('verified wins advance Round and Highest Round immediately without depending on a later browser save', async (t) => {
+  t.mock.timers.enable({apis:['Date'],now:new Date('2026-10-27T12:00:00Z')});
+  const options={production:true,bloodTies:true};
+  for(const type of ['easter','word','blood']) {
+    const date={easter:'2026-10-27',word:'2026-10-29',blood:'2026-10-30'}[type];
+    t.mock.timers.setTime(Date.parse(date+'T12:00:00Z'));
+    const db=await database();
+    try {
+      const previous=new Date(Date.parse(date+'T00:00:00Z')-86400000).toISOString().slice(0,10);
+      db.sqlite.exec("INSERT INTO player_profiles(user_id,username) VALUES ('verified-win','VerifiedWin'); INSERT INTO player_saves(user_id,current_round,best_round,round_anchor_date,round_anchor_value) VALUES ('verified-win',50,50,'"+previous+"',50)");
+      let send,payload;
+      if(type==='easter') { const p=buildDailyPuzzle(date,workerMaps);send=recordVerifiedMapResult;payload={puzzleDate:date,puzzleId:p.key,selectedMapId:p.map.id,cluesUsed:1}; }
+      else if(type==='word') { const p=buildDailyWordPuzzle(date,workerWords);send=recordVerifiedWordResult;payload={puzzleDate:date,puzzleId:p.key,guesses:[...new Set(p.entry.answer.toUpperCase().match(/[A-Z]/g))]}; }
+      else { const p=buildDailyBloodTiesPuzzle(date,options);send=recordVerifiedBloodResult;payload={puzzleDate:date,puzzleId:p.key,attempts:p.groups.map(g=>g.answers),rulesVersion:3}; }
+      for(let retry=0;retry<2;retry++) {
+        const result=await send(db,accountRequest(payload),'verified-win',options);
+        assert.equal(result.status,200,type);assert.equal(result.body.progress.currentRound,51,type);assert.equal(result.body.progress.bestRound,51,type);
+        assert.equal(result.body.progress.solves,1,'retries cannot count twice');
+      }
+    } finally { db.sqlite.close(); }
+  }
+});
+
+test('server-owned rounds count a new account’s first day, preserve imported anchors, and still reset genuine missed days', async (t) => {
+  const db=await database();t.after(()=>db.sqlite.close());
+  t.mock.timers.enable({apis:['Date'],now:new Date('2026-10-31T12:00:00Z')});
+  const options={production:true,bloodTies:true};
+  assert.equal((await registerAccount(db,accountRequest({username:'FirstDay',puzzleDate:'2026-10-31',importLocalProgress:false}),'first-day',options)).status,201);
+  const p=buildDailyWordPuzzle('2026-10-31',workerWords);
+  const result=await recordVerifiedWordResult(db,accountRequest({puzzleDate:'2026-10-31',puzzleId:p.key,guesses:[...new Set(p.entry.answer.toUpperCase().match(/[A-Z]/g))]}),'first-day',options);
+  assert.equal(result.body.progress.currentRound,2);assert.equal(result.body.progress.bestRound,2);
+  t.mock.timers.setTime(Date.parse('2026-11-01T12:00:00Z'));
+  assert.equal((await getAccount(db,'first-day','2026-11-01')).body.progress.currentRound,2,'the first solve remains counted tomorrow');
+  db.sqlite.exec("UPDATE player_saves SET score_migration_method='guest-local-import',round_anchor_value=50,current_round=50,best_round=50 WHERE user_id='first-day'");
+  assert.equal((await getAccount(db,'first-day','2026-11-01')).body.progress.currentRound,50,'an imported completed anchor day is already counted');
+  t.mock.timers.setTime(Date.parse('2026-11-03T12:00:00Z'));
+  const gap=await saveAccount(db,accountRequest({progress:{currentRound:50}}),'first-day');
+  assert.equal(gap.body.progress.currentRound,1,'saving an old browser cannot bypass genuinely missed days');assert.equal(gap.body.progress.bestRound,50);
+});
+
+test('round reconstruction cannot overwrite a newer verified result from another tab', async (t) => {
+  const db=await database();t.after(()=>db.sqlite.close());
+  db.sqlite.exec("INSERT INTO player_profiles(user_id,username) VALUES ('concurrent-run','ConcurrentRun'); INSERT INTO player_saves(user_id,current_round,best_round,round_anchor_date,round_anchor_value) VALUES ('concurrent-run',4,60,'2026-10-30',50)");
+  const snapshot=db.sqlite.prepare("SELECT * FROM player_saves WHERE user_id='concurrent-run'").get();
+  const batch=db.batch.bind(db);let inject=true;
+  db.batch=async(statements)=>{
+    const result=await batch(statements);
+    if(inject){
+      inject=false;
+      db.sqlite.exec("INSERT INTO player_daily_results(user_id,puzzle_date,puzzle_id,selected_map_id,clues_used,map_correct,progression_applied) VALUES ('concurrent-run','2026-10-31','failure','map',1,0,1); UPDATE player_saves SET current_round=1,last_played_date='2026-10-31',revision=revision+1 WHERE user_id='concurrent-run'");
+    }
+    return result;
+  };
+  const progress=await reconstructRound(db,'concurrent-run',snapshot,'2026-10-31');
+  assert.equal(progress.current_round,1,'a late verified failure takes precedence over the older reconstruction snapshot');
+  assert.equal(progress.best_round,60);
 });

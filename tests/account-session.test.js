@@ -10,6 +10,7 @@ import {
   forgetRememberedAccount,
   pendingProgressBelongsTo,
   pendingMatchesCloud,
+  pendingCoveredByCloud,
   readPendingProgress,
   readRememberedAccount,
   rememberAccount,
@@ -80,7 +81,45 @@ test('save summaries distinguish different puzzle actions even when the account 
   const device=describeAccountSave('2026-10-31',make(['G']));
   const cloud=describeAccountSave('2026-10-31',make(['E']));
   assert.match(device,/Letters tried: G/); assert.match(cloud,/Letters tried: E/);
-  assert.notEqual(device,cloud); assert.match(cloud,/Round 1 · Score 160 · 2 solves/);
+  assert.notEqual(device,cloud); assert.doesNotMatch(cloud,/Round|Score|solves/);
+});
+
+const wordDay = (guesses) => ({dayStateVersion:1,dateKey:'2026-10-31',officialType:'word',
+  sessions:{word:{key:'2026-10-31:word:example',guesses}}});
+const queuedDay = (dailyState) => ({puzzleDate:'2026-10-31',snapshot:{progress:{currentRound:4},dailyState}});
+
+test('cloud progress automatically covers an older prefix, regardless of stale local account totals', () => {
+  assert.equal(pendingCoveredByCloud(queuedDay(wordDay([])),{progress:{currentRound:50},dailyState:wordDay(['E'])}),true);
+  assert.equal(pendingCoveredByCloud(queuedDay(wordDay(['E'])),{dailyState:wordDay(['E','G'])}),true);
+  assert.equal(pendingCoveredByCloud(queuedDay(wordDay(['G'])),{dailyState:wordDay(['E'])}),false);
+  assert.equal(pendingCoveredByCloud(queuedDay(wordDay(['E','G'])),{dailyState:wordDay(['E'])}),false);
+  const wrongDay=wordDay(['E']); wrongDay.dateKey='2026-10-30';
+  assert.equal(pendingCoveredByCloud(queuedDay(wordDay([])),{dailyState:wrongDay}),false);
+  const wrongPuzzle=wordDay(['E']);wrongPuzzle.sessions.word.key='another-word';
+  assert.equal(pendingCoveredByCloud(queuedDay(wordDay(['E'])),{dailyState:wrongPuzzle}),false);
+});
+
+test('new just-for-fun actions and independent Blood Ties transcripts still require a choice', () => {
+  const local=wordDay(['E']),cloud=wordDay(['E','G']);
+  local.sessions.blood={key:'blood-key',rulesVersion:3,attempts:[['A','B','C']],selected:[]};
+  cloud.sessions.blood={key:'blood-key',rulesVersion:3,attempts:[],selected:[]};
+  assert.equal(pendingCoveredByCloud(queuedDay(local),{dailyState:cloud}),false);
+  cloud.sessions.blood.attempts=[['A','B','C'],['D','E','F']];
+  assert.equal(pendingCoveredByCloud(queuedDay(local),{dailyState:cloud}),true);
+  local.sessions.blood.selected=['G'];
+  assert.equal(pendingCoveredByCloud(queuedDay(local),{dailyState:cloud}),false);
+  local.sessions.blood.selected=[];cloud.sessions.blood.attempts=[['G','H','I']];
+  assert.equal(pendingCoveredByCloud(queuedDay(local),{dailyState:cloud}),false);
+});
+
+test('cloud coverage preserves map choices, clue reveals and unfinished bonus arrangements', () => {
+  const local={puzzleKey:'2026-10-31:map:example',phase:'clues',cluesRevealed:1};
+  const cloud={...local,phase:'result',cluesRevealed:3,selectedMapId:'map',selectedGameId:'game',lockedClues:1,isCorrect:true,bonusOrder:['a','b','c'],bonusComplete:true};
+  assert.equal(pendingCoveredByCloud(queuedDay(local),{dailyState:cloud}),true);
+  assert.equal(pendingCoveredByCloud(queuedDay({...local,phase:'map',selectedMapId:'other-map'}),{dailyState:cloud}),false);
+  assert.equal(pendingCoveredByCloud(queuedDay({...cloud,bonusComplete:false,bonusOrder:['b','a','c']}),{dailyState:cloud}),false);
+  assert.equal(pendingCoveredByCloud(queuedDay(local),{dailyState:null}),true);
+  assert.equal(pendingCoveredByCloud(queuedDay({...local,cluesRevealed:2}),{dailyState:null}),false);
 });
 
 test("remembered accounts retain only an app-owned account id and cloud revision", () => {

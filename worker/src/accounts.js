@@ -392,7 +392,8 @@ async function persistSimpleResult(db, userId, { today, puzzleId, answerId, succ
     .first();
   const progress = await db.prepare("SELECT * FROM player_saves WHERE user_id = ?")
     .bind(userId).first();
-  return { status: 200, body: { result: rowToResult(result), progress: rowToProgress(progress) } };
+  const reconstructed = await reconstructRound(db, userId, progress, getUtcDateKey());
+  return { status: 200, body: { result: rowToResult(result), progress: rowToProgress(reconstructed) } };
 }
 
 function followingDateKey(dateKey) {
@@ -401,9 +402,15 @@ function followingDateKey(dateKey) {
   return date.toISOString().slice(0, 10);
 }
 
-export async function reconstructRound(db, userId, progressRow, todayDateKey) {
+export async function reconstructRound(db, userId, progressRow, todayDateKey, retries = 1) {
   const anchorDate = progressRow?.round_anchor_date;
-  if (!isValidDateKey(anchorDate) || anchorDate >= todayDateKey) return progressRow;
+  if (!isValidDateKey(anchorDate) || anchorDate > todayDateKey) return progressRow;
+  // New accounts anchor before their first puzzle. Imported/legacy anchors
+  // already include that day's progress and must not count it a second time.
+  const includesAnchorResult = progressRow.score_migration_method === 'new-account';
+  const resultStart = includesAnchorResult
+    ? new Date(Date.parse(`${anchorDate}T00:00:00Z`) - 86400000).toISOString().slice(0, 10)
+    : anchorDate;
 
   const [resultsQuery, protectedQuery] = await db.batch([
     db.prepare(
@@ -411,12 +418,12 @@ export async function reconstructRound(db, userId, progressRow, todayDateKey) {
       FROM player_daily_results
       WHERE user_id = ? AND puzzle_date > ? AND puzzle_date <= ?
       ORDER BY puzzle_date`,
-    ).bind(userId, anchorDate, todayDateKey),
+    ).bind(userId, resultStart, todayDateKey),
     db.prepare(
       `SELECT game_date
       FROM game_dates
       WHERE game_date > ? AND game_date < ? AND counts_for_round = 0`,
-    ).bind(anchorDate, todayDateKey),
+    ).bind(resultStart, todayDateKey),
   ]);
 
   const results = new Map(
@@ -433,7 +440,7 @@ export async function reconstructRound(db, userId, progressRow, todayDateKey) {
   let currentRound = Math.max(1, Number(progressRow.round_anchor_value || 0));
   let bestRound = Math.max(Number(progressRow.best_round || 0), currentRound);
 
-  for (let date = followingDateKey(anchorDate); date <= todayDateKey; date = followingDateKey(date)) {
+  for (let date = includesAnchorResult ? anchorDate : followingDateKey(anchorDate); date <= todayDateKey; date = followingDateKey(date)) {
     if (protectedDates.has(date)) continue;
     if (results.has(date)) {
       currentRound = results.get(date) ? currentRound + 1 : 1;
@@ -449,16 +456,20 @@ export async function reconstructRound(db, userId, progressRow, todayDateKey) {
     lastPlayedDate === progressRow.last_played_date
   ) return progressRow;
 
-  await db.prepare(
+  const update = await db.prepare(
     `UPDATE player_saves SET
       current_round = ?,
       best_round = MAX(best_round, ?),
       last_played_date = MAX(COALESCE(last_played_date, ''), COALESCE(?, '')),
       revision = revision + 1,
       updated_at = CURRENT_TIMESTAMP
-    WHERE user_id = ?`,
-  ).bind(currentRound, bestRound, lastPlayedDate ?? null, userId).run();
-  return db.prepare("SELECT * FROM player_saves WHERE user_id = ?").bind(userId).first();
+    WHERE user_id = ? AND revision = ?`,
+  ).bind(currentRound, bestRound, lastPlayedDate ?? null, userId, Number(progressRow.revision || 1)).run();
+  const latest = await db.prepare("SELECT * FROM player_saves WHERE user_id = ?").bind(userId).first();
+  if (Number(update?.meta?.changes || 0) === 0 && retries > 0) {
+    return reconstructRound(db, userId, latest, todayDateKey, retries - 1);
+  }
+  return latest;
 }
 
 export async function readJsonBody(request, maximumBytes = 20_000) {
@@ -800,18 +811,14 @@ export async function saveAccount(db, request, userId, options = {}) {
     .first();
   if (!profile) return { status: 409, body: { error: "Finish setting up your account first." } };
 
+  // Puzzle saves may acknowledge a missed-day notice, but all run/stat values
+  // come from verified results and the server's reconstruction anchor.
   const updateSql = `UPDATE player_saves SET
-          current_round = ?,
-          best_round = MAX(best_round, ?),
-          last_played_date = MAX(COALESCE(last_played_date, ''), COALESCE(?, '')),
           missed_day_json = ?,
           revision = revision + 1,
           updated_at = CURRENT_TIMESTAMP
         WHERE user_id = ?${baseRevision == null ? "" : " AND revision = ?"}`;
   const updateBindings = [
-    progress.currentRound,
-    progress.bestRound,
-    progress.lastPlayedDate,
     progress.missedDayState ? JSON.stringify(progress.missedDayState) : null,
     userId,
   ];
@@ -850,7 +857,8 @@ export async function saveAccount(db, request, userId, options = {}) {
     .prepare("SELECT * FROM player_saves WHERE user_id = ?")
     .bind(userId)
     .first();
-  return { status: 200, body: { progress: rowToProgress(saved) } };
+  const reconstructed = await reconstructRound(db, userId, saved, getUtcDateKey());
+  return { status: 200, body: { progress: rowToProgress(reconstructed) } };
 }
 
 export async function recordVerifiedMapResult(db, request, userId, options = {}, verificationDate = getUtcDateKey()) {
@@ -955,7 +963,8 @@ export async function recordVerifiedMapResult(db, request, userId, options = {},
     .first();
   const progress = await db.prepare("SELECT * FROM player_saves WHERE user_id = ?")
     .bind(userId).first();
-  return { status: 200, body: { result: rowToResult(result), progress: rowToProgress(progress) } };
+  const reconstructed = await reconstructRound(db, userId, progress, getUtcDateKey());
+  return { status: 200, body: { result: rowToResult(result), progress: rowToProgress(reconstructed) } };
 }
 
 export async function recordVerifiedBonusResult(db, request, userId, verificationDate = getUtcDateKey()) {
