@@ -3,7 +3,8 @@ import { deleteAccount, isAccountRevoked, retryAuthDeletions } from "./account-d
 import { retryAuthProfileSync, syncAuthProfile } from "./auth-profile-sync.js";
 import { ensureStagingFixtures, fixturesEnabled } from "./staging-fixtures.js";
 import { puzzleOptions } from './puzzle-environment.js';
-import { buildDailyBloodTiesPuzzle, replayBloodTiesAttempts } from '../../js/blood-ties-core.js';
+import { replayBloodTiesAttempts } from '../../js/blood-ties-core.js';
+import { buildDailyBloodTiesPuzzle } from './blood-ties-puzzles.js';
 import {
   getAccount,
   getPublicProfile,

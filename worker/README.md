@@ -19,6 +19,12 @@ The Daily Undead remains a static GitHub Pages site. Optional accounts, cross-de
 
 The frontend API address is the public metadata value in `index.html`; it is not a credential. Cloudflare API tokens and account credentials must never be added to frontend files.
 
+## Blood Ties request CPU
+
+Account saves and result verification use `src/blood-ties-puzzles.js`, a lookup of the shared generator's exact output. This avoids rebuilding all historical board pools during a cold Worker request. The browser's generator, puzzle keys, environment histories, scoring and save validation are unchanged. No database migration is involved.
+
+Run `pnpm run generate:worker-blood-ties` after changing any Blood Ties generator/content input. The generated catalogue covers 22 October 2026 through 31 December 2029; both production and staging histories are compiled separately. Tests compare every compiled puzzle with the shared generator and reject stale inputs or less than a year of remaining coverage. Extend `catalogueThrough` in the generation script before that check expires. Out-of-range dates retain the shared generator as a compatibility fallback; they do not receive substitute puzzles. Returned puzzles are copied so one request cannot mutate another's assignment.
+
 The Worker exposes:
 
 - `GET /health` for a simple health check.

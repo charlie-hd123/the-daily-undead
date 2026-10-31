@@ -24,7 +24,8 @@ import {
   workerMaps,
 } from "./generated-map-catalog.js";
 import { workerWords } from "./generated-word-catalog.js";
-import { buildDailyBloodTiesPuzzle, normalizeBloodTiesSession, replayBloodTiesAttempts } from '../../js/blood-ties-core.js';
+import { normalizeBloodTiesSession, replayBloodTiesAttempts } from '../../js/blood-ties-core.js';
+import { buildDailyBloodTiesPuzzle } from './blood-ties-puzzles.js';
 
 const maximumCounter = 1_000_000_000;
 const allowedPhases = new Set(["clues", "game", "map", "result"]);

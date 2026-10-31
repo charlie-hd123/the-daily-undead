@@ -303,6 +303,27 @@ test('production account saves preserve the issued 30 October Blood Ties transcr
   assert.equal(row.total_rounds,4);
 });
 
+test('compiled puzzle saves restore an interrupted transcript without changing awards or another account', async t => {
+  t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-31T12:00:00Z') });
+  const db = await database(); t.after(() => db.sqlite.close());
+  db.sqlite.exec("INSERT INTO player_profiles(user_id,username) VALUES ('compiled-save','CompiledSave'),('untouched','Untouched'); INSERT INTO player_saves(user_id,score,total_rounds,current_round,best_round,revision) VALUES ('compiled-save',500,4,7,9,7),('untouched',321,5,3,8,2)");
+  const otherBefore = db.sqlite.prepare("SELECT * FROM player_saves WHERE user_id='untouched'").get();
+  const options = { production: true, bloodTies: true };
+  const p = buildDailyBloodTiesPuzzle('2026-10-31', options);
+  const session = { ...replayBloodTiesAttempts(p, [wrongs(p)[0], p.groups[0].answers]), selected: p.groups[1].answers.slice(0, 2), shuffleCount: 2 };
+  const dailyState = { dayStateVersion: 1, dateKey: p.dateKey, officialType: 'word', sessions: { blood: session } };
+  const request = baseRevision => new Request('https://test/save', { method: 'PUT', body: JSON.stringify({ puzzleDate: p.dateKey, dailyState, baseRevision, progress: { score: 999999, solves: 999999 } }) });
+  const saved = await saveAccount(db, request(7), 'compiled-save', options);
+  assert.equal(saved.status, 200);
+  assert.equal(saved.body.progress.revision, 8);
+  const restored = await getAccount(db, 'compiled-save', p.dateKey, p.dateKey, options);
+  assert.deepEqual(restored.body.dailyState.sessions.blood, normalizeBloodTiesSession(p, session));
+  assert.deepEqual({ ...db.sqlite.prepare("SELECT score,total_rounds,current_round,best_round FROM player_saves WHERE user_id='compiled-save'").get() }, { score: 500, total_rounds: 4, current_round: 7, best_round: 9 });
+  assert.equal((await saveAccount(db, request(7), 'compiled-save', options)).status, 409, 'stale devices still cannot overwrite a newer save');
+  assert.equal(db.sqlite.prepare('SELECT COUNT(*) n FROM player_daily_results').get().n, 0, 'saving cannot manufacture an award');
+  assert.deepEqual(db.sqlite.prepare("SELECT * FROM player_saves WHERE user_id='untouched'").get(), otherBefore);
+});
+
 test('historical three-day rotation is staging/local only and remains intact', () => {
   assert.deepEqual(Array.from({ length: 4 }, (_, i) => getOfficialPuzzleType(`2026-10-${22 + i}`, { bloodTies: true })), ['blood', 'word', 'easter', 'blood']);
   assert.equal(getOfficialPuzzleType('2026-10-22'), 'easter');

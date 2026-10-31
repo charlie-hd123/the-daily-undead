@@ -3,7 +3,8 @@ import { buildDailyWordPuzzle, calculateWordPoints } from "../../js/word-puzzle-
 import { getOfficialPuzzleType } from "../../js/daily-challenge-core.js";
 import { workerMaps } from "./generated-map-catalog.js";
 import { workerWords } from "./generated-word-catalog.js";
-import { bloodTiesRulesVersion, buildDailyBloodTiesPuzzle, calculateBloodTiesPoints } from '../../js/blood-ties-core.js';
+import { bloodTiesRulesVersion, calculateBloodTiesPoints } from '../../js/blood-ties-core.js';
+import { buildDailyBloodTiesPuzzle } from './blood-ties-puzzles.js';
 
 const fixtureVersion = 2;
 const ready = new WeakMap();
