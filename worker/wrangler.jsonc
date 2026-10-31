@@ -8,8 +8,6 @@
   },
   "vars": {
     "ALLOWED_ORIGINS": "https://thedailyundead.com,https://www.thedailyundead.com",
-    "CLERK_ISSUER": "https://clerk.thedailyundead.com",
-    "CLERK_AUTHORIZED_PARTIES": "https://thedailyundead.com,https://www.thedailyundead.com",
     "SUPABASE_ISSUER": "https://bhqhfxwdcpujfxxvcoeo.supabase.co/auth/v1",
     "SUPABASE_HEARTBEAT_URL": "https://bhqhfxwdcpujfxxvcoeo.supabase.co/functions/v1/project-heartbeat"
   },

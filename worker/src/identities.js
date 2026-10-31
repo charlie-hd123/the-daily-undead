@@ -1,3 +1,5 @@
+// Historical provider names remain valid for stored mappings and revocations.
+// Authentication itself accepts Supabase only; never rewrite legacy player IDs.
 const providers = new Set(["clerk", "supabase"]);
 
 export function createAccountId(randomUUID = crypto.randomUUID.bind(crypto)) {
@@ -32,6 +34,8 @@ export async function resolveAccountIdentity(db, identity) {
     && typeof identity.migrationSubject === "string"
     && identity.migrationSubject.startsWith("user_")
   ) {
+    // Returning imported users may not have visited since cutover. This local
+    // lookup preserves their original profile/saves without contacting Clerk.
     const legacy = await db.prepare(
       `SELECT account_id
       FROM account_identities

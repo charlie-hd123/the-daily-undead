@@ -22,6 +22,7 @@ import { retryAuthProfileSync, syncAuthProfile } from "../worker/src/auth-profil
 import { getAccount, getPublicProfile, registerAccount, reconstructRound, saveAccount, recordVerifiedMapResult, recordVerifiedWordResult, recordVerifiedBloodResult } from '../worker/src/accounts.js';
 import { readLeaderboards } from '../worker/src/leaderboards.js';
 import { buildDailyBloodTiesPuzzle } from '../js/blood-ties-core.js';
+import { resolveAccountIdentity } from '../worker/src/identities.js';
 import { prepareMissedDayProgress } from '../js/progression.js';
 
 // Real SQLite schema, triggers and SQL, behind the same small D1 interface.
@@ -59,6 +60,42 @@ async function database() {
   return db;
 }
 const stagingEnv = (DB) => ({ DB, DEPLOYMENT_ENVIRONMENT: "staging", STAGING_FIXTURES: "1", SUPABASE_ISSUER: "https://zsnnvzhimtlhpvwhwxpy.supabase.co/auth/v1", ALLOWED_ORIGINS: "https://daily-undead-staging.pages.dev", RELEASE_API_DIGEST: "api-tested", RELEASE_CONFIG_DIGEST: "config-tested" });
+
+test("retired Clerk mappings restore returning Supabase players without rewriting any game data", async (t) => {
+  const db = await database();
+  t.after(() => db.sqlite.close());
+  db.sqlite.exec(`
+    INSERT INTO player_profiles (user_id,username,account_id) VALUES
+      ('user_returning','ReturningPlayer','acct_returning'), ('user_other','OtherPlayer','acct_other');
+    INSERT INTO player_saves (user_id,score,total_rounds,current_round,best_round,revision) VALUES
+      ('user_returning',4780,59,12,19,7), ('user_other',321,5,3,4,2);
+    INSERT INTO player_daily_saves (user_id,puzzle_date,state_json) VALUES
+      ('user_returning','2026-10-30','{"phase":"game","marker":"unfinished"}');
+    INSERT INTO player_daily_results
+      (user_id,puzzle_date,puzzle_id,selected_map_id,clues_used,map_correct,map_points,points_earned)
+      VALUES ('user_returning','2026-10-29','2026-10-29:test','test-map',1,1,100,100);
+    INSERT OR IGNORE INTO game_dates (game_date,counts_for_round) VALUES ('2026-10-29',1);
+    INSERT INTO account_identities (provider,provider_subject,account_id) VALUES
+      ('clerk','user_returning','acct_returning'), ('clerk','user_other','acct_other');
+  `);
+  const tables = ['player_profiles', 'player_saves', 'player_daily_saves', 'player_daily_results', 'game_dates'];
+  const snapshot = () => tables.map((table) => db.sqlite.prepare(`SELECT * FROM ${table} ORDER BY 1`).all());
+  const before = snapshot();
+  const identity = { provider: 'supabase', subject: 'returning-supabase-id', migrationSubject: 'user_returning' };
+  assert.deepEqual(await resolveAccountIdentity(db, identity), {
+    provider: 'supabase', subject: identity.subject, userId: 'user_returning', accountId: 'acct_returning',
+  });
+  assert.deepEqual(snapshot(), before, 'linking must leave all profiles, saves, results and assignments unchanged');
+  assert.equal(db.sqlite.prepare("SELECT COUNT(*) n FROM account_identities WHERE provider='clerk'").get().n, 2);
+  assert.equal(db.sqlite.prepare("SELECT COUNT(*) n FROM account_identities WHERE provider='supabase'").get().n, 1);
+  await resolveAccountIdentity(db, identity);
+  assert.equal(db.sqlite.prepare("SELECT COUNT(*) n FROM account_identities").get().n, 3, 'repeat login is idempotent');
+  // An existing Supabase attachment always wins over a different migration hint.
+  assert.equal((await resolveAccountIdentity(db, { ...identity, migrationSubject: 'user_other' })).accountId, 'acct_returning');
+  // Unknown imports still use normal onboarding; no guessed or new account is created.
+  assert.equal((await resolveAccountIdentity(db, { ...identity, subject: 'unknown', migrationSubject: 'user_missing' })).accountId, null);
+  assert.deepEqual(snapshot(), before);
+});
 
 test("admin views identify legacy and new players, track renames, and cannot edit progress", async (t) => {
   const db = await database();

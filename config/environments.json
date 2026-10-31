@@ -4,7 +4,6 @@
     "apiUrl": "https://api.thedailyundead.com",
     "supabaseUrl": "https://bhqhfxwdcpujfxxvcoeo.supabase.co",
     "supabasePublishableKey": "sb_publishable_MbUwrP6JY8xVSyqiC0683g__7bRCOYk",
-    "clerkPublishableKey": "pk_live_Y2xlcmsudGhlZGFpbHl1bmRlYWQuY29tJA",
     "workerConfig": "worker/wrangler.jsonc",
     "database": "daily-undead-stats"
   },
@@ -13,7 +12,6 @@
     "apiUrl": "https://daily-undead-staging-api.charlieharrisondavies.workers.dev",
     "supabaseUrl": "https://zsnnvzhimtlhpvwhwxpy.supabase.co",
     "supabasePublishableKey": "sb_publishable_YfgJYTqB09B7dKxzZ1NMYA_CN9XiAkO",
-    "clerkPublishableKey": "pk_test_cmFwaWQtcGlnZW9uLTg0Ni5jbGVyay5hY2NvdW50cy5kZXYk",
     "workerConfig": "worker/wrangler.staging.jsonc",
     "database": "daily-undead-staging",
     "pagesProject": "daily-undead-staging"
@@ -23,7 +21,6 @@
     "apiUrl": "http://localhost:8787",
     "supabaseUrl": "https://zsnnvzhimtlhpvwhwxpy.supabase.co",
     "supabasePublishableKey": "sb_publishable_YfgJYTqB09B7dKxzZ1NMYA_CN9XiAkO",
-    "clerkPublishableKey": "pk_test_cmFwaWQtcGlnZW9uLTg0Ni5jbGVyay5hY2NvdW50cy5kZXYk",
     "workerConfig": "worker/wrangler.local.jsonc",
     "database": "daily-undead-development"
   }

@@ -389,9 +389,8 @@ export default {
           bloodTiesDemo: puzzleOptions(env).bloodTies && env.DEPLOYMENT_ENVIRONMENT !== 'production',
           bloodTiesEnabled: puzzleOptions(env).bloodTies,
           puzzleSchedule: puzzleOptions(env).production ? 'production-v1' : 'v1',
-          accountsConfigured: Boolean(env.CLERK_ISSUER || env.SUPABASE_ISSUER),
+          accountsConfigured: Boolean(env.SUPABASE_ISSUER),
           accountProviders: {
-            clerk: Boolean(env.CLERK_ISSUER),
             supabase: Boolean(env.SUPABASE_ISSUER),
           },
         });

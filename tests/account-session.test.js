@@ -204,13 +204,13 @@ test("expired accounts must sign in before submitting a scored result", () => {
 });
 
 test("account API requests time out instead of blocking game startup forever", async () => {
-  const clerk = {
+  const authClient = {
     session: { getToken: async () => "signed-token" },
   };
 
   await assert.rejects(
     requestJson(
-      clerk,
+      authClient,
       "https://api.example.test",
       "/api/account",
       {},

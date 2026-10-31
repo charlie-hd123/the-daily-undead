@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261031-8";
+import { browserStorage } from "./browser-storage.js?v=20261031-9";
 import {
   accountMemoryStorageKey,
   archivePendingProgress,
@@ -13,15 +13,9 @@ import {
   recommendedAccountSave,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261031-8";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261031-8";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261031-8";
-
-function getClerkPublishableKey(documentObject = document) {
-  return documentObject
-    .querySelector('meta[name="daily-undead-clerk-publishable-key"]')
-    ?.content?.trim() || null;
-}
+} from "./account-session.js?v=20261031-9";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261031-9";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261031-9";
 
 function hasSupabaseConfiguration(documentObject = document) {
   const read = (name) => documentObject
@@ -29,15 +23,6 @@ function hasSupabaseConfiguration(documentObject = document) {
     ?.content?.trim() || "";
   return /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(read("daily-undead-supabase-url"))
     && read("daily-undead-supabase-publishable-key").startsWith("sb_publishable_");
-}
-
-function getClerkDomain(publishableKey) {
-  try {
-    const encodedDomain = publishableKey.split("_")[2];
-    return atob(encodedDomain).slice(0, -1);
-  } catch {
-    return null;
-  }
 }
 
 function withTimeout(promise, timeoutMs, message) {
@@ -48,282 +33,14 @@ function withTimeout(promise, timeoutMs, message) {
   return Promise.race([promise, timeoutPromise]).finally(() => globalThis.clearTimeout(timeout));
 }
 
-function loadScript({ src, publishableKey, timeoutMs = 8_000 }) {
-  return new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    const timeout = globalThis.setTimeout(() => {
-      script.remove();
-      reject(new Error("Account sign-in took too long to load."));
-    }, timeoutMs);
-    const finish = (callback) => (event) => {
-      globalThis.clearTimeout(timeout);
-      callback(event);
-    };
-    script.src = src;
-    script.async = true;
-    script.crossOrigin = "anonymous";
-    if (publishableKey) script.dataset.clerkPublishableKey = publishableKey;
-    script.addEventListener("load", finish(resolve), { once: true });
-    script.addEventListener(
-      "error",
-      finish(() => reject(new Error("Account sign-in could not load."))),
-      { once: true },
-    );
-    document.head.append(script);
-  });
-}
-
-function createClerkAppearance() {
-  const bodyFont =
-    '"Barlow", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
-  const displayFont = '"Barlow Condensed", "Arial Narrow", Impact, sans-serif';
-  const border = "rgb(160 201 255 / 34%)";
-  const surface = "linear-gradient(145deg, rgb(21 27 43 / 98%), rgb(8 11 20 / 99%) 72%)";
-
-  return {
-    variables: {
-      colorPrimary: "#67e8ff",
-      colorPrimaryForeground: "#061017",
-      colorDanger: "#ff6577",
-      colorSuccess: "#6ce7a1",
-      colorWarning: "#f7c85c",
-      colorNeutral: "#9ca9c0",
-      colorForeground: "#f6f7fb",
-      colorMutedForeground: "#a8b2c7",
-      colorMuted: "#1b2439",
-      colorBackground: "#0d111d",
-      colorInputForeground: "#f6f7fb",
-      colorInput: "#05080f",
-      colorShimmer: "#1b2439",
-      colorRing: "#67e8ff",
-      colorShadow: "#000000",
-      colorBorder: border,
-      colorModalBackdrop: "rgb(2 4 9 / 84%)",
-      fontFamily: bodyFont,
-      fontFamilyButtons: displayFont,
-      fontSize: "0.875rem",
-      fontWeight: {
-        normal: 400,
-        medium: 500,
-        semibold: 600,
-        bold: 800,
-      },
-      borderRadius: "0.7rem",
-      spacing: "1rem",
-    },
-    elements: {
-      modalBackdrop: {
-        backdropFilter: "blur(8px)",
-        WebkitBackdropFilter: "blur(8px)",
-      },
-      modalContent: {
-        border: `1px solid ${border}`,
-        borderRadius: "1rem",
-        background: surface,
-        boxShadow: "0 1.4rem 4rem rgb(0 0 0 / 52%), 0 0 3rem rgb(103 232 255 / 8%)",
-        overflow: "hidden",
-      },
-      modalCloseButton: {
-        width: "2.25rem",
-        height: "2.25rem",
-        border: `1px solid ${border}`,
-        borderRadius: "999px",
-        backgroundColor: "rgb(255 255 255 / 5%)",
-        color: "#c7cfdd",
-        '&:hover, &:focus-visible': {
-          borderColor: "rgb(103 232 255 / 72%)",
-          backgroundColor: "rgb(103 232 255 / 10%)",
-          color: "#ffffff",
-        },
-      },
-      cardBox: {
-        borderRadius: "1rem",
-        boxShadow: "0 1.4rem 4rem rgb(0 0 0 / 46%), 0 0 3rem rgb(103 232 255 / 8%)",
-      },
-      card: {
-        border: `1px solid ${border}`,
-        background: surface,
-      },
-      headerTitle: {
-        fontFamily: displayFont,
-        fontWeight: 900,
-        letterSpacing: "0.025em",
-        textTransform: "uppercase",
-      },
-      formButtonPrimary: {
-        minHeight: "3rem",
-        border: "0",
-        borderRadius: "0.7rem",
-        background: "linear-gradient(110deg, #f7c85c 0%, #ffad54 48%, #ff8a48 100%)",
-        color: "#171006",
-        boxShadow:
-          "0 0.8rem 2.2rem rgb(255 138 72 / 16%), inset 0 1px 0 rgb(255 255 255 / 36%) !important",
-        fontFamily: displayFont,
-        fontSize: "0.9rem",
-        fontWeight: 800,
-        letterSpacing: "0.045em",
-        textTransform: "uppercase",
-        '&:hover, &:active': {
-          background: "linear-gradient(110deg, #ffe08a 0%, #ffc16b 48%, #ff9c63 100%)",
-          color: "#171006",
-          boxShadow:
-            "0 0.9rem 2.5rem rgb(255 138 72 / 25%), inset 0 1px 0 rgb(255 255 255 / 42%) !important",
-        },
-        '&:focus-visible': {
-          outline: "3px solid #ffffff",
-          outlineOffset: "3px",
-          boxShadow:
-            "0 0.8rem 2.2rem rgb(255 138 72 / 16%), inset 0 1px 0 rgb(255 255 255 / 36%) !important",
-        },
-      },
-      formFieldInput: {
-        minHeight: "3rem",
-        border: `1px solid ${border}`,
-        borderRadius: "0.65rem",
-        backgroundColor: "rgb(5 8 15 / 92%)",
-        boxShadow: "none",
-        '&:focus': {
-          borderColor: "#67e8ff",
-          boxShadow: "0 0 0 3px rgb(103 232 255 / 16%)",
-        },
-      },
-      formFieldLabel: {
-        color: "#f6f7fb",
-        fontWeight: 700,
-      },
-      footer: {
-        backgroundColor: "transparent",
-      },
-      footerActionLink: {
-        color: "#67e8ff",
-        fontWeight: 700,
-      },
-      badge: {
-        border: "1px solid rgb(103 232 255 / 24%)",
-        backgroundColor: "rgb(103 232 255 / 8%)",
-        color: "#bdf0fa",
-      },
-    },
-    userProfile: {
-      elements: {
-        cardBox: {
-          width: "min(94vw, 78rem)",
-          maxWidth: "78rem",
-        },
-        card: {
-          background: surface,
-        },
-        navbar: {
-          borderRight: `1px solid ${border}`,
-          background:
-            "radial-gradient(circle at 15% 10%, rgb(103 232 255 / 8%), transparent 17rem), linear-gradient(165deg, rgb(22 28 43 / 99%), rgb(10 13 23 / 99%))",
-        },
-        navbarButton: {
-          minHeight: "3.4rem",
-          border: "1px solid transparent",
-          borderRadius: "0.7rem",
-          color: "#c7cfdd",
-          fontWeight: 700,
-          '&:hover, &:focus-visible': {
-            borderColor: "rgb(103 232 255 / 26%)",
-            backgroundColor: "rgb(103 232 255 / 8%)",
-            color: "#ffffff",
-          },
-        },
-        navbarButton__active: {
-          borderColor: "rgb(103 232 255 / 42%)",
-          backgroundColor: "rgb(103 232 255 / 12%)",
-          color: "#ffffff",
-          boxShadow: "inset 3px 0 0 #67e8ff, 0 0.7rem 1.8rem rgb(0 0 0 / 15%)",
-        },
-        navbarButtonIcon: {
-          color: "#a8b2c7",
-        },
-        navbarButtonIcon__active: {
-          color: "#67e8ff",
-        },
-        navbarButtonText: {
-          fontFamily: bodyFont,
-          fontWeight: 700,
-        },
-        pageScrollBox: {
-          background:
-            "radial-gradient(circle at 90% 4%, rgb(158 119 255 / 8%), transparent 24rem), rgb(13 17 29 / 96%)",
-        },
-        profilePage: {
-          color: "#f6f7fb",
-        },
-        profileSection: {
-          borderColor: "rgb(160 201 255 / 20%)",
-        },
-        profileSectionTitleText: {
-          fontFamily: displayFont,
-          fontSize: "0.95rem",
-          fontWeight: 800,
-          letterSpacing: "0.035em",
-          textTransform: "uppercase",
-        },
-        profileSectionPrimaryButton: {
-          minHeight: "2.65rem",
-          padding: "0.55rem 0.85rem",
-          border: "1px solid rgb(103 232 255 / 34%)",
-          borderRadius: "0.6rem",
-          backgroundColor: "rgb(103 232 255 / 8%)",
-          color: "#bdf0fa",
-          fontFamily: displayFont,
-          fontSize: "0.875rem",
-          fontWeight: 800,
-          letterSpacing: "0.035em",
-          textTransform: "uppercase",
-          '&:hover, &:focus-visible': {
-            borderColor: "rgb(103 232 255 / 72%)",
-            backgroundColor: "rgb(103 232 255 / 14%)",
-            color: "#ffffff",
-          },
-        },
-        avatarBox: {
-          border: "2px solid rgb(103 232 255 / 45%)",
-          boxShadow: "0 0 0 4px rgb(103 232 255 / 8%), 0 0.8rem 2rem rgb(158 119 255 / 18%)",
-        },
-        activeDeviceListItem: {
-          borderRadius: "0.75rem",
-          '&:hover': {
-            backgroundColor: "rgb(103 232 255 / 5%)",
-          },
-        },
-        menuButtonEllipsis: {
-          color: "#a8b2c7",
-        },
-      },
-    },
-  };
-}
-
-async function loadClerk(publishableKey) {
-  const domain = getClerkDomain(publishableKey);
-  if (!domain) throw new Error("The account service is not configured correctly.");
-
-  await loadScript({ src: `https://${domain}/npm/@clerk/ui@1/dist/ui.browser.js` });
-  await loadScript({
-    src: `https://${domain}/npm/@clerk/clerk-js@6/dist/clerk.browser.js`,
-    publishableKey,
-  });
-  if (!globalThis.Clerk) throw new Error("Account sign-in could not load.");
-  await globalThis.Clerk.load({
-    appearance: createClerkAppearance(),
-    ui: { ClerkUI: globalThis.__internal_ClerkUICtor },
-  });
-  return globalThis.Clerk;
-}
-
 export async function requestJson(
-  clerk,
+  authClient,
   apiUrl,
   path,
   options = {},
   { fetchImpl = globalThis.fetch, timeoutMs = 8_000, timeoutMessage = "Account sync took too long. Your cloud save is safe." } = {},
 ) {
-  const token = await clerk.session?.getToken();
+  const token = await authClient.session?.getToken();
   if (!token) throw new Error("Please sign in again.");
 
   const controller = new AbortController();
@@ -476,134 +193,6 @@ function makeAvatar(documentObject, avatarId, className = "") {
   return avatar;
 }
 
-function createUserProfileOptions(
-  clerk,
-  {
-    openUsernameEditor = null,
-    openProfileEditor = null,
-    beforeSignOut = null,
-    afterSignOutFailure = null,
-  } = {},
-) {
-  const customPages = [];
-
-  const addLaunchPage = (url, label, icon, descriptionText, buttonText, handler) => {
-    if (!handler) return;
-    customPages.push({
-      url,
-      label,
-      mountIcon: (element) => { element.textContent = icon; },
-      unmountIcon: (element) => { element.replaceChildren(); },
-      mount: (element) => {
-        const heading = document.createElement("h2");
-        const description = document.createElement("p");
-        const button = document.createElement("button");
-        heading.textContent = label;
-        description.textContent = descriptionText;
-        button.className = "button primary";
-        button.type = "button";
-        button.textContent = buttonText;
-        button.addEventListener("click", handler);
-        element.replaceChildren(heading, description, button);
-      },
-      unmount: (element) => element.replaceChildren(),
-    });
-  };
-
-  addLaunchPage(
-    "game-profile", "Profile", "☣",
-    "Choose your zombie identity, favourites, profile theme and favourite memory.",
-    "Edit profile", openProfileEditor,
-  );
-  if (openUsernameEditor) {
-    customPages.push({
-      url: "change-username",
-      label: "Change username",
-      mountIcon: (element) => {
-        element.textContent = "✎";
-      },
-      unmountIcon: (element) => {
-        element.replaceChildren();
-      },
-      mount: (element) => {
-        const heading = document.createElement("h2");
-        const description = document.createElement("p");
-        const button = document.createElement("button");
-
-        element.classList.add("clerk-username-page");
-        heading.textContent = "Change username";
-        description.textContent = "This is the public name shown on leaderboards.";
-        button.className = "button primary";
-        button.type = "button";
-        button.textContent = "Edit username";
-        button.dataset.openUsernameEditor = "";
-
-        element.replaceChildren(heading, description, button);
-      },
-      unmount: (element) => {
-        element.classList.remove("clerk-username-page");
-        element.replaceChildren();
-      },
-    });
-  }
-
-  customPages.push(
-    {
-      url: "sign-out",
-      label: "Sign out",
-      mountIcon: (element) => {
-        element.textContent = "↪";
-      },
-      unmountIcon: (element) => {
-        element.replaceChildren();
-      },
-      mount: (element) => {
-        const heading = document.createElement("h2");
-        const description = document.createElement("p");
-        const button = document.createElement("button");
-        const error = document.createElement("p");
-
-        element.classList.add("clerk-sign-out-page");
-        heading.textContent = "Sign out";
-        description.textContent = "Sign out of The Daily Undead on this device?";
-        button.className = "button clerk-sign-out-button";
-        button.type = "button";
-        button.textContent = "Sign out";
-        error.className = "account-error";
-        error.setAttribute("role", "alert");
-
-        button.addEventListener("click", async () => {
-          button.disabled = true;
-          button.textContent = "Signing out…";
-          error.textContent = "";
-          try {
-            beforeSignOut?.();
-            await clerk.signOut({
-              redirectUrl: `${window.location.origin}${window.location.pathname}`,
-            });
-          } catch {
-            afterSignOutFailure?.();
-            button.disabled = false;
-            button.textContent = "Sign out";
-            error.textContent = "Could not sign out. Please try again.";
-          }
-        });
-
-        element.replaceChildren(heading, description, button, error);
-      },
-      unmount: (element) => {
-        element.classList.remove("clerk-sign-out-page");
-        element.replaceChildren();
-      },
-    },
-  );
-
-  return {
-    routing: "hash",
-    customPages,
-  };
-}
-
 export async function initialiseAccount({
   apiUrl,
   puzzleDate,
@@ -637,9 +226,8 @@ export async function initialiseAccount({
   const profileEditorFeedback = documentObject.querySelector("#profile-editor-feedback");
   const publicProfileDialog = documentObject.querySelector("#player-profile-dialog");
   const publicProfileContent = documentObject.querySelector("[data-public-profile-content]");
-  const publishableKey = getClerkPublishableKey(documentObject);
   const supabaseConfigured = hasSupabaseConfiguration(documentObject);
-  let clerk = null;
+  let authClient = null;
   let profile = null;
   let saveTimer = null;
   let saveInFlight = false;
@@ -735,7 +323,7 @@ export async function initialiseAccount({
     }
   }
 
-  if (!accountButton || (!supabaseConfigured && !publishableKey) || !apiUrl) {
+  if (!accountButton || !supabaseConfigured || !apiUrl) {
     if (accountButton) accountButton.hidden = true;
     return createUnavailableController({ openPlayerProfile });
   }
@@ -745,12 +333,10 @@ export async function initialiseAccount({
   accountButton.textContent = "Loading...";
 
   try {
-    clerk = await withTimeout(
-      supabaseConfigured
-        ? import("./supabase-auth.js?v=20261031-8").then(({ loadSupabaseAuth }) => (
-          loadSupabaseAuth(documentObject)
-        ))
-        : loadClerk(publishableKey),
+    authClient = await withTimeout(
+      import("./supabase-auth.js?v=20261031-9").then(({ loadSupabaseAuth }) => (
+        loadSupabaseAuth(documentObject)
+      )),
       5_000,
       "Account sign-in took too long to load.",
     );
@@ -783,7 +369,7 @@ export async function initialiseAccount({
   );
   const beginSignIn = () => {
     closeDialog(sessionExpiredDialog);
-    clerk.openSignIn({ routing: "hash" });
+    authClient.openSignIn({ routing: "hash" });
   };
   const showExpiredSession = () => {
     accountButton.classList.remove("is-signed-in", "has-username");
@@ -869,7 +455,7 @@ export async function initialiseAccount({
     if (signOutError) signOutError.textContent = "";
     try {
       beforeSignOut();
-      await clerk.signOut({
+      await authClient.signOut({
         redirectUrl: `${window.location.origin}${window.location.pathname}`,
       });
     } catch {
@@ -881,14 +467,14 @@ export async function initialiseAccount({
   });
   documentObject.querySelector("#account-create")?.addEventListener("click", () => {
     closeDialog(accessDialog);
-    clerk.openSignUp({ routing: "hash" });
+    authClient.openSignUp({ routing: "hash" });
   });
   documentObject.querySelector("#account-sign-in")?.addEventListener("click", () => {
     closeDialog(accessDialog);
-    clerk.openSignIn({ routing: "hash" });
+    authClient.openSignIn({ routing: "hash" });
   });
 
-  if (!clerk.isSignedIn) {
+  if (!authClient.isSignedIn) {
     const remembered = rememberedAccount();
     if (remembered) {
       showExpiredSession();
@@ -899,7 +485,7 @@ export async function initialiseAccount({
       accountButton.addEventListener("click", () => openDialog(accessDialog));
     }
     let wasSignedOut = true;
-    clerk.addListener(({ user }) => {
+    authClient.addListener(({ user }) => {
       if (wasSignedOut && user) {
         wasSignedOut = false;
         window.location.reload();
@@ -912,7 +498,7 @@ export async function initialiseAccount({
       accountButton.textContent = "Log in";
     });
     return createUnavailableController({
-      clerk,
+      authClient,
       signedIn: false,
       openPlayerProfile,
       openAccountAccess: () => openDialog(accessDialog),
@@ -926,31 +512,18 @@ export async function initialiseAccount({
 
   accountButton.classList.add("is-signed-in");
 
-  if (clerk.kind === "supabase") {
-    const securityCopy = documentObject.querySelector("[data-account-security-copy]");
-    const securityDescription = documentObject.querySelector('[data-account-description="security"]');
-    const profileButton = documentObject.querySelector("[data-open-clerk-profile]");
-    const securityButton = documentObject.querySelector("[data-open-clerk-security]");
-    if (securityCopy) {
-      securityCopy.textContent = "Your login uses a short-lived email code. The Daily Undead never sees or stores a password.";
-    }
-    if (securityDescription) securityDescription.textContent = "Email codes and signed-in devices";
-    if (profileButton) profileButton.hidden = true;
-    if (securityButton) securityButton.hidden = true;
-  }
-
   let account;
   try {
     const url = new URL("/api/account", apiUrl);
     url.searchParams.set("date", readOnlyProgress ? new Date().toISOString().slice(0, 10) : puzzleDate);
-    account = await requestJson(clerk, apiUrl, `${url.pathname}${url.search}`);
+    account = await requestJson(authClient, apiUrl, `${url.pathname}${url.search}`);
   } catch (error) {
     const remembered = rememberedAccount();
     accountButton.disabled = false;
     accountButton.textContent = "Account sync offline";
     accountButton.addEventListener("click", openSignOutDialog);
     return createUnavailableController({
-      clerk,
+      authClient,
       signedIn: true,
       openPlayerProfile,
       scheduleSave: remembered
@@ -977,7 +550,7 @@ export async function initialiseAccount({
 
       try {
         const snapshot = getLocalSnapshot();
-        await requestJson(clerk, apiUrl, "/api/account/register", {
+        await requestJson(authClient, apiUrl, "/api/account/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -997,11 +570,11 @@ export async function initialiseAccount({
       }
     });
 
-    return createUnavailableController({ clerk, signedIn: true, openPlayerProfile });
+    return createUnavailableController({ authClient, signedIn: true, openPlayerProfile });
   }
 
   profile = account.profile;
-  const userId = account.accountId || clerk.user.id;
+  const userId = account.accountId || authClient.user.id;
   const legacyUserId = account.legacyUserId;
   let pendingProgress = readOnlyProgress ? null : readPendingProgress(browserStorage, userId);
   if (!readOnlyProgress && !pendingProgress && legacyUserId && legacyUserId !== userId) {
@@ -1039,7 +612,7 @@ export async function initialiseAccount({
       // Compare yesterday's queued save with yesterday's cloud puzzle, rather
       // than comparing it with today's fresh board and inventing a conflict.
       try {
-        pendingCloud = await requestJson(clerk, apiUrl,
+        pendingCloud = await requestJson(authClient, apiUrl,
           `/api/account?date=${encodeURIComponent(puzzleDate)}&savedDate=${encodeURIComponent(pendingProgress.puzzleDate)}`);
         account.progress = pendingCloud.progress;
         pendingCloud.dailyState = pendingCloud.pendingDailyState;
@@ -1047,7 +620,7 @@ export async function initialiseAccount({
         accountButton.disabled = false;
         accountButton.textContent = 'Progress waiting to sync';
         return createUnavailableController({
-          clerk, signedIn: true, openPlayerProfile,
+          authClient, signedIn: true, openPlayerProfile,
           scheduleSave: () => persistPendingProgress(userId, pendingProgress.revision),
         });
       }
@@ -1064,7 +637,7 @@ export async function initialiseAccount({
 
     if (useDeviceProgress && !cloudCoversPending) {
       try {
-        const saveResult = await requestJson(clerk, apiUrl, "/api/account/save", {
+        const saveResult = await requestJson(authClient, apiUrl, "/api/account/save", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -1085,7 +658,7 @@ export async function initialiseAccount({
         accountButton.textContent = "Progress waiting to sync";
         rememberAccount(browserStorage, { userId, revision: cloudRevision });
         return createUnavailableController({
-          clerk,
+          authClient,
           signedIn: true,
           openPlayerProfile,
           scheduleSave: () => persistPendingProgress(userId, cloudRevision),
@@ -1102,22 +675,22 @@ export async function initialiseAccount({
     const replayedProgress = !readOnlyProgress && await replaySavedAccountResult({
       dailyState: account.dailyState,
       puzzleDate,
-      sendMapResult: (payload) => requestJson(clerk, apiUrl, "/api/account/results/map", {
+      sendMapResult: (payload) => requestJson(authClient, apiUrl, "/api/account/results/map", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       }),
-      sendBonusResult: (payload) => requestJson(clerk, apiUrl, "/api/account/results/bonus", {
+      sendBonusResult: (payload) => requestJson(authClient, apiUrl, "/api/account/results/bonus", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       }),
-      sendWordResult: (payload) => requestJson(clerk, apiUrl, "/api/account/results/word", {
+      sendWordResult: (payload) => requestJson(authClient, apiUrl, "/api/account/results/word", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       }),
-      sendBloodResult: (payload) => requestJson(clerk, apiUrl, '/api/account/results/blood', {
+      sendBloodResult: (payload) => requestJson(authClient, apiUrl, '/api/account/results/blood', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
       }),
     });
@@ -1210,7 +783,6 @@ export async function initialiseAccount({
   };
 
   const openProfileEditor = () => {
-    clerk.closeUserProfile();
     if (!profileEditorForm || !profileEditorDialog) return;
     ["favouriteGame", "favouriteMap", "bio"].forEach((field) => {
       profileEditorForm.elements[field].value = profile[field] || "";
@@ -1240,7 +812,7 @@ export async function initialiseAccount({
       if (selectedTheme && mapsSolved < selectedTheme.requiredMaps) {
         throw new Error(`${selectedTheme.label} unlocks at ${selectedTheme.requiredMaps} solves. Preview only for now.`);
       }
-      const result = await requestJson(clerk, apiUrl, "/api/account/profile", {
+      const result = await requestJson(authClient, apiUrl, "/api/account/profile", {
         method: "PUT", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -1271,18 +843,11 @@ export async function initialiseAccount({
 
   const openUsernameEditor = () => {
     if (!usernameDialog || !usernameForm || !usernameFeedback) return;
-    clerk.closeUserProfile();
     usernameForm.elements.publicName.value = profile.username;
     usernameFeedback.textContent = "";
     usernameFeedback.classList.remove("account-error", "is-success");
     globalThis.setTimeout(() => openDialog(usernameDialog), 250);
   };
-
-  documentObject.addEventListener("click", (event) => {
-    if (!event.target.closest("[data-open-username-editor]")) return;
-    event.preventDefault();
-    openUsernameEditor();
-  });
 
   usernameForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -1292,7 +857,7 @@ export async function initialiseAccount({
     usernameFeedback.classList.remove("account-error", "is-success");
 
     try {
-      const result = await requestJson(clerk, apiUrl, "/api/account/username", {
+      const result = await requestJson(authClient, apiUrl, "/api/account/username", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: usernameForm.elements.publicName.value.trim() }),
@@ -1310,21 +875,14 @@ export async function initialiseAccount({
     }
   });
 
-  const clerkProfileOptions = () => createUserProfileOptions(clerk, {
-    openUsernameEditor,
-    openProfileEditor,
-    beforeSignOut,
-    afterSignOutFailure,
-  });
-
-  const primaryEmail = () => clerk.user?.primaryEmailAddress?.emailAddress
-    || clerk.user?.emailAddresses?.[0]?.emailAddress
+  const primaryEmail = () => authClient.user?.primaryEmailAddress?.emailAddress
+    || authClient.user?.emailAddresses?.[0]?.emailAddress
     || "Not available";
   initialiseAccountSettings({
     documentObject,
-    clerk,
+    authClient,
     userIds: [userId, legacyUserId].filter(Boolean),
-    requestDelete: () => requestJson(clerk, apiUrl, "/api/account", {
+    requestDelete: () => requestJson(authClient, apiUrl, "/api/account", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ confirmation: "DELETE" }),
@@ -1337,23 +895,6 @@ export async function initialiseAccount({
     },
     afterDeleteFailure: () => { deletingAccount = false; intentionalSignOut = false; },
   });
-  const openClerkPage = (initialPage) => {
-    closeDialog(accountDetailsDialog);
-    closeDialog(accountSecurityDialog);
-    clerk.openUserProfile({
-      ...clerkProfileOptions(),
-      initialPage,
-    });
-  };
-
-  documentObject.querySelector("[data-open-clerk-profile]")?.addEventListener(
-    "click",
-    () => openClerkPage("account"),
-  );
-  documentObject.querySelector("[data-open-clerk-security]")?.addEventListener(
-    "click",
-    () => openClerkPage("security"),
-  );
   accountMenuDialog?.addEventListener("click", (event) => {
     const action = event.target.closest("[data-account-action]")?.dataset.accountAction;
     if (!action) return;
@@ -1399,7 +940,7 @@ export async function initialiseAccount({
       try {
         if (deletingAccount) return;
         const snapshot = structuredClone(getLocalSnapshot());
-        const saveResult = await requestJson(clerk, apiUrl, "/api/account/save", {
+        const saveResult = await requestJson(authClient, apiUrl, "/api/account/save", {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -1446,7 +987,7 @@ export async function initialiseAccount({
     return queueMutation(async () => {
       if (deletingAccount) return null;
       try {
-        const result = await requestJson(clerk, apiUrl, path, {
+        const result = await requestJson(authClient, apiUrl, path, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
@@ -1487,7 +1028,7 @@ export async function initialiseAccount({
   };
 
   let wasSignedIn = true;
-  clerk.addListener(({ user }) => {
+  authClient.addListener(({ user }) => {
     if (!wasSignedIn || user) return;
     wasSignedIn = false;
     controller.canSync = false;
@@ -1505,7 +1046,7 @@ export async function initialiseAccount({
 }
 
 function createUnavailableController({
-  clerk = null,
+  authClient = null,
   signedIn = false,
   openPlayerProfile = async () => {},
   scheduleSave = () => {},
@@ -1514,7 +1055,7 @@ function createUnavailableController({
   openAccountAccess = () => {},
 } = {}) {
   return {
-    available: Boolean(clerk),
+    available: Boolean(authClient),
     signedIn,
     canSync: false,
     resultSubmissionRequiresSignIn,

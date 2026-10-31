@@ -125,12 +125,12 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
     button.addEventListener("click", () => closeDialog(button.closest("dialog")));
   });
 
-  accountMenuNote.textContent = "Local demo mode. Clerk manages the standard account pages when signed in normally.";
+  accountMenuNote.textContent = "Local demo mode. Supabase handles sign-in when using a normal account.";
   ["profile", "security", "sign-out"].forEach((action) => {
     const button = accountDialog.querySelector(`[data-account-action="${action}"]`);
     button.disabled = true;
     const description = button.querySelector("span");
-    description.textContent = action === "sign-out" ? "Unavailable in demo mode" : "Managed by Clerk";
+    description.textContent = action === "sign-out" ? "Unavailable in demo mode" : "Managed by Supabase";
   });
 
   const avatarOptions = [

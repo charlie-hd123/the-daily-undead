@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "build:auth-vendor": "esbuild node_modules/@supabase/supabase-js/dist/index.mjs --bundle --format=esm --platform=browser --minify --outfile=js/vendor/supabase.js",
-    "migrate:auth-users": "node scripts/migrate-clerk-users-to-supabase.mjs",
     "start": "python3 -m http.server 8080",
     "dev": "node scripts/dev.mjs",
     "build:staging": "node scripts/build-staging.mjs",

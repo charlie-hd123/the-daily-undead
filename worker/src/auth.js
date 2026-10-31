@@ -11,15 +11,6 @@ function decodeJsonSegment(value) {
   return JSON.parse(new TextDecoder().decode(decodeBase64Url(value)));
 }
 
-function getAuthorizedParties(env) {
-  return new Set(
-    String(env.CLERK_AUTHORIZED_PARTIES || env.ALLOWED_ORIGINS || "")
-      .split(",")
-      .map((origin) => origin.trim().replace(/\/$/, ""))
-      .filter(Boolean),
-  );
-}
-
 async function getJwks(issuer, fetchImpl, cacheMilliseconds = 10 * 60 * 1000) {
   const now = Date.now();
   const cached = jwksCache.get(issuer);
@@ -98,38 +89,6 @@ async function verifySignature({ parts, header }, issuer, fetchImpl, cacheMillis
   if (!validSignature) throw new Error("The account session signature is invalid.");
 }
 
-export async function verifyClerkRequest(request, env, fetchImpl = fetch) {
-  const issuer = String(env.CLERK_ISSUER || "").replace(/\/$/, "");
-  if (!issuer.startsWith("https://")) throw new Error("Clerk is not configured.");
-  const decoded = decodeToken(bearerToken(request));
-  const { header, payload } = decoded;
-  if (header.alg !== "RS256") {
-    throw new Error("The account session uses an unsupported signature.");
-  }
-  await verifySignature(decoded, issuer, fetchImpl, 60 * 60 * 1000);
-
-  const now = Math.floor(Date.now() / 1000);
-  const authorizedParties = getAuthorizedParties(env);
-  if (
-    payload.iss !== issuer ||
-    typeof payload.sub !== "string" ||
-    !payload.sub.startsWith("user_") ||
-    !Number.isFinite(payload.exp) ||
-    payload.exp <= now - 5 ||
-    (Number.isFinite(payload.nbf) && payload.nbf > now + 5) ||
-    typeof payload.azp !== "string" ||
-    !authorizedParties.has(payload.azp.replace(/\/$/, ""))
-  ) {
-    throw new Error("The account session claims are invalid.");
-  }
-
-  return {
-    provider: "clerk",
-    subject: payload.sub,
-    sessionId: payload.sid || null,
-  };
-}
-
 function audienceIncludes(audience, expected) {
   return audience === expected || (Array.isArray(audience) && audience.includes(expected));
 }
@@ -162,6 +121,7 @@ export async function verifySupabaseRequest(request, env, fetchImpl = fetch) {
     provider: "supabase",
     subject: payload.sub,
     sessionId: payload.session_id || null,
+    // Keep the signed migration hint for returning players; it is not Clerk auth.
     migrationSubject: typeof payload.app_metadata?.daily_undead_clerk_user_id === "string"
       && payload.app_metadata.daily_undead_clerk_user_id.startsWith("user_")
       ? payload.app_metadata.daily_undead_clerk_user_id
@@ -172,9 +132,7 @@ export async function verifySupabaseRequest(request, env, fetchImpl = fetch) {
 export async function verifyAccountRequest(request, env, fetchImpl = fetch) {
   const token = bearerToken(request);
   const { payload } = decodeToken(token);
-  const clerkIssuer = String(env.CLERK_ISSUER || "").replace(/\/$/, "");
   const supabaseIssuer = String(env.SUPABASE_ISSUER || "").replace(/\/$/, "");
-  if (payload.iss === clerkIssuer) return verifyClerkRequest(request, env, fetchImpl);
   if (payload.iss === supabaseIssuer) return verifySupabaseRequest(request, env, fetchImpl);
   throw new Error("The account session issuer is invalid.");
 }

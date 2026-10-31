@@ -269,19 +269,6 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(account, /accountButton\.textContent = profile\.username;/);
   assert.match(account, /accountButton\.classList\.add\("has-username"\)/);
   assert.match(css, /\.account-button\.has-username \{\s*text-transform: none;/);
-  assert.match(account, /function createClerkAppearance\(\)/);
-  assert.match(account, /appearance: createClerkAppearance\(\)/);
-  assert.match(account, /colorPrimary: "#67e8ff"/);
-  assert.match(account, /colorBackground: "#0d111d"/);
-  assert.match(account, /fontFamilyButtons: displayFont/);
-  assert.match(account, /fontSize: "0\.875rem"/);
-  assert.match(account, /outline: "3px solid #ffffff"/);
-  assert.match(account, /boxShadow:[\s\S]*?!important/);
-  assert.match(account, /navbarButton__active/);
-  assert.match(account, /profileSectionPrimaryButton/);
-  assert.match(account, /formButtonPrimary/);
-  assert.match(account, /customPages/);
-  assert.match(account, /label: "Change username"/);
   assert.match(account, /"\/api\/account\/username"/);
   assert.match(html, /id="account-username-dialog"/);
   assert.equal((html.match(/maxlength="16"/g) || []).length, 2);
@@ -295,10 +282,9 @@ test("account controls support optional sign-in without exposing private credent
     /id="account-username-form"[\s\S]*?name="publicName"[\s\S]*?autocomplete="off"/,
   );
   assert.match(account, /usernameForm\.elements\.publicName\.value = profile\.username/);
-  assert.match(account, /button\.dataset\.openUsernameEditor = ""/);
-  assert.match(account, /event\.target\.closest\("\[data-open-username-editor\]"\)/);
-  assert.match(account, /label: "Sign out"/);
-  assert.match(account, /clerk\.signOut\(/);
+  assert.match(account, /authClient\.signOut\(/);
+  assert.doesNotMatch([html, account, css].join("\n"), /clerk/i);
+  assert.match(account, /loadSupabaseAuth\(documentObject\)/);
   assert.match(html, /id="account-details-dialog"/);
   assert.match(html, /id="account-security-dialog"/);
   assert.match(html, /id="account-sign-out-dialog"/);
@@ -313,12 +299,8 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(account, /textContent = "Edit your profile →"[\s\S]*?openProfileEditor\(\)/);
   assert.match(account, /textContent = "Profile saved\.";[\s\S]*?closeDialog\(profileEditorDialog\)/);
   assert.match(css, /\.public-profile-header h2 \{[^}]*text-transform: none;/);
-  assert.match(account, /\[data-confirm-sign-out\][\s\S]*?beforeSignOut\(\)[\s\S]*?clerk\.signOut\(/);
+  assert.match(account, /\[data-confirm-sign-out\][\s\S]*?beforeSignOut\(\)[\s\S]*?authClient\.signOut\(/);
   assert.match(account, /accountButton\.classList\.add\("is-signed-in"\)/);
-  assert.match(css, /\.clerk-sign-out-page::before,/);
-  assert.match(css, /\.clerk-username-page::before \{/);
-  assert.match(css, /linear-gradient\(90deg, var\(--aether\), var\(--aether-violet\), var\(--aether-pink\)\)/);
-  assert.match(css, /font-size: clamp\(1\.65rem, 4vw, 2\.1rem\);/);
   assert.match(css, /#account-button:not\(\.is-signed-in\)/);
   assert.match(css, /#account-button::before[\s\S]*mask-image:/);
   assert.match(css, /#leaderboards-button::before[\s\S]*mask-image:/);

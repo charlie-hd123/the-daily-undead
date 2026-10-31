@@ -1,6 +1,6 @@
 # Account and community statistics operations guide
 
-The Daily Undead remains a static GitHub Pages site. Optional accounts, cross-device saves, verified results, and community statistics are handled by a Cloudflare Worker and D1 database. Clerk handles email-code authentication; the Worker verifies Clerk session tokens without storing a Clerk secret.
+The Daily Undead remains a static GitHub Pages site. Optional accounts, cross-device saves, verified results, and community statistics are handled by a Cloudflare Worker and D1 database. Supabase handles passwordless email-code authentication; the Worker verifies Supabase session tokens against the project’s published signing keys.
 
 ## Live production configuration
 
@@ -9,12 +9,13 @@ The Daily Undead remains a static GitHub Pages site. Optional accounts, cross-de
 - D1 database: `daily-undead-stats`
 - D1 binding: `DB`
 - Worker variable: `ALLOWED_ORIGINS`
-- Worker variable: `CLERK_ISSUER`
-- Worker variable: `CLERK_AUTHORIZED_PARTIES`
+- Worker variable: `SUPABASE_ISSUER`
+- Worker variable: `SUPABASE_HEARTBEAT_URL`
+- Server-only secret: `SUPABASE_SECRET_KEY` or existing `SUPABASE_HEARTBEAT_SECRET_KEY`
 - Dashboard-managed custom domain: `api.thedailyundead.com`
 - `workers.dev` URL: disabled; the custom domain is the only production address
 - Observability: invocation logs enabled, traces disabled
-- Cron triggers, queues, routes, build hooks, and secrets: none
+- Cron: every 12 hours for Supabase heartbeat and account maintenance; preserve existing server secrets
 
 The frontend API address is the public metadata value in `index.html`; it is not a credential. Cloudflare API tokens and account credentials must never be added to frontend files.
 
@@ -31,7 +32,7 @@ The Worker exposes:
 - `PUT /api/account/save` to synchronise personal progress and the current daily state.
 - `POST /api/account/results/map`, `POST /api/account/results/bonus`, and `POST /api/account/results/word` for server-verified official daily results.
 
-All `/api/account` routes require a Clerk bearer token. The Worker verifies the RS256 signature against Clerk's published JWKS, then checks the issuer and authorized browser origin (`azp`).
+All `/api/account` routes require a Supabase bearer token. The Worker verifies the ES256/RS256 signature against the configured project's JWKS, then checks issuer, expiry, authenticated audience/role and subject. Browser origins are restricted by `ALLOWED_ORIGINS`. Clerk tokens are rejected in the cleanup candidate; production retains its existing behavior until explicit promotion.
 
 Account saves may include the last cloud revision seen by the browser. D1 increments the revision on every successful save and rejects stale revisions with `409`, preventing pending progress from one device from silently replacing newer progress saved on another device. A player can explicitly resolve that conflict in the browser before retrying.
 
@@ -55,7 +56,7 @@ A Quest Steps play is recorded when the player confirms a map. A Last Words play
 
 The browser creates a random local identifier. The Worker hashes it with SHA-256 before D1 storage. D1's `UNIQUE (puzzle_date, player_hash, puzzle_type)` rule is the final protection against repeat submissions from one browser for the same puzzle on one UTC date. Another browser or device can count separately.
 
-The anonymous tables store the puzzle/date, answer map, correct/incorrect map result, hashed browser identifier, and submission time. Account tables store an opaque Clerk user ID, public username, permanent Score and Solves, Round and Highest Round, daily save state, and verified daily results. Verified result awards are idempotent, so a retried request cannot add Score twice. Email addresses, passwords, and verification codes stay with Clerk and are never stored in D1. Worker invocation logs are a separate Cloudflare operational feature and can contain normal request metadata.
+The anonymous tables store the puzzle/date, answer map, correct/incorrect map result, hashed browser identifier, and submission time. Account tables retain their original opaque player IDs, stable application account IDs, provider identity mappings, public username, permanent Score and Solves, Round and Highest Round, daily save state, and verified daily results. Verified result awards are idempotent, so a retried request cannot add Score twice. Email addresses and verification codes stay with Supabase Auth and are never stored in D1. Worker invocation logs are a separate Cloudflare operational feature and can contain normal request metadata.
 
 The all-time total started with an estimated 100 historical games from before tracking launched. `migrations/0002_seed_historical_total.sql` documents that one-time baseline and cannot reduce a total that has already passed 100.
 
@@ -80,7 +81,8 @@ D1 contains these application tables:
 - `attempts` — one accepted browser/date entry per completed map guess.
 - `daily_stats` — daily attempt and correct-answer aggregates plus the answer map.
 - `community_totals` — the all-time total.
-- `player_profiles` — Clerk user ID plus the case-insensitive public username.
+- `player_profiles` — original player ID, stable application account ID and case-insensitive public username.
+- `account_identities` — Supabase links plus historical Clerk mappings required for returning migrated players; preserve them.
 - `player_saves` — cross-device progression totals and missed-day state.
 - `player_daily_saves` — resumable per-day game state.
 - `player_daily_results` — one independently verified result per player and UTC date.
@@ -196,11 +198,11 @@ If the Worker ever has to be recreated:
    ALLOWED_ORIGINS=https://thedailyundead.com,https://www.thedailyundead.com
    ```
 
-   Add `CLERK_ISSUER` using the Clerk instance URL and set `CLERK_AUTHORIZED_PARTIES` to the same comma-separated production browser origins. These values are configuration, not secrets. Use the separate local Wrangler configs for localhost development.
+   Set `SUPABASE_ISSUER` and `SUPABASE_HEARTBEAT_URL` from the environment’s tracked Wrangler configuration. Retain the existing server-only Supabase secret for heartbeat, account metadata and deletion. Use the local Wrangler configuration for localhost development; never substitute production authentication there.
 
 6. Under **Domains**, disable the production `workers.dev` URL.
 7. Add the custom domain `api.thedailyundead.com`.
-8. Leave routes, cron triggers, queues, build hooks, and secrets empty.
+8. Restore the tracked 12-hour cron and existing server-only Supabase secrets. Do not copy production data into staging.
 
 ## Production verification after publishing the site
 

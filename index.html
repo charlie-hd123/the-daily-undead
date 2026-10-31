@@ -5,14 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#070a12">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <meta name="daily-undead-build" content="20261031-8">
+    <meta name="daily-undead-build" content="20261031-9">
     <!-- Public API URL only; localhost is isolated to a local Worker on port 8787. -->
     <meta name="daily-undead-stats-api" content="https://api.thedailyundead.com">
     <!-- Replace this marker with the exact UTC launch time in the production launch commit. -->
     <meta name="daily-undead-progression-launch-at" content="2026-10-02T09:11:35Z">
-    <!-- Clerk publishable keys identify the public frontend and are safe to expose. -->
-    <meta name="daily-undead-clerk-publishable-key" content="pk_live_Y2xlcmsudGhlZGFpbHl1bmRlYWQuY29tJA">
-    <!-- Supabase publishable configuration is safe to expose; Clerk remains available for rollback. -->
+    <!-- Supabase publishable configuration is safe to expose. -->
     <meta name="daily-undead-supabase-url" content="https://bhqhfxwdcpujfxxvcoeo.supabase.co">
     <meta name="daily-undead-supabase-publishable-key" content="sb_publishable_MbUwrP6JY8xVSyqiC0683g__7bRCOYk">
     <link rel="canonical" href="https://thedailyundead.com/">
@@ -21,18 +19,18 @@
       content="The Daily Undead — your daily Treyarch Zombies challenge. Play Last Words, Quest Steps and Blood Ties."
     >
     <title>The Daily Undead</title>
-    <link rel="icon" href="./assets/favicon.png?v=20261031-8" type="image/png" sizes="128x128">
-    <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png?v=20261031-8" sizes="180x180">
-    <link rel="preload" as="image" href="./assets/mystery-box/chest-poster.webp?v=20261031-8">
-    <link rel="preload" as="font" href="./assets/fonts/barlow-condensed-600.ttf?v=20261031-8" type="font/ttf" crossorigin>
-    <link rel="stylesheet" href="./styles.css?v=20261031-8">
-    <link rel="stylesheet" href="./staging-demo.css?v=20261031-8">
+    <link rel="icon" href="./assets/favicon.png?v=20261031-9" type="image/png" sizes="128x128">
+    <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png?v=20261031-9" sizes="180x180">
+    <link rel="preload" as="image" href="./assets/mystery-box/chest-poster.webp?v=20261031-9">
+    <link rel="preload" as="font" href="./assets/fonts/barlow-condensed-600.ttf?v=20261031-9" type="font/ttf" crossorigin>
+    <link rel="stylesheet" href="./styles.css?v=20261031-9">
+    <link rel="stylesheet" href="./staging-demo.css?v=20261031-9">
   </head>
   <body>
-    <script src="./js/player-entry.js?v=20261031-8"></script>
+    <script src="./js/player-entry.js?v=20261031-9"></script>
     <header class="site-header">
       <div class="brand-lockup">
-        <img class="brand-logo" src="./assets/zombie-logo.png?v=20261031-8" alt="" width="512" height="512">
+        <img class="brand-logo" src="./assets/zombie-logo.png?v=20261031-9" alt="" width="512" height="512">
         <div class="brand-copy">
           <p class="eyebrow">Your daily Treyarch Zombies challenge</p>
           <h1>The Daily Undead</h1>
@@ -76,7 +74,7 @@
       <p class="puzzle-entry-loading" role="status">Loading today’s puzzle…</p>
       <div id="initial-mystery-box" class="mb-reveal mb-loading" data-phase="closed">
         <div class="mb-scene">
-          <img class="mb-poster" src="./assets/mystery-box/chest-poster.webp?v=20261031-8" alt="" width="1220" height="620" fetchpriority="high">
+          <img class="mb-poster" src="./assets/mystery-box/chest-poster.webp?v=20261031-9" alt="" width="1220" height="620" fetchpriority="high">
           <button id="mb-open-trigger" class="mb-open-trigger" type="button" aria-label="Open box to reveal today’s puzzle"></button>
         </div>
         <div class="mb-copy">
@@ -343,7 +341,7 @@
         <button type="button" data-account-action="game-profile"><strong>Profile</strong><span>Avatar, theme and favourites</span></button>
         <button type="button" data-account-action="username"><strong>Change username</strong><span>Public leaderboard name</span></button>
         <button type="button" data-account-action="profile"><strong>Account</strong><span data-account-description="profile">Email and account details</span></button>
-        <button type="button" data-account-action="security"><strong>Security</strong><span data-account-description="security">Password and active devices</span></button>
+        <button type="button" data-account-action="security"><strong>Security</strong><span data-account-description="security">Email codes and signed-in devices</span></button>
         <button type="button" data-account-action="sign-out"><strong>Sign out</strong><span data-account-description="sign-out">Sign out of this device</span></button>
       </div>
     </dialog>
@@ -363,7 +361,6 @@
         <button class="button" type="button" data-change-email>Change email</button>
         <button class="button danger" type="button" data-delete-account>Delete account</button>
       </div>
-      <button class="button" type="button" data-open-clerk-profile>Manage sign-in details</button>
     </dialog>
 
     <dialog id="account-email-dialog" class="account-dialog" aria-labelledby="account-email-title">
@@ -411,12 +408,11 @@
       <button class="dialog-close" type="button" data-close-account-dialog aria-label="Close">×</button>
       <p class="kicker">Account protection</p>
       <h2>Security</h2>
-      <p data-account-security-copy>Your login is protected by Clerk. The Daily Undead never sees or stores your password.</p>
+      <p data-account-security-copy>Your login uses a short-lived email code. The Daily Undead never sees or stores a password.</p>
       <div class="account-security-status">
         <span aria-hidden="true">✓</span>
         <div><strong>Signed in securely</strong><small data-account-security-email>Current device</small></div>
       </div>
-      <button class="button" type="button" data-open-clerk-security>Manage password &amp; devices</button>
     </dialog>
 
     <dialog id="account-sign-out-dialog" class="account-dialog account-sign-out-dialog">
@@ -465,7 +461,7 @@
       <div data-public-profile-content></div>
     </dialog>
 
-    <script type="module" src="./js/app.js?v=20261031-8"></script>
+    <script type="module" src="./js/app.js?v=20261031-9"></script>
 
     <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "4eeb20e1411c4e7baf24969ced969c88"}'></script><!-- End Cloudflare Web Analytics -->
 

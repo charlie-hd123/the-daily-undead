@@ -8,7 +8,6 @@ export function configureHtml(source, config, environment) {
   let html = source;
   for (const [name, value] of Object.entries({
     "daily-undead-stats-api": config.apiUrl,
-    "daily-undead-clerk-publishable-key": config.clerkPublishableKey,
     "daily-undead-supabase-url": config.supabaseUrl,
     "daily-undead-supabase-publishable-key": config.supabasePublishableKey,
   })) html = html.replace(new RegExp(`(name="${name}" content=")[^"]*(")`), (_, before, after) => `${before}${value}${after}`);

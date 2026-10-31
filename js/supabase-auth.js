@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261031-8";
+import { browserStorage } from "./browser-storage.js?v=20261031-9";
 import { createClient } from "./vendor/supabase.js";
 
 function readConfig(documentObject) {
@@ -197,7 +197,6 @@ export async function loadSupabaseAuth(documentObject = document) {
   }
 
   const facade = {
-    kind: "supabase",
     client,
     get isSignedIn() { return Boolean(currentSession); },
     get user() { return publicUser(); },
@@ -208,8 +207,6 @@ export async function loadSupabaseAuth(documentObject = document) {
     },
     openSignIn() { begin("signin"); },
     openSignUp() { begin("signup"); },
-    openUserProfile() { openDialog(documentObject.querySelector("#account-details-dialog")); },
-    closeUserProfile() {},
     addListener(listener) {
       listeners.add(listener);
       return () => listeners.delete(listener);

@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { resetJwksCacheForTests, verifySupabaseRequest } from "../worker/src/auth.js";
+import { resetJwksCacheForTests, verifyAccountRequest, verifySupabaseRequest } from "../worker/src/auth.js";
 import { createAccountId, resolveAccountIdentity } from "../worker/src/identities.js";
 import worker from "../worker/src/index.js";
 
@@ -74,6 +74,36 @@ test("Supabase JWT verification rejects the wrong audience", async () => {
     ),
     /claims are invalid/,
   );
+});
+
+test("account authentication rejects retired Clerk issuers without fetching keys", async () => {
+  const { token } = await signedToken({ iss: "https://clerk.thedailyundead.com", sub: "user_existing" });
+  let fetched = false;
+  await assert.rejects(verifyAccountRequest(
+    new Request("https://api.example/api/account", { headers: { Authorization: `Bearer ${token}` } }),
+    {
+      SUPABASE_ISSUER: "https://example.supabase.co/auth/v1",
+      // Even a stale dashboard variable cannot re-enable the retired provider.
+      CLERK_ISSUER: "https://clerk.thedailyundead.com",
+    },
+    async () => { fetched = true; throw new Error("must not fetch Clerk keys"); },
+  ), /issuer is invalid/);
+  assert.equal(fetched, false);
+});
+
+test("account authentication retains signed Supabase migration metadata", async () => {
+  resetJwksCacheForTests();
+  const { token, jwk } = await signedToken({ app_metadata: { daily_undead_clerk_user_id: "user_returning" } });
+  const identity = await verifyAccountRequest(
+    new Request("https://api.example/api/account", { headers: { Authorization: `Bearer ${token}` } }),
+    { SUPABASE_ISSUER: "https://example.supabase.co/auth/v1" },
+    async (url) => {
+      assert.equal(url, "https://example.supabase.co/auth/v1/.well-known/jwks.json");
+      return Response.json({ keys: [jwk] });
+    },
+  );
+  assert.equal(identity.provider, "supabase");
+  assert.equal(identity.migrationSubject, "user_returning");
 });
 
 test("app-owned account ids do not depend on an auth provider", () => {

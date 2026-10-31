@@ -1,4 +1,4 @@
-import { fetchWithTimeout } from "./network.js?v=20261031-8";
+import { fetchWithTimeout } from "./network.js?v=20261031-9";
 
 const buildVersionPattern = /^\d{8}-\d+$/;
 

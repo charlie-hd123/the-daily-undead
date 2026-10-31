@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261031-8";
+import { browserStorage } from "./browser-storage.js?v=20261031-9";
 export async function requestEmailChange(auth, email, currentEmail, redirectUrl) {
   const nextEmail = String(email || "").trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nextEmail)) throw new Error("Enter a valid email address.");
@@ -26,7 +26,7 @@ export function clearDeletedAccountStorage(storage, userIds = []) {
     .forEach((key) => storage.removeItem(key));
 }
 
-export function initialiseAccountSettings({ documentObject, clerk, userIds, requestDelete, beforeDelete, afterDeleteFailure }) {
+export function initialiseAccountSettings({ documentObject, authClient, userIds, requestDelete, beforeDelete, afterDeleteFailure }) {
   const emailDialog = documentObject.querySelector("#account-email-dialog");
   const emailForm = documentObject.querySelector("#account-email-form");
   const codeForm = documentObject.querySelector("#account-email-code-form");
@@ -45,7 +45,7 @@ export function initialiseAccountSettings({ documentObject, clerk, userIds, requ
     codeForm.hidden = false;
     emailCopy.textContent = `Check ${pendingEmail} and your current inbox. Open the confirmation links in the emails. If they include codes, you can enter those below instead. Confirm both emails when asked. Your progress stays with your account.`;
     codeForm.elements.recipient.replaceChildren();
-    [pendingEmail, clerk.user.primaryEmailAddress.emailAddress].forEach((email) => {
+    [pendingEmail, authClient.user.primaryEmailAddress.emailAddress].forEach((email) => {
       const option = documentObject.createElement("option");
       option.value = email;
       option.textContent = email;
@@ -54,11 +54,10 @@ export function initialiseAccountSettings({ documentObject, clerk, userIds, requ
     codeForm.elements.code.value = "";
   };
   const openEmail = () => {
-    if (clerk.kind !== "supabase") return clerk.openUserProfile({ initialPage: "account" });
     close(documentObject.querySelector("#account-details-dialog"));
     emailForm.reset();
     codeForm.reset();
-    pendingEmail = clerk.user.pendingEmail || pendingEmail;
+    pendingEmail = authClient.user.pendingEmail || pendingEmail;
     feedback.textContent = "";
     emailForm.hidden = false;
     codeForm.hidden = true;
@@ -72,7 +71,7 @@ export function initialiseAccountSettings({ documentObject, clerk, userIds, requ
     button.disabled = true;
     feedback.textContent = "";
     try {
-      pendingEmail = await requestEmailChange(clerk.client.auth, emailForm.elements.email.value, clerk.user.primaryEmailAddress.emailAddress, redirectUrl);
+      pendingEmail = await requestEmailChange(authClient.client.auth, emailForm.elements.email.value, authClient.user.primaryEmailAddress.emailAddress, redirectUrl);
       resendAfter = Date.now() + 60_000;
       showPending();
     } catch (error) { feedback.textContent = error.message; }
@@ -84,12 +83,12 @@ export function initialiseAccountSettings({ documentObject, clerk, userIds, requ
     button.disabled = true;
     feedback.textContent = "";
     try {
-      const complete = await verifyEmailChange(clerk.client.auth, codeForm.elements.recipient.value, codeForm.elements.code.value, pendingEmail);
+      const complete = await verifyEmailChange(authClient.client.auth, codeForm.elements.recipient.value, codeForm.elements.code.value, pendingEmail);
       if (complete) {
         pendingEmail = "";
         codeForm.hidden = true;
         feedback.textContent = "Email updated. Use your new email next time you sign in.";
-        documentObject.querySelector("[data-account-profile-email]").textContent = clerk.user.primaryEmailAddress.emailAddress;
+        documentObject.querySelector("[data-account-profile-email]").textContent = authClient.user.primaryEmailAddress.emailAddress;
       } else {
         feedback.textContent = "Code accepted. Now enter the code sent to your other email address.";
         codeForm.elements.recipient.selectedIndex = codeForm.elements.recipient.selectedIndex === 0 ? 1 : 0;
@@ -106,7 +105,7 @@ export function initialiseAccountSettings({ documentObject, clerk, userIds, requ
     }
     event.target.disabled = true;
     try {
-      const result = await clerk.client.auth.updateUser({ email: pendingEmail }, { emailRedirectTo: redirectUrl });
+      const result = await authClient.client.auth.updateUser({ email: pendingEmail }, { emailRedirectTo: redirectUrl });
       if (result.error) throw result.error;
       resendAfter = Date.now() + 60_000;
       feedback.textContent = "New confirmation emails sent. Use the latest emails.";
@@ -119,7 +118,7 @@ export function initialiseAccountSettings({ documentObject, clerk, userIds, requ
     codeForm.hidden = true;
     feedback.textContent = "";
   });
-  clerk.addListener(({ user }) => {
+  authClient.addListener(({ user }) => {
     if (!pendingEmail || user?.primaryEmailAddress?.emailAddress?.toLowerCase() !== pendingEmail.toLowerCase()) return;
     pendingEmail = "";
     emailForm.hidden = true;
@@ -128,7 +127,7 @@ export function initialiseAccountSettings({ documentObject, clerk, userIds, requ
     documentObject.querySelector("[data-account-profile-email]").textContent = user.primaryEmailAddress.emailAddress;
   });
   documentObject.querySelectorAll("[data-delete-account]").forEach((button) => {
-    button.hidden = clerk.kind !== "supabase";
+    button.hidden = false;
     button.addEventListener("click", () => {
       close(documentObject.querySelector("#account-details-dialog"));
       deleteForm.reset();
@@ -154,8 +153,8 @@ export function initialiseAccountSettings({ documentObject, clerk, userIds, requ
       if (result.deleted !== true) throw new Error("Could not confirm deletion. Please try again.");
       deleted = true;
       try { clearDeletedAccountStorage(browserStorage, userIds); } catch { /* Storage may be disabled. */ }
-      try { await clerk.signOut(); } catch { /* The auth user may already be gone. */ }
-      clerk.forgetDeletedSession?.();
+      try { await authClient.signOut(); } catch { /* The auth user may already be gone. */ }
+      authClient.forgetDeletedSession?.();
       deleteForm.hidden = true;
       deleteError.textContent = result.authDeletionPending
         ? "Your account and progress have been removed. Sign-in removal is queued and will finish automatically."

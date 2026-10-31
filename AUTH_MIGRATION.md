@@ -14,9 +14,21 @@ authentication provider and transactional account email delivery change:
 ## Current safety boundary
 
 The production frontend switched to Supabase Auth on 7 October 2026. The
-production Worker continues accepting both Clerk and Supabase during the
-rollback overlap period. Clerk configuration, imported Supabase users and the
-historical identity mappings must remain in place until that period ends.
+31 October cleanup candidate removes the unused Clerk browser fallback,
+Clerk JWT verification and provider configuration. It is a staging release;
+production remains unchanged until an explicitly approved promotion.
+See [CLERK-RETIREMENT.md](CLERK-RETIREMENT.md) for scope and validation.
+
+Historical identity mappings, original player IDs and imported Supabase
+`daily_undead_clerk_user_id` app metadata remain required. The first Supabase
+visit by a returning migrated player may still use them to recover an existing
+profile and its saves. This path uses D1 and signed Supabase metadata only;
+it does not call Clerk. Never remove these records as redundant code.
+
+The sections below record the October cutover, including the former
+dual-provider overlap and rollback procedure; they are historical, not current
+deployment instructions. The one-off import scripts and `migrate:auth-users`
+command have been retired; their original versions remain in Git history.
 
 ## Staging state
 

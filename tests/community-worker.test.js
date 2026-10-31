@@ -21,7 +21,7 @@ import {
   updateAccountUsername,
   updateSocialProfile,
 } from "../worker/src/accounts.js";
-import { verifyClerkRequest } from "../worker/src/auth.js";
+import { verifyAccountRequest } from "../worker/src/auth.js";
 import {
   answerEquivalents as workerAnswerEquivalents,
   profileGames,
@@ -82,7 +82,8 @@ test("production Worker origins stay isolated from localhost preview origins", a
   const productionConfig = JSON.parse(await readProjectFile("worker/wrangler.jsonc"));
   assert.match(productionConfig.vars.ALLOWED_ORIGINS, /https:\/\/thedailyundead\.com/);
   assert.doesNotMatch(productionConfig.vars.ALLOWED_ORIGINS, /localhost|127\.0\.0\.1/);
-  assert.doesNotMatch(productionConfig.vars.CLERK_AUTHORIZED_PARTIES, /localhost|127\.0\.0\.1/);
+  assert.equal(productionConfig.vars.CLERK_ISSUER, undefined);
+  assert.equal(productionConfig.vars.CLERK_AUTHORIZED_PARTIES, undefined);
 });
 
 test("account usernames and uploaded local saves are tightly validated", () => {
@@ -506,14 +507,13 @@ test("username changes preserve D1 uniqueness errors", async () => {
   });
 });
 
-test("account routes reject requests without a Clerk bearer token before any network call", async () => {
+test("account routes reject requests without a Supabase bearer token before any network call", async () => {
   let fetched = false;
   await assert.rejects(
-    verifyClerkRequest(
+    verifyAccountRequest(
       new Request("https://api.example.test/api/account"),
       {
-        CLERK_ISSUER: "https://example.clerk.accounts.dev",
-        CLERK_AUTHORIZED_PARTIES: "https://thedailyundead.com",
+        SUPABASE_ISSUER: "https://example.supabase.co/auth/v1",
       },
       async () => {
         fetched = true;
