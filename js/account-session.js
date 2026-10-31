@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261031-5";
+import { browserStorage } from "./browser-storage.js?v=20261031-7";
 export const accountMemoryStorageKey = "the-daily-undead:account-memory";
 const pendingProgressStoragePrefix = "the-daily-undead:account-pending:";
 
@@ -212,15 +212,13 @@ export function recommendedAccountSave(pending, account) {
   return cloudCoversLocal ? 'cloud' : 'device';
 }
 
-export function describeAccountSave(date, snapshot) {
-  const day = snapshot?.dailyState;
-  const type = day?.dayStateVersion === 1 ? day.officialType : 'easter';
-  const session = day?.dayStateVersion === 1 ? day.sessions?.[type] : day;
+function describePuzzleSession(type, session) {
   let detail = 'Puzzle not started.';
   if (type === 'word' && session) {
     detail = `Letters tried: ${session.guesses?.join(', ') || 'none'}.`;
   } else if (type === 'blood' && session) {
-    detail = `${session.solved?.length || 0}/4 connections; ${session.attempts?.length || 0} attempts.`;
+    const attempts = session.attempts?.length || 0;
+    detail = `${session.solved?.length || 0}/4 connections; ${attempts} ${attempts === 1 ? 'attempt' : 'attempts'}.`;
     if (session.selected?.length) detail += ` Selected: ${session.selected.join(', ')}.`;
     else if (session.attempts?.length) detail += ` Last trio: ${session.attempts.at(-1).join(', ')}.`;
   } else if (type === 'easter' && session) {
@@ -228,8 +226,23 @@ export function describeAccountSave(date, snapshot) {
       ? session.isCorrect ? 'correct map' : 'incorrect map' : 'map not submitted'}.`;
     if (session.bonusComplete || session.bonusFailed) detail += ` Bonus ${session.bonusComplete ? 'correct' : 'incorrect'}.`;
   }
+  return detail;
+}
+
+export function describeAccountSave(date, snapshot, otherSnapshot) {
+  const day = snapshot?.dailyState;
+  const otherDay = otherSnapshot?.dailyState;
+  if (day?.dayStateVersion === 1 && otherDay?.dayStateVersion === 1 && day.dateKey === otherDay.dateKey) {
+    const labels = { word: 'Last Words', easter: 'Quest Steps', blood: 'Blood Ties' };
+    const differentTypes = ['word', 'easter', 'blood'].filter((type) =>
+      !sameActions(puzzleActions(day.sessions?.[type]), puzzleActions(otherDay.sessions?.[type])));
+    if (differentTypes.length) return `${date} · ${differentTypes.map((type) =>
+      `${labels[type]}: ${describePuzzleSession(type, day.sessions?.[type])}`).join(' ')}`;
+  }
+  const type = day?.dayStateVersion === 1 ? day.officialType : 'easter';
+  const session = day?.dayStateVersion === 1 ? day.sessions?.[type] : day;
   const complete = day?.officialCompleted || isLegacyComplete(day);
-  return `${date} · ${complete ? 'Daily puzzle complete. ' : ''}${detail}`;
+  return `${date} · ${complete ? 'Daily puzzle complete. ' : ''}${describePuzzleSession(type, session)}`;
 }
 
 function isLegacyComplete(state) {

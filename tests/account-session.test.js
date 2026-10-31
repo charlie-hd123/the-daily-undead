@@ -113,6 +113,18 @@ test('save recommendations require strictly inclusive puzzle progress, never a l
   assert.equal(recommendedAccountSave(pending,{dailyState:null}),null,'missing evidence cannot justify a highlighted choice');
 });
 
+test('conflict summaries show the differing just-for-fun puzzle instead of identical official results', () => {
+  const local={dailyState:wordDay(['E'])},cloud=structuredClone(local);
+  local.dailyState.officialCompleted=true;cloud.dailyState.officialCompleted=true;
+  local.dailyState.sessions.blood={key:'blood-key',rulesVersion:3,attempts:[['A','B','C']],solved:['group'],selected:[]};
+  cloud.dailyState.sessions.blood={key:'blood-key',rulesVersion:3,attempts:[],solved:[],selected:[]};
+  const localSummary=describeAccountSave('2026-10-31',local,cloud);
+  const cloudSummary=describeAccountSave('2026-10-31',cloud,local);
+  assert.match(localSummary,/Blood Ties: 1\/4 connections; 1 attempt\./);
+  assert.match(cloudSummary,/Blood Ties: 0\/4 connections; 0 attempts/);
+  assert.doesNotMatch(localSummary,/Letters tried|Daily puzzle complete/);
+});
+
 test('new just-for-fun actions and independent Blood Ties transcripts still require a choice', () => {
   const local=wordDay(['E']),cloud=wordDay(['E','G']);
   local.sessions.blood={key:'blood-key',rulesVersion:3,attempts:[['A','B','C']],selected:[]};

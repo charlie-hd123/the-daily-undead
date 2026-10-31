@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261031-5";
+import { browserStorage } from "./browser-storage.js?v=20261031-7";
 import {
   accountMemoryStorageKey,
   archivePendingProgress,
@@ -13,9 +13,9 @@ import {
   recommendedAccountSave,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261031-5";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261031-5";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261031-5";
+} from "./account-session.js?v=20261031-7";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261031-7";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261031-7";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -747,7 +747,7 @@ export async function initialiseAccount({
   try {
     clerk = await withTimeout(
       supabaseConfigured
-        ? import("./supabase-auth.js?v=20261031-5").then(({ loadSupabaseAuth }) => (
+        ? import("./supabase-auth.js?v=20261031-7").then(({ loadSupabaseAuth }) => (
           loadSupabaseAuth(documentObject)
         ))
         : loadClerk(publishableKey),
@@ -825,8 +825,8 @@ export async function initialiseAccount({
     const accountSummary = documentObject.querySelector('[data-conflict-account-summary]');
     const progress = cloud?.progress || {};
     if (accountSummary) accountSummary.textContent = `Round ${Math.max(1, Number(progress.currentRound || 1))} · Highest Round ${Number(progress.bestRound || 1)} · Score ${Number(progress.score || 0).toLocaleString('en-GB')} · ${Number(progress.solves || 0)} solves`;
-    if (deviceSummary) deviceSummary.textContent = describeAccountSave(pending.puzzleDate, pending.snapshot);
-    if (cloudSummary) cloudSummary.textContent = describeAccountSave(pending.puzzleDate, cloud);
+    if (deviceSummary) deviceSummary.textContent = describeAccountSave(pending.puzzleDate, pending.snapshot, cloud);
+    if (cloudSummary) cloudSummary.textContent = describeAccountSave(pending.puzzleDate, cloud, pending.snapshot);
     const feedback = documentObject.querySelector('[data-conflict-feedback]');
     if (feedback) feedback.textContent = '';
     const choose = (choice) => {
