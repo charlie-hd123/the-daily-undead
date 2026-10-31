@@ -298,7 +298,7 @@ async function handleAccountRequest(request, env, url, context) {
     result = await deleteAccount(request, env, identity);
   } else if (url.pathname === "/api/account" && request.method === "GET") {
     result = identity.userId
-      ? await getAccount(env.DB, identity.userId, url.searchParams.get("date"))
+      ? await getAccount(env.DB, identity.userId, url.searchParams.get("date"), url.searchParams.get('savedDate'), puzzleOptions(env))
       : { status: 200, body: { needsOnboarding: true, accountId: null } };
     if (identity.accountId) {
       result.body.accountId = identity.accountId;

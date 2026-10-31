@@ -19,6 +19,9 @@ import { workerMaps } from "../worker/src/generated-map-catalog.js";
 import { workerWords } from "../worker/src/generated-word-catalog.js";
 import { deleteAccount, isAccountRevoked, retryAuthDeletions } from "../worker/src/account-deletion.js";
 import { retryAuthProfileSync, syncAuthProfile } from "../worker/src/auth-profile-sync.js";
+import { getAccount, saveAccount, recordVerifiedMapResult, recordVerifiedWordResult, recordVerifiedBloodResult } from '../worker/src/accounts.js';
+import { buildDailyBloodTiesPuzzle } from '../js/blood-ties-core.js';
+import { prepareMissedDayProgress } from '../js/progression.js';
 
 // Real SQLite schema, triggers and SQL, behind the same small D1 interface.
 async function database() {
@@ -447,4 +450,97 @@ test("reproducible releases exclude uncommitted files and use identical applicat
     assert.doesNotMatch(await readFile(path.join(production.output, "index.html"), "utf8"), /advance-dev-day|return-dev-today|daily-undead-environment/);
     assert.equal(sourceManifest(await sourceFiles(folder, { ref: "HEAD" }), git("rev-parse", "HEAD")).applicationDigest, staging.manifest.applicationDigest);
   } finally { await rm(folder, { recursive: true, force: true }); }
+});
+
+test('verified results atomically retain participation when the browser save never arrives', async (t) => {
+  const db = await database(); t.after(() => db.sqlite.close());
+  t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-10-27T12:00:00Z') });
+  db.sqlite.exec("INSERT INTO player_profiles(user_id,username) VALUES ('sync-player','SyncPlayer'); INSERT INTO player_saves(user_id,current_round,best_round,last_played_date,round_anchor_date,round_anchor_value) VALUES ('sync-player',10,10,'2026-10-26','2026-10-26',10)");
+  const request = (body) => new Request('https://test.invalid/result', { method: 'POST', body: JSON.stringify(body) });
+  const options = { production: true, bloodTies: true };
+  const map = buildDailyPuzzle('2026-10-27',workerMaps);
+  const mapped = await recordVerifiedMapResult(db,request({puzzleDate:map.dateKey,puzzleId:map.key,selectedMapId:map.map.id,cluesUsed:1}),'sync-player',options);
+  assert.equal(mapped.status,200); assert.equal(mapped.body.progress.lastPlayedDate,'2026-10-27');
+  t.mock.timers.setTime(new Date('2026-10-29T12:00:00Z').getTime());
+  const word = buildDailyWordPuzzle('2026-10-29',workerWords);
+  const worded = await recordVerifiedWordResult(db,request({puzzleDate:'2026-10-29',puzzleId:word.key,guesses:[...new Set(word.entry.answer.toUpperCase().match(/[A-Z]/g))]}),'sync-player',options);
+  assert.equal(worded.status,200); assert.equal(worded.body.progress.lastPlayedDate,'2026-10-29');
+  t.mock.timers.setTime(new Date('2026-10-30T12:00:00Z').getTime());
+  const blood = buildDailyBloodTiesPuzzle('2026-10-30',options);
+  const attempts = blood.groups.map(g=>g.answers);
+  const blooded = await recordVerifiedBloodResult(db,request({puzzleDate:'2026-10-30',puzzleId:blood.key,attempts,rulesVersion:3}),'sync-player',options);
+  assert.equal(blooded.status,200); assert.equal(blooded.body.progress.lastPlayedDate,'2026-10-30');
+  const staleSave = await saveAccount(db,request({progress:{currentRound:1,lastPlayedDate:'2026-10-29'},baseRevision:blooded.body.progress.revision}),'sync-player',options);
+  assert.equal(staleSave.body.progress.lastPlayedDate,'2026-10-30','a subsequent stale browser date must not undo verified participation');
+  const score = staleSave.body.progress.score;
+  await recordVerifiedBloodResult(db,request({puzzleDate:'2026-10-30',puzzleId:blood.key,attempts,rulesVersion:3}),'sync-player',options);
+  assert.equal(db.sqlite.prepare("SELECT score FROM player_saves WHERE user_id='sync-player'").get().score,score,'result retries cannot double-credit');
+});
+
+test('account read repairs a false missed day from verified history before the browser decides to end the run', async (t) => {
+  const db=await database(); t.after(()=>db.sqlite.close());
+  t.mock.timers.enable({apis:['Date'],now:new Date('2026-10-31T12:00:00Z')});
+  db.sqlite.exec(`INSERT INTO player_profiles(user_id,username) VALUES ('stale-date','StaleDate');
+    INSERT INTO player_saves(user_id,current_round,best_round,score,total_rounds,last_played_date,round_anchor_date,round_anchor_value,missed_day_json)
+    VALUES ('stale-date',1,77,7840,82,'2026-10-29','2026-10-26',73,'{"dateKey":"2026-10-31","missedDays":1,"roundsBeforeLoss":77,"resolved":false}');`);
+  const insert=db.sqlite.prepare(`INSERT INTO player_daily_results(user_id,puzzle_date,puzzle_id,selected_map_id,clues_used,map_correct,map_points,points_earned,score_awarded,progression_applied)
+    VALUES ('stale-date',?,'history','map',1,1,50,50,50,1)`);
+  for(const date of ['2026-10-27','2026-10-28','2026-10-29','2026-10-30'])insert.run(date);
+  const account=(await getAccount(db,'stale-date','2026-10-31')).body;
+  assert.equal(account.progress.currentRound,77); assert.equal(account.progress.lastPlayedDate,'2026-10-30');
+  assert.equal(account.progress.score,7840); assert.equal(account.progress.solves,82);
+  const missed=prepareMissedDayProgress({savedState:account.progress.missedDayState,lastPlayedDate:account.progress.lastPlayedDate,dateKey:'2026-10-31',currentRound:account.progress.currentRound,score:account.progress.score});
+  assert.equal(missed.missedDayState,null); assert.equal(missed.currentRound,77);
+});
+
+test('yesterday’s on-time cloud evidence recovers after midnight without allowing historical client submissions', async (t) => {
+  const db=await database(); t.after(()=>db.sqlite.close());
+  t.mock.timers.enable({apis:['Date'],now:new Date('2026-10-30T12:00:00Z')});
+  const date='2026-10-29', puzzle=buildDailyWordPuzzle(date,workerWords), guesses=[...new Set(puzzle.entry.answer.toUpperCase().match(/[A-Z]/g))];
+  db.sqlite.exec("INSERT INTO player_profiles(user_id,username) VALUES ('recover','Recover'),('late','Late'); INSERT INTO player_saves(user_id,score,last_played_date,round_anchor_date,round_anchor_value) VALUES ('recover',500,'2026-10-28','2026-10-28',9),('late',500,'2026-10-28','2026-10-28',9)");
+  const state={dayStateVersion:1,dateKey:date,officialType:'word',officialCompleted:true,sessions:{word:{key:puzzle.key,guesses,complete:true,success:true,points:999999}}};
+  const insert=db.sqlite.prepare('INSERT INTO player_daily_saves(user_id,puzzle_date,state_json,updated_at) VALUES (?,?,?,?)');
+  insert.run('recover',date,JSON.stringify(state),'2026-10-29 23:59:59');
+  insert.run('late',date,JSON.stringify(state),'2026-10-30 00:00:01');
+  const options={production:true,bloodTies:true};
+  const recovered=(await getAccount(db,'recover','2026-10-30',date,options)).body;
+  assert.equal(recovered.progress.score,600); assert.equal(recovered.progress.solves,1); assert.equal(recovered.progress.currentRound,10); assert.equal(recovered.progress.lastPlayedDate,date);
+  assert.equal(recovered.pendingDailyState.dateKey,date);
+  assert.equal((await getAccount(db,'recover','2026-10-30',date,options)).body.progress.score,600);
+  assert.equal((await getAccount(db,'late','2026-10-30',date,options)).body.progress.score,500,'backdated evidence arriving after the day cannot earn historical credit');
+  const response=await recordVerifiedWordResult(db,new Request('https://test.invalid/result',{method:'POST',body:JSON.stringify({puzzleDate:date,puzzleId:puzzle.key,guesses})}),'late',options);
+  assert.equal(response.status,400);
+});
+
+test('recovery verifies map bonuses, Blood Ties attempts and failures, and leaves imported opening totals alone', async (t) => {
+  t.mock.timers.enable({apis:['Date'],now:new Date('2026-10-28T12:00:00Z')});
+  const options={production:true,bloodTies:true};
+  for(const type of ['easter','blood','word']) {
+    const db=await database();
+    try {
+      const date={easter:'2026-10-27',blood:'2026-10-30',word:'2026-10-29'}[type];
+      const next=new Date(Date.parse(date+'T12:00:00Z')+86400000);
+      t.mock.timers.setTime(next.getTime());
+      db.sqlite.exec("INSERT INTO player_profiles(user_id,username) VALUES ('recovery-case','RecoveryCase'); INSERT INTO player_saves(user_id,score,round_anchor_date,round_anchor_value) VALUES ('recovery-case',500,'2026-10-26',9)");
+      let session;
+      if(type==='easter'){
+        const puzzle=buildDailyPuzzle(date,workerMaps);
+        session={puzzleKey:puzzle.key,phase:'result',selectedMapId:puzzle.map.id,lockedClues:1,isCorrect:true,bonusComplete:true,bonusOrder:puzzle.chronologicalSteps.map(s=>s.id)};
+      }else if(type==='blood'){
+        const puzzle=buildDailyBloodTiesPuzzle(date,options);
+        session={key:puzzle.key,complete:true,attempts:puzzle.groups.map(g=>g.answers),rulesVersion:3,points:9999};
+      }else{
+        const puzzle=buildDailyWordPuzzle(date,workerWords);
+        session={key:puzzle.key,complete:true,guesses:[...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].filter(l=>!puzzle.entry.answer.toUpperCase().includes(l)).slice(0,5),points:9999,success:true};
+      }
+      const state={dayStateVersion:1,dateKey:date,officialType:type,officialCompleted:true,sessions:{[type]:session}};
+      db.sqlite.prepare('INSERT INTO player_daily_saves(user_id,puzzle_date,state_json,updated_at) VALUES (?,?,?,?)').run('recovery-case',date,JSON.stringify(state),date+' 22:00:00');
+      const expected=type==='word'?500:600;
+      assert.equal((await getAccount(db,'recovery-case',next.toISOString().slice(0,10),date,options)).body.progress.score,expected,type);
+      assert.equal((await getAccount(db,'recovery-case',next.toISOString().slice(0,10),date,options)).body.progress.score,expected,'retry '+type);
+      assert.equal(db.sqlite.prepare("SELECT map_correct FROM player_daily_results WHERE user_id='recovery-case'").get().map_correct,type==='word'?0:1);
+      db.sqlite.exec("DELETE FROM player_daily_results; UPDATE player_saves SET score=500,total_rounds=1,score_migration_method='guest-local-import',round_anchor_date='"+date+"'");
+      assert.equal((await getAccount(db,'recovery-case',next.toISOString().slice(0,10),date,options)).body.progress.score,500,'imported result already contributes to the opening total');
+    } finally { db.sqlite.close(); }
+  }
 });

@@ -1,15 +1,18 @@
-import { browserStorage } from "./browser-storage.js?v=20261030-2";
+import { browserStorage } from "./browser-storage.js?v=20261031-1";
 import {
   accountMemoryStorageKey,
+  archivePendingProgress,
   clearPendingProgress,
+  createAccountMutationQueue,
   forgetRememberedAccount,
   readPendingProgress,
   readRememberedAccount,
+  pendingMatchesCloud,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261030-2";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261030-2";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261030-2";
+} from "./account-session.js?v=20261031-1";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261031-1";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261031-1";
 
 function getClerkPublishableKey(documentObject = document) {
   return documentObject
@@ -740,7 +743,7 @@ export async function initialiseAccount({
   try {
     clerk = await withTimeout(
       supabaseConfigured
-        ? import("./supabase-auth.js?v=20261030-2").then(({ loadSupabaseAuth }) => (
+        ? import("./supabase-auth.js?v=20261031-1").then(({ loadSupabaseAuth }) => (
           loadSupabaseAuth(documentObject)
         ))
         : loadClerk(publishableKey),
@@ -803,13 +806,34 @@ export async function initialiseAccount({
     }
     openDialog(accountSignOutDialog);
   };
-  const waitForConflictChoice = () => new Promise((resolve) => {
+  const waitForConflictChoice = (pending, cloud) => new Promise((resolve) => {
+    const describe = (date, snapshot) => {
+      const progress = snapshot?.progress || {};
+      const state = snapshot?.dailyState;
+      const complete = state?.officialCompleted || state?.phase === 'result';
+      return `${date}: ${complete ? 'daily puzzle complete' : 'puzzle in progress'}. Score ${Number(progress.score || 0).toLocaleString('en-GB')}; ${Number(progress.solves || 0)} solves.`;
+    };
+    const deviceSummary = documentObject.querySelector('[data-conflict-device-summary]');
+    const cloudSummary = documentObject.querySelector('[data-conflict-cloud-summary]');
+    if (deviceSummary) deviceSummary.textContent = describe(pending.puzzleDate, pending.snapshot);
+    if (cloudSummary) cloudSummary.textContent = describe(pending.puzzleDate, cloud);
+    const feedback = documentObject.querySelector('[data-conflict-feedback]');
+    if (feedback) feedback.textContent = '';
     const choose = (choice) => {
+      if (choice === 'cloud' && !archivePendingProgress(browserStorage, pending)) {
+        if (feedback) feedback.textContent = 'Could not keep a recovery copy on this device. Your pending save is still safe. Please free some browser storage and try again.';
+        return;
+      }
+      conflictDeviceButton?.removeEventListener('click', chooseDevice);
+      conflictCloudButton?.removeEventListener('click', chooseCloud);
       closeDialog(conflictDialog);
       resolve(choice);
     };
-    conflictDeviceButton?.addEventListener("click", () => choose("device"), { once: true });
-    conflictCloudButton?.addEventListener("click", () => choose("cloud"), { once: true });
+    const chooseDevice = () => choose('device');
+    const chooseCloud = () => choose('cloud');
+    conflictDeviceButton?.addEventListener('click', chooseDevice);
+    conflictCloudButton?.addEventListener('click', chooseCloud);
+    conflictDialog?.addEventListener('cancel', (event) => event.preventDefault(), { once: true });
     openDialog(conflictDialog);
   });
 
@@ -997,15 +1021,34 @@ export async function initialiseAccount({
   }
 
   if (pendingProgress) {
+    let pendingCloud = account;
+    if (pendingProgress.puzzleDate !== puzzleDate) {
+      // Compare yesterday's queued save with yesterday's cloud puzzle, rather
+      // than comparing it with today's fresh board and inventing a conflict.
+      try {
+        pendingCloud = await requestJson(clerk, apiUrl,
+          `/api/account?date=${encodeURIComponent(puzzleDate)}&savedDate=${encodeURIComponent(pendingProgress.puzzleDate)}`);
+        account.progress = pendingCloud.progress;
+        pendingCloud.dailyState = pendingCloud.pendingDailyState;
+      } catch {
+        accountButton.disabled = false;
+        accountButton.textContent = 'Progress waiting to sync';
+        return createUnavailableController({
+          clerk, signedIn: true, openPlayerProfile,
+          scheduleSave: () => persistPendingProgress(userId, pendingProgress.revision),
+        });
+      }
+    }
     const cloudRevision = Number(account.progress?.revision || 0);
     const revisionsMatch =
       pendingProgress.revision != null && pendingProgress.revision === cloudRevision;
     let useDeviceProgress = revisionsMatch;
-    if (!revisionsMatch) {
-      useDeviceProgress = await waitForConflictChoice() === "device";
+    const alreadySynced = pendingMatchesCloud(pendingProgress, pendingCloud);
+    if (!revisionsMatch && !alreadySynced) {
+      useDeviceProgress = await waitForConflictChoice(pendingProgress, pendingCloud) === "device";
     }
 
-    if (useDeviceProgress) {
+    if (useDeviceProgress && !alreadySynced) {
       try {
         const saveResult = await requestJson(clerk, apiUrl, "/api/account/save", {
           method: "PUT",
@@ -1014,7 +1057,7 @@ export async function initialiseAccount({
             puzzleDate: pendingProgress.puzzleDate,
             progress: pendingProgress.snapshot.progress,
             dailyState: pendingProgress.snapshot.dailyState,
-            baseRevision: revisionsMatch ? pendingProgress.revision : null,
+            baseRevision: cloudRevision,
           }),
         });
         account.progress = saveResult.progress;
@@ -1328,6 +1371,7 @@ export async function initialiseAccount({
   });
 
   let currentRevision = Number(account.progress?.revision || 1);
+  const queueMutation = createAccountMutationQueue();
 
   async function saveNow() {
     if (readOnlyProgress || deletingAccount) return;
@@ -1336,32 +1380,42 @@ export async function initialiseAccount({
       return;
     }
     saveInFlight = true;
-    try {
-      const snapshot = getLocalSnapshot();
-      const saveResult = await requestJson(clerk, apiUrl, "/api/account/save", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          puzzleDate,
-          progress: snapshot.progress,
-          dailyState: snapshot.dailyState,
-          baseRevision: currentRevision,
-        }),
-      });
-      currentRevision = Number(saveResult.progress?.revision || currentRevision + 1);
-      if (deletingAccount) return;
-      rememberAccount(browserStorage, { userId, revision: currentRevision });
-      clearPendingProgress(browserStorage, userId);
-    } catch (error) {
-      // Progress remains stored locally and the next change will retry the sync.
-      if (error.status === 409) accountButton.textContent = "Progress waiting to sync";
-    } finally {
-      saveInFlight = false;
-      if (saveAgain) {
-        saveAgain = false;
-        scheduleSave();
+    return queueMutation(async () => {
+      try {
+        if (deletingAccount) return;
+        const snapshot = structuredClone(getLocalSnapshot());
+        const saveResult = await requestJson(clerk, apiUrl, "/api/account/save", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            puzzleDate,
+            progress: snapshot.progress,
+            dailyState: snapshot.dailyState,
+            baseRevision: currentRevision,
+          }),
+        });
+        currentRevision = Number(saveResult.progress?.revision || currentRevision + 1);
+        if (deletingAccount) return;
+        rememberAccount(browserStorage, { userId, revision: currentRevision });
+        if (JSON.stringify(getLocalSnapshot()) === JSON.stringify(snapshot)) {
+          clearPendingProgress(browserStorage, userId);
+        } else {
+          // New input arrived during the request. Acknowledge only what was sent.
+          persistPendingProgress(userId, currentRevision);
+          saveAgain = true;
+        }
+        accountButton.textContent = profile.username;
+      } catch {
+        // The pending snapshot remains durable for a later retry.
+        accountButton.textContent = "Progress waiting to sync";
+      } finally {
+        saveInFlight = false;
+        if (saveAgain) {
+          saveAgain = false;
+          scheduleSave();
+        }
       }
-    }
+    });
   }
 
   function scheduleSave() {
@@ -1371,72 +1425,33 @@ export async function initialiseAccount({
     saveTimer = globalThis.setTimeout(saveNow, 350);
   }
 
-  async function recordMapResult(payload) {
+  async function recordResult(path, payload) {
     if (readOnlyProgress || deletingAccount) return null;
-    try {
-      const result = await requestJson(clerk, apiUrl, "/api/account/results/map", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      currentRevision = Math.max(currentRevision, Number(result.progress?.revision || 0));
+    return queueMutation(async () => {
       if (deletingAccount) return null;
-      rememberAccount(browserStorage, { userId, revision: currentRevision });
-      scheduleSave();
-      return result;
-    } catch {
-      return null;
-    }
+      try {
+        const result = await requestJson(clerk, apiUrl, path, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        currentRevision = Math.max(currentRevision, Number(result.progress?.revision || 0));
+        if (deletingAccount) return null;
+        rememberAccount(browserStorage, { userId, revision: currentRevision });
+        scheduleSave();
+        return result;
+      } catch {
+        persistPendingProgress(userId, currentRevision);
+        accountButton.textContent = 'Progress waiting to sync';
+        return null;
+      }
+    });
   }
 
-  async function recordBonusResult(payload) {
-    if (readOnlyProgress || deletingAccount) return null;
-    try {
-      const result = await requestJson(clerk, apiUrl, "/api/account/results/bonus", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      currentRevision = Math.max(currentRevision, Number(result.progress?.revision || 0));
-      if (deletingAccount) return null;
-      rememberAccount(browserStorage, { userId, revision: currentRevision });
-      scheduleSave();
-      return result;
-    } catch {
-      return null;
-    }
-  }
-
-  async function recordWordResult(payload) {
-    if (readOnlyProgress || deletingAccount) return null;
-    try {
-      const result = await requestJson(clerk, apiUrl, "/api/account/results/word", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      currentRevision = Math.max(currentRevision, Number(result.progress?.revision || 0));
-      if (deletingAccount) return null;
-      rememberAccount(browserStorage, { userId, revision: currentRevision });
-      scheduleSave();
-      return result;
-    } catch {
-      return null;
-    }
-  }
-
-  async function recordBloodResult(payload) {
-    if (readOnlyProgress || deletingAccount) return null;
-    try {
-      const result = await requestJson(clerk, apiUrl, '/api/account/results/blood', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
-      });
-      currentRevision = Math.max(currentRevision, Number(result.progress?.revision || 0));
-      if (deletingAccount) return null;
-      rememberAccount(browserStorage, { userId, revision: currentRevision });
-      scheduleSave(); return result;
-    } catch { return null; }
-  }
+  const recordMapResult = (payload) => recordResult('/api/account/results/map', payload);
+  const recordBonusResult = (payload) => recordResult('/api/account/results/bonus', payload);
+  const recordWordResult = (payload) => recordResult('/api/account/results/word', payload);
+  const recordBloodResult = (payload) => recordResult('/api/account/results/blood', payload);
 
   const controller = {
     available: true,

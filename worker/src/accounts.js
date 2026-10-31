@@ -282,9 +282,9 @@ function rowToResult(row) {
     : null;
 }
 
-export async function recordVerifiedWordResult(db, request, userId, options = {}) {
+export async function recordVerifiedWordResult(db, request, userId, options = {}, verificationDate = getUtcDateKey()) {
   const body = await readJsonBody(request, 8_000);
-  const today = getUtcDateKey();
+  const today = verificationDate;
   if (body.puzzleDate !== today || getOfficialPuzzleType(today, options) !== "word") {
     return { status: 400, body: { error: "Only today’s official Last Words result can be saved." } };
   }
@@ -303,9 +303,9 @@ export async function recordVerifiedWordResult(db, request, userId, options = {}
   return persistSimpleResult(db, userId, { today, puzzleId: puzzle.key, answerId: puzzle.entry.id, success, points, misses: wrongGuesses, type: 'word' });
 }
 
-export async function recordVerifiedBloodResult(db, request, userId, options = {}) {
+export async function recordVerifiedBloodResult(db, request, userId, options = {}, verificationDate = getUtcDateKey()) {
   const body = await readJsonBody(request, 8000);
-  const today = getUtcDateKey();
+  const today = verificationDate;
   if (!options.bloodTies || body.puzzleDate !== today || getOfficialPuzzleType(today, options) !== 'blood') {
     return { status: 400, body: { error: 'Only today’s official Blood Ties result can be saved.' } };
   }
@@ -362,6 +362,7 @@ async function persistSimpleResult(db, userId, { today, puzzleId, answerId, succ
           ), 1) = 1 THEN current_round
           ELSE 1
         END,
+        last_played_date = MAX(COALESCE(last_played_date, ''), ?),
         revision = revision + 1,
         updated_at = CURRENT_TIMESTAMP
       WHERE user_id = ? AND EXISTS (
@@ -372,6 +373,7 @@ async function persistSimpleResult(db, userId, { today, puzzleId, answerId, succ
       userId, today,
       userId, today,
       userId, today,
+      today,
       userId,
       userId, today,
     ),
@@ -423,6 +425,11 @@ export async function reconstructRound(db, userId, progressRow, todayDateKey) {
   const protectedDates = new Set(
     (protectedQuery.results || []).map((row) => row.game_date),
   );
+  // A verified result is also proof of participation. The browser's follow-up
+  // save can fail or lose a revision race after the result has been credited.
+  const latestResultDate = [...results.keys()].sort().at(-1);
+  const lastPlayedDate = latestResultDate && latestResultDate > (progressRow.last_played_date || '')
+    ? latestResultDate : progressRow.last_played_date;
   let currentRound = Math.max(1, Number(progressRow.round_anchor_value || 0));
   let bestRound = Math.max(Number(progressRow.best_round || 0), currentRound);
 
@@ -438,17 +445,19 @@ export async function reconstructRound(db, userId, progressRow, todayDateKey) {
 
   if (
     currentRound === Number(progressRow.current_round || 0) &&
-    bestRound === Number(progressRow.best_round || 0)
+    bestRound === Number(progressRow.best_round || 0) &&
+    lastPlayedDate === progressRow.last_played_date
   ) return progressRow;
 
   await db.prepare(
     `UPDATE player_saves SET
       current_round = ?,
       best_round = MAX(best_round, ?),
+      last_played_date = MAX(COALESCE(last_played_date, ''), COALESCE(?, '')),
       revision = revision + 1,
       updated_at = CURRENT_TIMESTAMP
     WHERE user_id = ?`,
-  ).bind(currentRound, bestRound, userId).run();
+  ).bind(currentRound, bestRound, lastPlayedDate ?? null, userId).run();
   return db.prepare("SELECT * FROM player_saves WHERE user_id = ?").bind(userId).first();
 }
 
@@ -469,8 +478,49 @@ export async function readJsonBody(request, maximumBytes = 20_000) {
   return body;
 }
 
-export async function getAccount(db, userId, dateKey) {
+export async function recoverSavedAccountResults(db, userId, options = {}) {
+  const today = getUtcDateKey();
+  const yesterday = new Date(Date.parse(`${today}T00:00:00Z`) - 86400000).toISOString().slice(0, 10);
+  const saved = await db.prepare(`SELECT d.puzzle_date, d.state_json FROM player_daily_saves d
+    JOIN player_saves p ON p.user_id = d.user_id
+    LEFT JOIN player_daily_results r ON r.user_id = d.user_id AND r.puzzle_date = d.puzzle_date
+    WHERE d.user_id = ? AND d.puzzle_date BETWEEN ? AND ?
+      AND substr(d.updated_at, 1, 10) <= d.puzzle_date
+      AND NOT (p.score_migration_method = 'guest-local-import' AND d.puzzle_date <= p.round_anchor_date)
+      AND (r.user_id IS NULL OR r.bonus_status = 'pending') ORDER BY d.puzzle_date`)
+    .bind(userId, yesterday, today).all();
+  for (const row of saved.results || []) {
+    let day;
+    try { day = JSON.parse(row.state_json); } catch { continue; }
+    if (!day || typeof day !== 'object') continue;
+    const type = getOfficialPuzzleType(row.puzzle_date, options);
+    if (day.dayStateVersion === 1 && (day.dateKey !== row.puzzle_date || day.officialType !== type)) continue;
+    const session = day.dayStateVersion === 1 ? day.sessions?.[type] : type === 'easter' ? day : null;
+    if (!session) continue;
+    const request = (body) => new Request('https://account.internal/recover', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ puzzleDate: row.puzzle_date, ...body }),
+    });
+    // Only server-held, on-time evidence may be recovered after midnight. The
+    // normal result endpoints still reject historical dates and verify every
+    // answer/attempt themselves; stored points and success flags are not trusted.
+    if (type === 'word' && isPuzzleSessionComplete(type, session)) {
+      await recordVerifiedWordResult(db, request({ puzzleId: session.key, guesses: session.guesses }), userId, options, row.puzzle_date);
+    } else if (type === 'blood' && isPuzzleSessionComplete(type, session)) {
+      await recordVerifiedBloodResult(db, request({ puzzleId: session.key, attempts: session.attempts, rulesVersion: session.rulesVersion ?? 1 }), userId, options, row.puzzle_date);
+    } else if (type === 'easter' && session.phase === 'result') {
+      const result = await recordVerifiedMapResult(db, request({ puzzleId: session.puzzleKey,
+        selectedMapId: session.selectedMapId, cluesUsed: session.lockedClues }), userId, options, row.puzzle_date);
+      if (result.status === 200 && (session.bonusComplete || session.bonusFailed)) {
+        await recordVerifiedBonusResult(db, request({ bonusOrder: session.bonusOrder || [] }), userId, row.puzzle_date);
+      }
+    }
+  }
+}
+
+export async function getAccount(db, userId, dateKey, savedDateKey = dateKey, options = {}) {
   if (!isValidDateKey(dateKey)) return { status: 400, body: { error: "A valid date is required." } };
+  await recoverSavedAccountResults(db, userId, options);
   const [profileResult, progressResult, dailyResult, verifiedResult] = await db.batch([
     db.prepare("SELECT * FROM player_profiles WHERE user_id = ?").bind(userId),
     db.prepare("SELECT * FROM player_saves WHERE user_id = ?").bind(userId),
@@ -493,6 +543,12 @@ export async function getAccount(db, userId, dateKey) {
   } catch {
     dailyState = null;
   }
+  let pendingDailyState = null;
+  if (isValidDateKey(savedDateKey) && savedDateKey < dateKey) {
+    const saved = await db.prepare('SELECT state_json FROM player_daily_saves WHERE user_id = ? AND puzzle_date = ?')
+      .bind(userId, savedDateKey).first();
+    try { pendingDailyState = saved ? JSON.parse(saved.state_json) : null; } catch { /* malformed old save */ }
+  }
 
   const reconstructedProgress = await reconstructRound(
     db,
@@ -508,6 +564,7 @@ export async function getAccount(db, userId, dateKey) {
       profile,
       progress: rowToProgress(reconstructedProgress),
       dailyState,
+      pendingDailyState,
       verifiedResult: rowToResult(verifiedResult.results?.[0]),
     },
   };
@@ -746,7 +803,7 @@ export async function saveAccount(db, request, userId, options = {}) {
   const updateSql = `UPDATE player_saves SET
           current_round = ?,
           best_round = MAX(best_round, ?),
-          last_played_date = ?,
+          last_played_date = MAX(COALESCE(last_played_date, ''), COALESCE(?, '')),
           missed_day_json = ?,
           revision = revision + 1,
           updated_at = CURRENT_TIMESTAMP
@@ -796,9 +853,9 @@ export async function saveAccount(db, request, userId, options = {}) {
   return { status: 200, body: { progress: rowToProgress(saved) } };
 }
 
-export async function recordVerifiedMapResult(db, request, userId, options = {}) {
+export async function recordVerifiedMapResult(db, request, userId, options = {}, verificationDate = getUtcDateKey()) {
   const body = await readJsonBody(request, 5_000);
-  const today = getUtcDateKey();
+  const today = verificationDate;
   if (body.puzzleDate !== today || !isValidDateKey(body.puzzleDate)) {
     return { status: 400, body: { error: "Only today’s live result can be saved." } };
   }
@@ -868,6 +925,7 @@ export async function recordVerifiedMapResult(db, request, userId, options = {})
           ), 1) = 1 THEN current_round
           ELSE 1
         END,
+        last_played_date = MAX(COALESCE(last_played_date, ''), ?),
         revision = revision + 1,
         updated_at = CURRENT_TIMESTAMP
       WHERE user_id = ? AND EXISTS (
@@ -878,6 +936,7 @@ export async function recordVerifiedMapResult(db, request, userId, options = {})
       userId, body.puzzleDate,
       userId, body.puzzleDate,
       userId, body.puzzleDate,
+      body.puzzleDate,
       userId,
       userId, body.puzzleDate,
     ),
@@ -899,9 +958,9 @@ export async function recordVerifiedMapResult(db, request, userId, options = {})
   return { status: 200, body: { result: rowToResult(result), progress: rowToProgress(progress) } };
 }
 
-export async function recordVerifiedBonusResult(db, request, userId) {
+export async function recordVerifiedBonusResult(db, request, userId, verificationDate = getUtcDateKey()) {
   const body = await readJsonBody(request, 5_000);
-  const today = getUtcDateKey();
+  const today = verificationDate;
   if (body.puzzleDate !== today || !Array.isArray(body.bonusOrder)) {
     return { status: 400, body: { error: "The submitted bonus result is invalid." } };
   }

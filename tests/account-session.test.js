@@ -3,9 +3,12 @@ import assert from "node:assert/strict";
 
 import {
   accountMemoryStorageKey,
+  archivePendingProgress,
   clearPendingProgress,
+  createAccountMutationQueue,
   forgetRememberedAccount,
   pendingProgressBelongsTo,
+  pendingMatchesCloud,
   readPendingProgress,
   readRememberedAccount,
   rememberAccount,
@@ -25,6 +28,51 @@ function memoryStorage() {
     removeItem: (key) => values.delete(key),
   };
 }
+
+test('result and save mutations acknowledge revisions in order, including failures', async () => {
+  const queue = createAccountMutationQueue();
+  let release;
+  let revision = 7;
+  const first = queue(async () => {
+    await new Promise((resolve) => { release = resolve; });
+    revision = 8;
+  });
+  const second = queue(async () => {
+    assert.equal(revision, 8, 'save body must use the result acknowledgement');
+    throw new Error('offline');
+  });
+  const third = queue(async () => { assert.equal(revision, 8); revision = 9; });
+  await Promise.resolve();
+  assert.equal(revision, 7);
+  release();
+  await first;
+  await assert.rejects(second, /offline/);
+  await third;
+  assert.equal(revision, 9);
+});
+
+test('an acknowledged save does not become a conflict because UI-only fields were normalised', () => {
+  const dailyState = { dayStateVersion: 1, dateKey: '2026-10-30', officialType: 'blood',
+    sessions: { blood: { key: '2026-10-30:blood:example', rulesVersion: 3,
+      attempts: [['A', 'B', 'C']], selected: [], shuffleCount: 2, message: 'Found!' } } };
+  const pending = { snapshot: { dailyState } };
+  const cloud = structuredClone(dailyState);
+  cloud.sessions.blood.shuffleCount = 0;
+  cloud.sessions.blood.message = '';
+  assert.equal(pendingMatchesCloud(pending, { dailyState: cloud }), true);
+  cloud.sessions.blood.attempts.push(['D', 'E', 'F']);
+  assert.equal(pendingMatchesCloud(pending, { dailyState: cloud }), false);
+  cloud.dateKey = '2026-10-31';
+  assert.equal(pendingMatchesCloud(pending, { dailyState: cloud }), false);
+});
+
+test('choosing cloud can retain the rejected device snapshot as an account-isolated recovery copy', () => {
+  const storage = memoryStorage();
+  const pending = { userId: 'user_alpha', puzzleDate: '2026-10-30', snapshot: { dailyState: { phase: 'result' } } };
+  assert.equal(archivePendingProgress(storage, pending), true);
+  assert.deepEqual(JSON.parse(storage.getItem('the-daily-undead:account-pending:user_alpha:recovery:2026-10-30')), pending);
+  assert.equal(storage.getItem('the-daily-undead:account-pending:user_beta:recovery:2026-10-30'), null);
+});
 
 test("remembered accounts retain only an app-owned account id and cloud revision", () => {
   const storage = memoryStorage();

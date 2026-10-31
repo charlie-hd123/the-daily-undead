@@ -289,7 +289,7 @@ test("signed-in Round reconstruction repairs a retrospectively protected date", 
     round_anchor_value: 38,
   }, "2026-09-30");
 
-  assert.deepEqual(updated, [39, 40, "user_1"]);
+  assert.deepEqual(updated, [39, 40, '2026-09-29', "user_1"]);
   assert.equal(result.current_round, 39);
   assert.equal(result.best_round, 40);
 });

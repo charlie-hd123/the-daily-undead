@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261030-2";
+import { browserStorage } from "./browser-storage.js?v=20261031-1";
 export const accountMemoryStorageKey = "the-daily-undead:account-memory";
 const pendingProgressStoragePrefix = "the-daily-undead:account-pending:";
 
@@ -114,4 +114,51 @@ export function clearPendingProgress(storage, userId) {
 
 export function pendingProgressBelongsTo(pending, userId) {
   return Boolean(pending && validUserId(userId) && pending.userId === userId);
+}
+
+// Queue the whole mutation, including its revision acknowledgement. Serialising
+// fetch alone still lets a save construct its body using an obsolete revision.
+export function createAccountMutationQueue() {
+  let tail = Promise.resolve();
+  return (operation) => {
+    const result = tail.then(operation);
+    tail = result.catch(() => {});
+    return result;
+  };
+}
+
+function puzzleActions(state) {
+  if (!state) return null;
+  if (state.dayStateVersion === 1) return {
+    date: state.dateKey, type: state.officialType,
+    sessions: ['easter', 'word', 'blood'].map((type) => puzzleActions(state.sessions?.[type])),
+  };
+  if (state.puzzleKey) return {
+    key: state.puzzleKey, phase: state.phase,
+    clues: state.cluesRevealed, locked: state.lockedClues ?? null,
+    game: state.selectedGameId ?? null, map: state.selectedMapId ?? null,
+    order: state.bonusOrder || [], bonusComplete: Boolean(state.bonusComplete),
+    bonusFailed: Boolean(state.bonusFailed),
+  };
+  if (Array.isArray(state.attempts)) return {
+    key: state.key, rules: state.rulesVersion ?? 1,
+    attempts: state.attempts, selected: state.selected || [],
+  };
+  return { key: state.key, guesses: state.guesses || [], complete: Boolean(state.complete) };
+}
+
+export function pendingMatchesCloud(pending, account) {
+  if (!pending?.snapshot?.dailyState || !account?.dailyState) return false;
+  return JSON.stringify(puzzleActions(pending.snapshot.dailyState))
+    === JSON.stringify(puzzleActions(account.dailyState));
+}
+
+export function archivePendingProgress(storage, pending) {
+  // Keep one recovery copy per account/day even after an explicit cloud choice.
+  // No authentication tokens or other accounts' progress are included.
+  try {
+    storage.setItem(`${pendingProgressStorageKey(pending.userId)}:recovery:${pending.puzzleDate}`,
+      JSON.stringify(pending));
+    return true;
+  } catch { return false; }
 }
