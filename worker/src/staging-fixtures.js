@@ -6,7 +6,7 @@ import { workerWords } from "./generated-word-catalog.js";
 import { bloodTiesRulesVersion, calculateBloodTiesPoints } from '../../js/blood-ties-core.js';
 import { buildDailyBloodTiesPuzzle } from './blood-ties-puzzles.js';
 
-const fixtureVersion = 4;
+const fixtureVersion = 5;
 const ready = new WeakMap();
 const characters = [
   ["Richtofen", "richtofen", "World at War", "Der Riese"],
@@ -27,13 +27,21 @@ const themes = [
   ["default", 0], ["afterlife", 50], ["outbreak", 100],
   ["hellfire", 250], ["blood-moon", 500], ["dark-aether", 1000],
 ];
-// Stable names/IDs keep the larger showcase persistent across days and deployments.
-for (const suffix of ["Runner", "Hunter", "Raven", "Keeper", "Wolf", "Scout", "Echo", "Reaper"]) {
-  for (const prefix of ["Frost", "Aether", "Midnight", "Ember", "Cobalt", "Crimson", "Ghost", "Neon"]) {
-    const index = characters.length;
-    const [, , game, map] = characters[index % 8];
-    characters.push([`${prefix}${suffix}`, index % 17 === 0 ? "unselected" : showcaseAvatars[index % showcaseAvatars.length], game, map]);
-  }
+// Stable handles vary in length and style to exercise real leaderboard layouts.
+const showcaseNames = [
+  "PerkHoarder", "nova_7", "LastCrawler", "Mothman", "PackAPunchPat", "jules115", "BlueStatic", "MuleKickMia",
+  "NoAmmoAgain", "round42", "SableFox", "ReviveRiley", "MoonUnit", "lexi_93", "QuietStorm", "JuggerNora",
+  "Frostbyte", "TeddySaysHi", "VeraViolet", "AfterHours", "MaxAmmoMax", "ash_404", "RubyRook", "OneMoreRound",
+  "RiftWalker", "ellaV", "LuckyRayGun", "NightShift", "MisoMancer", "ThirdStrike", "ZeroGravity", "captain_wren",
+  "GhostToast", "CinderJack", "OrbitOllie", "TheLastPerk", "Nox", "DoubleTapDan", "tiny_dancer", "StaticMoth",
+  "Ravenous", "SideQuestSam", "HazelHaze", "RedDoor", "TheBusDriver", "neon_kai", "Echoes115", "DuskTillDawn",
+  "QuickRevive", "WillowWisp", "VaultDweller", "HalfPastDead", "CrispyToast", "foxglove", "Astra", "SoulBox",
+  "BrokenBarrier", "FinnAgain", "LostInTransit", "PixelGhoul", "BowieKnife", "LastTrainHome", "squid_88", "PaperCrow",
+];
+for (const name of showcaseNames) {
+  const index = characters.length;
+  const [, , game, map] = characters[index % 8];
+  characters.push([name, index % 17 === 0 ? "unselected" : showcaseAvatars[index % showcaseAvatars.length], game, map]);
 }
 const attemptPlayerCount = characters.length + 24;
 
