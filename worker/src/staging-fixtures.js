@@ -6,7 +6,7 @@ import { workerWords } from "./generated-word-catalog.js";
 import { bloodTiesRulesVersion, calculateBloodTiesPoints } from '../../js/blood-ties-core.js';
 import { buildDailyBloodTiesPuzzle } from './blood-ties-puzzles.js';
 
-const fixtureVersion = 2;
+const fixtureVersion = 4;
 const ready = new WeakMap();
 const characters = [
   ["Richtofen", "richtofen", "World at War", "Der Riese"],
@@ -18,6 +18,24 @@ const characters = [
   ["Marlton", "marlton", "Black Ops 2", "TranZit"],
   ["Russman", "russman", "Black Ops 2", "Die Rise"],
 ];
+const showcaseAvatars = [
+  "richtofen", "dempsey", "takeo", "nikolai", "samantha", "dr-maxis", "dr-monty", "warden",
+  "misty", "stuhlinger", "marlton", "russman", "scarlett", "diego", "bruno", "stanton",
+  "weaver", "grey", "carver", "maya", "shadowman", "tedd", "brutus",
+];
+const themes = [
+  ["default", 0], ["afterlife", 50], ["outbreak", 100],
+  ["hellfire", 250], ["blood-moon", 500], ["dark-aether", 1000],
+];
+// Stable names/IDs keep the larger showcase persistent across days and deployments.
+for (const suffix of ["Runner", "Hunter", "Raven", "Keeper", "Wolf", "Scout", "Echo", "Reaper"]) {
+  for (const prefix of ["Frost", "Aether", "Midnight", "Ember", "Cobalt", "Crimson", "Ghost", "Neon"]) {
+    const index = characters.length;
+    const [, , game, map] = characters[index % 8];
+    characters.push([`${prefix}${suffix}`, index % 17 === 0 ? "unselected" : showcaseAvatars[index % showcaseAvatars.length], game, map]);
+  }
+}
+const attemptPlayerCount = characters.length + 24;
 
 export function fixturesEnabled(env) {
   return env.STAGING_FIXTURES === "1"
@@ -30,13 +48,17 @@ export function fixtureStatements(db, today) {
   const statement = (sql, ...values) => statements.push(db.prepare(sql).bind(...values));
   for (const [index, [name, avatar, game, map]] of characters.entries()) {
     const id = `stage_demo_${String(index + 1).padStart(2, "0")}`;
+    const [theme, requiredSolves] = themes[index % themes.length];
     statement(`INSERT INTO player_profiles (user_id, account_id, username, leaderboard_visible, avatar_id, theme_id, favourite_game, favourite_map, bio)
-      VALUES (?, ?, ?, 1, ?, 'default', ?, ?, 'Fictional staging player. Safe test data.')
-      ON CONFLICT(user_id) DO NOTHING`, id, `acct_staging_fixture_${index + 1}`, `Demo${name}`, avatar, game, map);
+      VALUES (?, ?, ?, 1, ?, ?, ?, ?, 'Fictional staging player. Safe test data.')
+      ON CONFLICT(user_id) DO UPDATE SET username = excluded.username, theme_id = excluded.theme_id`,
+    id, `acct_staging_fixture_${index + 1}`, index < 8 ? `Demo${name}` : name, avatar, theme, game, map);
     statement(`INSERT INTO player_saves (user_id, current_round, best_round, score, total_rounds, last_played_date, round_anchor_date, round_anchor_value)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET
+      total_rounds = MAX(player_saves.total_rounds, ?),
       last_played_date = excluded.last_played_date, round_anchor_date = excluded.round_anchor_date`,
-    id, 12 + index, 24 + index, 8400 - index * 650, 120 - index * 9, today, today, 12 + index);
+    id, 30 + index % 50, 45 + index % 50, 114000 - index * 1400,
+    Math.max(requiredSolves, 1600 - index * 19 + index % 3 * 7), today, today, 30 + index % 50, requiredSolves);
   }
   for (const offset of [1, 0]) {
     const date = new Date(`${today}T00:00:00Z`);
@@ -46,8 +68,8 @@ export function fixtureStatements(db, today) {
     const word = buildDailyWordPuzzle(dateKey, workerWords);
     const blood = buildDailyBloodTiesPuzzle(dateKey);
     const official = getOfficialPuzzleType(dateKey, { bloodTies: true });
-    for (let index = 0; index < 16; index += 1) {
-      const correct = index < 12;
+    for (let index = 0; index < attemptPlayerCount; index += 1) {
+      const correct = index < characters.length;
       for (const type of ["easter", "word", 'blood']) {
         statement(`INSERT OR IGNORE INTO puzzle_attempts (puzzle_date, puzzle_type, puzzle_id, player_hash, answer_id, answer_name, is_correct)
           VALUES (?, ?, ?, ?, ?, ?, ?)`, dateKey, type, type === 'blood' ? blood.key : type === "word" ? word.key : map.key,

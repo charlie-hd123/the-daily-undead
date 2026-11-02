@@ -3,7 +3,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("./assets/fonts/barlow-400.ttf?v=20261102-1") format("truetype");
+  src: url("./assets/fonts/barlow-400.ttf?v=20261102-3") format("truetype");
 }
 
 @font-face {
@@ -11,7 +11,7 @@
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url("./assets/fonts/barlow-500.ttf?v=20261102-1") format("truetype");
+  src: url("./assets/fonts/barlow-500.ttf?v=20261102-3") format("truetype");
 }
 
 @font-face {
@@ -19,7 +19,7 @@
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url("./assets/fonts/barlow-600.ttf?v=20261102-1") format("truetype");
+  src: url("./assets/fonts/barlow-600.ttf?v=20261102-3") format("truetype");
 }
 
 @font-face {
@@ -27,7 +27,7 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("./assets/fonts/barlow-700.ttf?v=20261102-1") format("truetype");
+  src: url("./assets/fonts/barlow-700.ttf?v=20261102-3") format("truetype");
 }
 
 @font-face {
@@ -35,7 +35,7 @@
   font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url("./assets/fonts/barlow-800.ttf?v=20261102-1") format("truetype");
+  src: url("./assets/fonts/barlow-800.ttf?v=20261102-3") format("truetype");
 }
 
 @font-face {
@@ -43,7 +43,7 @@
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-600.ttf?v=20261102-1") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-600.ttf?v=20261102-3") format("truetype");
 }
 
 @font-face {
@@ -51,7 +51,7 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-700.ttf?v=20261102-1") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-700.ttf?v=20261102-3") format("truetype");
 }
 
 @font-face {
@@ -59,7 +59,7 @@
   font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-800.ttf?v=20261102-1") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-800.ttf?v=20261102-3") format("truetype");
 }
 
 @font-face {
@@ -67,7 +67,7 @@
   font-style: normal;
   font-weight: 900;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-900.ttf?v=20261102-1") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-900.ttf?v=20261102-3") format("truetype");
 }
 
 :root {
@@ -1457,35 +1457,35 @@ h1 {
     linear-gradient(145deg, #122233, #05080d);
 }
 
-.zombie-avatar[data-avatar="richtofen"] { background-image: url("./assets/avatars/richtofen.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="dempsey"] { background-image: url("./assets/avatars/dempsey.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="takeo"] { background-image: url("./assets/avatars/takeo.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="nikolai"] { background-image: url("./assets/avatars/nikolai.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="samantha"] { background-image: url("./assets/avatars/samantha.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="dr-maxis"] { background-image: url("./assets/avatars/dr-maxis.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="dr-monty"] { background-image: url("./assets/avatars/dr-monty.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="warden"] { background-image: url("./assets/avatars/warden.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="misty"] { background-image: url("./assets/avatars/misty.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="stuhlinger"] { background-image: url("./assets/avatars/stuhlinger.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="marlton"] { background-image: url("./assets/avatars/marlton.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="russman"] { background-image: url("./assets/avatars/russman.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="scarlett"] { background-image: url("./assets/avatars/scarlett.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="diego"] { background-image: url("./assets/avatars/diego.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="bruno"] { background-image: url("./assets/avatars/bruno.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="stanton"] { background-image: url("./assets/avatars/stanton.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="weaver"] { background-image: url("./assets/avatars/weaver.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="grey"] { background-image: url("./assets/avatars/grey.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="carver"] { background-image: url("./assets/avatars/carver.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="maya"] { background-image: url("./assets/avatars/maya.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="shadowman"] { background-image: url("./assets/avatars/shadowman.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="tedd"] { background-image: url("./assets/avatars/tedd.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="brutus"] { background-image: url("./assets/avatars/brutus.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="scientist"] { background-image: url("./assets/avatars/richtofen.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="soldier"] { background-image: url("./assets/avatars/dempsey.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="warrior"] { background-image: url("./assets/avatars/takeo.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="explorer"] { background-image: url("./assets/avatars/nikolai.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="punk"] { background-image: url("./assets/avatars/misty.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="hazmat"] { background-image: url("./assets/avatars/carver.png?v=20261102-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="richtofen"] { background-image: url("./assets/avatars/richtofen.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="dempsey"] { background-image: url("./assets/avatars/dempsey.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="takeo"] { background-image: url("./assets/avatars/takeo.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="nikolai"] { background-image: url("./assets/avatars/nikolai.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="samantha"] { background-image: url("./assets/avatars/samantha.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="dr-maxis"] { background-image: url("./assets/avatars/dr-maxis.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="dr-monty"] { background-image: url("./assets/avatars/dr-monty.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="warden"] { background-image: url("./assets/avatars/warden.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="misty"] { background-image: url("./assets/avatars/misty.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="stuhlinger"] { background-image: url("./assets/avatars/stuhlinger.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="marlton"] { background-image: url("./assets/avatars/marlton.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="russman"] { background-image: url("./assets/avatars/russman.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="scarlett"] { background-image: url("./assets/avatars/scarlett.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="diego"] { background-image: url("./assets/avatars/diego.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="bruno"] { background-image: url("./assets/avatars/bruno.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="stanton"] { background-image: url("./assets/avatars/stanton.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="weaver"] { background-image: url("./assets/avatars/weaver.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="grey"] { background-image: url("./assets/avatars/grey.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="carver"] { background-image: url("./assets/avatars/carver.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="maya"] { background-image: url("./assets/avatars/maya.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="shadowman"] { background-image: url("./assets/avatars/shadowman.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="tedd"] { background-image: url("./assets/avatars/tedd.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="brutus"] { background-image: url("./assets/avatars/brutus.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="scientist"] { background-image: url("./assets/avatars/richtofen.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="soldier"] { background-image: url("./assets/avatars/dempsey.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="warrior"] { background-image: url("./assets/avatars/takeo.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="explorer"] { background-image: url("./assets/avatars/nikolai.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="punk"] { background-image: url("./assets/avatars/misty.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="hazmat"] { background-image: url("./assets/avatars/carver.png?v=20261102-3"), linear-gradient(145deg, #122233, #05080d); }
 
 .avatar-choice .zombie-avatar {
   width: 100%;
@@ -1546,12 +1546,11 @@ h1 {
 .theme-choice.is-locked span { filter: saturate(0.86); opacity: 0.88; }
 .theme-choice[data-theme="default"] { --theme-accent: #67e8ff; }
 .theme-choice[data-theme="afterlife"] { --theme-accent: #64ffe1; }
-.theme-choice[data-theme="outbreak"] { --theme-accent: #9bd8ff; }
+.theme-choice[data-theme="outbreak"] { --theme-accent: #a8ecff; }
 .theme-choice[data-theme="hellfire"] { --theme-accent: #ffb14a; }
 .theme-choice[data-theme="blood-moon"] { --theme-accent: #ff755f; }
 .theme-choice[data-theme="dark-aether"] { --theme-accent: #d695ff; }
 .theme-choice[data-theme="afterlife"] span { background: radial-gradient(circle at 78% 12%, rgb(105 255 223 / 42%), transparent 42%), linear-gradient(145deg, #163d45, #07151d 75%); }
-.theme-choice[data-theme="outbreak"] span { background: radial-gradient(circle at 20% 8%, rgb(143 218 255 / 44%), transparent 38%), linear-gradient(145deg, #163448, #07121d 75%); }
 .theme-choice[data-theme="hellfire"] span { background: radial-gradient(circle at 76% 16%, rgb(255 178 65 / 55%), transparent 38%), linear-gradient(145deg, #4a2812, #160b07 75%); }
 .theme-choice[data-theme="blood-moon"] span { background: radial-gradient(circle at 82% 10%, rgb(255 87 57 / 60%), transparent 42%), linear-gradient(145deg, #4a171d, #14080d 75%); }
 .theme-choice[data-theme="dark-aether"] span { background: radial-gradient(circle at 22% 5%, rgb(226 113 255 / 65%), transparent 34%), radial-gradient(circle at 88% 78%, rgb(70 120 255 / 50%), transparent 42%), linear-gradient(145deg, #291348, #080717 72%); }
@@ -1580,13 +1579,20 @@ h1 {
 }
 .player-profile-dialog[data-theme="outbreak"],
 .leaderboard-entry[data-theme="outbreak"],
+.theme-choice[data-theme="outbreak"] span,
 .profile-editor-dialog[data-preview-theme="outbreak"] {
-  --profile-accent: #9bd8ff;
+  --profile-accent: #a8ecff;
+  --muted: #d5e5f6;
+  --muted-strong: #e5f2ff;
   background:
-    radial-gradient(ellipse 52% 38% at 14% 8%, rgb(102 199 255 / 25%), transparent 72%),
-    radial-gradient(ellipse 44% 54% at 92% 82%, rgb(57 112 161 / 19%), transparent 74%),
-    linear-gradient(142deg, #163247 0%, #0a1725 48%, #050a12 100%);
-  box-shadow: var(--shadow), 0 0 4rem rgb(87 180 244 / 18%), inset 0 0 4rem rgb(118 210 255 / 5%);
+    radial-gradient(ellipse 75% 95% at 8% 0%, rgb(174 231 255 / 32%), transparent 72%),
+    linear-gradient(128deg, transparent 22%, rgb(183 240 255 / 10%) 22.2% 23%, transparent 23.2% 54%, rgb(183 240 255 / 7%) 54.2% 55%, transparent 55.2%),
+    radial-gradient(ellipse 90% 95% at 100% 100%, rgb(28 109 247 / 36%), transparent 76%),
+    linear-gradient(140deg, #17568d 0%, #0c3464 48%, #081b38 100%);
+}
+.player-profile-dialog[data-theme="outbreak"],
+.profile-editor-dialog[data-preview-theme="outbreak"] {
+  box-shadow: var(--shadow), 0 0 4rem rgb(60 155 255 / 20%), inset 0 0 4rem rgb(118 210 255 / 6%);
 }
 .player-profile-dialog[data-theme="hellfire"],
 .leaderboard-entry[data-theme="hellfire"],

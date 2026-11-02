@@ -208,11 +208,11 @@ test("fictional staging activity uses real SQL, remains idempotent and rolls ove
   // A new isolate loses its memory cache; database uniqueness must still protect totals.
   await ensureStagingFixtures({ ...env, DB: { ...db } }, "2026-10-17");
   assert.equal(db.sqlite.prepare("SELECT total_games FROM community_totals").get().total_games, initial);
-  assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS count FROM puzzle_attempts WHERE puzzle_date = '2026-10-17'").get().count, 48);
-  assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS count FROM player_daily_results WHERE puzzle_date = '2026-10-17' AND puzzle_type = 'word'").get().count, 8);
+  assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS count FROM puzzle_attempts WHERE puzzle_date = '2026-10-17'").get().count, 288);
+  assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS count FROM player_daily_results WHERE puzzle_date = '2026-10-17' AND puzzle_type = 'word'").get().count, 72);
   await ensureStagingFixtures(env, "2026-10-18");
-  assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS count FROM player_daily_results WHERE puzzle_date = '2026-10-18' AND puzzle_type = 'easter'").get().count, 8);
-  assert.equal(db.sqlite.prepare("SELECT total_games FROM community_totals").get().total_games, initial + 48);
+  assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS count FROM player_daily_results WHERE puzzle_date = '2026-10-18' AND puzzle_type = 'easter'").get().count, 72);
+  assert.equal(db.sqlite.prepare("SELECT total_games FROM community_totals").get().total_games, initial + 288);
   assert.deepEqual({ ...db.sqlite.prepare("SELECT score,current_round,best_round,revision FROM player_saves WHERE user_id='real-test-account'").get() }, { score: 1234, current_round: 9, best_round: 12, revision: 7 });
   db.sqlite.close();
 });
@@ -231,7 +231,16 @@ test("staging is a complete database-backed service through production routes", 
   const stats = await get(`/api/stats?date=${today}`);
   const leaderboards = await get(`/api/leaderboards?date=${today}`);
   assertSmoke({ health, stats, leaderboards, manifest: { apiDigest: "api-tested", apiConfigurationDigest: "config-tested" } });
-  assert.equal(stats.playersToday, 16);
+  assert.equal(stats.playersToday, 96);
+  assert.equal(leaderboards.allTime.length, 72);
+  assert.equal(leaderboards.today.elite.length, 72);
+  for (const entries of [leaderboards.allTime, leaderboards.today.elite]) {
+    assert.deepEqual([...new Set(entries.map(entry => entry.themeId))].sort(), ['afterlife', 'blood-moon', 'dark-aether', 'default', 'hellfire', 'outbreak']);
+    assert.ok(new Set(entries.map(entry => entry.avatarId)).size >= 23);
+    for (const theme of new Set(entries.map(entry => entry.themeId))) {
+      assert.equal(entries.filter(entry => entry.themeId === theme).length, 12);
+    }
+  }
   assert.equal(stats.yesterday.word.solvePercentage, 75);
   assert.equal(stats.yesterday.easter.solvePercentage, 75);
   const profile = await get("/api/profiles/DemoRichtofen");
@@ -241,6 +250,32 @@ test("staging is a complete database-backed service through production routes", 
   const badOrigin = await worker.fetch(new Request("https://staging.test/api/stats", { headers: { Origin: "https://thedailyundead.com" } }), env);
   assert.equal(badOrigin.status, 403);
   db.sqlite.close();
+});
+
+test("theme showcase upgrades only reserved fictional profiles and preserves real accounts and in-progress puzzles", async (t) => {
+  const db = await database(); t.after(() => db.sqlite.close());
+  db.sqlite.exec(`
+    CREATE TABLE staging_fixture_runs (date_key TEXT NOT NULL, version INTEGER NOT NULL, PRIMARY KEY(date_key, version));
+    INSERT INTO staging_fixture_runs VALUES ('2026-11-02', 2);
+    INSERT INTO player_profiles (user_id,username,account_id,theme_id,bio) VALUES
+      ('real-showcase-account','KeepMyTheme','acct_keep_theme','afterlife','Keep my profile'),
+      ('stage_demo_06','DemoMisty','acct_staging_fixture_6','afterlife','Existing fictional profile');
+    INSERT INTO player_saves (user_id,score,total_rounds,current_round,best_round,revision) VALUES
+      ('real-showcase-account',4321,71,12,28,9), ('stage_demo_06',16540,200,35,48,2);
+    INSERT INTO player_daily_saves (user_id,puzzle_date,state_json) VALUES
+      ('real-showcase-account','2026-11-02','{"phase":"game","marker":"unfinished"}');
+  `);
+  const snapshot = () => ['player_profiles', 'player_saves', 'player_daily_saves'].map(table =>
+    db.sqlite.prepare(`SELECT * FROM ${table} WHERE user_id='real-showcase-account'`).all());
+  const before = snapshot();
+  await ensureStagingFixtures(stagingEnv(db), '2026-11-02');
+  assert.deepEqual(snapshot(), before);
+  const misty = db.sqlite.prepare("SELECT p.theme_id,s.score,s.total_rounds,s.revision FROM player_profiles p JOIN player_saves s USING(user_id) WHERE user_id='stage_demo_06'").get();
+  assert.deepEqual({ ...misty }, { theme_id: 'dark-aether', score: 16540, total_rounds: 1000, revision: 2 });
+  const unlocks = { default: 0, afterlife: 50, outbreak: 100, hellfire: 250, 'blood-moon': 500, 'dark-aether': 1000 };
+  const fixtures = db.sqlite.prepare("SELECT p.theme_id,s.total_rounds FROM player_profiles p JOIN player_saves s USING(user_id) WHERE user_id LIKE 'stage_demo_%'").all();
+  assert.equal(fixtures.length, 72);
+  assert.ok(fixtures.every(player => player.total_rounds >= unlocks[player.theme_id]));
 });
 
 test("fixtures follow the balanced schedule across rollover without changing real account saves", async (t) => {
@@ -253,7 +288,7 @@ test("fixtures follow the balanced schedule across rollover without changing rea
     await ensureStagingFixtures(env, date);
     const official = getOfficialPuzzleType(date, { bloodTies: true }); seen.add(official);
     const rows = db.sqlite.prepare("SELECT puzzle_type FROM player_daily_results WHERE user_id LIKE 'stage_demo_%' AND puzzle_date=?").all(date);
-    assert.equal(rows.length, 8);
+    assert.equal(rows.length, 72);
     assert.ok(rows.every((row) => row.puzzle_type === official), date);
     const before = db.sqlite.prepare('SELECT COUNT(*) n FROM player_daily_results').get().n;
     await ensureStagingFixtures({ ...env, DB: { ...db } }, date);
