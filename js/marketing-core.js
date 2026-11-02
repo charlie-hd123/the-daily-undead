@@ -1,4 +1,4 @@
-import { getUtcDateKey, isValidDateKey } from "./game-core.js?v=20261102-10";
+import { getUtcDateKey, isValidDateKey } from "./game-core.js?v=20261102-11";
 
 export const firstRedditPostDate = "2026-08-13";
 
