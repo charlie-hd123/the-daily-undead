@@ -122,8 +122,10 @@ function makePoints(documentObject, points) {
   return score;
 }
 
-function markCurrentPlayer(item, username, currentUsername) {
+function personaliseEntry(item, entry, currentUsername) {
+  const { username } = entry;
   item.dataset.username = username;
+  item.dataset.theme = entry.themeId || "default";
   item.tabIndex = -1;
   if (currentUsername && username === currentUsername) {
     item.classList.add("is-current-player");
@@ -144,7 +146,7 @@ function renderTodayEntries(list, entries, currentUsername, documentObject) {
   entries.forEach((entry) => {
     const item = documentObject.createElement("li");
     item.className = "leaderboard-entry leaderboard-today-entry";
-    markCurrentPlayer(item, entry.username, currentUsername);
+    personaliseEntry(item, entry, currentUsername);
     const isWordResult = entry.puzzleType === "word" || entry.puzzleType === 'blood';
     const misses = entry.puzzleType === 'blood' ? entry.bloodMisses : entry.wordMisses;
     const resultLabel = isWordResult
@@ -199,7 +201,7 @@ function renderAllTimeEntries(
   sortedEntries.forEach((entry, index) => {
     const item = documentObject.createElement("li");
     item.className = "leaderboard-entry leaderboard-all-time-entry";
-    markCurrentPlayer(item, entry.username, currentUsername);
+    personaliseEntry(item, entry, currentUsername);
 
     const player = makePlayer(documentObject, entry.username, null, null, null, entry.avatarId);
     const supportingMetrics = documentObject.createElement("dl");
