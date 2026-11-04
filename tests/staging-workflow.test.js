@@ -19,17 +19,19 @@ import { workerMaps } from "../worker/src/generated-map-catalog.js";
 import { workerWords } from "../worker/src/generated-word-catalog.js";
 import { deleteAccount, isAccountRevoked, retryAuthDeletions } from "../worker/src/account-deletion.js";
 import { retryAuthProfileSync, syncAuthProfile } from "../worker/src/auth-profile-sync.js";
-import { getAccount, getPublicProfile, registerAccount, reconstructRound, saveAccount, recordVerifiedMapResult, recordVerifiedWordResult, recordVerifiedBloodResult } from '../worker/src/accounts.js';
+import { getAccount, getPublicProfile, registerAccount, reconstructRound, saveAccount, updateSocialProfile, recordVerifiedMapResult, recordVerifiedWordResult, recordVerifiedBloodResult } from '../worker/src/accounts.js';
 import { readLeaderboards } from '../worker/src/leaderboards.js';
 import { buildDailyBloodTiesPuzzle } from '../js/blood-ties-core.js';
 import { resolveAccountIdentity } from '../worker/src/identities.js';
 import { prepareMissedDayProgress } from '../js/progression.js';
 
 // Real SQLite schema, triggers and SQL, behind the same small D1 interface.
-async function database() {
+async function database(throughMigration = null) {
   const sqlite = new DatabaseSync(":memory:");
   for (const name of (await readdir(new URL("../worker/migrations/", import.meta.url))).sort()) {
-    if (name.endsWith(".sql")) sqlite.exec(await readFile(new URL(`../worker/migrations/${name}`, import.meta.url), "utf8"));
+    if (name.endsWith(".sql") && (!throughMigration || name <= throughMigration)) {
+      sqlite.exec(await readFile(new URL(`../worker/migrations/${name}`, import.meta.url), "utf8"));
+    }
   }
   const db = {
     sqlite,
@@ -60,6 +62,80 @@ async function database() {
   return db;
 }
 const stagingEnv = (DB) => ({ DB, DEPLOYMENT_ENVIRONMENT: "staging", STAGING_FIXTURES: "1", SUPABASE_ISSUER: "https://zsnnvzhimtlhpvwhwxpy.supabase.co/auth/v1", ALLOWED_ORIGINS: "https://daily-undead-staging.pages.dev", RELEASE_API_DIGEST: "api-tested", RELEASE_CONFIG_DIGEST: "config-tested" });
+
+test("theme migration moves every existing Toxic profile to Cryo and preserves other player data", async (t) => {
+  const db = await database('0016_blood_ties_strikes.sql');
+  t.after(() => db.sqlite.close());
+  const players = [
+    ['Toxic50', 'afterlife', 50], ['Toxic99', 'afterlife', 99],
+    ['Toxic100', 'afterlife', 100], ['Toxic1000', 'afterlife', 1000],
+    ['Cryo100', 'outbreak', 100], ['Default0', 'default', 0],
+    ['Napalm250', 'hellfire', 250], ['Blood500', 'blood-moon', 500],
+    ['Aether1000', 'dark-aether', 1000],
+  ];
+  for (const [name, theme, solves] of players) {
+    db.sqlite.prepare(`INSERT INTO player_profiles
+      (user_id,username,account_id,theme_id,avatar_id,favourite_game,favourite_map,bio,updated_at)
+      VALUES (?,?,?,?, 'richtofen','Black Ops','Moon','Keep my memory','2026-11-01 12:00:00')`)
+      .run(name, name, `acct_${name}`, theme);
+    db.sqlite.prepare(`INSERT INTO player_saves
+      (user_id,score,total_rounds,current_round,best_round,revision,last_played_date)
+      VALUES (?,4321,?,12,28,9,'2026-11-03')`).run(name, solves);
+    db.sqlite.prepare(`INSERT INTO player_daily_saves (user_id,puzzle_date,state_json)
+      VALUES (?,'2026-11-04','{"phase":"game","marker":"unfinished"}')`).run(name);
+    db.sqlite.prepare(`INSERT INTO account_identities (provider,provider_subject,account_id)
+      VALUES ('supabase',?,?)`).run(`subject_${name}`, `acct_${name}`);
+  }
+  db.sqlite.exec(`INSERT INTO player_daily_results
+    (user_id,puzzle_date,puzzle_id,selected_map_id,clues_used,map_correct,map_points,points_earned)
+    VALUES ('Toxic50','2026-11-03','test-puzzle','test-map',1,1,100,100)`);
+  const profileDetails = () => db.sqlite.prepare(`SELECT user_id,username,account_id,avatar_id,
+    favourite_game,favourite_map,bio,leaderboard_visible,created_at FROM player_profiles ORDER BY user_id`).all();
+  const gameplay = () => ['player_saves', 'player_daily_saves', 'player_daily_results', 'account_identities', 'community_totals']
+    .map(table => db.sqlite.prepare(`SELECT * FROM ${table} ORDER BY 1`).all());
+  const beforeProfiles = profileDetails();
+  const beforeGameplay = gameplay();
+  db.sqlite.exec(await readFile(new URL('../worker/migrations/0017_swap_cryo_toxic_unlocks.sql', import.meta.url), 'utf8'));
+  assert.deepEqual(profileDetails(), beforeProfiles);
+  assert.deepEqual(gameplay(), beforeGameplay);
+  const board = await readLeaderboards(db, '2026-11-03');
+  for (const [name, oldTheme] of players) {
+    const expected = oldTheme === 'afterlife' ? 'outbreak' : oldTheme;
+    const row = db.sqlite.prepare('SELECT theme_id,updated_at FROM player_profiles WHERE user_id=?').get(name);
+    assert.equal(row.theme_id, expected, name);
+    if (oldTheme !== 'afterlife') assert.equal(row.updated_at, '2026-11-01 12:00:00', name);
+    assert.equal((await getPublicProfile(db, name)).body.profile.themeId, expected, name);
+    assert.equal(board.allTime.find(player => player.username === name).themeId, expected, name);
+  }
+  assert.equal(board.today.elite[0].themeId, 'outbreak');
+});
+
+test("real profile writes enforce Cryo at 50 solves and Toxic at 100, including stale clients", async (t) => {
+  const db = await database();
+  t.after(() => db.sqlite.close());
+  db.sqlite.exec(`INSERT INTO player_profiles (user_id,username,account_id,avatar_id,theme_id)
+    VALUES ('theme-player','ThemePlayer','acct_theme_player','richtofen','default');
+    INSERT INTO player_saves (user_id,total_rounds,score,current_round,best_round,revision)
+    VALUES ('theme-player',49,4321,12,28,9)`);
+  for (const [solves, themeId, status] of [
+    [49, 'outbreak', 403], [50, 'outbreak', 200],
+    [50, 'afterlife', 403], [99, 'afterlife', 403],
+    [100, 'afterlife', 200], [100, 'outbreak', 200],
+  ]) {
+    db.sqlite.prepare("UPDATE player_saves SET total_rounds=? WHERE user_id='theme-player'").run(solves);
+    const previousTheme = db.sqlite.prepare("SELECT theme_id FROM player_profiles WHERE user_id='theme-player'").get().theme_id;
+    const before = db.sqlite.prepare("SELECT * FROM player_saves WHERE user_id='theme-player'").get();
+    const response = await updateSocialProfile(db, new Request('https://staging.test/api/account/profile', {
+      method: 'PUT', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ avatarId: 'richtofen', themeId }),
+    }), 'theme-player');
+    assert.equal(response.status, status, `${themeId} at ${solves} solves`);
+    assert.equal(db.sqlite.prepare("SELECT theme_id FROM player_profiles WHERE user_id='theme-player'").get().theme_id,
+      status === 200 ? themeId : previousTheme);
+    assert.deepEqual(db.sqlite.prepare("SELECT * FROM player_saves WHERE user_id='theme-player'").get(), before);
+    if (status === 403) assert.match(response.body.error, new RegExp(`${themeId === 'outbreak' ? 50 : 100} solves`));
+  }
+});
 
 test("retired Clerk mappings restore returning Supabase players without rewriting any game data", async (t) => {
   const db = await database();
@@ -272,7 +348,7 @@ test("theme showcase upgrades only reserved fictional profiles and preserves rea
   assert.deepEqual(snapshot(), before);
   const misty = db.sqlite.prepare("SELECT p.theme_id,s.score,s.total_rounds,s.revision FROM player_profiles p JOIN player_saves s USING(user_id) WHERE user_id='stage_demo_06'").get();
   assert.deepEqual({ ...misty }, { theme_id: 'dark-aether', score: 16540, total_rounds: 1000, revision: 2 });
-  const unlocks = { default: 0, afterlife: 50, outbreak: 100, hellfire: 250, 'blood-moon': 500, 'dark-aether': 1000 };
+  const unlocks = { default: 0, outbreak: 50, afterlife: 100, hellfire: 250, 'blood-moon': 500, 'dark-aether': 1000 };
   const fixtures = db.sqlite.prepare("SELECT p.theme_id,s.total_rounds FROM player_profiles p JOIN player_saves s USING(user_id) WHERE user_id LIKE 'stage_demo_%'").all();
   assert.equal(fixtures.length, 72);
   assert.ok(fixtures.every(player => player.total_rounds >= unlocks[player.theme_id]));

@@ -217,8 +217,8 @@ function normalizeAvatarId(value) {
 }
 const themeUnlocks = new Map([
   ["default", 0],
-  ["afterlife", 50],
-  ["outbreak", 100],
+  ["outbreak", 50],
+  ["afterlife", 100],
   ["hellfire", 250],
   ["blood-moon", 500],
   ["dark-aether", 1000],

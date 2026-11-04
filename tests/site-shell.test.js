@@ -177,8 +177,9 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(html, /data-leaderboard-find="daily"/);
   assert.match(html, /data-leaderboard-find="all-time"/);
   assert.match(html, /placeholder="Tell us your favourite Zombies memory\.\.\."/);
-  assert.match(account, /label: "Toxic", requiredMaps: 50/);
-  assert.match(account, /label: "Cryo", requiredMaps: 100/);
+  assert.match(account, /label: "Cryo", requiredMaps: 50/);
+  assert.match(account, /label: "Toxic", requiredMaps: 100/);
+  assert.ok(account.indexOf('label: "Cryo"') < account.indexOf('label: "Toxic"'));
   assert.match(account, /label: "Napalm", requiredMaps: 250/);
   assert.match(account, /label: "Blood", requiredMaps: 500/);
   assert.match(account, /label: "Aether", requiredMaps: 1000/);

@@ -158,8 +158,8 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
   ];
   const themeOptions = [
     { id: "default", label: "Default", requiredMaps: 0 },
-    { id: "afterlife", label: "Toxic", requiredMaps: 50 },
-    { id: "outbreak", label: "Cryo", requiredMaps: 100 },
+    { id: "outbreak", label: "Cryo", requiredMaps: 50 },
+    { id: "afterlife", label: "Toxic", requiredMaps: 100 },
     { id: "hellfire", label: "Napalm", requiredMaps: 250 },
     { id: "blood-moon", label: "Blood", requiredMaps: 500 },
     { id: "dark-aether", label: "Aether", requiredMaps: 1000 },

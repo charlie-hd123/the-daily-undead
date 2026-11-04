@@ -6,7 +6,7 @@ import { workerWords } from "./generated-word-catalog.js";
 import { bloodTiesRulesVersion, calculateBloodTiesPoints } from '../../js/blood-ties-core.js';
 import { buildDailyBloodTiesPuzzle } from './blood-ties-puzzles.js';
 
-const fixtureVersion = 5;
+const fixtureVersion = 6;
 const ready = new WeakMap();
 const characters = [
   ["Richtofen", "richtofen", "World at War", "Der Riese"],
@@ -24,7 +24,7 @@ const showcaseAvatars = [
   "weaver", "grey", "carver", "maya", "shadowman", "tedd", "brutus",
 ];
 const themes = [
-  ["default", 0], ["afterlife", 50], ["outbreak", 100],
+  ["default", 0], ["outbreak", 50], ["afterlife", 100],
   ["hellfire", 250], ["blood-moon", 500], ["dark-aether", 1000],
 ];
 // Stable handles vary in length and style to exercise real leaderboard layouts.

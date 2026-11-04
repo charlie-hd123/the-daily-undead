@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261104-2";
+import { browserStorage } from "./browser-storage.js?v=20261104-3";
 import {
   accountMemoryStorageKey,
   archivePendingProgress,
@@ -13,9 +13,9 @@ import {
   recommendedAccountSave,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261104-2";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261104-2";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261104-2";
+} from "./account-session.js?v=20261104-3";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261104-3";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261104-3";
 
 function hasSupabaseConfiguration(documentObject = document) {
   const read = (name) => documentObject
@@ -161,8 +161,8 @@ const avatarOptions = [
 ];
 const themeOptions = [
   { id: "default", label: "Default", requiredMaps: 0 },
-  { id: "afterlife", label: "Toxic", requiredMaps: 50 },
-  { id: "outbreak", label: "Cryo", requiredMaps: 100 },
+  { id: "outbreak", label: "Cryo", requiredMaps: 50 },
+  { id: "afterlife", label: "Toxic", requiredMaps: 100 },
   { id: "hellfire", label: "Napalm", requiredMaps: 250 },
   { id: "blood-moon", label: "Blood", requiredMaps: 500 },
   { id: "dark-aether", label: "Aether", requiredMaps: 1000 },
@@ -334,7 +334,7 @@ export async function initialiseAccount({
 
   try {
     authClient = await withTimeout(
-      import("./supabase-auth.js?v=20261104-2").then(({ loadSupabaseAuth }) => (
+      import("./supabase-auth.js?v=20261104-3").then(({ loadSupabaseAuth }) => (
         loadSupabaseAuth(documentObject)
       )),
       5_000,
