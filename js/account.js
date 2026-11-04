@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261102-14";
+import { browserStorage } from "./browser-storage.js?v=20261104-1";
 import {
   accountMemoryStorageKey,
   archivePendingProgress,
@@ -13,9 +13,9 @@ import {
   recommendedAccountSave,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261102-14";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261102-14";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261102-14";
+} from "./account-session.js?v=20261104-1";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261104-1";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261104-1";
 
 function hasSupabaseConfiguration(documentObject = document) {
   const read = (name) => documentObject
@@ -334,7 +334,7 @@ export async function initialiseAccount({
 
   try {
     authClient = await withTimeout(
-      import("./supabase-auth.js?v=20261102-14").then(({ loadSupabaseAuth }) => (
+      import("./supabase-auth.js?v=20261104-1").then(({ loadSupabaseAuth }) => (
         loadSupabaseAuth(documentObject)
       )),
       5_000,

@@ -3,7 +3,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url("./assets/fonts/barlow-400.ttf?v=20261102-14") format("truetype");
+  src: url("./assets/fonts/barlow-400.ttf?v=20261104-1") format("truetype");
 }
 
 @font-face {
@@ -11,7 +11,7 @@
   font-style: normal;
   font-weight: 500;
   font-display: swap;
-  src: url("./assets/fonts/barlow-500.ttf?v=20261102-14") format("truetype");
+  src: url("./assets/fonts/barlow-500.ttf?v=20261104-1") format("truetype");
 }
 
 @font-face {
@@ -19,7 +19,7 @@
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url("./assets/fonts/barlow-600.ttf?v=20261102-14") format("truetype");
+  src: url("./assets/fonts/barlow-600.ttf?v=20261104-1") format("truetype");
 }
 
 @font-face {
@@ -27,7 +27,7 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("./assets/fonts/barlow-700.ttf?v=20261102-14") format("truetype");
+  src: url("./assets/fonts/barlow-700.ttf?v=20261104-1") format("truetype");
 }
 
 @font-face {
@@ -35,7 +35,7 @@
   font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url("./assets/fonts/barlow-800.ttf?v=20261102-14") format("truetype");
+  src: url("./assets/fonts/barlow-800.ttf?v=20261104-1") format("truetype");
 }
 
 @font-face {
@@ -43,7 +43,7 @@
   font-style: normal;
   font-weight: 600;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-600.ttf?v=20261102-14") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-600.ttf?v=20261104-1") format("truetype");
 }
 
 @font-face {
@@ -51,7 +51,7 @@
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-700.ttf?v=20261102-14") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-700.ttf?v=20261104-1") format("truetype");
 }
 
 @font-face {
@@ -59,7 +59,7 @@
   font-style: normal;
   font-weight: 800;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-800.ttf?v=20261102-14") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-800.ttf?v=20261104-1") format("truetype");
 }
 
 @font-face {
@@ -67,7 +67,7 @@
   font-style: normal;
   font-weight: 900;
   font-display: swap;
-  src: url("./assets/fonts/barlow-condensed-900.ttf?v=20261102-14") format("truetype");
+  src: url("./assets/fonts/barlow-condensed-900.ttf?v=20261104-1") format("truetype");
 }
 
 :root {
@@ -88,6 +88,7 @@
   --muted: #a8b2c7;
   --muted-strong: #c7cfdd;
   --aether: #67e8ff;
+  --profile-default-accent: #526d8d;
   --aether-deep: #1ba6d2;
   --aether-violet: #9e77ff;
   --aether-pink: #f15cc0;
@@ -1442,7 +1443,7 @@ h1 {
 .zombie-avatar {
   display: block;
   overflow: hidden;
-  border: 2px solid #526d8d;
+  border: 2px solid var(--profile-default-accent);
   border-radius: 50%;
   background-color: #08101a;
   background-image: linear-gradient(145deg, #122233, #05080d);
@@ -1457,35 +1458,35 @@ h1 {
     linear-gradient(145deg, #122233, #05080d);
 }
 
-.zombie-avatar[data-avatar="richtofen"] { background-image: url("./assets/avatars/richtofen.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="dempsey"] { background-image: url("./assets/avatars/dempsey.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="takeo"] { background-image: url("./assets/avatars/takeo.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="nikolai"] { background-image: url("./assets/avatars/nikolai.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="samantha"] { background-image: url("./assets/avatars/samantha.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="dr-maxis"] { background-image: url("./assets/avatars/dr-maxis.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="dr-monty"] { background-image: url("./assets/avatars/dr-monty.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="warden"] { background-image: url("./assets/avatars/warden.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="misty"] { background-image: url("./assets/avatars/misty.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="stuhlinger"] { background-image: url("./assets/avatars/stuhlinger.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="marlton"] { background-image: url("./assets/avatars/marlton.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="russman"] { background-image: url("./assets/avatars/russman.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="scarlett"] { background-image: url("./assets/avatars/scarlett.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="diego"] { background-image: url("./assets/avatars/diego.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="bruno"] { background-image: url("./assets/avatars/bruno.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="stanton"] { background-image: url("./assets/avatars/stanton.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="weaver"] { background-image: url("./assets/avatars/weaver.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="grey"] { background-image: url("./assets/avatars/grey.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="carver"] { background-image: url("./assets/avatars/carver.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="maya"] { background-image: url("./assets/avatars/maya.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="shadowman"] { background-image: url("./assets/avatars/shadowman.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="tedd"] { background-image: url("./assets/avatars/tedd.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="brutus"] { background-image: url("./assets/avatars/brutus.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="scientist"] { background-image: url("./assets/avatars/richtofen.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="soldier"] { background-image: url("./assets/avatars/dempsey.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="warrior"] { background-image: url("./assets/avatars/takeo.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="explorer"] { background-image: url("./assets/avatars/nikolai.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="punk"] { background-image: url("./assets/avatars/misty.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
-.zombie-avatar[data-avatar="hazmat"] { background-image: url("./assets/avatars/carver.png?v=20261102-14"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="richtofen"] { background-image: url("./assets/avatars/richtofen.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="dempsey"] { background-image: url("./assets/avatars/dempsey.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="takeo"] { background-image: url("./assets/avatars/takeo.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="nikolai"] { background-image: url("./assets/avatars/nikolai.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="samantha"] { background-image: url("./assets/avatars/samantha.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="dr-maxis"] { background-image: url("./assets/avatars/dr-maxis.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="dr-monty"] { background-image: url("./assets/avatars/dr-monty.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="warden"] { background-image: url("./assets/avatars/warden.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="misty"] { background-image: url("./assets/avatars/misty.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="stuhlinger"] { background-image: url("./assets/avatars/stuhlinger.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="marlton"] { background-image: url("./assets/avatars/marlton.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="russman"] { background-image: url("./assets/avatars/russman.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="scarlett"] { background-image: url("./assets/avatars/scarlett.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="diego"] { background-image: url("./assets/avatars/diego.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="bruno"] { background-image: url("./assets/avatars/bruno.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="stanton"] { background-image: url("./assets/avatars/stanton.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="weaver"] { background-image: url("./assets/avatars/weaver.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="grey"] { background-image: url("./assets/avatars/grey.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="carver"] { background-image: url("./assets/avatars/carver.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="maya"] { background-image: url("./assets/avatars/maya.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="shadowman"] { background-image: url("./assets/avatars/shadowman.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="tedd"] { background-image: url("./assets/avatars/tedd.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="brutus"] { background-image: url("./assets/avatars/brutus.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="scientist"] { background-image: url("./assets/avatars/richtofen.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="soldier"] { background-image: url("./assets/avatars/dempsey.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="warrior"] { background-image: url("./assets/avatars/takeo.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="explorer"] { background-image: url("./assets/avatars/nikolai.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="punk"] { background-image: url("./assets/avatars/misty.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
+.zombie-avatar[data-avatar="hazmat"] { background-image: url("./assets/avatars/carver.png?v=20261104-1"), linear-gradient(145deg, #122233, #05080d); }
 
 .avatar-choice .zombie-avatar {
   width: 100%;
@@ -1558,10 +1559,14 @@ h1 {
 }
 
 .player-profile-dialog {
-  --profile-accent: var(--aether);
+  --profile-accent: var(--profile-default-accent);
   border-color: color-mix(in srgb, var(--profile-accent) 50%, var(--border-strong));
   background: linear-gradient(145deg, rgb(25 32 51 / 98%), rgb(8 11 20 / 99%) 68%);
   box-shadow: var(--shadow), 0 0 3rem color-mix(in srgb, var(--profile-accent) 12%, transparent);
+}
+.player-profile-dialog[data-theme="default"] { border-color: var(--profile-default-accent); }
+.player-profile-dialog[data-theme="default"] .public-profile-bio::before {
+  color: color-mix(in srgb, var(--profile-default-accent) 70%, var(--text));
 }
 .profile-editor-dialog { transition: border-color 140ms ease, box-shadow 140ms ease; }
 .player-profile-dialog[data-theme="afterlife"],
@@ -1797,15 +1802,16 @@ h1 {
 }
 
 .leaderboard-player-identity { display: flex; align-items: center; gap: 0.55rem; min-width: 0; }
-.leaderboard-player-avatar { display: block; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; }
-.leaderboard-player-avatar:hover .zombie-avatar { border-color: var(--aether); box-shadow: 0 0 0 2px rgb(125 249 255 / 20%); }
-.leaderboard-player-avatar:focus-visible { outline: 2px solid var(--aether); outline-offset: 3px; }
+.leaderboard-player-avatar { display: block; padding: 0; border: 0; border-radius: 50%; background: none; cursor: pointer; -webkit-tap-highlight-color: rgb(246 247 251 / 18%); }
+.leaderboard-player-avatar:is(:hover, :active, :focus-visible) .zombie-avatar { border-color: var(--text); box-shadow: 0 0 0 2px rgb(246 247 251 / 20%); }
+.leaderboard-player-avatar:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
 .leaderboard-player-avatar .zombie-avatar { width: 2.5rem; height: 2.5rem; }
 .zombie-avatar-small { width: 2.25rem; height: 2.25rem; flex: 0 0 auto; }
-.leaderboard-player-name { display: block; min-width: 0; padding: 0; border: 0; appearance: none; background: none; color: var(--text); cursor: pointer; font: 800 1.04rem/1.35 var(--font-display); text-align: left; }
+.leaderboard-player-name { display: block; min-width: 0; padding: 0; border: 0; appearance: none; background: none; color: var(--text); cursor: pointer; font: 800 1.04rem/1.35 var(--font-display); text-align: left; -webkit-tap-highlight-color: rgb(246 247 251 / 18%); }
 /* Include glyph overhangs (especially a leading j) inside the ellipsis clip. */
 .leaderboard-player-name-text { display: block; overflow: hidden; padding: 0.12em 0.12em 0.2em; text-overflow: ellipsis; white-space: nowrap; }
-.leaderboard-player-name:hover { color: var(--aether); text-decoration: underline; }
+.leaderboard-player-name:is(:hover, :active, :focus-visible) { color: var(--text); text-decoration: underline; text-underline-offset: 0.16em; }
+.leaderboard-player-name:focus-visible { border-radius: 0.2rem; outline: 2px solid var(--text); outline-offset: 3px; }
 
 .account-field small,
 .account-import-choice {
@@ -2043,7 +2049,7 @@ h1 {
 }
 
 .leaderboard-entry {
-  --profile-accent: var(--muted-strong);
+  --profile-accent: var(--profile-default-accent);
   --muted: #becbdc;
   --muted-strong: #e1e7f2;
   display: grid;
@@ -2055,6 +2061,10 @@ h1 {
   border: 1px solid color-mix(in srgb, var(--profile-accent) 45%, var(--border));
   border-radius: 0.75rem;
   background: linear-gradient(145deg, rgb(27 36 57 / 72%), rgb(9 13 22 / 78%));
+}
+
+.leaderboard-entry[data-theme="default"] {
+  border-color: var(--profile-default-accent);
 }
 
 .leaderboard-entry.is-current-player {
@@ -2170,7 +2180,7 @@ h1 {
 }
 
 .leaderboard-all-time-entry {
-  grid-template-columns: 2rem minmax(0, 1fr) 7.5rem minmax(4.5rem, max-content);
+  grid-template-columns: 2rem minmax(0, 1fr) 8.5rem minmax(4.5rem, max-content);
   column-gap: 0.75rem;
   min-height: 4.25rem;
 }
@@ -2239,8 +2249,13 @@ h1 {
 }
 
 .leaderboard-supporting-metrics dd {
+  color: var(--text);
+  font-size: 0.96rem;
+}
+
+.leaderboard-supporting-metrics dt {
   color: var(--muted-strong);
-  font-size: 0.875rem;
+  font-size: 0.76rem;
 }
 
 .leaderboard-primary-metric {
@@ -2374,14 +2389,13 @@ h1 {
 
   .leaderboard-all-time-entry .leaderboard-supporting-metrics dd {
     flex-shrink: 0;
-    font: 600 0.75rem/1.2 "Barlow", sans-serif;
+    font: 800 1rem/1.1 var(--font-display);
   }
 
   .leaderboard-all-time-entry .leaderboard-supporting-metrics dt,
   .leaderboard-all-time-entry .leaderboard-primary-metric dt {
-    font: 400 0.65625rem/1.25 "Barlow", sans-serif;
-    letter-spacing: 0;
-    text-transform: none;
+    font: 700 0.76rem/1.2 var(--font-display);
+    letter-spacing: 0.025em;
   }
 
   .leaderboard-all-time-entry .leaderboard-supporting-metrics dt {
@@ -2419,9 +2433,15 @@ h1 {
 
   .leaderboard-all-time-entry .leaderboard-supporting-metrics {
     grid-column: 2 / -1;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 0.3rem 0.9rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .leaderboard-all-time-entry .leaderboard-supporting-metrics div {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
   }
 }
 
