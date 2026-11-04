@@ -66,6 +66,7 @@ test("the page's local release assets exist", async () => {
     "assets/fonts/barlow-600.ttf",
     "assets/fonts/barlow-700.ttf",
     "assets/fonts/barlow-800.ttf",
+    "assets/fonts/barlow-condensed-500.ttf",
     "assets/fonts/barlow-condensed-600.ttf",
     "assets/fonts/barlow-condensed-700.ttf",
     "assets/fonts/barlow-condensed-800.ttf",
