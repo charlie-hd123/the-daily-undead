@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261104-5";
+import { browserStorage } from "./browser-storage.js?v=20261104-6";
 import {
   accountMemoryStorageKey,
   archivePendingProgress,
@@ -13,9 +13,9 @@ import {
   recommendedAccountSave,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261104-5";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261104-5";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261104-5";
+} from "./account-session.js?v=20261104-6";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261104-6";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261104-6";
 
 function hasSupabaseConfiguration(documentObject = document) {
   const read = (name) => documentObject
@@ -199,6 +199,7 @@ export async function initialiseAccount({
   getLocalSnapshot,
   applyRemoteAccount,
   applyRemoteProgress = () => {},
+  onProfileSaved = () => {},
   readOnlyProgress = false,
   documentObject = document,
 }) {
@@ -334,7 +335,7 @@ export async function initialiseAccount({
 
   try {
     authClient = await withTimeout(
-      import("./supabase-auth.js?v=20261104-5").then(({ loadSupabaseAuth }) => (
+      import("./supabase-auth.js?v=20261104-6").then(({ loadSupabaseAuth }) => (
         loadSupabaseAuth(documentObject)
       )),
       5_000,
@@ -817,6 +818,7 @@ export async function initialiseAccount({
         body: JSON.stringify(payload),
       });
       Object.assign(profile, result.profile);
+      onProfileSaved(profile);
       profileEditorFeedback.classList.remove("account-error", "is-preview-warning");
       profileEditorFeedback.classList.add("is-success");
       profileEditorFeedback.textContent = "Profile saved.";

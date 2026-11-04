@@ -250,6 +250,27 @@ export function initialiseLeaderboards({
   const yourRank = dialog.querySelector("[data-leaderboard-your-rank]");
   let allTimeEntries = [];
   let currentUsername = null;
+  let profileRevision = 0;
+  const savedProfiles = new Map();
+
+  function updateProfile(profile) {
+    if (!profile?.username) return;
+    const saved = {
+      themeId: profile.themeId || "default",
+      avatarId: profile.avatarId || "unselected",
+      revision: ++profileRevision,
+    };
+    savedProfiles.set(profile.username, saved);
+    // A profile editor can sit above an already rendered leaderboard dialog.
+    // Update its existing tiles without resetting the tab, scroll or focus.
+    dialog.querySelectorAll(".leaderboard-entry").forEach((entry) => {
+      if (entry.dataset.username !== profile.username) return;
+      entry.dataset.theme = saved.themeId;
+      entry.querySelectorAll(".zombie-avatar").forEach((avatar) => {
+        avatar.dataset.avatar = saved.avatarId;
+      });
+    });
+  }
 
   function updateFindButtons() {
     findButtons.forEach((findButton) => {
@@ -317,17 +338,26 @@ export function initialiseLeaderboards({
     }
 
     try {
+      const requestRevision = profileRevision;
       const result = await fetchLeaderboards({
         apiUrl,
         puzzleDate: getPuzzleDate(),
         fetchImpl,
       });
+      // A response begun before a successful save must not restore old styling.
+      // Requests begun after that save still use fresh server data normally.
+      const currentProfile = (entry) => {
+        const saved = savedProfiles.get(entry.username);
+        return saved?.revision > requestRevision
+          ? { ...entry, themeId: saved.themeId, avatarId: saved.avatarId }
+          : entry;
+      };
       currentUsername = getCurrentUsername();
-      allTimeEntries = result.allTime || [];
+      allTimeEntries = (result.allTime || []).map(currentProfile);
       playerCount.textContent = numberFormatter.format(result.today?.playersToday || 0);
       renderTodayEntries(
         eliteList,
-        result.today?.elite || [],
+        (result.today?.elite || []).map(currentProfile),
         currentUsername,
         documentObject,
       );
@@ -352,4 +382,6 @@ export function initialiseLeaderboards({
       status.dataset.state = "error";
     }
   });
+
+  return { updateProfile };
 }
