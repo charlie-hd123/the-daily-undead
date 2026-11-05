@@ -15,7 +15,7 @@ const cards = {
   },
   blood: {
     title: 'Spot a Zombies connection?',
-    subtitle: ['Can you identify three tiles that form', 'a connection? There are four total.'],
+    subtitle: ['Find four connected groups of three.', 'Some tiles fit more than one group.', 'There’s only one intended solution.'],
   },
 };
 
@@ -240,7 +240,7 @@ export async function drawMarketingImage(canvas, type, puzzle) {
     const image = new Image();
     image.onload = () => resolve(image);
     image.onerror = () => reject(new Error('The original brand logo could not be loaded.'));
-    image.src = new URL('../assets/zombie-logo.png?v=20261104-6', import.meta.url).href;
+    image.src = new URL('../assets/zombie-logo.png?v=20261105-1', import.meta.url).href;
   });
   const [logo] = await Promise.all([logoPromise, fontsPromise]);
   const ctx = canvas.getContext('2d', { alpha: false });
@@ -249,7 +249,7 @@ export async function drawMarketingImage(canvas, type, puzzle) {
     background(ctx);
     label(ctx, cards[type].title, 78, 154, 105);
     ctx.font = `500 46px ${BODY_FONT}`;ctx.fillStyle = '#ae90f0';ctx.textAlign = 'left';ctx.textBaseline = 'top';
-    cards[type].subtitle.forEach((line, i) => ctx.fillText(line, 80, 291 + i * 65));
+    cards[type].subtitle.forEach((line, i) => ctx.fillText(line, 80, 291 + i * (type === 'blood' ? 50 : 65)));
     panel(ctx);
     if (type === 'easter') drawQuest(ctx, puzzle.clue);
     else if (type === 'word') drawWord(ctx, puzzle);

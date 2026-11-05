@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261104-6";
+import { browserStorage } from "./browser-storage.js?v=20261105-1";
 import { createClient } from "./vendor/supabase.js";
 
 function readConfig(documentObject) {
