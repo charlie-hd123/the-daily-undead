@@ -15,7 +15,7 @@ const cards = {
   },
   blood: {
     title: 'Spot a Zombies connection?',
-    subtitle: ['Find four connected groups of three.', 'Some tiles fit more than one group.', 'There’s only one intended solution.'],
+    subtitle: ['Find four groups of three. Some tiles fit multiple', 'groups, but there’s only one intended solution.'],
   },
 };
 
@@ -249,7 +249,7 @@ export async function drawMarketingImage(canvas, type, puzzle) {
     background(ctx);
     label(ctx, cards[type].title, 78, 154, 105);
     ctx.font = `500 46px ${BODY_FONT}`;ctx.fillStyle = '#ae90f0';ctx.textAlign = 'left';ctx.textBaseline = 'top';
-    cards[type].subtitle.forEach((line, i) => ctx.fillText(line, 80, 291 + i * (type === 'blood' ? 50 : 65)));
+    cards[type].subtitle.forEach((line, i) => ctx.fillText(line, 80, 291 + i * 65));
     panel(ctx);
     if (type === 'easter') drawQuest(ctx, puzzle.clue);
     else if (type === 'word') drawWord(ctx, puzzle);
