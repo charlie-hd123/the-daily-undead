@@ -2,11 +2,11 @@ import {
   buildDailyPuzzle,
   getAnswerDisplayTitle,
   getUtcDateKey,
-} from "./game-core.js?v=20261108-2";
-import { getOfficialPuzzleType, browserPuzzleOptions } from "./daily-challenge-core.js?v=20261108-2";
-import { buildDailyWordPuzzle } from "./word-puzzle-core.js?v=20261108-2";
-import { loadBloodTiesPuzzleBuilder } from './blood-ties-browser.js?v=20261108-2';
-import { fetchCommunityStats } from "./community-stats.js?v=20261108-2";
+} from "./game-core.js?v=20261108-3";
+import { getOfficialPuzzleType, browserPuzzleOptions } from "./daily-challenge-core.js?v=20261108-3";
+import { buildDailyWordPuzzle } from "./word-puzzle-core.js?v=20261108-3";
+import { loadBloodTiesPuzzles } from './blood-ties-browser.js?v=20261108-3';
+import { fetchCommunityStats } from "./community-stats.js?v=20261108-3";
 import {
   buildMarketingCopy,
   buildWordMarketingCopy,
@@ -15,9 +15,9 @@ import {
   getDailyPostNumber,
   getPreviousDateKey,
   isAppleMobileDevice,
-} from "./marketing-core.js?v=20261108-2";
+} from "./marketing-core.js?v=20261108-3";
 
-import { drawMarketingImage } from "./marketing-art.js?v=20261108-2";
+import { drawMarketingImage } from "./marketing-art.js?v=20261108-3";
 
 const pack = document.querySelector("#marketing-pack");
 const packDate = document.querySelector("#pack-date");
@@ -182,15 +182,16 @@ async function initialise() {
     const scheduleOptions = browserPuzzleOptions(document.querySelector('meta[name="daily-undead-environment"]')?.content);
     const puzzleType = getOfficialPuzzleType(dateKey, scheduleOptions);
     const yesterdayPuzzleType = getOfficialPuzzleType(yesterdayDateKey, scheduleOptions);
-    const buildDailyBloodTiesPuzzle = puzzleType === 'blood' || yesterdayPuzzleType === 'blood'
-      ? await loadBloodTiesPuzzleBuilder(scheduleOptions)
-      : null;
+    const bloodDates = [];
+    if (puzzleType === 'blood') bloodDates.push(dateKey);
+    if (yesterdayPuzzleType === 'blood') bloodDates.push(yesterdayDateKey);
+    const bloodPuzzles = await loadBloodTiesPuzzles(bloodDates, scheduleOptions);
     const yesterdayPuzzleName = { word: 'Last Words', easter: 'Quest Steps', blood: 'Blood Ties' }[yesterdayPuzzleType];
     const postNumber = getDailyPostNumber(dateKey);
     const puzzle = buildDailyPuzzle(dateKey, maps);
     const wordPuzzle = buildDailyWordPuzzle(dateKey, wordEntries);
     const yesterdayAnswer = yesterdayPuzzleType === 'blood'
-      ? buildDailyBloodTiesPuzzle(yesterdayDateKey).groups.map((g) => `${g.name}: ${g.answers.join(', ')}`).join('\n')
+      ? bloodPuzzles.find(puzzle => puzzle.dateKey === yesterdayDateKey).groups.map((g) => `${g.name}: ${g.answers.join(', ')}`).join('\n')
       : yesterdayPuzzleType === "word"
       ? buildDailyWordPuzzle(yesterdayDateKey, wordEntries).entry.answer
       : getAnswerDisplayTitle(
@@ -235,7 +236,7 @@ async function initialise() {
         solvePercentage,
       });
     const imagePuzzle = puzzleType === 'blood'
-      ? buildDailyBloodTiesPuzzle(dateKey)
+      ? bloodPuzzles.find(puzzle => puzzle.dateKey === dateKey)
       : puzzleType === 'word'
       ? { answer: wordPuzzle.entry.answer, initialLetters: wordPuzzle.initialLetters, category: wordPuzzle.entry.category }
       : { clue };

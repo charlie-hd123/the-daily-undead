@@ -1,10 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { bloodTiesSourceDigest, catalogueFrom, catalogueThrough } from '../scripts/generate-worker-blood-ties.mjs';
 import { workerBloodTiesCatalogue as catalogue } from '../worker/src/generated-blood-ties-catalog.js';
 import { buildDailyBloodTiesPuzzle as compiledPuzzle } from '../worker/src/blood-ties-puzzles.js';
 import { buildDailyBloodTiesPuzzle, createBloodTiesSession, normalizeBloodTiesSession, replayBloodTiesAttempts } from '../js/blood-ties-core.js';
-import { loadBloodTiesPuzzleBuilder } from '../js/blood-ties-browser.js';
+import { loadBloodTiesPuzzles } from '../js/blood-ties-browser.js';
+import { bloodTiesCatalogueQuarter } from '../js/blood-ties-compiled.js';
 import { sanitizeDailyState } from '../worker/src/accounts.js';
 
 test('browser, generator and compiled Worker puzzles match every date in both environments', async () => {
@@ -12,14 +14,36 @@ test('browser, generator and compiled Worker puzzles match every date in both en
   assert.equal(catalogue.from, catalogueFrom);
   assert.equal(catalogue.through, catalogueThrough);
   assert.ok(Date.parse(catalogue.through) > Date.now() + 366 * 86400000, 'Extend and regenerate the compiled range before releasing.');
+  const dates = [];
+  for (let time = Date.parse(catalogue.from); time <= Date.parse(catalogue.through); time += 86400000) {
+    dates.push(new Date(time).toISOString().slice(0, 10));
+  }
   for (const production of [false, true]) {
-    const browserPuzzle = await loadBloodTiesPuzzleBuilder({ production });
-    for (let time = Date.parse(catalogue.from); time <= Date.parse(catalogue.through); time += 86400000) {
-      const dateKey = new Date(time).toISOString().slice(0, 10);
+    const requests = [];
+    const browserPuzzles = await loadBloodTiesPuzzles(dates, { production, fetchImpl: async (url, options) => {
+      requests.push(url);
+      assert.equal(options.cache, 'force-cache');
+      return new Response(await readFile(new URL(url.replace(/^\.\//, '../'), import.meta.url)));
+    } });
+    assert.equal(requests.length, new Set(dates.map(bloodTiesCatalogueQuarter)).size,
+      'each quarter is fetched once, including both sides of each date boundary');
+    for (const [index, dateKey] of dates.entries()) {
       const expected = compiledPuzzle(dateKey, { production });
       assert.deepEqual(buildDailyBloodTiesPuzzle(dateKey, { production }), expected, `${dateKey}, production=${production}`);
-      assert.deepEqual(browserPuzzle(dateKey), expected, `${dateKey}, production=${production}, browser`);
+      assert.deepEqual(browserPuzzles[index], expected, `${dateKey}, production=${production}, browser`);
     }
+  }
+});
+
+test('the browser falls back to the exact generator for missing, corrupt and out-of-range packages', async () => {
+  const dates = ['2026-10-21', '2026-10-30'];
+  const production = false;
+  for (const fetchImpl of [
+    async () => new Response(null, { status: 404 }),
+    async () => new Response('{"environment":"staging","days":[]}'),
+  ]) {
+    assert.deepEqual(await loadBloodTiesPuzzles(dates, { production, fetchImpl }),
+      dates.map(date => buildDailyBloodTiesPuzzle(date, { production })));
   }
 });
 

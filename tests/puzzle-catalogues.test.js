@@ -6,6 +6,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { browserCatalogues, generateBrowserCatalogues } from "../scripts/generate-browser-catalogues.mjs";
+import { browserBloodTiesAssets } from "../scripts/generate-browser-blood-ties.mjs";
 import { loadPuzzleCatalogues } from "../js/puzzle-catalogues.js";
 import { puzzleCatalogueUrls } from "../js/puzzle-catalogue-assets.js";
 import { buildDailyPuzzle } from "../js/game-core.js";
@@ -16,7 +17,7 @@ const readJson = async (name) => JSON.parse(await readFile(path.join(root, name)
 const packaged = async (url) => readJson(url.replace(/^\.\//, ""));
 
 test("committed browser packages match every source field and immutable filename", async () => {
-  for (const [name, content] of await browserCatalogues()) {
+  for (const [name, content] of [...await browserCatalogues(), ...browserBloodTiesAssets()]) {
     assert.equal(await readFile(path.join(root, name), "utf8"), content,
       `${name} is stale; run generate:browser-catalogues and add the generated files`);
   }

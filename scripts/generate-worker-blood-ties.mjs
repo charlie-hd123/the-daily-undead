@@ -7,7 +7,7 @@ export const catalogueFrom = '2026-10-22';
 export const catalogueThrough = '2029-12-31';
 // Include every input to the generator, including historical content and rules.
 const sourceNames = [
-  'game-core.js', 'blood-ties-core.js', 'blood-ties-engine.js',
+  'game-core.js', 'blood-ties-core.js', 'blood-ties-engine.js', 'blood-ties-rules.js',
   'blood-ties-content.js', 'blood-ties-production-content.js',
   'blood-ties-v2.js', 'blood-ties-legacy.js', 'blood-ties-discovery.js',
   'blood-ties-catalogue.js', 'blood-ties-catalogue-v1.js', 'blood-ties-catalogue-v2.js',
