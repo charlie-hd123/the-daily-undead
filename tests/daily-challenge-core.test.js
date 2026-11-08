@@ -111,14 +111,14 @@ test("the official puzzle alternates on consecutive UTC dates", () => {
   assert.equal(getOfficialPuzzleType("2026-10-15"), OFFICIAL_PUZZLE_TYPES.WORD);
 });
 
-test("the unscored puzzle is always the other game", () => {
+test("older two-game bundles can still select the unscored puzzle", () => {
   assert.equal(getOtherPuzzleType(OFFICIAL_PUZZLE_TYPES.WORD), OFFICIAL_PUZZLE_TYPES.EASTER);
   assert.equal(getOtherPuzzleType(OFFICIAL_PUZZLE_TYPES.EASTER), OFFICIAL_PUZZLE_TYPES.WORD);
+  assert.throws(() => getOtherPuzzleType("unknown"), /recognised puzzle type/);
 });
 
-test("official puzzle assignment rejects invalid dates and puzzle types", () => {
+test("official puzzle assignment rejects invalid dates", () => {
   assert.throws(() => getOfficialPuzzleType("today"), /valid UTC date/);
-  assert.throws(() => getOtherPuzzleType("unknown"), /recognised puzzle type/);
 });
 
 test("Quest Steps completion is recovered from persisted result fields", () => {

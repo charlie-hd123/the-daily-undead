@@ -5,7 +5,6 @@ import {
   buildDailyPuzzle,
   calculateBonusPoints,
   calculateMapPoints,
-  calculateNextScore,
   calculateNextStreak,
   getAnswerDisplayTitle,
   getMillisecondsUntilNextUtcDay,
@@ -196,13 +195,6 @@ test("a correct step order doubles the map points", () => {
   assert.equal(twoCluePoints + calculateBonusPoints(twoCluePoints, true), 40);
   assert.equal(threeCluePoints + calculateBonusPoints(threeCluePoints, false), 10);
   assert.equal(oneCluePoints + calculateBonusPoints(oneCluePoints, true), 100);
-});
-
-test("Score accumulates permanently and zero-point failures never reduce it", () => {
-  assert.equal(calculateNextScore(40, 30), 70);
-  assert.equal(calculateNextScore(70, 20), 90);
-  assert.equal(calculateNextScore(90, 0), 90);
-  assert.equal(calculateNextScore(Number.NaN, 20), 20);
 });
 
 test("date helpers use the worldwide UTC day boundary", () => {

@@ -1,8 +1,6 @@
-const key = (date) => `the-daily-undead:play-destination:${date}`;
-
-export function rememberPlayDestination(storage, date, destination) {
-  try { storage.setItem(key(date), JSON.stringify(destination)); } catch { /* Navigation still works. */ }
-}
+// Cached app bundles may still import these names during a release.
+// The official puzzle is selected from day state, so the old marker needs no write.
+export function rememberPlayDestination() {}
 
 export function restorePlayDestination(_storage, date, day) {
   // A refresh opens the official puzzle's saved play or ending page. Extra

@@ -1,5 +1,0 @@
--- Retired: fixed-date sample SQL caused empty daily statistics and stale leaderboards.
--- Fictional staging players and current-day activity are now maintained by
--- worker/src/staging-fixtures.js through the normal database/API.
--- STAGING_FIXTURES is enabled only by the isolated staging/local Worker configs.
--- Never run sample-data SQL against production.

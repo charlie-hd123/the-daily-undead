@@ -83,6 +83,8 @@ export function browserPuzzleOptions(environment) {
   return { bloodTies: true, production: !['local', 'staging'].includes(environment) };
 }
 
+// The original two-game release imported this name. Keep it available when
+// an older app bundle loads this shared module during a release.
 export function getOtherPuzzleType(type) {
   if (type === OFFICIAL_PUZZLE_TYPES.WORD) return OFFICIAL_PUZZLE_TYPES.EASTER;
   if (type === OFFICIAL_PUZZLE_TYPES.EASTER) return OFFICIAL_PUZZLE_TYPES.WORD;

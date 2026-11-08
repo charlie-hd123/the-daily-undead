@@ -38,11 +38,14 @@ for (const officialType of ['word', 'easter', 'blood']) {
   });
 }
 
-test('missing, corrupt and unavailable navigation storage cannot change official entry', () => {
+test('cached app bundles can call the former writer without modifying old navigation storage', () => {
   const day = { dateKey: date, officialType: 'word', officialCompleted: true, sessions: { word: { complete: true }, blood: { attempts: [['a', 'b', 'c']] } } };
   const storage = memory();
+  const marker = `the-daily-undead:play-destination:${date}`;
   for (const value of [null, '{', JSON.stringify({ screen: 'hub' })]) {
-    if (value !== null) storage.setItem(`the-daily-undead:play-destination:${date}`, value);
+    if (value !== null) storage.setItem(marker, value);
+    rememberPlayDestination(storage, date, { type: 'blood', mode: 'for_fun' });
+    assert.equal(storage.getItem(marker), value);
     assert.deepEqual(restorePlayDestination(storage, date, day), { type: 'word', mode: 'official' });
   }
   const denied = { getItem() { throw Error('denied'); }, setItem() { throw Error('denied'); } };

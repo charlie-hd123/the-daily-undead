@@ -19,7 +19,7 @@ export function hashFiles(files) {
   return hash.digest("hex");
 }
 export function isWebsiteFile(name) {
-  return /^(assets|data|js)\//.test(name) && name !== "js/staging-demo.js"
+  return /^(assets|data|js)\//.test(name)
     || ["index.html", "marketing.html", "maintenance.html", "staging-demo.html", "styles.css", "marketing.css", "staging-demo.css", "release.json", "CNAME", ".nojekyll"].includes(name);
 }
 export function isApiFile(name) {
