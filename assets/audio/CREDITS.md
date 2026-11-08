@@ -2,7 +2,7 @@
 
 Correct-letter and streak sounds (02–05) raised by 3dB. Clue reveal (07) and bonus selections (11–13) lowered by 3dB. Reward flourish (14) lowered by 6dB, with a smooth 5dB treble shelf above 2.5kHz and gentle high-frequency rolloff. Pitch, timing, stereo and existing effects retained. The other eight active sound pairs are unchanged.
 
-Rebuild from the committed original import using `python scripts/adjust-audio-levels.py` (numpy and macOS afconvert). Processing levels and WAV/AAC peaks: [level-feedback-qa-2026-10-24.json](level-feedback-qa-2026-10-24.json). Decoder, endpoint and true-peak checks passed; no subjective listening assessment was possible. The fourth successful Blood Ties connection now receives the same confirmation cue as the preceding connections, alongside its result count.
+Rebuild from the committed original import using `python scripts/archive/audio/adjust-audio-levels.py` (numpy and macOS afconvert). Processing levels and WAV/AAC peaks: [level-feedback-qa-2026-10-24.json](level-feedback-qa-2026-10-24.json). Decoder, endpoint and true-peak checks passed; no subjective listening assessment was possible. The fourth successful Blood Ties connection now receives the same confirmation cue as the preceding connections, alongside its result count.
 
 # Current user-selected sound pack · 24 October 2026
 
@@ -30,17 +30,17 @@ Mystery Box now has a longer, darker reverb across its melody, chimes, ethereal 
 
 ## Previous fuller atmosphere and quiet chimes · 23 October 2026
 
-Raised the Mystery Box ethereal layer by 4.61 dB relative to its previous mix, with three soft bell glints at 0.72, 1.06 and 1.43 seconds. The chimes share the existing dark room reverb. The recorded opening, 1G phrase and 3.42-second fade remain; no late impacts are added. Overall active-window loudness remains -18 dBFS and in-game gain remains .86. All other 16 cues are unchanged. Rebuild with `python scripts/revise-box-atmosphere.py`.
+Raised the Mystery Box ethereal layer by 4.61 dB relative to its previous mix, with three soft bell glints at 0.72, 1.06 and 1.43 seconds. The chimes share the existing dark room reverb. The recorded opening, 1G phrase and 3.42-second fade remain; no late impacts are added. Overall active-window loudness remains -18 dBFS and in-game gain remains .86. All other 16 cues are unchanged. Rebuild with `python scripts/archive/audio/revise-box-atmosphere.py`.
 
 ## Previous recorded chest and atmospheric 1G · 23 October 2026
 
 Mystery Box now combines the existing 1G melody with a CC0 recording of an actual wooden chest opening. The initial synthetic knock and the two post-jingle thuds are removed. A dark diffuse reverb and quiet E/B harmonic layer add depth, fading to silence at 3.42 seconds before the 3.50-second animation finishes. The active-window RMS remains -18 dBFS and cue gain remains .86. All other 16 cues, including the cleaned reward flourish, are unchanged.
 
-Recording: [Wooden Chest Open.wav by The_Frisbee_of_Peace](https://freesound.org/people/The_Frisbee_of_Peace/sounds/573654/), CC0. The public HQ MP3 preview is retained; the login-gated original WAV was not downloaded. Full source hash, licence and processing details: [sources/CREDITS.md](sources/CREDITS.md). Rebuild with `python scripts/revise-box-atmosphere.py`. No direct listening assessment; PCM/AAC decoding, finite samples, duration, silent endpoints and 4x true peaks checked.
+Recording: [Wooden Chest Open.wav by The_Frisbee_of_Peace](https://freesound.org/people/The_Frisbee_of_Peace/sounds/573654/), CC0. The public HQ MP3 preview is retained; the login-gated original WAV was not downloaded. Full source hash, licence and processing details: [sources/CREDITS.md](sources/CREDITS.md). Rebuild with `python scripts/archive/audio/revise-box-atmosphere.py`. No direct listening assessment; PCM/AAC decoding, finite samples, duration, silent endpoints and 4x true peaks checked.
 
 ## Previous reward texture cleanup · 23 October 2026
 
-The papery air sweep embedded in Double Points (190–610 ms into its clip) has been removed by reconstructing and subtracting that original component. The existing chimes, echoes, 1.65-second duration, playback gain and post-count trigger timing remain. Loudness is matched to the accepted file. This shared flourish is cleaned wherever it plays. All other cues, including selected box 1G and clue 8E, are byte-identical. Rebuild with `python scripts/remove-reward-sweep.py` (numpy + macOS afconvert). Source/AAC decoding and true-peak checks passed; no subjective listening assessment.
+The papery air sweep embedded in Double Points (190–610 ms into its clip) has been removed by reconstructing and subtracting that original component. The existing chimes, echoes, 1.65-second duration, playback gain and post-count trigger timing remain. Loudness is matched to the accepted file. This shared flourish is cleaned wherever it plays. All other cues, including selected box 1G and clue 8E, are byte-identical. Rebuild with `python scripts/archive/audio/remove-reward-sweep.py` (numpy + macOS afconvert). Source/AAC decoding and true-peak checks passed; no subjective listening assessment.
 
 ## Selected original box 1G · 23 October 2026
 
@@ -96,7 +96,7 @@ button routing and delayed bonus reward timing remain unchanged from revision 2.
 These are original procedural synthesis using local numpy and macOS afconvert.
 No downloaded audio or paid generation services were used. No direct listening
 assessment was available; WAV and decoded AAC signal checks are recorded in the
-review pack. Rebuild with `python scripts/revise-audio-timing.py --feedback-r6`;
+review pack. Rebuild with `python scripts/archive/audio/revise-audio-timing.py --feedback-r6`;
 the standalone audition player is in `audio-review/2026-10-21-r6`.
 
 ## Previous listening feedback · revision 2.3
@@ -118,7 +118,7 @@ including run ended, and every playback gain remain bit-identical to revision 2.
   site buttons are silent. New buttons default to silence.
 - Bonus reward timing from revision 2.2 is unchanged.
 
-Rebuild with `python scripts/revise-audio-timing.py --feedback-r5`. The standalone
+Rebuild with `python scripts/archive/audio/revise-audio-timing.py --feedback-r5`. The standalone
 player and montage are in `audio-review/2026-10-21-r5`. This is original local
 synthesis, using the haunted clockwork/music-box character as creative direction.
 No Treyarch samples or melody were copied; no direct listening tool was available.
@@ -140,7 +140,7 @@ bit-identical to revision 2.1.
   immediate total and ping. Unscored play has no count and keeps its immediate
   reward. Muting, leaving the page or navigating cancels the scheduled flourish.
 
-Rebuild with `python scripts/revise-audio-timing.py --feedback-r4`. The review
+Rebuild with `python scripts/archive/audio/revise-audio-timing.py --feedback-r4`. The review
 player and montage are written to `audio-review/2026-10-21-r4`.
 
 ## Previous listening feedback · revision 2.1
@@ -164,7 +164,7 @@ silenced the failed-word result. Its timing remains 850 ms (120 ms with reduced
 motion). Word score-count sounds are likewise scheduled for their visible result.
 Reloaded results stay silent; mute, hiding and navigation cancel scheduled cues.
 
-Rebuild this revision with `python scripts/revise-audio-timing.py` (numpy + macOS
+Rebuild this revision with `python scripts/archive/audio/revise-audio-timing.py` (numpy + macOS
 afconvert). It preserves every other active file and gain. Review artifacts are
 written to `audio-review/2026-10-21-r3`.
 

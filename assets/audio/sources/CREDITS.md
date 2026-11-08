@@ -13,4 +13,4 @@ The creator describes raw audio of a wooden chest being opened, recorded with a 
 
 The 0.18–0.84 second excerpt is decoded to mono, retained at natural speed, gently filtered, peak-controlled and edge-faded. It starts immediately on activation, with the physical movement inside the 850 ms lid-opening phase. Later handling/impact sounds are excluded. It is mixed with the existing original 1G melody, a dark diffuse reverb and soft synthesised harmonic atmosphere. The old synthetic opening knock and the two post-jingle thuds are excluded. The completed cue fades to silence at 3.42 seconds, before the 3.50-second presentation ends.
 
-Rebuild: `python scripts/revise-box-atmosphere.py` (numpy and macOS afconvert). Other cues are not regenerated.
+Rebuild: `python scripts/archive/audio/revise-box-atmosphere.py` (numpy and macOS afconvert). Other cues are not regenerated.

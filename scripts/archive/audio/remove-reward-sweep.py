@@ -12,7 +12,7 @@ import subprocess
 import tempfile
 import numpy as np
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[3]
 spec = importlib.util.spec_from_file_location('synthesis', ROOT/'scripts/synthesise-feedback.py')
 s = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(s)

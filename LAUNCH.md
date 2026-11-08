@@ -66,7 +66,7 @@ No database step begins until the public page and API write freeze are confirmed
 3. Verify read-only stats, Today leaderboard, All Time leaderboard and one account.
 4. Verify the progression launch validator reports the intended two-day popup and
    four-day leaderboard-reminder cutoffs.
-5. Publish the redesigned website from the reviewed `scoring-redesign` commit.
+5. Publish the redesigned website from the commit marked by the `release-scoring-redesign` tag.
 6. Verify the real domain on Mac and mobile before removing the maintenance layer.
 
 ## Reopen

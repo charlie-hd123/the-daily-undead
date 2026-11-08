@@ -10,7 +10,7 @@ import subprocess
 import tempfile
 import numpy as np
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[3]
 ASSETS = ROOT / 'assets/audio'
 BASE = '1d8b4ae073f037d71546f3c27424833a33656c28'
 CHANGES = {
