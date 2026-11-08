@@ -7,7 +7,6 @@ import {
   resolveLeaderboardsApiUrl,
   sortAllTimeEntries,
 } from "../js/leaderboards.js";
-import localWorker from "../worker/src/leaderboards-local.js";
 import { readLeaderboards } from "../worker/src/leaderboards.js";
 
 const projectRoot = new URL("../", import.meta.url);
@@ -127,7 +126,7 @@ test("username tie-breaking preserves case-sensitive display and ordering", () =
   );
 });
 
-test("the browser uses a separate local leaderboard service", () => {
+test("the browser uses the local application API for leaderboards in development", () => {
   assert.equal(resolveLeaderboardsApiUrl({ isLocalDevelopment: true }), "http://localhost:8787");
   assert.equal(
     resolveLeaderboardsApiUrl({
@@ -155,30 +154,6 @@ test("the leaderboard browser request passes the selected puzzle date", async ()
 
   assert.equal(requestedUrl, "https://api.example.test/api/leaderboards?date=2026-09-20");
   assert.deepEqual(result, { today: { playersToday: 0, elite: [] }, allTime: [] });
-});
-
-test("the production-data preview has no write routes", async () => {
-  const response = await localWorker.fetch(
-    new Request("http://localhost:8788/api/leaderboards", {
-      method: "POST",
-      headers: { Origin: "http://localhost:8080" },
-    }),
-    {},
-  );
-
-  assert.equal(response.status, 405);
-  assert.deepEqual(await response.json(), { error: "This local preview is read-only." });
-});
-
-test("the local Wrangler config opts only its D1 binding into remote data", async () => {
-  const config = await fs.readFile(
-    new URL("../worker/wrangler.leaderboards-local.jsonc", import.meta.url),
-    "utf8",
-  );
-
-  assert.match(config, /"main": "src\/leaderboards-local\.js"/);
-  assert.match(config, /"remote": true/);
-  assert.doesNotMatch(config, /src\/index\.js/);
 });
 
 test("the leaderboard uses player-facing introductory copy", async () => {
