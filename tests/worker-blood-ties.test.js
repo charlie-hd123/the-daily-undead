@@ -4,17 +4,21 @@ import { bloodTiesSourceDigest, catalogueFrom, catalogueThrough } from '../scrip
 import { workerBloodTiesCatalogue as catalogue } from '../worker/src/generated-blood-ties-catalog.js';
 import { buildDailyBloodTiesPuzzle as compiledPuzzle } from '../worker/src/blood-ties-puzzles.js';
 import { buildDailyBloodTiesPuzzle, createBloodTiesSession, normalizeBloodTiesSession, replayBloodTiesAttempts } from '../js/blood-ties-core.js';
+import { loadBloodTiesPuzzleBuilder } from '../js/blood-ties-browser.js';
 import { sanitizeDailyState } from '../worker/src/accounts.js';
 
-test('compiled Worker puzzles match every shared historical/future assignment in both environments', async () => {
+test('browser, generator and compiled Worker puzzles match every date in both environments', async () => {
   assert.equal(catalogue.sourceDigest, await bloodTiesSourceDigest(), 'Regenerate the Worker Blood Ties catalogue after changing its inputs.');
   assert.equal(catalogue.from, catalogueFrom);
   assert.equal(catalogue.through, catalogueThrough);
   assert.ok(Date.parse(catalogue.through) > Date.now() + 366 * 86400000, 'Extend and regenerate the compiled range before releasing.');
   for (const production of [false, true]) {
+    const browserPuzzle = await loadBloodTiesPuzzleBuilder({ production });
     for (let time = Date.parse(catalogue.from); time <= Date.parse(catalogue.through); time += 86400000) {
       const dateKey = new Date(time).toISOString().slice(0, 10);
-      assert.deepEqual(compiledPuzzle(dateKey, { production }), buildDailyBloodTiesPuzzle(dateKey, { production }), `${dateKey}, production=${production}`);
+      const expected = compiledPuzzle(dateKey, { production });
+      assert.deepEqual(buildDailyBloodTiesPuzzle(dateKey, { production }), expected, `${dateKey}, production=${production}`);
+      assert.deepEqual(browserPuzzle(dateKey), expected, `${dateKey}, production=${production}, browser`);
     }
   }
 });
