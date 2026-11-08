@@ -1,0 +1,32 @@
+# GitHub Pages publishes from the repository root. Keep these files in Git
+# while excluding them from the public site.
+exclude:
+  - config/
+  - scripts/
+  - supabase/
+  - tests/
+  - worker/
+  - AGENTS.md
+  - AUDIO-PERFORMANCE.md
+  - AUTH_MIGRATION.md
+  - BLOOD-TIES.md
+  - CACHE_RECOVERY.md
+  - CLERK-RETIREMENT.md
+  - CLOUD-SAVE-REVIEW-2026-10-31.md
+  - LAUNCH.md
+  - MYSTERY-BOX.md
+  - PLAYER-ADMIN.md
+  - README.md
+  - STAGING.md
+  - WEBSITE-WORKFLOW.md
+  - package.json
+  - pnpm-lock.yaml
+  - pnpm-workspace.yaml
+  # Preserve Jekyll 3's default build exclusions.
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/

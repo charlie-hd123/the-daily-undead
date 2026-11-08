@@ -29,3 +29,34 @@ jobs:
           node scripts/build-site.mjs staging
           node scripts/build-site.mjs production
           node --input-type=module -e "import fs from 'node:fs'; const a=JSON.parse(fs.readFileSync('.staging-dist/release-manifest.json')); const b=JSON.parse(fs.readFileSync('.production-dist/release-manifest.json')); if(a.applicationDigest!==b.applicationDigest || a.apiDigest!==b.apiDigest) process.exit(1);"
+  pages-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Rehearse the GitHub Pages build without publishing
+        uses: actions/jekyll-build-pages@v1
+        with:
+          verbose: false
+      - name: Compare Pages output with the website file list
+        run: |
+          node --input-type=module <<'NODE'
+          import assert from 'node:assert/strict';
+          import { readFileSync, readdirSync } from 'node:fs';
+          import { join } from 'node:path';
+          import { isWebsiteFile, trackedFiles } from './scripts/lib/release-tools.mjs';
+
+          const output = '_site';
+          const expected = trackedFiles(process.cwd()).filter(isWebsiteFile);
+          const actual = readdirSync(output, { recursive: true, withFileTypes: true })
+            .filter(entry => entry.isFile())
+            .map(entry => join(entry.parentPath, entry.name).slice(output.length + 1))
+            .sort();
+          assert.deepEqual(actual, expected, 'GitHub Pages file list differs from the website file list');
+          for (const file of expected) {
+            assert.ok(readFileSync(join(output, file)).equals(readFileSync(file)), `GitHub Pages changed ${file}`);
+          }
+          console.log(`GitHub Pages preserved all ${expected.length} website files and excluded developer files.`);
+          NODE
