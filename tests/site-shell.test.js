@@ -467,41 +467,12 @@ test("stat rewards stay attached to their header pills", async () => {
   assert.doesNotMatch(css, /\.reward-hud|reward-hud-arrival/);
 });
 
-test("the progression update auto-opens for two days and remains in leaderboards for four", async () => {
-  const [html, css, app] = await Promise.all([
-    readProjectFile("index.html"),
-    readProjectFile("styles.css"),
-    readProjectFile("js/app.js"),
-  ]);
-
-  assert.match(html, /id="progression-update-button"[^>]*hidden/);
-  assert.match(html, /id="leaderboards-dialog"[\s\S]*?id="progression-update-button"/);
-  assert.doesNotMatch(html, /class="header-meta"[\s\S]*?id="progression-update-button"[\s\S]*?<\/header>/);
-  assert.match(html, /id="progression-update-dialog"/);
-  assert.match(
-    html,
-    /name="daily-undead-progression-launch-at" content="\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z"/,
-  );
-  assert.match(html, /<h2>A simpler scoring system<\/h2>/);
-  assert.match(html, /It never decreases, resets or gets spent, so every successful puzzle moves you forward\./);
-  assert.match(html, /Failing ends your current Round, but not your career progress\./);
-  assert.match(html, /Your Score is our best estimate from the history available\./);
-  assert.match(html, /leaderboard positions closely match the original standings\./);
-  assert.match(html, /Nobody’s Score has been reset\./);
-  assert.match(app, /getProgressionUpdateVisibility/);
-  assert.match(app, /if \(!visibility\.showReminder\) return;/);
-  assert.match(app, /if \(visibility\.autoOpen && !document\.querySelector\("dialog\[open\]"\)\)/);
-  assert.match(app, /getCurrentTime\(\)\.getTime\(\)/);
-  assert.match(app, /function hasEstablishedProgress\(\)/);
-  assert.match(app, /updateState\.autoShown = true;/);
-  assert.match(app, /progressionUpdateButton\.addEventListener\("click", openProgressionUpdate\)/);
+test("legacy browser Score is migrated before cloud account setup", async () => {
+  const app = await readProjectFile("js/app.js");
   assert.match(
     app,
-    /legacyEasterState = loadState\(\);[\s\S]*?migrateLegacyLocalScore\(localStorage,[\s\S]*?initialiseAccount\([\s\S]*?initialiseProgressionUpdate\(\);/,
+    /legacyEasterState = loadState\(\);[\s\S]*?migrateLegacyLocalScore\(localStorage,[\s\S]*?initialiseAccount\(/,
   );
-  assert.match(css, /\.progression-update-button \{/);
-  assert.match(css, /\.progression-update-dialog \.progression-update-benefit \{/);
-  assert.match(css, /\.progression-estimate-note \{/);
 });
 
 test("survivor profiles hide an empty favourite memory section", async () => {

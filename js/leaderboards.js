@@ -65,7 +65,6 @@ function makePlayer(
   username,
   resultLabel = null,
   resultClass = null,
-  resultAccent = null,
   avatarId = "unselected",
 ) {
   const player = documentObject.createElement("span");
@@ -97,13 +96,6 @@ function makePlayer(
     const result = documentObject.createElement("small");
     result.className = `leaderboard-result is-${resultClass || resultLabel.toLowerCase()}`;
     result.textContent = resultLabel;
-    if (resultAccent) {
-      result.append(documentObject.createTextNode(" "));
-      const accent = documentObject.createElement("span");
-      accent.className = "leaderboard-result-accent";
-      accent.textContent = resultAccent;
-      result.append(accent);
-    }
     player.append(result);
   }
 
@@ -163,7 +155,6 @@ function renderTodayEntries(list, entries, currentUsername, documentObject) {
         entry.username,
         resultLabel,
         isPerfect ? "elite" : "correct",
-        null,
         entry.avatarId,
       ),
       makePoints(documentObject, entry.points),
@@ -203,7 +194,7 @@ function renderAllTimeEntries(
     item.className = "leaderboard-entry leaderboard-all-time-entry";
     personaliseEntry(item, entry, currentUsername);
 
-    const player = makePlayer(documentObject, entry.username, null, null, null, entry.avatarId);
+    const player = makePlayer(documentObject, entry.username, null, null, entry.avatarId);
     const supportingMetrics = documentObject.createElement("dl");
     supportingMetrics.className = "leaderboard-supporting-metrics";
     supportingMetrics.append(

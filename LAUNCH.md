@@ -1,8 +1,8 @@
-# Scoring redesign launch runbook
+# October 2026 scoring redesign launch record
 
-This runbook is preparation only. Do not run any production command until Charlie
-explicitly approves the live launch. Commands naming `daily-undead-stats`,
-`worker/wrangler.jsonc`, `thedailyundead.com` or `main` affect production.
+This records the one-off scoring launch on 2 October 2026 at 09:11:35 UTC.
+Use [STAGING.md](STAGING.md) for current releases. The steps below are historical.
+Running the score migration or rollback today could overwrite player progress.
 
 ## Release rules
 
@@ -22,7 +22,8 @@ explicitly approves the live launch. Commands naming `daily-undead-stats`,
 - `worker/launch/opening-score-migration.sql` — backed-up, idempotent Score write.
 - `worker/launch/opening-score-verification.sql` — post-write checks and final ranking.
 - `worker/launch/opening-score-rollback.sql` — pre-reopening rollback only.
-- `scripts/validate-production-launch.mjs` — refuses a release with no fixed launch time.
+- The launch validator and temporary announcement are retained in the Git
+  history for the scoring release.
 
 ## Before maintenance
 

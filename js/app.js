@@ -1,7 +1,7 @@
-import { browserStorage } from "./browser-storage.js?v=20261105-1";
-import { buildDailyBloodTiesPuzzle, createBloodTiesSession, normalizeBloodTiesSession, replayBloodTiesAttempts } from './blood-ties-core.js?v=20261105-1';
-import { renderBloodTiesGroup, renderBloodTiesView } from './blood-ties-view.js?v=20261105-1';
-import { rememberPlayDestination, restorePlayDestination } from "./play-destination.js?v=20261105-1";
+import { browserStorage } from "./browser-storage.js?v=20261108-1";
+import { buildDailyBloodTiesPuzzle, createBloodTiesSession, normalizeBloodTiesSession, replayBloodTiesAttempts } from './blood-ties-core.js?v=20261108-1';
+import { renderBloodTiesGroup, renderBloodTiesView } from './blood-ties-view.js?v=20261108-1';
+import { rememberPlayDestination, restorePlayDestination } from "./play-destination.js?v=20261108-1";
 import {
   buildDailyPuzzle,
   calculateBonusPoints,
@@ -16,51 +16,49 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261105-1";
+} from "./game-core.js?v=20261108-1";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
   shouldHandleWordShortcut,
-} from "./word-puzzle-core.js?v=20261105-1";
+} from "./word-puzzle-core.js?v=20261108-1";
 import {
   getOfficialPuzzleType as selectOfficialPuzzleType,
   browserPuzzleOptions,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261105-1";
+} from "./daily-challenge-core.js?v=20261108-1";
 import {
   canUseRequestedPreviewDate,
-  getProgressionUpdateVisibility,
   isLocalDevelopmentHostname,
   isLocalPreviewHostname,
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261105-1";
+} from "./progression.js?v=20261108-1";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261105-1";
+} from "./account.js?v=20261108-1";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261105-1";
+} from "./community-stats.js?v=20261108-1";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261105-1";
-import { fetchWithTimeout } from "./network.js?v=20261105-1";
-import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261105-1";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261105-1";
-import { createSocialDemoFetch, initialiseSocialDemo } from "./social-demo.js?v=20261105-1";
-import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261105-1";
-import { createMysteryBox } from "./mystery-box.js?v=20261105-1";
-import { initialiseGameAudio, letterSound, bloodConnectionSound } from "./game-audio.js?v=20261105-1";
+} from "./leaderboards.js?v=20261108-1";
+import { fetchWithTimeout } from "./network.js?v=20261108-1";
+import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261108-1";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261108-1";
+import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261108-1";
+import { createMysteryBox } from "./mystery-box.js?v=20261108-1";
+import { initialiseGameAudio, letterSound, bloodConnectionSound } from "./game-audio.js?v=20261108-1";
 
 const gameAudio = initialiseGameAudio(browserStorage);
 const mysteryBox = createMysteryBox({
@@ -78,8 +76,6 @@ const scoreLabel = document.querySelector("#score-count");
 const countdownLabel = document.querySelector("#next-round-countdown");
 const playerStats = document.querySelector(".player-stats");
 const statExplainer = document.querySelector("#player-stat-explainer");
-const progressionUpdateButton = document.querySelector("#progression-update-button");
-const progressionUpdateDialog = document.querySelector("#progression-update-dialog");
 const leaderboardsButton = document.querySelector("#leaderboards-button");
 const leaderboardsDialog = document.querySelector("#leaderboards-dialog");
 const clueTemplate = document.querySelector("#clue-template");
@@ -132,6 +128,7 @@ const returnDevTodayButton = document.querySelector("#return-dev-today");
 let dayPreviewEnabled = false;
 let localStorage = browserStorage;
 const socialDemoEnabled = isLocalDevelopment && new URLSearchParams(window.location.search).get("socialDemo") === "1";
+const socialDemo = socialDemoEnabled ? await import("./social-demo.js?v=20261108-1") : null;
 const currentBuild = readCurrentBuild();
 const communityStatsApiUrl = resolveCommunityStatsApiUrl({ isLocalDevelopment });
 const leaderboardsApiUrl = resolveLeaderboardsApiUrl({ isLocalDevelopment });
@@ -143,7 +140,6 @@ const legacyPointsStorageKey = "the-daily-undead:total-points";
 const legacyScoreMigrationStorageKey = "the-daily-undead:legacy-score-migration";
 const puzzleStatsStorageKey = "the-daily-undead:puzzle-stats-v1";
 const multiPuzzleDayStoragePrefix = "the-daily-undead:multi-puzzle-day:";
-const progressionUpdateStorageKey = "the-daily-undead:progression-update-v2";
 const statExplainers = {
   round: {
     title: "Round",
@@ -242,19 +238,19 @@ const puzzleTypes = {
     name: "Quest Steps",
     kicker: "Easter egg puzzle",
     description: "Can you identify the Zombies map from its Easter egg steps?",
-    image: "./assets/quest-steps-card.svg?v=20261105-1",
+    image: "./assets/quest-steps-card.svg?v=20261108-1",
   },
   word: {
     name: "Last Words",
     kicker: "Letter puzzle",
     description: "Can you identify the Zombies word or phrase by revealing its letters?",
-    image: "./assets/dead-letters-card.svg?v=20261105-1",
+    image: "./assets/dead-letters-card.svg?v=20261108-1",
   },
 };
 if (bloodTiesEnabled) puzzleTypes.blood = {
   name: 'Blood Ties', kicker: 'Connection puzzle',
   description: 'Can you uncover the hidden Zombies connections?',
-  image: './assets/blood-ties-card.svg?v=20261105-1',
+  image: './assets/blood-ties-card.svg?v=20261108-1',
 };
 
 function escapeHtml(value) {
@@ -315,7 +311,7 @@ const leaderboardsController = initialiseLeaderboards({
   getPuzzleDate: getDateKey,
   getCurrentUsername: getLeaderboardUsername,
   onSelectPlayer: (username) => accountController.openPlayerProfile?.(username),
-  fetchImpl: socialDemoEnabled ? createSocialDemoFetch() : globalThis.fetch,
+  fetchImpl: socialDemo ? socialDemo.createSocialDemoFetch() : globalThis.fetch,
 });
 
 function getCurrentTime() {
@@ -1104,64 +1100,6 @@ function animateStat(label, amount, theme) {
   reward.addEventListener("animationend", finish, { once: true });
   window.setTimeout(finish, 1400);
   window.setTimeout(() => display.classList.remove("is-earned"), 850);
-}
-
-function hasEstablishedProgress() {
-  return score > 0 || solves > 0 || bestRound > 0 || Boolean(lastPlayedDate) || state.phase === "result";
-}
-
-function readProgressionUpdateState() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(progressionUpdateStorageKey));
-    return saved && typeof saved === "object" ? { autoShown: Boolean(saved.autoShown) } : null;
-  } catch {
-    return null;
-  }
-}
-
-function writeProgressionUpdateState(updateState) {
-  try {
-    localStorage.setItem(progressionUpdateStorageKey, JSON.stringify(updateState));
-  } catch {
-    // The explanation remains available for this visit when storage is disabled.
-  }
-}
-
-function openProgressionUpdate() {
-  if (!progressionUpdateDialog || progressionUpdateDialog.open) return;
-  if (typeof progressionUpdateDialog.showModal === "function") {
-    progressionUpdateDialog.showModal();
-  }
-}
-
-function initialiseProgressionUpdate() {
-  if (!progressionUpdateButton || !progressionUpdateDialog || !hasEstablishedProgress()) return;
-
-  const launchAt = Date.parse(
-    document.querySelector('meta[name="daily-undead-progression-launch-at"]')?.content || "",
-  );
-  const saved = readProgressionUpdateState();
-  const updateState = saved || { autoShown: false };
-  const visibility = getProgressionUpdateVisibility({
-    launchAt,
-    now: getCurrentTime().getTime(),
-    autoShown: updateState.autoShown,
-  });
-  if (!visibility.showReminder) return;
-
-  progressionUpdateButton.hidden = false;
-  progressionUpdateButton.addEventListener("click", openProgressionUpdate);
-  progressionUpdateDialog.querySelectorAll("[data-close-progression-update]").forEach((button) => {
-    button.addEventListener("click", () => progressionUpdateDialog.close());
-  });
-
-  if (visibility.autoOpen && !document.querySelector("dialog[open]")) {
-    updateState.autoShown = true;
-    writeProgressionUpdateState(updateState);
-    openProgressionUpdate();
-  } else if (!saved) {
-    writeProgressionUpdateState(updateState);
-  }
 }
 
 function closeStatExplainer() {
@@ -2676,8 +2614,8 @@ async function initialise() {
       solves,
       dailyState: legacyEasterState,
     }).score;
-    accountController = socialDemoEnabled
-      ? initialiseSocialDemo()
+    accountController = socialDemo
+      ? socialDemo.initialiseSocialDemo()
       : await initialiseAccount({
           apiUrl: leaderboardsApiUrl,
           puzzleDate: dateKey,
@@ -2711,7 +2649,6 @@ async function initialise() {
     updateStreakDisplay();
     updateSolvesDisplay();
     updateScoreDisplay();
-    initialiseProgressionUpdate();
     updateNextRoundCountdown();
     window.setInterval(updateNextRoundCountdown, 1000);
     initialiseReleaseMonitoring();

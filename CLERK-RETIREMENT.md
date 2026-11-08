@@ -1,8 +1,8 @@
 # Clerk retirement — 31 October 2026
 
-This cleanup is staged for review. Production publication is a separate explicit
-approval under AGENTS.md. It includes no database migration, account export,
-account deletion, identity rewrite or production configuration change.
+This is the October retirement record. The 7 November audit confirmed that the
+live and staging Workers report Supabase as their sole account provider.
+The historical identity records below are still part of account recovery.
 
 ## Removed from the candidate
 
@@ -37,26 +37,21 @@ Historical SQL migrations and admin views remain unchanged. Client storage
 keys, pending-save recovery and legacy user-ID compatibility remain unchanged.
 No production player data is copied to staging.
 
-## Hosted audit and remaining external retirement
+## Pre-retirement hosted audit
 
-Read-only checks found the production Worker still advertises both providers
-before this release. Its deployed bindings contain `CLERK_ISSUER` and
-`CLERK_AUTHORIZED_PARTIES`; the candidate removes both. The only Worker secret
+At the October review the live Worker still advertised both providers and its
+bindings included `CLERK_ISSUER` and `CLERK_AUTHORIZED_PARTIES`. The cleanup
+removed both from the Worker configuration. The only Worker secret
 name in production and staging was `SUPABASE_HEARTBEAT_SECRET_KEY`; it must be
 preserved. No Clerk secret was found in either Worker secret-name list.
 
-The public frontend has Supabase configuration and no static Clerk script tag,
-but still has the obsolete Clerk public metadata removed by this candidate.
-The public DNS name `clerk.thedailyundead.com` still points to
-`frontend-api.clerk.services`.
+At that review the live frontend still had the obsolete Clerk public metadata,
+and `clerk.thedailyundead.com` pointed to `frontend-api.clerk.services`. The
+7 November public DNS sample returned no CNAME, A or AAAA answer for that host.
 
-Do not remove that DNS record, cancel/delete the Clerk application, revoke
-external credentials or delete Clerk users as part of this staging release.
-Those external dashboard settings and any third-party webhooks/billing have
-not been exhaustively audited. After explicit promotion and live account
-verification, review them separately before final service cancellation.
-Deleting historical D1 mappings or Supabase migration metadata is never part
-of service cancellation.
+Review the external project, credentials, webhooks, billing and rollback
+dependencies separately before any service cancellation. Preserve the
+historical D1 mappings and Supabase migration metadata.
 
 ## Validation scope
 

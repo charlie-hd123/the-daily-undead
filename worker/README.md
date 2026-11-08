@@ -160,7 +160,10 @@ npm run dev
 
 This starts the complete website at http://localhost:8080 and the real API at http://localhost:8787, applies migrations to local-only `daily-undead-development`, and maintains fictional current-day players/results. Profiles, account saves, leaderboards and community stats share the same local database. Authentication uses the separate staging Supabase project; no writes go to production. Add new source files to Git's index before previewing and refresh the page after changes.
 
-The old separate profile/read-only leaderboard configs are legacy development helpers. They are not used by the full local/staging workflow. See [../STAGING.md](../STAGING.md) for the release commands and environment boundaries.
+Use the full local workflow for account or gameplay testing. The legacy
+`wrangler.leaderboards-local.jsonc` preview reads production D1 through a
+read-only endpoint, and `wrangler.profiles-local.jsonc` has its own local
+database. See [../STAGING.md](../STAGING.md) for the current environment boundaries.
 
 The **Advance a day** preview never writes to production. The frontend submits only when the puzzle date equals the real current UTC date, and the Worker independently rejects non-current dates.
 

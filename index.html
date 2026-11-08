@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#070a12">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <meta name="daily-undead-build" content="20261105-1">
+    <meta name="daily-undead-build" content="20261108-1">
     <!-- Public API URL only; localhost is isolated to a local Worker on port 8787. -->
     <meta name="daily-undead-stats-api" content="https://api.thedailyundead.com">
     <!-- Replace this marker with the exact UTC launch time in the production launch commit. -->
-    <meta name="daily-undead-progression-launch-at" content="2026-10-02T09:11:35Z">
     <!-- Supabase publishable configuration is safe to expose. -->
     <meta name="daily-undead-supabase-url" content="https://bhqhfxwdcpujfxxvcoeo.supabase.co">
     <meta name="daily-undead-supabase-publishable-key" content="sb_publishable_MbUwrP6JY8xVSyqiC0683g__7bRCOYk">
@@ -19,18 +18,18 @@
       content="The Daily Undead — your daily Treyarch Zombies challenge. Play Last Words, Quest Steps and Blood Ties."
     >
     <title>The Daily Undead</title>
-    <link rel="icon" href="./assets/favicon.png?v=20261105-1" type="image/png" sizes="128x128">
-    <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png?v=20261105-1" sizes="180x180">
-    <link rel="preload" as="image" href="./assets/mystery-box/chest-poster.webp?v=20261105-1">
-    <link rel="preload" as="font" href="./assets/fonts/barlow-condensed-600.ttf?v=20261105-1" type="font/ttf" crossorigin>
-    <link rel="stylesheet" href="./styles.css?v=20261105-1">
-    <link rel="stylesheet" href="./staging-demo.css?v=20261105-1">
+    <link rel="icon" href="./assets/favicon.png?v=20261108-1" type="image/png" sizes="128x128">
+    <link rel="apple-touch-icon" href="./assets/apple-touch-icon.png?v=20261108-1" sizes="180x180">
+    <link rel="preload" as="image" href="./assets/mystery-box/chest-poster.webp?v=20261108-1">
+    <link rel="preload" as="font" href="./assets/fonts/barlow-condensed-600.ttf?v=20261108-1" type="font/ttf" crossorigin>
+    <link rel="stylesheet" href="./styles.css?v=20261108-1">
+    <link rel="stylesheet" href="./staging-demo.css?v=20261108-1">
   </head>
   <body>
-    <script src="./js/player-entry.js?v=20261105-1"></script>
+    <script src="./js/player-entry.js?v=20261108-1"></script>
     <header class="site-header">
       <div class="brand-lockup">
-        <img class="brand-logo" src="./assets/zombie-logo.png?v=20261105-1" alt="" width="512" height="512">
+        <img class="brand-logo" src="./assets/zombie-logo.png?v=20261108-1" alt="" width="512" height="512">
         <div class="brand-copy">
           <p class="eyebrow">Your daily Treyarch Zombies challenge</p>
           <h1>The Daily Undead</h1>
@@ -74,7 +73,7 @@
       <p class="puzzle-entry-loading" role="status">Loading today’s puzzle…</p>
       <div id="initial-mystery-box" class="mb-reveal mb-loading" data-phase="closed">
         <div class="mb-scene">
-          <img class="mb-poster" src="./assets/mystery-box/chest-poster.webp?v=20261105-1" alt="" width="1220" height="620" fetchpriority="high">
+          <img class="mb-poster" src="./assets/mystery-box/chest-poster.webp?v=20261108-1" alt="" width="1220" height="620" fetchpriority="high">
           <button id="mb-open-trigger" class="mb-open-trigger" type="button" aria-label="Open box to reveal today’s puzzle"></button>
         </div>
         <div class="mb-copy">
@@ -121,21 +120,6 @@
     <noscript>
       <p class="noscript">This game needs JavaScript enabled.</p>
     </noscript>
-
-    <dialog id="progression-update-dialog" class="account-dialog progression-update-dialog">
-      <button class="dialog-close" type="button" data-close-progression-update aria-label="Close progression update">×</button>
-      <p class="kicker">Progression update</p>
-      <h2>A simpler scoring system</h2>
-      <p>
-        Points earned in each puzzle now add to one permanent <strong>Score</strong>. It never decreases, resets or gets spent, so every successful puzzle moves you forward.
-      </p>
-      <p class="progression-update-benefit"><strong>Failing ends your current Round, but not your career progress.</strong> Puzzle Solves and Highest Round stay permanent too.</p>
-      <div class="progression-estimate-note">
-        <strong>Why might my Score look different?</strong>
-        <p>Your Score is our best estimate from the history available. Old Points could be spent or lost, so the exact lifetime total cannot always be rebuilt. Even so, leaderboard positions closely match the original standings. Nobody’s Score has been reset.</p>
-      </div>
-      <button class="button primary progression-update-dismiss" type="button" data-close-progression-update>Got it</button>
-    </dialog>
 
     <template id="clue-template">
       <article class="clue-card">
@@ -221,9 +205,6 @@
       <p class="kicker">The Daily Undead Leaderboards</p>
       <h2>Leaderboards</h2>
       <p class="leaderboard-status" data-leaderboard-status aria-live="polite">Loading current scores…</p>
-      <button id="progression-update-button" class="progression-update-button" type="button" hidden>
-        Progression update
-      </button>
       <div class="leaderboard-tabs" role="tablist" aria-label="Leaderboard period">
         <button
           id="leaderboard-daily-tab"
@@ -461,7 +442,7 @@
       <div data-public-profile-content></div>
     </dialog>
 
-    <script type="module" src="./js/app.js?v=20261105-1"></script>
+    <script type="module" src="./js/app.js?v=20261108-1"></script>
 
     <!-- Cloudflare Web Analytics --><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "4eeb20e1411c4e7baf24969ced969c88"}'></script><!-- End Cloudflare Web Analytics -->
 

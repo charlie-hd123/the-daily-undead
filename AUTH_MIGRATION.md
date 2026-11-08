@@ -14,10 +14,10 @@ authentication provider and transactional account email delivery change:
 ## Current safety boundary
 
 The production frontend switched to Supabase Auth on 7 October 2026. The
-31 October cleanup candidate removes the unused Clerk browser fallback,
-Clerk JWT verification and provider configuration. It is a staging release;
-production remains unchanged until an explicitly approved promotion.
-See [CLERK-RETIREMENT.md](CLERK-RETIREMENT.md) for scope and validation.
+31 October cleanup removed the Clerk browser fallback, JWT verification and
+provider configuration. Production and staging now authenticate through
+Supabase. See [CLERK-RETIREMENT.md](CLERK-RETIREMENT.md) for the audit record
+and [STAGING.md](STAGING.md) for the current release workflow.
 
 Historical identity mappings, original player IDs and imported Supabase
 `daily_undead_clerk_user_id` app metadata remain required. The first Supabase
