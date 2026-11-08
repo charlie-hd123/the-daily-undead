@@ -301,8 +301,14 @@ export function initialiseLeaderboards({
         `[data-leaderboard-panel='${findButton.dataset.leaderboardFind}']`,
       );
       const currentEntry = panel?.querySelector(".is-current-player");
-      currentEntry?.scrollIntoView({ block: "center", behavior: "smooth" });
-      currentEntry?.focus({ preventScroll: true });
+      if (!currentEntry) return;
+
+      const row = currentEntry.getBoundingClientRect();
+      const panelTop = panel.getBoundingClientRect().top + panel.clientTop;
+      panel.scrollTo({
+        top: panel.scrollTop + row.top - panelTop - (panel.clientHeight - row.height) / 2,
+      });
+      currentEntry.focus({ preventScroll: true });
     });
   });
 

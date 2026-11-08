@@ -204,7 +204,6 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(css, /\.leaderboard-status \{\s*margin: 0 0 0\.85rem;/);
   assert.doesNotMatch(css, /\.leaderboard-status \{[^}]*min-height:/);
   const leaderboards = await readProjectFile("js/leaderboards.js");
-  assert.match(leaderboards, /scrollIntoView\(\{ block: "center"/);
   assert.match(leaderboards, /toolbar\.hidden = !\[\.\.\.toolbar\.children\]\.some/);
   assert.match(css, /\.leaderboard-dialog \[role="tabpanel"\] \{[\s\S]*?margin-top: 0\.65rem;/);
   assert.match(css, /\.leaderboard-panel-tools\[hidden\] \{\s*display: none;/);
@@ -299,7 +298,7 @@ test("account controls support optional sign-in without exposing private credent
   );
   assert.match(appScript, /catalog\.mapOrder\?\.\[game\.id\][\s\S]*?mapOrder\.get\(left\.id\)/);
   assert.match(account, /textContent = "Edit your profile →"[\s\S]*?openProfileEditor\(\)/);
-  assert.match(account, /textContent = "Profile saved\.";[\s\S]*?closeDialog\(profileEditorDialog\)/);
+  assert.match(account, /Object\.assign\(profile, result\.profile\);[\s\S]*?closeDialog\(profileEditorDialog\)/);
   assert.match(css, /\.public-profile-header h2 \{[^}]*text-transform: none;/);
   assert.match(account, /\[data-confirm-sign-out\][\s\S]*?beforeSignOut\(\)[\s\S]*?authClient\.signOut\(/);
   assert.match(account, /accountButton\.classList\.add\("is-signed-in"\)/);
@@ -380,7 +379,7 @@ test("avatar portraits stay clipped behind an opaque circular border", async () 
 test("profile customisation keeps horizontal pickers inside narrow mobile dialogs", async () => {
   const css = await readProjectFile("styles.css");
 
-  assert.match(css, /\.profile-editor-dialog form \{[\s\S]*?min-width: 0;[\s\S]*?overflow-x: hidden;/);
+  assert.match(css, /\.profile-editor-fields \{[\s\S]*?min-width: 0;[\s\S]*?overflow-x: hidden;/);
   assert.match(css, /\.profile-choice-field \{[\s\S]*?min-width: 0;/);
   assert.match(css, /\.avatar-picker \{[\s\S]*?width: 100%;[\s\S]*?min-width: 0;/);
   assert.match(css, /\.theme-picker \{[\s\S]*?width: 100%;[\s\S]*?min-width: 0;/);
@@ -394,7 +393,7 @@ test("profile customisation keeps its scrollbars present", async () => {
     readProjectFile("js/app.js"),
   ]);
 
-  assert.match(css, /\.profile-editor-dialog form \{[\s\S]*?overflow-y: scroll;[\s\S]*?scrollbar-gutter: stable;/);
+  assert.match(css, /\.profile-editor-fields \{[\s\S]*?overflow-y: scroll;[\s\S]*?scrollbar-gutter: stable;/);
   assert.match(css, /\.avatar-picker \{[\s\S]*?overflow-x: scroll;[\s\S]*?scrollbar-gutter: stable;/);
   assert.match(css, /\.theme-picker \{[\s\S]*?overflow-x: scroll;[\s\S]*?scrollbar-gutter: stable;/);
   assert.equal((html.match(/data-profile-scrollbar/g) || []).length, 2);

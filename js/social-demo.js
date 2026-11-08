@@ -121,7 +121,7 @@ export function initialiseSocialDemo({ documentObject = document, storage = loca
   const usernameForm = documentObject.querySelector("#account-username-form");
   const usernameFeedback = documentObject.querySelector("#account-username-feedback");
 
-  documentObject.querySelectorAll("[data-close-account-dialog]").forEach((button) => {
+  documentObject.querySelectorAll("[data-close-account-dialog], [data-close-profile-editor]").forEach((button) => {
     button.addEventListener("click", () => closeDialog(button.closest("dialog")));
   });
 

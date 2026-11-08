@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261108-5";
+import { browserStorage } from "./browser-storage.js?v=20261108-6";
 import {
   accountMemoryStorageKey,
   archivePendingProgress,
@@ -13,9 +13,9 @@ import {
   recommendedAccountSave,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261108-5";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261108-5";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261108-5";
+} from "./account-session.js?v=20261108-6";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261108-6";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261108-6";
 
 function hasSupabaseConfiguration(documentObject = document) {
   const read = (name) => documentObject
@@ -335,7 +335,7 @@ export async function initialiseAccount({
 
   try {
     authClient = await withTimeout(
-      import("./supabase-auth.js?v=20261108-5").then(({ loadSupabaseAuth }) => (
+      import("./supabase-auth.js?v=20261108-6").then(({ loadSupabaseAuth }) => (
         loadSupabaseAuth(documentObject)
       )),
       5_000,
@@ -708,8 +708,14 @@ export async function initialiseAccount({
   accountButton.disabled = false;
   accountButton.textContent = profile.username;
   accountButton.classList.add("has-username");
-  const mapsSolved = Number(account.progress?.solves || 0);
-  const highestRound = Number(account.progress?.bestRound || 0);
+  let mapsSolved = Number(account.progress?.solves || 0);
+  let highestRound = Number(account.progress?.bestRound || 0);
+  const refreshUnlocks = [];
+  const profileSaveButton = profileEditorForm?.querySelector('button[type="submit"]');
+  const profileCloseButton = profileEditorDialog?.querySelector("[data-close-profile-editor]");
+  const profileDiscardDialog = documentObject.querySelector("#profile-discard-dialog");
+  let savedProfileFields;
+  let savingProfile = false;
 
   if (profileEditorForm) {
     const avatarPicker = profileEditorForm.querySelector("[data-avatar-picker]");
@@ -717,18 +723,20 @@ export async function initialiseAccount({
     avatarPicker?.replaceChildren(...avatarOptions.map(([id, label, unlock]) => {
       const choice = documentObject.createElement("label");
       choice.className = "avatar-choice";
-      const locked = !avatarIsUnlocked(unlock, highestRound, mapsSolved);
       const requirement = avatarUnlockLabel(unlock);
-      choice.classList.toggle("is-locked", locked);
-      choice.dataset.unlockLabel = locked ? requirement : "Unlocked";
-      choice.title = locked ? `${label} — ${requirement}` : `${label} — Unlocked`;
       const input = documentObject.createElement("input");
       input.type = "radio";
       input.name = "avatarId";
       input.value = id;
       input.dataset.unlockType = unlock?.type || "signup";
       input.dataset.unlockValue = unlock?.value || 0;
-      input.setAttribute("aria-label", locked ? `${label}, locked, ${requirement}, available to preview` : `${label}, unlocked`);
+      refreshUnlocks.push(() => {
+        const locked = !avatarIsUnlocked(unlock, highestRound, mapsSolved);
+        choice.classList.toggle("is-locked", locked);
+        choice.dataset.unlockLabel = locked ? requirement : "Unlocked";
+        choice.title = locked ? `${label} — ${requirement}` : `${label} — Unlocked`;
+        input.setAttribute("aria-label", locked ? `${label}, locked, ${requirement}, available to preview` : `${label}, unlocked`);
+      });
       choice.append(input, makeAvatar(documentObject, id));
       return choice;
     }));
@@ -736,111 +744,141 @@ export async function initialiseAccount({
       const choice = documentObject.createElement("label");
       choice.className = "theme-choice";
       choice.dataset.theme = id;
-      const locked = mapsSolved < requiredMaps;
-      choice.classList.toggle("is-locked", locked);
       const input = documentObject.createElement("input");
       input.type = "radio";
       input.name = "themeId";
       input.value = id;
       input.dataset.requiredMaps = requiredMaps;
-      input.setAttribute("aria-label", locked ? `${label}, unlocks at ${requiredMaps} solves, available to preview` : label);
       const text = documentObject.createElement("span");
       const name = documentObject.createElement("strong");
       const unlock = documentObject.createElement("small");
       unlock.className = "theme-unlock";
       name.textContent = label;
-      unlock.textContent = locked ? `🔒 ${requiredMaps} solves` : "";
-      unlock.hidden = !locked;
+      unlock.textContent = `🔒 ${requiredMaps} solves`;
+      refreshUnlocks.push(() => {
+        const locked = mapsSolved < requiredMaps;
+        choice.classList.toggle("is-locked", locked);
+        input.setAttribute("aria-label", locked ? `${label}, unlocks at ${requiredMaps} solves, available to preview` : label);
+        unlock.hidden = !locked;
+      });
       text.append(name, unlock);
       choice.append(input, text);
       return choice;
     }));
+    refreshUnlocks.forEach((refresh) => refresh());
   }
 
-  const updateLockedPreviewState = () => {
-    if (!profileEditorForm || !profileEditorFeedback) return;
+  const profileFields = () => Object.fromEntries(new FormData(profileEditorForm));
+  const hasProfileChanges = (fields = profileFields()) => JSON.stringify(fields) !== savedProfileFields;
+
+  const updateProfileEditorState = () => {
+    if (savingProfile || !profileSaveButton || !profileEditorFeedback) return;
+    const fields = profileFields();
     const requirements = [];
-    const selectedAvatarId = profileEditorForm.querySelector('[name="avatarId"]:checked')?.value;
-    const selectedAvatar = avatarOptions.find(([id]) => id === selectedAvatarId);
+    const selectedAvatar = avatarOptions.find(([id]) => id === fields.avatarId);
     if (selectedAvatar && !avatarIsUnlocked(selectedAvatar[2], highestRound, mapsSolved)) {
       requirements.push(`${selectedAvatar[1]}: ${avatarUnlockLabel(selectedAvatar[2])}`);
     }
-    const selectedThemeId = profileEditorForm.querySelector('[name="themeId"]:checked')?.value;
-    const selectedTheme = themeOptions.find(({ id }) => id === selectedThemeId);
+    const selectedTheme = themeOptions.find(({ id }) => id === fields.themeId);
     if (selectedTheme && mapsSolved < selectedTheme.requiredMaps) {
       requirements.push(`${selectedTheme.label}: ${selectedTheme.requiredMaps} solves`);
     }
-    const saveButton = profileEditorForm.querySelector('button[type="submit"]');
-    if (requirements.length) {
-      profileEditorFeedback.classList.remove("account-error", "is-success");
-      profileEditorFeedback.classList.add("is-preview-warning");
-      profileEditorFeedback.textContent = `Previewing locked content — ${requirements.join(" · ")}. Unlock it before saving.`;
-      if (saveButton) saveButton.disabled = true;
-      return;
-    }
-    profileEditorFeedback.classList.remove("account-error", "is-success", "is-preview-warning");
-    profileEditorFeedback.textContent = "";
-    if (saveButton) saveButton.disabled = false;
+    profileSaveButton.disabled = requirements.length > 0 || !hasProfileChanges(fields);
+    profileEditorFeedback.classList.remove("account-error", "is-success");
+    profileEditorFeedback.classList.toggle("is-preview-warning", requirements.length > 0);
+    profileEditorFeedback.textContent = requirements.length
+      ? `Previewing locked content — ${requirements.join(" · ")}. Unlock it before saving.`
+      : "";
   };
+
+  function updateVerifiedUnlocks(progress) {
+    if (!progress) return;
+    const solves = Number(progress.solves || 0);
+    const bestRound = Number(progress.bestRound || 0);
+    if (solves !== mapsSolved || bestRound !== highestRound) {
+      mapsSolved = solves;
+      highestRound = bestRound;
+      refreshUnlocks.forEach((refresh) => refresh());
+      if (profileEditorDialog?.open) updateProfileEditorState();
+    }
+  }
 
   const openProfileEditor = () => {
     if (!profileEditorForm || !profileEditorDialog) return;
     ["favouriteGame", "favouriteMap", "bio"].forEach((field) => {
       profileEditorForm.elements[field].value = profile[field] || "";
     });
-    const avatarInput = profileEditorForm.querySelector(`[name="avatarId"][value="${profile.avatarId || "unselected"}"]`);
-    const themeInput = profileEditorForm.querySelector(`[name="themeId"][value="${profile.themeId || "default"}"]`);
-    if (avatarInput) avatarInput.checked = true;
-    if (themeInput) themeInput.checked = true;
+    profileEditorForm.querySelectorAll('input[type="radio"]').forEach((input) => {
+      const selected = input.name === "avatarId" ? profile.avatarId : profile.themeId || "default";
+      input.checked = input.value === selected;
+    });
     profileEditorDialog.dataset.previewTheme = profile.themeId || "default";
-    profileEditorFeedback.textContent = "";
-    updateLockedPreviewState();
-    globalThis.setTimeout(() => openDialog(profileEditorDialog), 250);
+    savedProfileFields = JSON.stringify(profileFields());
+    globalThis.setTimeout(() => {
+      updateProfileEditorState();
+      openDialog(profileEditorDialog);
+      profileEditorForm.querySelector(".profile-editor-fields").scrollTop = 0;
+    }, 250);
   };
+
+  const requestCloseProfileEditor = () => {
+    if (savingProfile) return;
+    if (hasProfileChanges()) openDialog(profileDiscardDialog);
+    else closeDialog(profileEditorDialog);
+  };
+  profileCloseButton?.addEventListener("click", requestCloseProfileEditor);
+  profileEditorDialog?.addEventListener("cancel", (event) => {
+    event.preventDefault();
+    requestCloseProfileEditor();
+  });
+  profileDiscardDialog?.querySelector("[data-keep-profile-editing]")?.addEventListener("click", () => {
+    closeDialog(profileDiscardDialog);
+  });
+  profileDiscardDialog?.querySelector("[data-discard-profile-changes]")?.addEventListener("click", () => {
+    closeDialog(profileDiscardDialog);
+    closeDialog(profileEditorDialog);
+  });
 
   profileEditorForm?.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const submitButton = profileEditorForm.querySelector('button[type="submit"]');
-    submitButton.disabled = true;
-    profileEditorFeedback.textContent = "";
+    if (savingProfile) return;
+    updateProfileEditorState();
+    if (profileSaveButton.disabled) return;
+
+    const payload = profileFields();
+    savingProfile = true;
+    profileSaveButton.disabled = true;
+    profileSaveButton.textContent = "Saving…";
+    profileCloseButton.disabled = true;
+    const fields = profileEditorForm.querySelector(".profile-editor-fields");
+    fields.inert = true;
     try {
-      const payload = Object.fromEntries(new FormData(profileEditorForm));
-      const selectedAvatar = avatarOptions.find(([id]) => id === payload.avatarId);
-      if (selectedAvatar && !avatarIsUnlocked(selectedAvatar[2], highestRound, mapsSolved)) {
-        throw new Error(`${selectedAvatar[1]} unlocks when you ${avatarUnlockLabel(selectedAvatar[2]).toLowerCase()}. Preview only for now.`);
-      }
-      const selectedTheme = themeOptions.find((theme) => theme.id === payload.themeId);
-      if (selectedTheme && mapsSolved < selectedTheme.requiredMaps) {
-        throw new Error(`${selectedTheme.label} unlocks at ${selectedTheme.requiredMaps} solves. Preview only for now.`);
-      }
       const result = await requestJson(authClient, apiUrl, "/api/account/profile", {
         method: "PUT", headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
       Object.assign(profile, result.profile);
+      savedProfileFields = JSON.stringify(payload);
       onProfileSaved(profile);
-      profileEditorFeedback.classList.remove("account-error", "is-preview-warning");
-      profileEditorFeedback.classList.add("is-success");
-      profileEditorFeedback.textContent = "Profile saved.";
       closeDialog(profileEditorDialog);
     } catch (error) {
-      profileEditorFeedback.classList.remove("is-success", "is-preview-warning");
       profileEditorFeedback.classList.add("account-error");
       profileEditorFeedback.textContent = error.message;
     } finally {
-      submitButton.disabled = false;
+      savingProfile = false;
+      fields.inert = false;
+      profileCloseButton.disabled = false;
+      profileSaveButton.textContent = "Save profile";
+      profileSaveButton.disabled = false;
+      if (profileEditorDialog.open) profileSaveButton.focus({ preventScroll: true });
     }
   });
 
-  profileEditorForm?.addEventListener("change", (event) => {
-    if (event.target.name === "avatarId") {
-      updateLockedPreviewState();
-      return;
-    }
+  profileEditorForm?.addEventListener("input", (event) => {
     if (event.target.name === "themeId") {
       profileEditorDialog.dataset.previewTheme = event.target.value;
-      updateLockedPreviewState();
     }
+    updateProfileEditorState();
   });
 
   const openUsernameEditor = () => {
@@ -955,6 +993,7 @@ export async function initialiseAccount({
         currentRevision = Number(saveResult.progress?.revision || currentRevision + 1);
         if (deletingAccount) return;
         rememberAccount(browserStorage, { userId, revision: currentRevision });
+        updateVerifiedUnlocks(saveResult.progress);
         if (JSON.stringify(getLocalSnapshot()) === JSON.stringify(snapshot)) {
           applyRemoteProgress(saveResult.progress);
           clearPendingProgress(browserStorage, userId);
@@ -997,6 +1036,7 @@ export async function initialiseAccount({
         currentRevision = Math.max(currentRevision, Number(result.progress?.revision || 0));
         if (deletingAccount) return null;
         rememberAccount(browserStorage, { userId, revision: currentRevision });
+        updateVerifiedUnlocks(result.progress);
         applyRemoteProgress(result.progress);
         scheduleSave();
         return result;
