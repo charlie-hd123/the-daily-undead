@@ -49,14 +49,26 @@ jobs:
           import { isWebsiteFile, trackedFiles } from './scripts/lib/release-tools.mjs';
 
           const output = '_site';
-          const expected = trackedFiles(process.cwd()).filter(isWebsiteFile);
+          const sourceFiles = trackedFiles(process.cwd()).filter(isWebsiteFile);
+          // GitHub Pages already serves these generated URLs alongside the source files.
+          const generatedFiles = [
+            'assets/audio/CREDITS.html',
+            'assets/audio/auditions-2026-10-21/CREDITS.html',
+            'assets/audio/auditions-2026-10-23-layered/CREDITS.html',
+            'assets/audio/auditions-2026-10-23-lift/CREDITS.html',
+            'assets/audio/auditions-2026-10-23/CREDITS.html',
+            'assets/audio/sources/CREDITS.html',
+            'assets/css/style.css',
+            'data/WORD_BANK.html',
+          ];
+          const expected = [...sourceFiles, ...generatedFiles].sort();
           const actual = readdirSync(output, { recursive: true, withFileTypes: true })
             .filter(entry => entry.isFile())
             .map(entry => join(entry.parentPath, entry.name).slice(output.length + 1))
             .sort();
           assert.deepEqual(actual, expected, 'GitHub Pages file list differs from the website file list');
-          for (const file of expected) {
+          for (const file of sourceFiles) {
             assert.ok(readFileSync(join(output, file)).equals(readFileSync(file)), `GitHub Pages changed ${file}`);
           }
-          console.log(`GitHub Pages preserved all ${expected.length} website files and excluded developer files.`);
+          console.log(`GitHub Pages preserved ${sourceFiles.length} website files and ${generatedFiles.length} existing generated URLs.`);
           NODE
