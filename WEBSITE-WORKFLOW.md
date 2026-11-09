@@ -79,6 +79,6 @@ The default is staging. “Publish staging to live” is the clear instruction t
 
 ## Where to look first
 
-For the December skin, see [js/seasonal-theme.js](js/seasonal-theme.js) for the recurring UTC schedule and [styles.css](styles.css) for the decorative colours, snow and frost. On staging or the local app, add `?season=december` to preview the skin without changing the puzzle date.
+For the December skin, see [js/seasonal-theme.js](js/seasonal-theme.js) for the recurring UTC schedule and [styles.css](styles.css) for the decorative colours, snow and frost. On staging and in the local app, **Advance a day** previews the skin for the date resolved by [js/app.js](js/app.js). Add `?season=december` to preview the skin without changing the puzzle date.
 
 For staging day previews, start with [js/day-preview.js](js/day-preview.js) for run and puzzle storage, [js/app.js](js/app.js) for progression, and [js/account.js](js/account.js) for profile unlocks. [STAGING.md](STAGING.md) describes how to start and exit a preview.

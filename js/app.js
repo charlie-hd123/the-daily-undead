@@ -1,6 +1,7 @@
-import { browserStorage } from "./browser-storage.js?v=20261109-7";
-import { createBloodTiesSession, loadBloodTiesPuzzles, normalizeBloodTiesSession, replayBloodTiesAttempts } from './blood-ties-browser.js?v=20261109-7';
-import { renderBloodTiesGroup, renderBloodTiesView } from './blood-ties-view.js?v=20261109-7';
+import { browserStorage } from "./browser-storage.js?v=20261109-8";
+import { setSeasonalPreviewDate } from "./seasonal-theme.js?v=20261109-8";
+import { createBloodTiesSession, loadBloodTiesPuzzles, normalizeBloodTiesSession, replayBloodTiesAttempts } from './blood-ties-browser.js?v=20261109-8';
+import { renderBloodTiesGroup, renderBloodTiesView } from './blood-ties-view.js?v=20261109-8';
 import {
   buildDailyPuzzle,
   calculateBonusPoints,
@@ -15,20 +16,20 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261109-7";
+} from "./game-core.js?v=20261109-8";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
   shouldHandleWordShortcut,
-} from "./word-puzzle-core.js?v=20261109-7";
+} from "./word-puzzle-core.js?v=20261109-8";
 import {
   getOfficialPuzzleType as selectOfficialPuzzleType,
   browserPuzzleOptions,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261109-7";
+} from "./daily-challenge-core.js?v=20261109-8";
 import {
   canUseRequestedPreviewDate,
   isLocalDevelopmentHostname,
@@ -36,29 +37,29 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261109-7";
+} from "./progression.js?v=20261109-8";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261109-7";
+} from "./account.js?v=20261109-8";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261109-7";
+} from "./community-stats.js?v=20261109-8";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261109-7";
-import { fetchWithTimeout } from "./network.js?v=20261109-7";
-import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261109-7";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261109-7";
-import { clearStartupRecovery, recoverFailedStartup } from "./startup-recovery.js?v=20261109-7";
-import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261109-7";
-import { createMysteryBox } from "./mystery-box.js?v=20261109-7";
-import { initialiseGameAudio, letterSound, bloodConnectionSound } from "./game-audio.js?v=20261109-7";
+} from "./leaderboards.js?v=20261109-8";
+import { fetchWithTimeout } from "./network.js?v=20261109-8";
+import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261109-8";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261109-8";
+import { clearStartupRecovery, recoverFailedStartup } from "./startup-recovery.js?v=20261109-8";
+import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261109-8";
+import { createMysteryBox } from "./mystery-box.js?v=20261109-8";
+import { initialiseGameAudio, letterSound, bloodConnectionSound } from "./game-audio.js?v=20261109-8";
 
 const gameAudio = initialiseGameAudio(browserStorage);
 const mysteryBox = createMysteryBox({
@@ -128,7 +129,7 @@ const returnDevTodayButton = document.querySelector("#return-dev-today");
 let dayPreviewEnabled = false;
 let localStorage = browserStorage;
 const socialDemoEnabled = isLocalDevelopment && new URLSearchParams(window.location.search).get("socialDemo") === "1";
-const socialDemo = socialDemoEnabled ? await import("./social-demo.js?v=20261109-7") : null;
+const socialDemo = socialDemoEnabled ? await import("./social-demo.js?v=20261109-8") : null;
 const currentBuild = readCurrentBuild();
 const communityStatsApiUrl = resolveCommunityStatsApiUrl({ isLocalDevelopment });
 const leaderboardsApiUrl = resolveLeaderboardsApiUrl({ isLocalDevelopment });
@@ -245,19 +246,19 @@ const puzzleTypes = {
     name: "Quest Steps",
     kicker: "Easter egg puzzle",
     description: "Can you identify the Zombies map from its Easter egg steps?",
-    image: "./assets/quest-steps-card.svg?v=20261109-7",
+    image: "./assets/quest-steps-card.svg?v=20261109-8",
   },
   word: {
     name: "Last Words",
     kicker: "Letter puzzle",
     description: "Can you identify the Zombies word or phrase by revealing its letters?",
-    image: "./assets/dead-letters-card.svg?v=20261109-7",
+    image: "./assets/dead-letters-card.svg?v=20261109-8",
   },
 };
 if (bloodTiesEnabled) puzzleTypes.blood = {
   name: 'Blood Ties', kicker: 'Connection puzzle',
   description: 'Can you uncover the hidden Zombies connections?',
-  image: './assets/blood-ties-card.svg?v=20261109-7',
+  image: './assets/blood-ties-card.svg?v=20261109-8',
 };
 
 function escapeHtml(value) {
@@ -2603,6 +2604,7 @@ async function initialise() {
     const previewRun = new URLSearchParams(window.location.search).get("previewRun") || "";
     localStorage = createDayPreviewStorage(browserStorage, dateKey, dayPreviewEnabled, previewRun, previewProgressKeys);
     if (dayPreviewEnabled) {
+      setSeasonalPreviewDate(dateKey);
       const fresh = document.createElement('button'); fresh.id = 'fresh-dev-preview'; fresh.type = 'button'; fresh.className = 'dev-day-button'; fresh.textContent = 'FRESH PREVIEW';
       fresh.addEventListener('click', () => {
         const url = new URL(window.location.href); url.searchParams.set('previewRun', crypto.randomUUID()); window.location.assign(url.href);
