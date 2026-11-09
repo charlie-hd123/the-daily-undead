@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261109-2";
+import { browserStorage } from "./browser-storage.js?v=20261109-3";
 import {
   accountMemoryStorageKey,
   archivePendingProgress,
@@ -13,9 +13,9 @@ import {
   recommendedAccountSave,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261109-2";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261109-2";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261109-2";
+} from "./account-session.js?v=20261109-3";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261109-3";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261109-3";
 
 function hasSupabaseConfiguration(documentObject = document) {
   const read = (name) => documentObject
@@ -335,7 +335,7 @@ export async function initialiseAccount({
 
   try {
     authClient = await withTimeout(
-      import("./supabase-auth.js?v=20261109-2").then(({ loadSupabaseAuth }) => (
+      import("./supabase-auth.js?v=20261109-3").then(({ loadSupabaseAuth }) => (
         loadSupabaseAuth(documentObject)
       )),
       5_000,
@@ -800,8 +800,14 @@ export async function initialiseAccount({
   const unlockNotice = documentObject.querySelector("#profile-unlock-notice");
   const unlockRewards = unlockNotice?.querySelector("[data-profile-unlock-rewards]");
   const unlockAnnouncement = documentObject.querySelector("#profile-unlock-announcement");
-  const unlockedThemes = new Set();
-  const unlockedAvatars = new Set();
+  const unlockedThemes = new Map();
+  const unlockedAvatars = new Map();
+
+  function makeUnlockReward(label, thumbnail) {
+    const item = documentObject.createElement("li");
+    item.append(thumbnail, documentObject.createTextNode(label));
+    return item;
+  }
 
   function showProfileUnlocks(solves, bestRound) {
     if (!unlockNotice || !unlockRewards) return;
@@ -810,18 +816,25 @@ export async function initialiseAccount({
       !avatarIsUnlocked(unlock, highestRound, mapsSolved) && avatarIsUnlocked(unlock, bestRound, solves));
     if (!newThemes.length && !newAvatars.length) return;
 
-    newThemes.forEach(({ label }) => unlockedThemes.add(label));
-    newAvatars.forEach(([, label]) => unlockedAvatars.add(label));
-    const rewards = [[unlockedThemes, "Theme"], [unlockedAvatars, "Avatar"]]
-      .filter(([names]) => names.size > 0)
-      .map(([names, kind]) => `${kind}${names.size === 1 ? "" : "s"} · ${[...names].join(", ")}`);
-    unlockRewards.replaceChildren(...rewards.map((reward) => {
-      const line = documentObject.createElement("p");
-      line.textContent = reward;
-      return line;
-    }));
+    newThemes.forEach(({ id, label }) => unlockedThemes.set(id, label));
+    newAvatars.forEach(([id, label]) => unlockedAvatars.set(id, label));
+    const themes = [...unlockedThemes].map(([id, label]) => {
+      const swatch = documentObject.createElement("span");
+      swatch.className = "profile-unlock-thumbnail";
+      swatch.dataset.theme = id;
+      swatch.setAttribute("aria-hidden", "true");
+      return makeUnlockReward(`${label} theme`, swatch);
+    });
+    const avatars = [...unlockedAvatars].map(([id, label]) =>
+      makeUnlockReward(label, makeAvatar(documentObject, id, "profile-unlock-thumbnail")));
+    unlockRewards.replaceChildren(...themes, ...avatars);
     unlockNotice.hidden = false;
-    if (unlockAnnouncement) unlockAnnouncement.textContent = `Profile rewards unlocked. ${rewards.join(". ")}.`;
+    if (unlockAnnouncement) {
+      const rewards = [[unlockedThemes, "Theme"], [unlockedAvatars, "Avatar"]]
+        .filter(([items]) => items.size > 0)
+        .map(([items, kind]) => `${kind}${items.size === 1 ? "" : "s"} · ${[...items.values()].join(", ")}`);
+      unlockAnnouncement.textContent = `Profile rewards unlocked. ${rewards.join(". ")}.`;
+    }
   }
 
   function dismissProfileUnlocks() {

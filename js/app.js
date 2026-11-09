@@ -1,6 +1,6 @@
-import { browserStorage } from "./browser-storage.js?v=20261109-2";
-import { createBloodTiesSession, loadBloodTiesPuzzles, normalizeBloodTiesSession, replayBloodTiesAttempts } from './blood-ties-browser.js?v=20261109-2';
-import { renderBloodTiesGroup, renderBloodTiesView } from './blood-ties-view.js?v=20261109-2';
+import { browserStorage } from "./browser-storage.js?v=20261109-3";
+import { createBloodTiesSession, loadBloodTiesPuzzles, normalizeBloodTiesSession, replayBloodTiesAttempts } from './blood-ties-browser.js?v=20261109-3';
+import { renderBloodTiesGroup, renderBloodTiesView } from './blood-ties-view.js?v=20261109-3';
 import {
   buildDailyPuzzle,
   calculateBonusPoints,
@@ -15,20 +15,20 @@ import {
   isValidDateKey,
   orderMapsForGame,
   toggleOrderedSelection,
-} from "./game-core.js?v=20261109-2";
+} from "./game-core.js?v=20261109-3";
 import {
   buildDailyWordPuzzle,
   calculateWordPoints,
   isWordSolved,
   normalizeLetter,
   shouldHandleWordShortcut,
-} from "./word-puzzle-core.js?v=20261109-2";
+} from "./word-puzzle-core.js?v=20261109-3";
 import {
   getOfficialPuzzleType as selectOfficialPuzzleType,
   browserPuzzleOptions,
   isPuzzleSessionComplete,
   MULTI_PUZZLE_LAUNCH_DATE,
-} from "./daily-challenge-core.js?v=20261109-2";
+} from "./daily-challenge-core.js?v=20261109-3";
 import {
   canUseRequestedPreviewDate,
   isLocalDevelopmentHostname,
@@ -36,29 +36,29 @@ import {
   migrateLegacyLocalScore,
   migrateStoredRoundNumbering,
   prepareMissedDayProgress,
-} from "./progression.js?v=20261109-2";
+} from "./progression.js?v=20261109-3";
 import {
   confirmAccountResultSubmission,
   initialiseAccount,
-} from "./account.js?v=20261109-2";
+} from "./account.js?v=20261109-3";
 import {
   fetchCommunityStats,
   formatCommunityCount,
   formatSolvePercentage,
   resolveCommunityStatsApiUrl,
   submitCommunityAttempt,
-} from "./community-stats.js?v=20261109-2";
+} from "./community-stats.js?v=20261109-3";
 import {
   initialiseLeaderboards,
   resolveLeaderboardsApiUrl,
-} from "./leaderboards.js?v=20261109-2";
-import { fetchWithTimeout } from "./network.js?v=20261109-2";
-import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261109-2";
-import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261109-2";
-import { clearStartupRecovery, recoverFailedStartup } from "./startup-recovery.js?v=20261109-2";
-import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261109-2";
-import { createMysteryBox } from "./mystery-box.js?v=20261109-2";
-import { initialiseGameAudio, letterSound, bloodConnectionSound } from "./game-audio.js?v=20261109-2";
+} from "./leaderboards.js?v=20261109-3";
+import { fetchWithTimeout } from "./network.js?v=20261109-3";
+import { loadPuzzleCatalogues } from "./puzzle-catalogues.js?v=20261109-3";
+import { createReleaseMonitor, readCurrentBuild } from "./release.js?v=20261109-3";
+import { clearStartupRecovery, recoverFailedStartup } from "./startup-recovery.js?v=20261109-3";
+import { canPreviewDays, createDayPreviewStorage } from "./day-preview.js?v=20261109-3";
+import { createMysteryBox } from "./mystery-box.js?v=20261109-3";
+import { initialiseGameAudio, letterSound, bloodConnectionSound } from "./game-audio.js?v=20261109-3";
 
 const gameAudio = initialiseGameAudio(browserStorage);
 const mysteryBox = createMysteryBox({
@@ -128,7 +128,7 @@ const returnDevTodayButton = document.querySelector("#return-dev-today");
 let dayPreviewEnabled = false;
 let localStorage = browserStorage;
 const socialDemoEnabled = isLocalDevelopment && new URLSearchParams(window.location.search).get("socialDemo") === "1";
-const socialDemo = socialDemoEnabled ? await import("./social-demo.js?v=20261109-2") : null;
+const socialDemo = socialDemoEnabled ? await import("./social-demo.js?v=20261109-3") : null;
 const currentBuild = readCurrentBuild();
 const communityStatsApiUrl = resolveCommunityStatsApiUrl({ isLocalDevelopment });
 const leaderboardsApiUrl = resolveLeaderboardsApiUrl({ isLocalDevelopment });
@@ -245,19 +245,19 @@ const puzzleTypes = {
     name: "Quest Steps",
     kicker: "Easter egg puzzle",
     description: "Can you identify the Zombies map from its Easter egg steps?",
-    image: "./assets/quest-steps-card.svg?v=20261109-2",
+    image: "./assets/quest-steps-card.svg?v=20261109-3",
   },
   word: {
     name: "Last Words",
     kicker: "Letter puzzle",
     description: "Can you identify the Zombies word or phrase by revealing its letters?",
-    image: "./assets/dead-letters-card.svg?v=20261109-2",
+    image: "./assets/dead-letters-card.svg?v=20261109-3",
   },
 };
 if (bloodTiesEnabled) puzzleTypes.blood = {
   name: 'Blood Ties', kicker: 'Connection puzzle',
   description: 'Can you uncover the hidden Zombies connections?',
-  image: './assets/blood-ties-card.svg?v=20261109-2',
+  image: './assets/blood-ties-card.svg?v=20261109-3',
 };
 
 function escapeHtml(value) {
