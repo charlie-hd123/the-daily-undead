@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261109-4";
+import { browserStorage } from "./browser-storage.js?v=20261109-5";
 import {
   accountMemoryStorageKey,
   archivePendingProgress,
@@ -13,9 +13,9 @@ import {
   recommendedAccountSave,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261109-4";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261109-4";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261109-4";
+} from "./account-session.js?v=20261109-5";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261109-5";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261109-5";
 
 function hasSupabaseConfiguration(documentObject = document) {
   const read = (name) => documentObject
@@ -335,7 +335,7 @@ export async function initialiseAccount({
 
   try {
     authClient = await withTimeout(
-      import("./supabase-auth.js?v=20261109-4").then(({ loadSupabaseAuth }) => (
+      import("./supabase-auth.js?v=20261109-5").then(({ loadSupabaseAuth }) => (
         loadSupabaseAuth(documentObject)
       )),
       5_000,
@@ -802,6 +802,9 @@ export async function initialiseAccount({
   const unlockAnnouncement = documentObject.querySelector("#profile-unlock-announcement");
   const unlockedThemes = new Map();
   const unlockedAvatars = new Map();
+  const unlockNoticeDelayMs = 1_800;
+  let unlockNoticeTimer = null;
+  let wasSignedIn = true;
 
   function makeUnlockReward(label, thumbnail) {
     const item = documentObject.createElement("li");
@@ -809,8 +812,8 @@ export async function initialiseAccount({
     return item;
   }
 
-  function showProfileUnlocks(solves, bestRound) {
-    if (!unlockNotice || !unlockRewards) return;
+  function queueProfileUnlocks(solves, bestRound) {
+    if (!unlockNotice || !unlockRewards || !wasSignedIn) return;
     const newThemes = themeOptions.filter(({ requiredMaps }) => mapsSolved < requiredMaps && solves >= requiredMaps);
     const newAvatars = avatarOptions.filter(([, , unlock]) =>
       !avatarIsUnlocked(unlock, highestRound, mapsSolved) && avatarIsUnlocked(unlock, bestRound, solves));
@@ -818,6 +821,15 @@ export async function initialiseAccount({
 
     newThemes.forEach(({ id, label }) => unlockedThemes.set(id, label));
     newAvatars.forEach(([id, label]) => unlockedAvatars.set(id, label));
+    if (unlockNotice.hidden) {
+      unlockNoticeTimer ??= globalThis.setTimeout(showProfileUnlocks, unlockNoticeDelayMs);
+    } else {
+      showProfileUnlocks();
+    }
+  }
+
+  function showProfileUnlocks() {
+    unlockNoticeTimer = null;
     const themes = [...unlockedThemes].map(([id, label]) => {
       const swatch = documentObject.createElement("span");
       swatch.className = "profile-unlock-thumbnail";
@@ -839,6 +851,8 @@ export async function initialiseAccount({
 
   function dismissProfileUnlocks() {
     if (!unlockNotice) return;
+    globalThis.clearTimeout(unlockNoticeTimer);
+    unlockNoticeTimer = null;
     if (unlockNotice.contains(documentObject.activeElement)) accountButton.focus({ preventScroll: true });
     unlockNotice.hidden = true;
     unlockedThemes.clear();
@@ -851,7 +865,7 @@ export async function initialiseAccount({
     const solves = Number(progress.solves || 0);
     const bestRound = Number(progress.bestRound || 0);
     if (solves !== mapsSolved || bestRound !== highestRound) {
-      showProfileUnlocks(solves, bestRound);
+      queueProfileUnlocks(solves, bestRound);
       mapsSolved = solves;
       highestRound = bestRound;
       refreshUnlocks.forEach((refresh) => refresh());
@@ -1136,7 +1150,6 @@ export async function initialiseAccount({
     openPlayerProfile,
   };
 
-  let wasSignedIn = true;
   authClient.addListener(({ user }) => {
     if (!wasSignedIn || user) return;
     wasSignedIn = false;
