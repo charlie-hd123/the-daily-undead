@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261108-9";
+import { browserStorage } from "./browser-storage.js?v=20261109-1";
 import {
   accountMemoryStorageKey,
   archivePendingProgress,
@@ -13,9 +13,9 @@ import {
   recommendedAccountSave,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261108-9";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261108-9";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261108-9";
+} from "./account-session.js?v=20261109-1";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261109-1";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261109-1";
 
 function hasSupabaseConfiguration(documentObject = document) {
   const read = (name) => documentObject
@@ -335,7 +335,7 @@ export async function initialiseAccount({
 
   try {
     authClient = await withTimeout(
-      import("./supabase-auth.js?v=20261108-9").then(({ loadSupabaseAuth }) => (
+      import("./supabase-auth.js?v=20261109-1").then(({ loadSupabaseAuth }) => (
         loadSupabaseAuth(documentObject)
       )),
       5_000,
@@ -577,6 +577,7 @@ export async function initialiseAccount({
   profile = account.profile;
   const userId = account.accountId || authClient.user.id;
   const legacyUserId = account.legacyUserId;
+  const progressBeforeSync = account.progress;
   let pendingProgress = readOnlyProgress ? null : readPendingProgress(browserStorage, userId);
   if (!readOnlyProgress && !pendingProgress && legacyUserId && legacyUserId !== userId) {
     const legacyPending = readPendingProgress(browserStorage, legacyUserId);
@@ -708,8 +709,8 @@ export async function initialiseAccount({
   accountButton.disabled = false;
   accountButton.textContent = profile.username;
   accountButton.classList.add("has-username");
-  let mapsSolved = Number(account.progress?.solves || 0);
-  let highestRound = Number(account.progress?.bestRound || 0);
+  let mapsSolved = Number(progressBeforeSync?.solves || 0);
+  let highestRound = Number(progressBeforeSync?.bestRound || 0);
   const refreshUnlocks = [];
   const profileSaveButton = profileEditorForm?.querySelector('button[type="submit"]');
   const profileCloseButton = profileEditorDialog?.querySelector("[data-close-profile-editor]");
@@ -791,11 +792,48 @@ export async function initialiseAccount({
       : "";
   };
 
+  const unlockNotice = documentObject.querySelector("#profile-unlock-notice");
+  const unlockRewards = unlockNotice?.querySelector("[data-profile-unlock-rewards]");
+  const unlockAnnouncement = documentObject.querySelector("#profile-unlock-announcement");
+  const unlockedThemes = new Set();
+  const unlockedAvatars = new Set();
+
+  function showProfileUnlocks(solves, bestRound) {
+    if (!unlockNotice || !unlockRewards) return;
+    const newThemes = themeOptions.filter(({ requiredMaps }) => mapsSolved < requiredMaps && solves >= requiredMaps);
+    const newAvatars = avatarOptions.filter(([, , unlock]) =>
+      !avatarIsUnlocked(unlock, highestRound, mapsSolved) && avatarIsUnlocked(unlock, bestRound, solves));
+    if (!newThemes.length && !newAvatars.length) return;
+
+    newThemes.forEach(({ label }) => unlockedThemes.add(label));
+    newAvatars.forEach(([, label]) => unlockedAvatars.add(label));
+    const rewards = [[unlockedThemes, "Theme"], [unlockedAvatars, "Avatar"]]
+      .filter(([names]) => names.size > 0)
+      .map(([names, kind]) => `${kind}${names.size === 1 ? "" : "s"} · ${[...names].join(", ")}`);
+    unlockRewards.replaceChildren(...rewards.map((reward) => {
+      const line = documentObject.createElement("p");
+      line.textContent = reward;
+      return line;
+    }));
+    unlockNotice.hidden = false;
+    if (unlockAnnouncement) unlockAnnouncement.textContent = `Profile rewards unlocked. ${rewards.join(". ")}.`;
+  }
+
+  function dismissProfileUnlocks() {
+    if (!unlockNotice) return;
+    if (unlockNotice.contains(documentObject.activeElement)) accountButton.focus({ preventScroll: true });
+    unlockNotice.hidden = true;
+    unlockedThemes.clear();
+    unlockedAvatars.clear();
+    if (unlockAnnouncement) unlockAnnouncement.textContent = "";
+  }
+
   function updateVerifiedUnlocks(progress) {
     if (!progress) return;
     const solves = Number(progress.solves || 0);
     const bestRound = Number(progress.bestRound || 0);
     if (solves !== mapsSolved || bestRound !== highestRound) {
+      showProfileUnlocks(solves, bestRound);
       mapsSolved = solves;
       highestRound = bestRound;
       refreshUnlocks.forEach((refresh) => refresh());
@@ -820,6 +858,13 @@ export async function initialiseAccount({
       profileEditorForm.querySelector(".profile-editor-fields").scrollTop = 0;
     }, 250);
   };
+
+  unlockNotice?.querySelector("[data-dismiss-profile-unlocks]")?.addEventListener("click", dismissProfileUnlocks);
+  unlockNotice?.querySelector("[data-view-profile-unlocks]")?.addEventListener("click", () => {
+    dismissProfileUnlocks();
+    openProfileEditor();
+  });
+  if (!readOnlyProgress) updateVerifiedUnlocks(account.progress);
 
   const requestCloseProfileEditor = () => {
     if (savingProfile) return;
@@ -1074,6 +1119,7 @@ export async function initialiseAccount({
     if (!wasSignedIn || user) return;
     wasSignedIn = false;
     controller.canSync = false;
+    dismissProfileUnlocks();
     globalThis.clearTimeout(saveTimer);
     saveAgain = false;
     if (!readRememberedAccount(browserStorage)) deletingAccount = true;
