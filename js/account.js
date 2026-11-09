@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261109-1";
+import { browserStorage } from "./browser-storage.js?v=20261109-2";
 import {
   accountMemoryStorageKey,
   archivePendingProgress,
@@ -13,9 +13,9 @@ import {
   recommendedAccountSave,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261109-1";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261109-1";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261109-1";
+} from "./account-session.js?v=20261109-2";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261109-2";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261109-2";
 
 function hasSupabaseConfiguration(documentObject = document) {
   const read = (name) => documentObject
@@ -335,7 +335,7 @@ export async function initialiseAccount({
 
   try {
     authClient = await withTimeout(
-      import("./supabase-auth.js?v=20261109-1").then(({ loadSupabaseAuth }) => (
+      import("./supabase-auth.js?v=20261109-2").then(({ loadSupabaseAuth }) => (
         loadSupabaseAuth(documentObject)
       )),
       5_000,
@@ -701,16 +701,16 @@ export async function initialiseAccount({
     // The saved daily state remains available for another replay after a refresh.
   }
 
-  applyRemoteAccount(account);
-  rememberAccount(browserStorage, {
-    userId,
-    revision: account.progress?.revision,
-  });
+  applyRemoteAccount(account, userId);
+  if (!readOnlyProgress) {
+    rememberAccount(browserStorage, { userId, revision: account.progress?.revision });
+  }
   accountButton.disabled = false;
   accountButton.textContent = profile.username;
   accountButton.classList.add("has-username");
-  let mapsSolved = Number(progressBeforeSync?.solves || 0);
-  let highestRound = Number(progressBeforeSync?.bestRound || 0);
+  const startingProgress = readOnlyProgress ? getLocalSnapshot().progress : progressBeforeSync;
+  let mapsSolved = Number(startingProgress?.solves || 0);
+  let highestRound = Number(startingProgress?.bestRound || 0);
   const refreshUnlocks = [];
   const profileSaveButton = profileEditorForm?.querySelector('button[type="submit"]');
   const profileCloseButton = profileEditorDialog?.querySelector("[data-close-profile-editor]");
@@ -774,6 +774,11 @@ export async function initialiseAccount({
 
   const updateProfileEditorState = () => {
     if (savingProfile || !profileSaveButton || !profileEditorFeedback) return;
+    if (readOnlyProgress) {
+      profileSaveButton.disabled = true;
+      profileEditorFeedback.textContent = "Return to today to save profile changes.";
+      return;
+    }
     const fields = profileFields();
     const requirements = [];
     const selectedAvatar = avatarOptions.find(([id]) => id === fields.avatarId);
@@ -828,7 +833,7 @@ export async function initialiseAccount({
     if (unlockAnnouncement) unlockAnnouncement.textContent = "";
   }
 
-  function updateVerifiedUnlocks(progress) {
+  function updateProfileUnlocks(progress) {
     if (!progress) return;
     const solves = Number(progress.solves || 0);
     const bestRound = Number(progress.bestRound || 0);
@@ -864,7 +869,7 @@ export async function initialiseAccount({
     dismissProfileUnlocks();
     openProfileEditor();
   });
-  if (!readOnlyProgress) updateVerifiedUnlocks(account.progress);
+  if (!readOnlyProgress) updateProfileUnlocks(account.progress);
 
   const requestCloseProfileEditor = () => {
     if (savingProfile) return;
@@ -1038,7 +1043,7 @@ export async function initialiseAccount({
         currentRevision = Number(saveResult.progress?.revision || currentRevision + 1);
         if (deletingAccount) return;
         rememberAccount(browserStorage, { userId, revision: currentRevision });
-        updateVerifiedUnlocks(saveResult.progress);
+        updateProfileUnlocks(saveResult.progress);
         if (JSON.stringify(getLocalSnapshot()) === JSON.stringify(snapshot)) {
           applyRemoteProgress(saveResult.progress);
           clearPendingProgress(browserStorage, userId);
@@ -1069,7 +1074,11 @@ export async function initialiseAccount({
   }
 
   async function recordResult(path, payload) {
-    if (readOnlyProgress || deletingAccount) return null;
+    if (deletingAccount) return null;
+    if (readOnlyProgress) {
+      if (wasSignedIn) updateProfileUnlocks(getLocalSnapshot().progress);
+      return null;
+    }
     return queueMutation(async () => {
       if (deletingAccount) return null;
       try {
@@ -1081,7 +1090,7 @@ export async function initialiseAccount({
         currentRevision = Math.max(currentRevision, Number(result.progress?.revision || 0));
         if (deletingAccount) return null;
         rememberAccount(browserStorage, { userId, revision: currentRevision });
-        updateVerifiedUnlocks(result.progress);
+        updateProfileUnlocks(result.progress);
         applyRemoteProgress(result.progress);
         scheduleSave();
         return result;

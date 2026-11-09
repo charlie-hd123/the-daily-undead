@@ -76,3 +76,7 @@ Only use this route when live needs an urgent fix. Routine improvements can accu
 - A useful general prompt is: **“Make this change on staging, preserve all pending work, use checks proportional to the change, and give me a short summary and review link.”**
 
 The default is staging. “Publish staging to live” is the clear instruction to release the accumulated approved work.
+
+## Where to look first
+
+For staging day previews, start with [js/day-preview.js](js/day-preview.js) for run and puzzle storage, [js/app.js](js/app.js) for progression, and [js/account.js](js/account.js) for profile unlocks. [STAGING.md](STAGING.md) describes how to start and exit a preview.

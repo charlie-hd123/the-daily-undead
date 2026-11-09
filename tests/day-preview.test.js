@@ -38,3 +38,29 @@ test('fresh preview runs retain previous previews and never select ordinary stor
   assert.equal(original.getItem('score'), '70'); assert.equal(storage.getItem('score'), '100');
   assert.equal(createDayPreviewStorage(storage, '2026-10-22', true, '../invalid').getItem('score'), '70');
 });
+
+test("an advance run shares totals while keeping each puzzle and other runs isolated", () => {
+  const values = new Map([["score", "100"]]);
+  const storage = {
+    getItem: (key) => values.get(key) ?? null,
+    setItem: (key, value) => values.set(key, String(value)),
+    removeItem: (key) => values.delete(key),
+  };
+  const progressKeys = new Set(["score", "account"]);
+  const first = createDayPreviewStorage(storage, "2026-11-10", true, "test-run", progressKeys);
+  const next = createDayPreviewStorage(storage, "2026-11-11", true, "test-run", progressKeys);
+  const fresh = createDayPreviewStorage(storage, "2026-11-11", true, "fresh-run", progressKeys);
+
+  first.setItem("score", 200);
+  first.setItem("account", "test-survivor");
+  first.setItem("puzzle", "completed");
+  assert.equal(next.getItem("score"), "200");
+  assert.equal(next.getItem("account"), "test-survivor");
+  assert.equal(next.getItem("puzzle"), null);
+  next.setItem("score", 300);
+  assert.equal(first.getItem("score"), "300");
+  assert.equal(first.getItem("puzzle"), "completed");
+  assert.equal(fresh.getItem("score"), null);
+  assert.equal(fresh.getItem("account"), null);
+  assert.equal(storage.getItem("score"), "100");
+});
