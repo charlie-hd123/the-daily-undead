@@ -15,8 +15,12 @@ import {
 test('Blood Ties marketing names the connection game and preserves yesterday’s answer and solve rate', () => {
   const copy = buildBloodMarketingCopy({ dateKey: '2026-10-22', yesterdayAnswer: 'Doctor Groph', solvePercentage: 73 });
   assert.equal(copy.redditTitle, 'Spot a Zombies connection? — 22 Oct');
-  assert.match(copy.redditBody, /Can you uncover four hidden Zombies connections\?/);
-  assert.match(copy.redditBody, /Found a group\? Comment your three tiles and what connects them 👇/);
+  const instructions = 'Sort the tiles into four groups of three, using each tile once. Some tiles deliberately fit more than one group, so watch out for overlaps! There’s only one intended solution.';
+  const commentPrompt = 'Found a group? Comment your three tiles and what connects them. You only need to post one group! 👇';
+  assert.equal(copy.redditBody.split('\n\n').slice(1).join('\n\n'), [
+    'Spot a Zombies connection?', instructions, 'Try to spot one before reading the comments 👀', commentPrompt,
+  ].join('\n\n'));
+  assert.ok(copy.discordBody.includes(`**Spot a Zombies connection?**\n\n${instructions}\n\n${commentPrompt}\n\n`));
   assert.match(copy.discordBody, /First correct here: @____, @____, @____/);
   assert.match(copy.discordBody, /Yesterday’s answer: Doctor Groph/);
   assert.match(copy.discordBody, /73%/);

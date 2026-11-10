@@ -121,13 +121,12 @@ export function buildBloodMarketingCopy({ dateKey, yesterdayAnswer, yesterdayPuz
   validateCopyInput(dateKey, yesterdayAnswer);
   const solved = solveRate(solvePercentage);
   const title = 'Spot a Zombies connection?';
-  const question = 'Can you uncover four hidden Zombies connections?';
-  const instructions = 'Sort these 12 tiles into four groups of three, using each tile once. Some tiles deliberately fit more than one group, so watch out for overlaps! There’s only one intended solution.';
-  const commentPrompt = 'Found a group? Comment your three tiles and what connects them 👇\nYou only need to post one group!';
+  const instructions = 'Sort the tiles into four groups of three, using each tile once. Some tiles deliberately fit more than one group, so watch out for overlaps! There’s only one intended solution.';
+  const commentPrompt = 'Found a group? Comment your three tiles and what connects them. You only need to post one group! 👇';
   return {
     redditTitle: `${title} — ${formatDiscordDate(dateKey)}`,
-    redditBody: [...previousPuzzleLines(yesterdayAnswer, yesterdayPuzzleName, solved, 'reddit'), '', title, '', question, '', instructions, '', 'Try to spot one before reading the comments 👀', '', commentPrompt].join('\n'),
-    discordBody: [`🧟 __The Daily Undead · ${formatDiscordDate(dateKey)}__`, '', ...previousPuzzleLines(yesterdayAnswer, yesterdayPuzzleName, solved, 'discord'), '', `**${title}**`, '', question, '', instructions, '', commentPrompt, '', 'Want to check your groups? Complete the puzzle on the website.', '', '🔗 <https://thedailyundead.com/>'].join('\n'),
+    redditBody: [...previousPuzzleLines(yesterdayAnswer, yesterdayPuzzleName, solved, 'reddit'), '', title, '', instructions, '', 'Try to spot one before reading the comments 👀', '', commentPrompt].join('\n'),
+    discordBody: [`🧟 __The Daily Undead · ${formatDiscordDate(dateKey)}__`, '', ...previousPuzzleLines(yesterdayAnswer, yesterdayPuzzleName, solved, 'discord'), '', `**${title}**`, '', instructions, '', commentPrompt, '', 'Want to check your groups? Complete the puzzle on the website.', '', '🔗 <https://thedailyundead.com/>'].join('\n'),
     solved,
   };
 }
