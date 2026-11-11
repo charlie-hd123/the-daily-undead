@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261111-1";
+import { browserStorage } from "./browser-storage.js?v=20261111-2";
 import {
   accountMemoryStorageKey,
   archivePendingProgress,
@@ -10,9 +10,9 @@ import {
   readRememberedAccount,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261111-1";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261111-1";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261111-1";
+} from "./account-session.js?v=20261111-2";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261111-2";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261111-2";
 
 function hasSupabaseConfiguration(documentObject = document) {
   const read = (name) => documentObject
@@ -329,7 +329,7 @@ export async function initialiseAccount({
 
   try {
     authClient = await withTimeout(
-      import("./supabase-auth.js?v=20261111-1").then(({ loadSupabaseAuth }) => (
+      import("./supabase-auth.js?v=20261111-2").then(({ loadSupabaseAuth }) => (
         loadSupabaseAuth(documentObject)
       )),
       5_000,
@@ -351,6 +351,10 @@ export async function initialiseAccount({
     if (typeof dialog.close === "function") dialog.close();
     else dialog.removeAttribute("open");
   };
+
+  documentObject.querySelectorAll("[data-close-account-dialog]").forEach((button) => {
+    button.addEventListener("click", () => closeDialog(button.closest("dialog")));
+  });
 
   const rememberedAccount = () => readRememberedAccount(browserStorage);
   const persistPendingProgress = (userId, revision) => !readOnlyProgress && writePendingProgress(
