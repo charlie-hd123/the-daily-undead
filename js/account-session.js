@@ -1,4 +1,4 @@
-import { browserStorage } from "./browser-storage.js?v=20261109-8";
+import { browserStorage } from "./browser-storage.js?v=20261111-1";
 export const accountMemoryStorageKey = "the-daily-undead:account-memory";
 const pendingProgressStoragePrefix = "the-daily-undead:account-pending:";
 
@@ -199,58 +199,34 @@ export function pendingCoveredByCloud(pending, account) {
   return sessionCoveredByCloud(local, cloud);
 }
 
-export function recommendedAccountSave(pending, account) {
-  const local = pending?.snapshot?.dailyState;
-  const cloud = account?.dailyState;
-  if (!local || !cloud) return null;
-  const cloudCoversLocal = pendingCoveredByCloud(pending, account);
-  const localCoversCloud = pendingCoveredByCloud({
-    puzzleDate: pending.puzzleDate,
-    snapshot: { dailyState: cloud },
-  }, { dailyState: local });
-  if (cloudCoversLocal === localCoversCloud) return null;
-  return cloudCoversLocal ? 'cloud' : 'device';
+function hasOfficialResult(day) {
+  if (day?.dayStateVersion !== 1) return day?.phase === 'result';
+  const type = day.officialType;
+  const session = day.sessions?.[type];
+  return type === 'easter' ? session?.phase === 'result' : Boolean(session?.complete);
 }
 
-function describePuzzleSession(type, session) {
-  let detail = 'Puzzle not started.';
-  if (type === 'word' && session) {
-    detail = `Letters tried: ${session.guesses?.join(', ') || 'none'}.`;
-  } else if (type === 'blood' && session) {
-    const attempts = session.attempts?.length || 0;
-    detail = `${session.solved?.length || 0}/4 connections; ${attempts} ${attempts === 1 ? 'attempt' : 'attempts'}.`;
-    if (session.selected?.length) detail += ` Selected: ${session.selected.join(', ')}.`;
-    else if (session.attempts?.length) detail += ` Last trio: ${session.attempts.at(-1).join(', ')}.`;
-  } else if (type === 'easter' && session) {
-    detail = `${session.cluesRevealed || 1}/3 clues; ${session.phase === 'result'
-      ? session.isCorrect ? 'correct map' : 'incorrect map' : 'map not submitted'}.`;
-    if (session.bonusComplete || session.bonusFailed) detail += ` Bonus ${session.bonusComplete ? 'correct' : 'incorrect'}.`;
+export function chooseAccountSave(pending, account) {
+  if (pendingMatchesCloud(pending, account) || pendingCoveredByCloud(pending, account)) return 'synced';
+  const cloud = account.dailyState;
+  if (!cloud) return 'device';
+
+  const local = pending.snapshot.dailyState;
+  const localFinished = hasOfficialResult(local);
+  const cloudFinished = hasOfficialResult(cloud);
+  if (cloudFinished && !localFinished) return 'cloud';
+  if (pendingCoveredByCloud({ puzzleDate: pending.puzzleDate, snapshot: account }, pending.snapshot)) {
+    return 'device';
   }
-  return detail;
-}
 
-export function describeAccountSave(date, snapshot, otherSnapshot) {
-  const day = snapshot?.dailyState;
-  const otherDay = otherSnapshot?.dailyState;
-  if (day?.dayStateVersion === 1 && otherDay?.dayStateVersion === 1 && day.dateKey === otherDay.dateKey) {
-    const labels = { word: 'Last Words', easter: 'Quest Steps', blood: 'Blood Ties' };
-    const differentTypes = ['word', 'easter', 'blood'].filter((type) =>
-      !sameActions(puzzleActions(day.sessions?.[type]), puzzleActions(otherDay.sessions?.[type])));
-    if (differentTypes.length) return `${date} · ${differentTypes.map((type) =>
-      `${labels[type]}: ${describePuzzleSession(type, day.sessions?.[type])}`).join(' ')}`;
-  }
-  const type = day?.dayStateVersion === 1 ? day.officialType : 'easter';
-  const session = day?.dayStateVersion === 1 ? day.sessions?.[type] : day;
-  const complete = day?.officialCompleted || isLegacyComplete(day);
-  return `${date} · ${complete ? 'Daily puzzle complete. ' : ''}${describePuzzleSession(type, session)}`;
-}
-
-function isLegacyComplete(state) {
-  return state?.phase === 'result' && (state.isCorrect === false || state.bonusComplete || state.bonusFailed);
+  // Preserve an acknowledged result and avoid combining independent attempts.
+  if (cloudFinished || account.verifiedResult) return 'cloud';
+  if (localFinished || pending.revision === account.progress?.revision) return 'device';
+  return 'cloud';
 }
 
 export function archivePendingProgress(storage, pending) {
-  // Keep one recovery copy per account/day even after an explicit cloud choice.
+  // Keep one recovery copy per account/day when the cloud board is retained.
   // No authentication tokens or other accounts' progress are included.
   try {
     storage.setItem(`${pendingProgressStorageKey(pending.userId)}:recovery:${pending.puzzleDate}`,

@@ -1,21 +1,18 @@
-import { browserStorage } from "./browser-storage.js?v=20261109-8";
+import { browserStorage } from "./browser-storage.js?v=20261111-1";
 import {
   accountMemoryStorageKey,
   archivePendingProgress,
   clearPendingProgress,
   createAccountMutationQueue,
-  describeAccountSave,
+  chooseAccountSave,
   forgetRememberedAccount,
   readPendingProgress,
   readRememberedAccount,
-  pendingMatchesCloud,
-  pendingCoveredByCloud,
-  recommendedAccountSave,
   rememberAccount,
   writePendingProgress,
-} from "./account-session.js?v=20261109-8";
-import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261109-8";
-import { initialiseAccountSettings } from "./account-settings.js?v=20261109-8";
+} from "./account-session.js?v=20261111-1";
+import { isPuzzleSessionComplete } from "./daily-challenge-core.js?v=20261111-1";
+import { initialiseAccountSettings } from "./account-settings.js?v=20261111-1";
 
 function hasSupabaseConfiguration(documentObject = document) {
   const read = (name) => documentObject
@@ -213,9 +210,6 @@ export async function initialiseAccount({
   const accessDialog = documentObject.querySelector("#account-access-dialog");
   const sessionExpiredDialog = documentObject.querySelector("#account-session-expired-dialog");
   const sessionLoginButton = documentObject.querySelector("#account-session-login");
-  const conflictDialog = documentObject.querySelector("#account-progress-conflict-dialog");
-  const conflictDeviceButton = documentObject.querySelector("#account-conflict-device");
-  const conflictCloudButton = documentObject.querySelector("#account-conflict-cloud");
   const onboardingDialog = documentObject.querySelector("#account-onboarding-dialog");
   const onboardingForm = documentObject.querySelector("#account-onboarding-form");
   const onboardingError = documentObject.querySelector("#account-onboarding-error");
@@ -335,7 +329,7 @@ export async function initialiseAccount({
 
   try {
     authClient = await withTimeout(
-      import("./supabase-auth.js?v=20261109-8").then(({ loadSupabaseAuth }) => (
+      import("./supabase-auth.js?v=20261111-1").then(({ loadSupabaseAuth }) => (
         loadSupabaseAuth(documentObject)
       )),
       5_000,
@@ -397,59 +391,6 @@ export async function initialiseAccount({
     }
     openDialog(accountSignOutDialog);
   };
-  const waitForConflictChoice = (pending, cloud) => new Promise((resolve) => {
-    const recommended = recommendedAccountSave(pending, cloud);
-    for (const [choice, button, label] of [
-      ['device', conflictDeviceButton, 'Use this device'],
-      ['cloud', conflictCloudButton, 'Use cloud save'],
-    ]) {
-      if (!button) continue;
-      button.classList.toggle('primary', recommended === choice);
-      button.textContent = recommended === choice ? `${label} (recommended)` : label;
-    }
-    const deviceSummary = documentObject.querySelector('[data-conflict-device-summary]');
-    const cloudSummary = documentObject.querySelector('[data-conflict-cloud-summary]');
-    const accountSummary = documentObject.querySelector('[data-conflict-account-summary]');
-    const progress = cloud?.progress || {};
-    if (accountSummary) accountSummary.textContent = `Round ${Math.max(1, Number(progress.currentRound || 1))} · Highest Round ${Number(progress.bestRound || 1)} · Score ${Number(progress.score || 0).toLocaleString('en-GB')} · ${Number(progress.solves || 0)} solves`;
-    if (deviceSummary) deviceSummary.textContent = describeAccountSave(pending.puzzleDate, pending.snapshot, cloud);
-    if (cloudSummary) cloudSummary.textContent = describeAccountSave(pending.puzzleDate, cloud, pending.snapshot);
-    const feedback = documentObject.querySelector('[data-conflict-feedback]');
-    if (feedback) feedback.textContent = '';
-    const choose = (choice) => {
-      if (choice === 'cloud' && !archivePendingProgress(browserStorage, pending)) {
-        if (feedback) feedback.textContent = 'Could not keep a recovery copy on this device. Your pending save is still safe. Please free some browser storage and try again.';
-        return;
-      }
-      conflictDeviceButton?.removeEventListener('click', chooseDevice);
-      conflictCloudButton?.removeEventListener('click', chooseCloud);
-      closeDialog(conflictDialog);
-      resolve(choice);
-    };
-    const chooseDevice = () => choose('device');
-    const chooseCloud = () => choose('cloud');
-    conflictDeviceButton?.addEventListener('click', chooseDevice);
-    conflictCloudButton?.addEventListener('click', chooseCloud);
-    conflictDialog?.addEventListener('cancel', (event) => event.preventDefault(), { once: true });
-    openDialog(conflictDialog);
-    const focusTarget = recommended === 'device' ? conflictDeviceButton
-      : recommended === 'cloud' ? conflictCloudButton : conflictDialog?.querySelector('h2');
-    focusTarget?.focus({ preventScroll: true });
-  });
-
-  sessionLoginButton?.addEventListener("click", beginSignIn);
-  documentObject.querySelector("[data-close-session-expired]")?.addEventListener(
-    "click",
-    () => closeDialog(sessionExpiredDialog),
-  );
-
-  documentObject.querySelectorAll("[data-close-account-dialog]").forEach((button) => {
-    button.addEventListener("click", () => closeDialog(button.closest("dialog")));
-  });
-  documentObject.querySelector("[data-cancel-sign-out]")?.addEventListener(
-    "click",
-    () => closeDialog(accountSignOutDialog),
-  );
   signOutButton?.addEventListener("click", async () => {
     signOutButton.disabled = true;
     signOutButton.textContent = "Signing out…";
@@ -608,68 +549,72 @@ export async function initialiseAccount({
     }
   }
 
-  if (pendingProgress) {
-    let pendingCloud = account;
-    if (pendingProgress.puzzleDate !== puzzleDate) {
-      // Compare yesterday's queued save with yesterday's cloud puzzle, rather
-      // than comparing it with today's fresh board and inventing a conflict.
-      try {
-        pendingCloud = await requestJson(authClient, apiUrl,
-          `/api/account?date=${encodeURIComponent(puzzleDate)}&savedDate=${encodeURIComponent(pendingProgress.puzzleDate)}`);
-        account.progress = pendingCloud.progress;
-        pendingCloud.dailyState = pendingCloud.pendingDailyState;
-      } catch {
-        accountButton.disabled = false;
-        accountButton.textContent = 'Progress waiting to sync';
-        return createUnavailableController({
-          authClient, signedIn: true, openPlayerProfile,
-          scheduleSave: () => persistPendingProgress(userId, pendingProgress.revision),
-        });
-      }
+  const readCloudSave = async (savedDate) => {
+    const query = new URLSearchParams({ date: puzzleDate });
+    if (savedDate !== puzzleDate) query.set('savedDate', savedDate);
+    const cloud = await requestJson(authClient, apiUrl, `/api/account?${query}`);
+    if (savedDate === puzzleDate) return cloud;
+    return { ...cloud, dailyState: cloud.pendingDailyState, verifiedResult: null };
+  };
+  const uploadSave = (pending, baseRevision) => requestJson(authClient, apiUrl, "/api/account/save", {
+    method: "PUT",
+    keepalive: true,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      puzzleDate: pending.puzzleDate,
+      progress: pending.snapshot.progress,
+      dailyState: pending.snapshot.dailyState,
+      baseRevision,
+    }),
+  });
+  const reconcileSave = async (pending, cloud) => {
+    const choice = chooseAccountSave(pending, cloud);
+    if (choice === 'device') {
+      // Keep the previous board available when an upload is first seen after rollover.
+      if (pending.puzzleDate !== puzzleDate) archivePendingProgress(browserStorage, pending);
+      const saved = await uploadSave(pending, cloud.progress.revision);
+      return { ...cloud, progress: saved.progress, dailyState: pending.snapshot.dailyState };
     }
-    const cloudRevision = Number(account.progress?.revision || 0);
-    const revisionsMatch =
-      pendingProgress.revision != null && pendingProgress.revision === cloudRevision;
-    let useDeviceProgress = revisionsMatch;
-    const alreadySynced = pendingMatchesCloud(pendingProgress, pendingCloud);
-    const cloudCoversPending = alreadySynced || !revisionsMatch && pendingCoveredByCloud(pendingProgress, pendingCloud);
-    if (!revisionsMatch && !cloudCoversPending) {
-      useDeviceProgress = await waitForConflictChoice(pendingProgress, pendingCloud) === "device";
+    if (choice === 'cloud' && !archivePendingProgress(browserStorage, pending)) {
+      throw new Error('Could not retain the alternate puzzle save.');
     }
-
-    if (useDeviceProgress && !cloudCoversPending) {
-      try {
-        const saveResult = await requestJson(authClient, apiUrl, "/api/account/save", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            puzzleDate: pendingProgress.puzzleDate,
-            progress: pendingProgress.snapshot.progress,
-            dailyState: pendingProgress.snapshot.dailyState,
-            baseRevision: cloudRevision,
-          }),
-        });
-        account.progress = saveResult.progress;
-        if (pendingProgress.puzzleDate === puzzleDate) {
-          account.dailyState = pendingProgress.snapshot.dailyState;
-        }
-        clearPendingProgress(browserStorage, userId);
-        pendingProgress = null;
-      } catch {
-        accountButton.disabled = false;
-        accountButton.textContent = "Progress waiting to sync";
-        rememberAccount(browserStorage, { userId, revision: cloudRevision });
-        return createUnavailableController({
-          authClient,
-          signedIn: true,
-          openPlayerProfile,
-          scheduleSave: () => persistPendingProgress(userId, cloudRevision),
-        });
-      }
-    } else {
-      if (!alreadySynced) archivePendingProgress(browserStorage, pendingProgress);
+    return { ...cloud, preserveCloudBoard: choice === 'cloud' };
+  };
+  const acknowledgeSave = (pending) => {
+    const latest = readPendingProgress(browserStorage, userId);
+    if (latest?.savedAt === pending.savedAt && JSON.stringify(latest) === JSON.stringify(pending)) {
       clearPendingProgress(browserStorage, userId);
-      pendingProgress = null;
+    }
+  };
+
+  if (pendingProgress) {
+    try {
+      const sameDay = pendingProgress.puzzleDate === puzzleDate;
+      let cloud = sameDay ? account : await readCloudSave(pendingProgress.puzzleDate);
+      try {
+        cloud = await reconcileSave(pendingProgress, cloud);
+      } catch (error) {
+        if (error.status !== 409) throw error;
+        cloud = await reconcileSave(pendingProgress, await readCloudSave(pendingProgress.puzzleDate));
+      }
+      account.progress = cloud.progress;
+      if (sameDay) {
+        account.dailyState = cloud.dailyState;
+        account.verifiedResult = cloud.verifiedResult;
+      }
+      acknowledgeSave(pendingProgress);
+    } catch {
+      // Keep the queued board for the next attempt. In particular, do not
+      // replace a previously saved completion with a fresh board on this device.
+      accountButton.disabled = false;
+      accountButton.textContent = profile.username;
+      return createUnavailableController({
+        authClient, signedIn: true, openPlayerProfile,
+        scheduleSave: () => {
+          if (pendingProgress.puzzleDate !== puzzleDate) archivePendingProgress(browserStorage, pendingProgress);
+          persistPendingProgress(userId, pendingProgress.revision);
+        },
+      });
     }
   }
 
@@ -1046,8 +991,17 @@ export async function initialiseAccount({
   let currentRevision = Number(account.progress?.revision || 1);
   const queueMutation = createAccountMutationQueue();
 
+  let saveRetryAttempt = 0;
+
+  function retryPendingSave() {
+    if (readOnlyProgress || deletingAccount || !wasSignedIn ||
+        readPendingProgress(browserStorage, userId)?.puzzleDate !== puzzleDate) return;
+    globalThis.clearTimeout(saveTimer);
+    void saveNow();
+  }
+
   async function saveNow() {
-    if (readOnlyProgress || deletingAccount) return;
+    if (readOnlyProgress || deletingAccount || !wasSignedIn) return;
     if (saveInFlight) {
       saveAgain = true;
       return;
@@ -1055,34 +1009,42 @@ export async function initialiseAccount({
     saveInFlight = true;
     return queueMutation(async () => {
       try {
-        if (deletingAccount) return;
+        if (deletingAccount || !wasSignedIn) return;
         const snapshot = structuredClone(getLocalSnapshot());
-        const saveResult = await requestJson(authClient, apiUrl, "/api/account/save", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            puzzleDate,
-            progress: snapshot.progress,
-            dailyState: snapshot.dailyState,
-            baseRevision: currentRevision,
-          }),
-        });
-        currentRevision = Number(saveResult.progress?.revision || currentRevision + 1);
-        if (deletingAccount) return;
+        const pending = readPendingProgress(browserStorage, userId);
+        const outgoing = { puzzleDate, snapshot, revision: currentRevision };
+        let synced;
+        try {
+          synced = await uploadSave(outgoing, currentRevision);
+        } catch (error) {
+          if (error.status !== 409) throw error;
+          synced = await reconcileSave({ ...pending, ...outgoing, userId }, await readCloudSave(puzzleDate));
+        }
+        const { progress } = synced;
+        saveRetryAttempt = 0;
+        // The active board stays in place. Check the cloud again on the next
+        // write if its different board was retained.
+        if (!synced.preserveCloudBoard) currentRevision = Number(progress?.revision || currentRevision);
+        if (deletingAccount || !wasSignedIn) return;
         rememberAccount(browserStorage, { userId, revision: currentRevision });
-        updateProfileUnlocks(saveResult.progress);
+        updateProfileUnlocks(progress);
         if (JSON.stringify(getLocalSnapshot()) === JSON.stringify(snapshot)) {
-          applyRemoteProgress(saveResult.progress);
-          clearPendingProgress(browserStorage, userId);
+          applyRemoteProgress(progress);
+          if (pending?.puzzleDate === puzzleDate && JSON.stringify(pending.snapshot) === JSON.stringify(snapshot)) {
+            acknowledgeSave(pending);
+          }
         } else {
           // New input arrived during the request. Acknowledge only what was sent.
           persistPendingProgress(userId, currentRevision);
           saveAgain = true;
         }
-        accountButton.textContent = profile.username;
-      } catch {
-        // The pending snapshot remains durable for a later retry.
-        accountButton.textContent = "Progress waiting to sync";
+      } catch (error) {
+        if ((!error.status || error.status === 409 || error.status === 429 || error.status >= 500) &&
+            saveRetryAttempt < 5 && !deletingAccount && wasSignedIn) {
+          const delay = 1_000 * 2 ** saveRetryAttempt++;
+          globalThis.clearTimeout(saveTimer);
+          saveTimer = globalThis.setTimeout(retryPendingSave, delay);
+        }
       } finally {
         saveInFlight = false;
         if (saveAgain) {
@@ -1094,10 +1056,18 @@ export async function initialiseAccount({
   }
 
   function scheduleSave() {
-    if (readOnlyProgress || deletingAccount) return;
+    if (readOnlyProgress || deletingAccount || !wasSignedIn) return;
     persistPendingProgress(userId, currentRevision);
     globalThis.clearTimeout(saveTimer);
     saveTimer = globalThis.setTimeout(saveNow, 350);
+  }
+
+  if (!readOnlyProgress) {
+    globalThis.addEventListener?.('online', retryPendingSave);
+    globalThis.addEventListener?.('pagehide', retryPendingSave);
+    documentObject.addEventListener('visibilitychange', () => {
+      if (documentObject.visibilityState === 'visible') retryPendingSave();
+    });
   }
 
   async function recordResult(path, payload) {
@@ -1107,23 +1077,24 @@ export async function initialiseAccount({
       return null;
     }
     return queueMutation(async () => {
-      if (deletingAccount) return null;
+      if (deletingAccount || !wasSignedIn) return null;
       try {
         const result = await requestJson(authClient, apiUrl, path, {
           method: "POST",
+          keepalive: true,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload),
         });
         currentRevision = Math.max(currentRevision, Number(result.progress?.revision || 0));
-        if (deletingAccount) return null;
+        if (deletingAccount || !wasSignedIn) return null;
         rememberAccount(browserStorage, { userId, revision: currentRevision });
         updateProfileUnlocks(result.progress);
         applyRemoteProgress(result.progress);
         scheduleSave();
         return result;
       } catch {
-        persistPendingProgress(userId, currentRevision);
-        accountButton.textContent = 'Progress waiting to sync';
+        // The completed board can also be verified by the server when its save arrives.
+        scheduleSave();
         return null;
       }
     });

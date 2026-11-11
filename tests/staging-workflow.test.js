@@ -696,7 +696,56 @@ test('recovery verifies map bonuses, Blood Ties attempts and failures, and leave
 
 const accountRequest = (body) => new Request('https://test.invalid/api/account/save', {method:'PUT',body:JSON.stringify(body)});
 
-test('choosing a local Round 4 puzzle never changes a verified Round 50, its achievements or leaderboard', async (t) => {
+test('a completed board received on time credits the win even when the result request is lost', async (t) => {
+  t.mock.timers.enable({ apis: ['Date'], now: new Date('2026-11-10T23:59:55Z') });
+  const options = { production: true, bloodTies: true };
+  for (const [type, date] of [['easter', '2026-10-27'], ['word', '2026-10-31'], ['blood', '2026-11-10']]) {
+    const db = await database();
+    try {
+      const played = Date.parse(date + 'T23:59:55Z');
+      t.mock.timers.setTime(played);
+      const previous = new Date(played - 86_400_000).toISOString().slice(0, 10);
+      db.sqlite.exec(`INSERT INTO player_profiles(user_id, username) VALUES ('on-time', 'OnTime'), ('late', 'Late');
+        INSERT INTO player_saves(user_id, score, current_round, best_round, last_played_date, round_anchor_date, round_anchor_value)
+        VALUES ('on-time', 500, 9, 9, '${previous}', '${previous}', 9), ('late', 500, 9, 9, '${previous}', '${previous}', 9)`);
+      let session;
+      if (type === 'easter') {
+        const puzzle = buildDailyPuzzle(date, workerMaps);
+        session = { puzzleKey: puzzle.key, phase: 'result', selectedMapId: puzzle.map.id, lockedClues: 1,
+          isCorrect: true, bonusComplete: true, bonusOrder: puzzle.chronologicalSteps.map(step => step.id) };
+      } else if (type === 'word') {
+        const puzzle = buildDailyWordPuzzle(date, workerWords);
+        session = { key: puzzle.key, complete: true, guesses: [...new Set(puzzle.entry.answer.toUpperCase().match(/[A-Z]/g))] };
+      } else {
+        const puzzle = buildDailyBloodTiesPuzzle(date, options);
+        session = { key: puzzle.key, complete: true, attempts: puzzle.groups.map(group => group.answers), rulesVersion: 4 };
+      }
+      const dailyState = { dayStateVersion: 1, dateKey: date, officialType: type, officialCompleted: true, sessions: { [type]: session } };
+      const request = (baseRevision) => accountRequest({ puzzleDate: date, dailyState, baseRevision });
+      const saved = await saveAccount(db, request(1), 'on-time', options);
+      assert.equal(saved.status, 200);
+      assert.equal(saved.body.progress.currentRound, 10, type);
+      assert.equal(saved.body.progress.score, 600, type);
+      assert.equal(saved.body.progress.solves, 1, type);
+      assert.equal(saved.body.progress.lastPlayedDate, date, type);
+      const duplicate = await saveAccount(db, request(saved.body.progress.revision), 'on-time', options);
+      assert.equal(duplicate.body.progress.score, 600);
+      assert.equal(duplicate.body.progress.solves, 1);
+
+      t.mock.timers.setTime(played + 10_000);
+      const late = await saveAccount(db, request(1), 'late', options);
+      assert.equal(late.status, 200);
+      assert.equal(late.body.progress.currentRound, 1);
+      assert.equal(late.body.progress.score, 500);
+      assert.equal((await getAccount(db, 'late', new Date().toISOString().slice(0, 10), date, options)).body.pendingDailyState.officialCompleted, true);
+      assert.equal(db.sqlite.prepare("SELECT COUNT(*) AS count FROM player_daily_results WHERE user_id = 'late'").get().count, 0);
+    } finally {
+      db.sqlite.close();
+    }
+  }
+});
+
+test('saving a local Round 4 puzzle never changes a verified Round 50, its achievements or leaderboard', async (t) => {
   const db=await database(); t.after(()=>db.sqlite.close());
   t.mock.timers.enable({apis:['Date'],now:new Date('2026-10-31T12:00:00Z')});
   db.sqlite.exec("INSERT INTO player_profiles(user_id,username) VALUES ('protected-run','ProtectedRun'); INSERT INTO player_saves(user_id,current_round,best_round,score,total_rounds,last_played_date,round_anchor_date,round_anchor_value) VALUES ('protected-run',50,60,7000,80,'2026-10-30','2026-10-30',50)");

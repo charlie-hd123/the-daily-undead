@@ -1,5 +1,5 @@
 import { bloodTiesCatalogueQuarter, readCompiledBloodTiesPuzzle } from './blood-ties-compiled.js';
-import { bloodTiesCatalogueUrls } from './blood-ties-catalogue-assets.js?v=20261109-8';
+import { bloodTiesCatalogueUrls } from './blood-ties-catalogue-assets.js?v=20261111-1';
 
 export { createBloodTiesSession, normalizeBloodTiesSession, replayBloodTiesAttempts } from './blood-ties-rules.js';
 
@@ -38,7 +38,7 @@ export async function loadBloodTiesPuzzles(dateKeys, { production, fetchImpl = g
     }
     // Keep the original schedule available for dates outside the compiled range
     // and for pages that cannot fetch or verify a package.
-    const { buildDailyBloodTiesPuzzle } = await import('./blood-ties-core.js?v=20261109-8');
+    const { buildDailyBloodTiesPuzzle } = await import('./blood-ties-core.js?v=20261111-1');
     return buildDailyBloodTiesPuzzle(dateKey, { production });
   }));
 }

@@ -799,6 +799,7 @@ export async function getPublicProfile(db, username) {
 }
 
 export async function saveAccount(db, request, userId, options = {}) {
+  const receivedAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
   const body = await readJsonBody(request);
   const progress = sanitizeProgress(body.progress);
   const baseRevision = Number.isInteger(body.baseRevision) && body.baseRevision > 0
@@ -830,13 +831,13 @@ export async function saveAccount(db, request, userId, options = {}) {
     statements.push(
       db
         .prepare(
-          `INSERT INTO player_daily_saves (user_id, puzzle_date, state_json)
-          SELECT ?, ?, ? WHERE changes() > 0
+          `INSERT INTO player_daily_saves (user_id, puzzle_date, state_json, updated_at)
+          SELECT ?, ?, ?, ? WHERE changes() > 0
           ON CONFLICT (user_id, puzzle_date) DO UPDATE SET
             state_json = excluded.state_json,
-            updated_at = CURRENT_TIMESTAMP`,
+            updated_at = excluded.updated_at`,
         )
-        .bind(userId, puzzleDate, JSON.stringify(dailyState)),
+        .bind(userId, puzzleDate, JSON.stringify(dailyState), receivedAt),
     );
   }
 
@@ -853,6 +854,13 @@ export async function saveAccount(db, request, userId, options = {}) {
         progress: rowToProgress(current),
       },
     };
+  }
+  if (dailyState && puzzleDate === receivedAt.slice(0, 10)) {
+    const type = getOfficialPuzzleType(puzzleDate, options);
+    const session = dailyState.dayStateVersion === 1 ? dailyState.sessions[type] : dailyState;
+    if (type === 'easter' ? session?.phase === 'result' : isPuzzleSessionComplete(type, session)) {
+      await recoverSavedAccountResults(db, userId, options);
+    }
   }
   const saved = await db
     .prepare("SELECT * FROM player_saves WHERE user_id = ?")

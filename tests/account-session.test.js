@@ -1,17 +1,17 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { registerHooks } from "node:module";
 
 import {
   accountMemoryStorageKey,
   archivePendingProgress,
   clearPendingProgress,
   createAccountMutationQueue,
-  describeAccountSave,
+  chooseAccountSave,
   forgetRememberedAccount,
   pendingProgressBelongsTo,
   pendingMatchesCloud,
   pendingCoveredByCloud,
-  recommendedAccountSave,
   readPendingProgress,
   readRememberedAccount,
   rememberAccount,
@@ -19,6 +19,7 @@ import {
 } from "../js/account-session.js";
 import {
   confirmAccountResultSubmission,
+  initialiseAccount,
   requestJson,
   replaySavedAccountResult,
 } from "../js/account.js";
@@ -77,14 +78,6 @@ test('choosing cloud can retain the rejected device snapshot as an account-isola
   assert.equal(storage.getItem('the-daily-undead:account-pending:user_beta:recovery:2026-10-30'), null);
 });
 
-test('save summaries distinguish different puzzle actions even when the account totals match', () => {
-  const make = (guesses) => ({progress:{score:160,solves:2,currentRound:1},dailyState:{dayStateVersion:1,officialType:'word',sessions:{word:{guesses}}}});
-  const device=describeAccountSave('2026-10-31',make(['G']));
-  const cloud=describeAccountSave('2026-10-31',make(['E']));
-  assert.match(device,/Letters tried: G/); assert.match(cloud,/Letters tried: E/);
-  assert.notEqual(device,cloud); assert.doesNotMatch(cloud,/Round|Score|solves/);
-});
-
 const wordDay = (guesses) => ({dayStateVersion:1,dateKey:'2026-10-31',officialType:'word',
   sessions:{word:{key:'2026-10-31:word:example',guesses}}});
 const queuedDay = (dailyState) => ({puzzleDate:'2026-10-31',snapshot:{progress:{currentRound:4},dailyState}});
@@ -100,32 +93,26 @@ test('cloud progress automatically covers an older prefix, regardless of stale l
   assert.equal(pendingCoveredByCloud(queuedDay(wordDay(['E'])),{dailyState:wrongPuzzle}),false);
 });
 
-test('save recommendations require strictly inclusive puzzle progress, never a larger round or score', () => {
-  const pending=queuedDay(wordDay(['E','G']));
-  const cloud={progress:{currentRound:50,score:9000},dailyState:wordDay(['E'])};
-  assert.equal(recommendedAccountSave(pending,cloud),'device');
-  pending.snapshot.dailyState=wordDay(['E']);cloud.dailyState=wordDay(['E','G']);
-  assert.equal(recommendedAccountSave(pending,cloud),'cloud');
-  pending.snapshot.dailyState=wordDay(['E','S']);
-  assert.equal(recommendedAccountSave(pending,cloud),null,'different histories cannot be ranked safely');
-  pending.snapshot.dailyState=wordDay(['E','G']);
-  assert.equal(recommendedAccountSave(pending,cloud),null,'identical actions need no recommendation');
-  assert.equal(recommendedAccountSave(pending,{dailyState:null}),null,'missing evidence cannot justify a highlighted choice');
+test('reconciliation keeps the more advanced board independent of Round and revision', () => {
+  const pending = { ...queuedDay(wordDay(['E', 'G'])), revision: 9 };
+  const cloud = { progress: { revision: 10, currentRound: 1 }, dailyState: wordDay(['E']) };
+  assert.equal(chooseAccountSave(pending, cloud), 'device');
+  assert.equal(chooseAccountSave(pending, { ...cloud, dailyState: null }), 'device');
+  cloud.dailyState = wordDay(['E', 'G', 'S']);
+  assert.equal(chooseAccountSave(pending, cloud), 'synced');
+  cloud.dailyState = wordDay(['S']);
+  assert.equal(chooseAccountSave(pending, cloud), 'cloud');
+
+  pending.snapshot.dailyState.sessions.word.complete = true;
+  assert.equal(chooseAccountSave(pending, cloud), 'device', 'a finished device board survives an unrelated revision');
+  assert.equal(chooseAccountSave(pending, { ...cloud, verifiedResult: {} }), 'cloud');
+  cloud.dailyState.sessions.word.complete = true;
+  assert.equal(chooseAccountSave(pending, cloud), 'cloud', 'two independent completed boards keep the cloud result');
+  pending.snapshot.dailyState.sessions.word.complete = false;
+  assert.equal(chooseAccountSave({ ...pending, revision: 10 }, cloud), 'cloud', 'an incomplete board cannot replace a completed one');
 });
 
-test('conflict summaries show the differing just-for-fun puzzle instead of identical official results', () => {
-  const local={dailyState:wordDay(['E'])},cloud=structuredClone(local);
-  local.dailyState.officialCompleted=true;cloud.dailyState.officialCompleted=true;
-  local.dailyState.sessions.blood={key:'blood-key',rulesVersion:3,attempts:[['A','B','C']],solved:['group'],selected:[]};
-  cloud.dailyState.sessions.blood={key:'blood-key',rulesVersion:3,attempts:[],solved:[],selected:[]};
-  const localSummary=describeAccountSave('2026-10-31',local,cloud);
-  const cloudSummary=describeAccountSave('2026-10-31',cloud,local);
-  assert.match(localSummary,/Blood Ties: 1\/4 connections; 1 attempt\./);
-  assert.match(cloudSummary,/Blood Ties: 0\/4 connections; 0 attempts/);
-  assert.doesNotMatch(localSummary,/Letters tried|Daily puzzle complete/);
-});
-
-test('new just-for-fun actions and independent Blood Ties transcripts still require a choice', () => {
+test('cloud coverage distinguishes independent just-for-fun and Blood Ties attempts', () => {
   const local=wordDay(['E']),cloud=wordDay(['E','G']);
   local.sessions.blood={key:'blood-key',rulesVersion:3,attempts:[['A','B','C']],selected:[]};
   cloud.sessions.blood={key:'blood-key',rulesVersion:3,attempts:[],selected:[]};
@@ -350,4 +337,77 @@ test("a completed Quest Steps result replays after cloud sanitizing removed its 
 
   assert.deepEqual(calls.map(([type]) => type), ["map"]);
   assert.deepEqual(progress, { score: 80, solves: 4 });
+});
+
+test('an interrupted result retries the saved board on reconnect and restores progress without a prompt', async (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const userId = 'acct_' + '1'.repeat(32);
+  const puzzleDate = '2026-10-31';
+  const win = new EventTarget();
+  win.location = { origin: 'https://game.test', pathname: '/' };
+  const button = new EventTarget();
+  button.classList = { add() {} };
+  const documentObject = new EventTarget();
+  const elements = new Map([
+    ['#account-button', button],
+    ['meta[name="daily-undead-supabase-url"]', { content: 'https://test.supabase.co' }],
+    ['meta[name="daily-undead-supabase-publishable-key"]', { content: 'sb_publishable_test' }],
+  ]);
+  documentObject.querySelector = (selector) => elements.get(selector) ?? null;
+  documentObject.querySelectorAll = () => [];
+  t.mock.method(globalThis, 'fetch', async (url, options) => {
+    requests.push([url.pathname, options.method, options.keepalive]);
+    if (url.pathname === '/api/account') return Response.json(account);
+    if (!online) throw new TypeError('offline');
+    assert.equal(url.pathname, '/api/account/save');
+    assert.equal(JSON.parse(options.body).dailyState.sessions.word.complete, true);
+    return Response.json({ progress: recovered });
+  });
+  const previousWindow = globalThis.window;
+  const previousListener = globalThis.addEventListener;
+  globalThis.window = win;
+  globalThis.addEventListener = win.addEventListener.bind(win);
+  const auth = registerHooks({
+    resolve(specifier, context, nextResolve) {
+      if (!specifier.startsWith('./supabase-auth.js?')) return nextResolve(specifier, context);
+      const source = `export async function loadSupabaseAuth() {
+        return { isSignedIn: true, user: { id: '${userId}' }, addListener() {},
+          session: { getToken: async () => 'fake-session' } };
+      }`;
+      return { shortCircuit: true, url: `data:text/javascript,${encodeURIComponent(source)}` };
+    },
+  });
+  t.after(() => {
+    auth.deregister();
+    globalThis.window = previousWindow;
+    globalThis.addEventListener = previousListener;
+  });
+
+  const account = { profile: { username: 'Synthetic' }, progress: { currentRound: 9, score: 800, revision: 2 } };
+  const recovered = { currentRound: 10, score: 900, revision: 4 };
+  let snapshot = { dailyState: wordDay(['E']), progress: account.progress };
+  let online = true;
+  const requests = [];
+  let acknowledge;
+  const synced = new Promise((resolve) => { acknowledge = resolve; });
+  const controller = await initialiseAccount({
+    apiUrl: 'https://api.test', puzzleDate, documentObject,
+    getLocalSnapshot: () => snapshot, applyRemoteAccount() {},
+    applyRemoteProgress(progress) { acknowledge(progress); },
+  });
+
+  online = false;
+  snapshot = { ...snapshot, dailyState: wordDay(['E', 'G']) };
+  snapshot.dailyState.sessions.word.complete = true;
+  await controller.recordWordResult({ puzzleDate });
+  assert.equal(button.textContent, 'Synthetic');
+  online = true;
+  win.dispatchEvent(new Event('online'));
+  assert.deepEqual(await synced, recovered);
+  assert.deepEqual(requests, [
+    ['/api/account', undefined, undefined],
+    ['/api/account/results/word', 'POST', true],
+    ['/api/account/save', 'PUT', true],
+  ]);
+  assert.equal(button.textContent, 'Synthetic');
 });

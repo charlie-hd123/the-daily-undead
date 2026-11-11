@@ -257,7 +257,7 @@ test("account controls support optional sign-in without exposing private credent
   assert.match(html, /<h2>Session has expired<\/h2>/);
   assert.match(html, /id="account-session-login"[^>]*>Log in<\/button>/);
   assert.match(html, /Your existing cloud save is safe\./);
-  assert.match(html, /id="account-progress-conflict-dialog"/);
+  assert.doesNotMatch(html, /id="account-progress-conflict-dialog"/);
   assert.match(account, /accountButton\.textContent = "Session expired";/);
   assert.equal((appScript.match(/confirmAccountResultSubmission\(accountController\)/g) || []).length, 4);
   assert.match(account, /await replaySavedAccountResult/);
